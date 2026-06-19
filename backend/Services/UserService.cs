@@ -1,7 +1,10 @@
-﻿using backend.Data;
+﻿using Azure.Core;
+using backend.Data;
 using backend.Domain;
 using backend.Services.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace backend.Services
 {
@@ -27,7 +30,6 @@ namespace backend.Services
                 .Where(uf => uf.UserId == userId)
                 .Select(uf => uf.Friend)
                 .ToListAsync();
-
         }
     }
 }

@@ -15,8 +15,8 @@ namespace backend.Data
         public DbSet<Message> Messages { get; set; }
         public DbSet<UserFriends> UserFriends { get; set; }
         public DbSet<FriendRequest> FriendRequests { get; set; }
-
-
+        public DbSet<EmailVerfication> EmailVerfications { get; set; }
+        public DbSet<MatchHistory> MatchHistories { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // tokens

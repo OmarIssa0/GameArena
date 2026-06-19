@@ -1,6 +1,6 @@
 "use client";
 
-import { api } from "@/app/network";
+import api from "@/app/network";
 import CustomAnimation from "@/component/animation";
 import TButton from "@/component/custom_button";
 import { useRouter } from "next/navigation";
@@ -47,7 +47,7 @@ export default function OtpPage(props: { email?: string }) {
         setLoading(true);
         try {
             await new Promise((r) => setTimeout(r, 800));
-            api.post("api/email-verification/verify", { otp, email: props.email || "" });
+            await api.post("/email-verification/verify", { otp, email: props.email || "" });
             router.replace("/home");
         } catch {
             setError("Invalid code. Try again.");
@@ -55,6 +55,7 @@ export default function OtpPage(props: { email?: string }) {
             setLoading(false);
         }
     };
+
 
     return (
         <div className="min-h-screen flex">

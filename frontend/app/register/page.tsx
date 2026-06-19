@@ -6,7 +6,7 @@ import CustomAnimation from "@/component/animation";
 import CustomDivider from "@/component/custom_divider";
 import SignInAnther from "@/component/sign_in_anther";
 import { useState } from "react";
-import { api } from "../network";
+import api from "../network";
 import { useRouter } from "next/navigation";
 import OtpPage from "../../component/page";
 
@@ -28,7 +28,7 @@ export default function Register() {
             }
             setLoading(true);
             console.log(email, password, firstName, lastName, username);
-            await api.post("api/auth/register", {
+            await api.post("/auth/register", {
                 email: email,
                 password: password,
                 firstName: firstName,
@@ -42,6 +42,7 @@ export default function Register() {
             setLoading(false);
         }
     };
+
 
     if (showOtp) {
         return <OtpPage email={email} />;

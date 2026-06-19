@@ -7,22 +7,13 @@ import CustomDivider from "@/component/custom_divider";
 import SignInAnther from "@/component/sign_in_anther";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { api } from "../network";
-import { request } from "https";
+import api from "../network";
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  useEffect(() => {
-      const Router = useRouter();
-        const accessToken = request.cookies.get("Access-token")?.value;
-        if (!accessToken && (!request.nextUrl.pathname.startsWith("/login")
-            || request.nextUrl.pathname.startsWith("/register") )) {
-            return Router.replace("/login");
-        }
-  }, []);
   const router = useRouter();
   const login = async () => {
     try {
@@ -30,10 +21,9 @@ export default function Login() {
         return;
       }
       setLoading(true);
-      console.log(email, password);
-      await api.post("api/auth/login", {
+      await api.post("/auth/login", {
         email: email,
-        password: password
+        password: password,
       });
       router.replace("/home");
     } catch (error) {
@@ -42,6 +32,7 @@ export default function Login() {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen flex bg">
@@ -70,18 +61,27 @@ export default function Login() {
             />
 
             <div className="flex items-center justify-between">
-
-              <a href="#" className="text-sm text-primary font-medium hover:underline">
+              <a
+                href="#"
+                className="text-sm text-primary font-medium hover:underline"
+              >
                 Forgot password?
               </a>
             </div>
 
-            <TButton title={loading ? "Logging in..." : "Sign in"} disabled={loading} onClick={login} />
+            <TButton
+              title={loading ? "Logging in..." : "Sign in"}
+              disabled={loading}
+              onClick={login}
+            />
           </form>
 
           <p className="text-center text-sm text-text-secondary mt-8">
             Don&apos;t have an account?{" "}
-            <a href="/register" className="text-primary font-medium hover:underline">
+            <a
+              href="/register"
+              className="text-primary font-medium hover:underline"
+            >
               Register
             </a>
           </p>

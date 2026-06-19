@@ -50,10 +50,11 @@ namespace backend.Auth
                 issuer: configuration.GetValue<string>("JWT:Issuer"),
                 audience: configuration.GetValue<string>("JWT:Audience"),
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(15),
+                expires: DateTime.UtcNow.AddMinutes(1000),
                 signingCredentials: creds
             );
             return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
         }
+
     }
 }

@@ -3,6 +3,7 @@ using backend.Data;
 using backend.Hubs;
 using backend.Services;
 using backend.Services.Interface;
+using ChatWebSignalR.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -14,9 +15,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // Database
+builder.Services.AddDbContextFactory<AppDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")),
+    ServiceLifetime.Scoped); // Force the factory options to match the scoped context
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 // Authentication & Authorization
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -38,11 +42,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             OnMessageReceived = context =>
             {
-                var token =
-                    context.Request.Cookies["accessToken"]
-                    ?? context.Request.Query["access_token"];
-
-                context.Token = token;
+                var token = context.Request.Cookies["access_token"];
+                if (!string.IsNullOrEmpty(token))
+                    context.Token = token;
                 return Task.CompletedTask;
             }
         };
@@ -71,7 +73,11 @@ builder.Services.AddCors(options =>
 // === Application Layer (Feature Services) ===
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IEmailVerificationService, EmailVerificationService>();
 
+// to avoid thread safety issues, we can use singleton for GameService since it will be used in SignalR hub
+builder.Services.AddScoped<IGameService, GameService>();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -86,6 +92,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<ChatHub>("/chatHub");
-// app.MapHub<GameHub>("/gameHub");
+app.MapHub<GameHub>("/gameHub");
 
 app.Run();

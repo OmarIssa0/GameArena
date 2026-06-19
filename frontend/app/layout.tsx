@@ -1,9 +1,7 @@
-import { Sidebar } from "lucide-react";
 import "./globals.css";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { SocialPanel } from "@/component/social_media";
-
+import { AuthProvider } from "./AuthProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,22 +15,22 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "GameArena",
-  description: "A Tailwind-powered chat and friends dashboard",
+  description: "Game platform",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full">
-        {children}
+      <body className="min-h-full bg-slate-950 text-white">
+        <AuthProvider>{children}</AuthProvider>
       </body>
-    </html >
+    </html>
   );
 }

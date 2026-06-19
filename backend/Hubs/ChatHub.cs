@@ -21,36 +21,12 @@ namespace backend.Hubs
         {
             _context = context;
         }
-        public override Task OnConnectedAsync()
-        {
-            var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (userId != null)
-                ConnectionManager.Add(userId, Context.ConnectionId);
-            else 
-                 throw new Exception("User ID not found in claims. Connection cannot be established.");
-            return base.OnConnectedAsync();
-        }
-
-        public override Task OnDisconnectedAsync(Exception? exception)
-        {
-            var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (userId != null)
-                ConnectionManager.Remove(userId, Context.ConnectionId);
-            else 
-                 throw new Exception("User ID not found in claims. Disconnection cannot be processed properly.");
-            return base.OnDisconnectedAsync(exception);
-        }
         public async Task SendGlobalMessage(string message)
         {
-            var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if(userId is null) 
-                throw new Exception("User ID not found in claims. Cannot send global message.");
             var payload = new
             {
                 type = "global",
-                userId,
 
                 message,
                 sentAt = DateTime.UtcNow

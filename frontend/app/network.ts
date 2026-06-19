@@ -1,60 +1,72 @@
-import axios from 'axios';
+import axios from "axios";
 
-export const authConfig = {
-  refreshEndpoint: '/auth/refresh',
-  onSessionExpired: () => {
-    window.location.href = '/login';
-  }
-};
-
-let isRefreshing = false;
-let failedQueue: { resolve: (v: unknown) => void; reject: (e: unknown) => void }[] = [];
-
-export const api = axios.create({
-  baseURL: 'https://gently-squeamish-chaffing.ngrok-free.dev/',
+const api = axios.create({
+  baseURL: "https://localhost:7127/api",
   withCredentials: true,
 });
 
+let isRefreshing = false;
+let queue: Array<{
+  resolve: () => void;
+  reject: (err: any) => void;
+}> = [];
+
+const flushQueue = (error?: any) => {
+  queue.forEach((p) => (error ? p.reject(error) : p.resolve()));
+  queue = [];
+};
+
 api.interceptors.response.use(
   (res) => res,
-  async (err) => {
-    const originalRequest = err.config;
 
-    if (err.response?.status !== 401 || originalRequest._retry) {
-      // If already retried and still 401 → session is dead
-      if (originalRequest._retry && err.response?.status === 401) {
-        authConfig.onSessionExpired();
-      }
-      return Promise.reject(err);
+  async (error) => {
+    const original = error.config;
+
+    if (
+      error.response?.status !== 401 ||
+      original._retry ||
+      original.url.includes("/auth/login") ||
+      original.url.includes("/auth/register") ||
+      original.url.includes("/auth/refresh") ||
+      original.url.includes("/auth/logout")
+    ) {
+      return Promise.reject(error);
     }
 
-    // Queue requests while refreshing
+    original._retry = true;
+
     if (isRefreshing) {
-      return new Promise((resolve, reject) => failedQueue.push({ resolve, reject }))
-        .then(() => api(originalRequest))
-        .catch((e) => Promise.reject(e));
+      return new Promise((resolve, reject) => {
+        queue.push({
+          resolve: () => resolve(api(original)),
+          reject,
+        });
+      });
     }
 
-    originalRequest._retry = true;
     isRefreshing = true;
 
     try {
-      await axios.post(
-        `${api.defaults.baseURL}${authConfig.refreshEndpoint}`,
-        {},
-        { withCredentials: true }
-      );
+      await api.post("/auth/refresh");
+      flushQueue();
+      return api(original);
+    } catch (err) {
+      flushQueue(err);
 
-      failedQueue.forEach((q) => q.resolve(undefined));
-      failedQueue = [];
-      return api(originalRequest);
-    } catch {
-      failedQueue.forEach((q) => q.reject(err));
-      failedQueue = [];
-      authConfig.onSessionExpired();
+      if (
+        typeof window !== "undefined" &&
+        window.location.pathname !== "/login" &&
+        window.location.pathname !== "/register"
+      ) {
+        window.location.replace("/login");
+      }
+
       return Promise.reject(err);
     } finally {
       isRefreshing = false;
     }
-  }
+  },
 );
+
+export default api;
+

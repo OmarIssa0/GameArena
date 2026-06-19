@@ -29,23 +29,74 @@ namespace backend.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            var response = await _authService.LoginAsync(request);
+            try
+            {
+                var response = await _authService.LoginAsync(request);
 
-            if (response is null)
-                return Unauthorized(new { message = "Invalid email or password" });
+                if (response == null)
+                    return Unauthorized(new { message = "Invalid email or password" });
 
-            return Ok(response);
+                SetAuthCookies(response);
+
+                return Ok(new { message = "ok" });
+            }
+            catch (Exception ex) when (ex.Message == "EMAIL_NOT_VERIFIED")
+            {
+                return Unauthorized(new { message = "Verify your email first" });
+            }
         }
-
-        [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest request)
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
         {
-            var response = await _authService.RefreshAccessTokenAsync(request.RefreshToken);
+            var refreshToken = Request.Cookies["refresh_token"];
+
+            if (!string.IsNullOrEmpty(refreshToken))
+            {
+                await _authService.RevokeRefreshTokenAsync(refreshToken);
+            }
+
+            Response.Cookies.Delete("access_token");
+            Response.Cookies.Delete("refresh_token");
+
+            return Ok(new { message = "Logged out" });
+        }
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh()
+        {
+            var refreshToken = Request.Cookies["refresh_token"];
+
+            if (string.IsNullOrEmpty(refreshToken))
+                return Unauthorized();
+
+            var response = await _authService.RefreshAccessTokenAsync(refreshToken);
 
             if (response is null)
-                return Unauthorized(new { message = "Invalid or expired refresh token" });
+                return Unauthorized();
 
-            return Ok(response);
+            SetAuthCookies(response);
+
+            return Ok();
+        }
+        private void SetAuthCookies(AuthResponse response)
+        {
+            var accessOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Expires = DateTime.UtcNow.AddMinutes(15)
+            };
+
+            var refreshOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.None,
+                Expires = DateTime.UtcNow.AddDays(7)
+            };
+
+            Response.Cookies.Append("access_token", response.AccessToken, accessOptions);
+            Response.Cookies.Append("refresh_token", response.RefreshToken, refreshOptions);
         }
     }
 }

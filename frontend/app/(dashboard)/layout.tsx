@@ -1,7 +1,29 @@
+"use client";
+
+import { useAuth } from "@/app/AuthProvider";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { Sidebar } from "@/component/side_bar";
 import { SocialPanel } from "@/component/social_media";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+    const { user, loading } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!loading && !user) {
+            router.replace("/login");
+        }
+    }, [loading, user, router]);
+
+    if (loading || !user) {
+        return (
+            <div className="flex h-screen w-screen bg-bg-dark items-center justify-center">
+                <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary"></div>
+            </div>
+        );
+    }
+
     return (
         <div className="flex h-screen w-screen bg-bg-dark text-text overflow-hidden font-sans antialiased">
             <Sidebar />
@@ -25,3 +47,4 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
     );
 }
+
