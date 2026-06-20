@@ -5,8 +5,12 @@ import CustomAnimation from "@/component/animation";
 import TButton from "@/component/custom_button";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { useTranslation } from "@/Hooks/useTranslation";
+import ar from "./i18n/otp.ar.i18n";
+import en, { TOtpTranslation } from "./i18n/otp.en.i18n";
 
 export default function OtpPage(props: { email?: string }) {
+    const t = useTranslation({ en, ar }) as TOtpTranslation;
     const [code, setCode] = useState(["", "", "", "", "", ""]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -43,14 +47,14 @@ export default function OtpPage(props: { email?: string }) {
 
     const verifyOtp = async () => {
         const otp = code.join("");
-        if (otp.length < 6) { setError("Enter the full 6-digit code"); return; }
+        if (otp.length < 6) { setError(t.enterFull); return; }
         setLoading(true);
         try {
             await new Promise((r) => setTimeout(r, 800));
             await api.post("/email-verification/verify", { otp, email: props.email || "" });
             router.replace("/home");
         } catch {
-            setError("Invalid code. Try again.");
+            setError(t.invalidCode);
         } finally {
             setLoading(false);
         }
@@ -59,13 +63,13 @@ export default function OtpPage(props: { email?: string }) {
 
     return (
         <div className="min-h-screen flex">
-            <CustomAnimation title="Verify It's You" pathAnimation="/game.json" />
+            <CustomAnimation title={t.verifyTitle} pathAnimation="/game.json" />
 
             <div className="flex-1 lg:w-1/2 flex items-center justify-center p-6">
                 <div className="w-full max-w-sm">
-                    <h1 className="text-3xl font-bold text-text mb-1">Verify OTP</h1>
+                    <h1 className="text-3xl font-bold text-text mb-1">{t.title}</h1>
                     <p className="text-text-secondary mb-8 text-sm">
-                        Enter the 6-digit code sent to your email
+                        {t.subtitle}
                     </p>
 
                     <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
@@ -96,16 +100,16 @@ export default function OtpPage(props: { email?: string }) {
                         )}
 
                         <TButton
-                            title={loading ? "Verifying..." : "Verify Code"}
+                            title={loading ? t.verifying : t.verify}
                             disabled={loading}
                             onClick={verifyOtp}
                         />
                     </form>
 
                     <p className="text-center text-sm text-text-secondary mt-8">
-                        Didn&apos;t receive the code?{" "}
+                        {t.noCode}{" "}
                         <button className="text-primary font-medium hover:underline bg-transparent border-none cursor-pointer">
-                            Resend
+                            {t.resend}
                         </button>
                     </p>
                 </div>

@@ -9,9 +9,13 @@ import { useState } from "react";
 import api from "../network";
 import { useRouter } from "next/navigation";
 import OtpPage from "../../component/page";
+import { useTranslation } from "@/Hooks/useTranslation";
+import ar from "./i18n/ar.i18n";
+import en, { TRegisterTranslation } from "./i18n/en.i18n";
 
 
 export default function Register() {
+    const t = useTranslation({ en, ar }) as TRegisterTranslation;
     const [loading, setLoading] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -49,33 +53,33 @@ export default function Register() {
     } else
         return (
             <div className="min-h-screen flex">
-                <CustomAnimation title="Join Us Today" />
+                <CustomAnimation title={t.joinUs} />
 
                 <div className="flex-1 lg:w-1/2 flex items-center justify-center p-6">
                     <div className="w-full max-w-sm">
 
                         <h1 className="text-3xl font-bold text-text mb-1">
-                            Create account
+                            {t.title}
                         </h1>
                         <p className="text-text-secondary mb-8 text-sm">
-                            Fill in your details to get started
+                            {t.subtitle}
                         </p>
 
 
                         <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
-                            <CustomTextField label="First Name" type="text" placeholder="Enter your first name" onChange={(e) => setFirstName(e.target.value)} />
-                            <CustomTextField label="Last Name" type="text" placeholder="Enter your last name" onChange={(e) => setLastName(e.target.value)} />
-                            <CustomTextField label="Username" type="text" placeholder="Enter your username" onChange={(e) => setUsername(e.target.value)} />
-                            <CustomTextField label="Email" type="email" placeholder="Enter your email" onChange={(e) => setEmail(e.target.value)} />
-                            <CustomTextField label="Password" type="password" placeholder="Create a password" onChange={(e) => setPassword(e.target.value)} />
+                            <CustomTextField label={t.firstName} type="text" placeholder={t.firstNamePlaceholder} onChange={(e) => setFirstName(e.target.value)} />
+                            <CustomTextField label={t.lastName} type="text" placeholder={t.lastNamePlaceholder} onChange={(e) => setLastName(e.target.value)} />
+                            <CustomTextField label={t.username} type="text" placeholder={t.usernamePlaceholder} onChange={(e) => setUsername(e.target.value)} />
+                            <CustomTextField label={t.email} type="email" placeholder={t.emailPlaceholder} onChange={(e) => setEmail(e.target.value)} />
+                            <CustomTextField label={t.password} type="password" placeholder={t.passwordPlaceholder} onChange={(e) => setPassword(e.target.value)} />
 
-                            <TButton title={loading ? "Creating account..." : "Create account"} disabled={loading} onClick={register} />
+                            <TButton title={loading ? t.creating : t.create} disabled={loading} onClick={register} />
                         </form>
 
                         <p className="text-center text-sm text-text-secondary mt-8">
-                            Already have an account?{" "}
+                            {t.haveAccount}{" "}
                             <a href="/login" className="text-primary font-medium hover:underline">
-                                Sign in
+                                {t.signIn}
                             </a>
                         </p>
                         <CustomDivider />
