@@ -3,9 +3,6 @@ using backend.DTOs.Requests;
 using backend.DTOs.Responses;
 using backend.Enums;
 using backend.Services.Interface;
-//using Microsoft.AspNetCore.Identity.Data;
-
-//using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Controllers
@@ -65,7 +62,7 @@ namespace backend.Controllers
             {
                 return ex.Message switch
                 {
-                    "EMAIL_NOT_VERIFIED" => Unauthorized(new ApiResponse<object>
+                    "EMAIL_NOT_VERIFIED" => StatusCode(403, new ApiResponse<object>
                     {
                         Success = false,
                         ErrorCode = ErrorCode.EmailNotVerified,
@@ -88,6 +85,7 @@ namespace backend.Controllers
                 };
             }
         }
+
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
         {
@@ -108,6 +106,7 @@ namespace backend.Controllers
                 Message = "Logged out"
             });
         }
+
         [HttpPost("refresh")]
         public async Task<IActionResult> Refresh()
         {
@@ -165,16 +164,15 @@ namespace backend.Controllers
                     Message = "If the email exists, OTP has been sent"
                 });
             }
-            catch(Exception err)
+            catch
             {
-                Console.WriteLine("err", err);
-                return BadRequest();
-                //return Ok(new ApiResponse<object>
-                //{
-                //    Success = true,
-                //    ErrorCode = ErrorCode.None,
-                //    Message = "If the email exists, OTP has been sent"
-                //});
+                // Always return a safe message to prevent email enumeration
+                return Ok(new ApiResponse<object>
+                {
+                    Success = true,
+                    ErrorCode = ErrorCode.None,
+                    Message = "If the email exists, OTP has been sent"
+                });
             }
         }
 
@@ -242,6 +240,7 @@ namespace backend.Controllers
                 };
             }
         }
+
         private void SetAuthCookies(AuthResponse response)
         {
             var accessOptions = new CookieOptions
@@ -265,4 +264,3 @@ namespace backend.Controllers
         }
     }
 }
-

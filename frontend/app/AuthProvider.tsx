@@ -2,7 +2,8 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import api from "./network";
+import { userApi } from "@/lib/user.api";
+import { getLocale } from "@/Hooks/useTranslation";
 
 type User = {
   id: string;
@@ -19,21 +20,22 @@ type User = {
 const AuthContext = createContext<{
   user: User | null;
   loading: boolean;
+  language: string;
 }>({
   user: null,
   loading: true,
+  language: "en",
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const pathname = usePathname();
-
+  const language = getLocale();
   const loadUser = async () => {
     setLoading(true);
     try {
-      const res = await api.get("/user/profile");
-      console.log("User profile response:", res);
+      const res = await userApi.profile();
       setUser(res.data);
     } catch {
       setUser(null);
@@ -60,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [pathname, user]);
 
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ user, loading, language }}>
       {children}
     </AuthContext.Provider>
   );

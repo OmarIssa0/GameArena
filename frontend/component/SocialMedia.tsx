@@ -4,8 +4,8 @@ import { ChevronLeft, ChevronRight, Gamepad2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useTranslation } from "@/Hooks/useTranslation";
-import ar from "./i18n/social.ar.i18n";
-import en, { TSocialTranslation } from "./i18n/social.en.i18n";
+import ar from "./i18n/SocialMedia/ar.i18n";
+import en, { TSocialTranslation } from "./i18n/SocialMedia/en.i18n";
 
 const friends = [
   { name: "Ahmed", status: "Playing Match", rank: 1 },

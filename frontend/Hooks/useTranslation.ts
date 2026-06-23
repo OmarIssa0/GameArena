@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { TLocale, THashMap, TTranslate } from "@/types";
+import type { TLocale, THashMap, TTranslate } from "@/public/types";
 
 let currentLocale: TLocale =
   (window.localStorage.getItem("locale") as TLocale) ?? "en";
@@ -47,11 +47,11 @@ export function useLocale() {
   return [locale, setLocale] as const;
 }
 
-function resolve(obj: THashMap, path: string[]): any {
+function resolve(obj: THashMap, path: string[]) {
   return path.reduce((acc, key) => acc?.[key], obj);
 }
 
-function createProxy(langs: TTranslate, path: string[] = []): any {
+function createProxy(langs: TTranslate, path: string[] = []) {
   return new Proxy(
     {},
     {

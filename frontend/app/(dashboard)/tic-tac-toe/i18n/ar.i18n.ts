@@ -1,70 +1,69 @@
-const ar = {
-  page: {
+import { TicTacToeTranslations } from "./en.i18n";
+
+const ar: TicTacToeTranslations = {
+  lobby: {
     title: "إكس أو",
-    subtitle: "ساحة اللعب الجماعي",
+    subtitle: "لعبة الشبكة الكلاسيكية 3×3 — الأول بثلاثة يفوز",
+    findMatch: "ابحث عن خصم",
+    connecting: "جارٍ الاتصال بخادم اللعبة…",
   },
 
-  auth: {
-    loading: "جاري تحميل اللاعب...",
-    notLoggedIn: "غير مسجل الدخول",
-    loggedInAs: "مسجل الدخول باسم",
+  searching: {
+    title: "البحث عن خصم",
+    subtitle: "جارٍ فحص اللاعبين المتاحين",
+    cancel: "إلغاء",
+    stages: {
+      server: "الاتصال بالخادم",
+      scanning: "البحث عن لاعبين",
+      joining: "الانضمام إلى الغرفة",
+      starting: "بدء اللعبة",
+    },
+    stageBadge: {
+      pending: "انتظار",
+      scanning: "جارٍ الفحص…",
+      connected: "متصل",
+      joined: "انضممت",
+      ready: "جاهز!",
+    },
   },
 
-  status: {
-    ready: "جاهز",
-    disconnected: "غير متصل",
-    searching: "جاري البحث عن خصم...",
-    inGame: "بدأت المباراة",
-    finished: "انتهت المباراة",
-    yourTurn: "دورك",
-    opponentTurn: "دور الخصم",
+  players: {
+    you: "أنت",
+    player1: "اللاعب 1",
+    player2: "اللاعب 2",
+    opponent: "الخصم",
+    waitingForOpponent: "في انتظار الخصم…",
+    vs: "ضد",
   },
 
-  matchmaking: {
-    joinQueue: "دخول قائمة الانتظار",
-    searching: "جاري البحث عن خصم",
-    cancel: "إلغاء البحث",
+  turn: {
+    yourTurn: "دورك — اختر خطوتك",
+    waiting: "في انتظار {{name}}…",
   },
 
-  room: {
-    title: "معلومات المباراة",
-    roomId: "الغرفة",
-    symbol: "رمزك",
-  },
-
-  player: {
-    title: "ملف اللاعب",
-    wins: "الانتصارات",
-    losses: "الهزائم",
-    draws: "التعادلات",
-    level: "المستوى",
-    online: "متصل",
-    offline: "غير متصل",
-  },
-
-  opponent: {
-    title: "الخصم",
-    waiting: "بانتظار خصم...",
-    connected: "متصل",
-  },
-
-  game: {
-    board: "لوحة اللعب",
-    playAgain: "العب مرة أخرى",
-    leaveMatch: "مغادرة المباراة",
-  },
-
-  result: {
-    victory: "انتصار",
-    defeat: "هزيمة",
-    draw: "تعادل",
-  },
-
-  notifications: {
-    connected: "تم الاتصال بالخادم",
-    disconnected: "تم فقدان الاتصال",
-    matchFound: "تم العثور على خصم",
-    waitingOpponent: "بانتظار خصم",
+  end: {
+    win: {
+      icon: "🏆",
+      title: "فزت!",
+      description: "أداء رائع — لقد تفوقت على خصمك.",
+    },
+    lose: {
+      icon: "😞",
+      title: "خسرت",
+      description: "جهد جيد، لكن خصمك حقق الفوز هذه المرة.",
+    },
+    draw: {
+      icon: "🤝",
+      title: "تعادل",
+      description: "مباراة شرسة — متكافئة تمامًا.",
+    },
+    opponentDisconnected: {
+      icon: "🏆",
+      title: "الخصم انسحب!",
+      description: "غادر خصمك اللعبة. فزت بشكل تلقائي.",
+    },
+    playAgain: "العب مجدداً",
+    lobby: "القائمة الرئيسية",
   },
 };
 

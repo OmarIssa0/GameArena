@@ -11,10 +11,10 @@ const ar = {
   forgotPassword: "نسيت كلمة المرور?",
   DontHaveAccount: "ليس لديك حساب؟",
   Register: "تسجيل",
-  ChooseYourPreferredSignInMethod: "اختر طريقة تسجيل الدخول المفضلة لديك",
   WelcomeBack: "مرحباً بك",
   loadingElipse: "جار التحميل...",
   createAccount: "إنشاء حساب",
+  verifyEmail: "تأكيد البريد الإلكتروني",
   loginDescription: "مرحبًا بعودتك. يرجى تسجيل الدخول للمتابعة.",
   switchLanguage: (lang: string) =>
     `التبديل إلى ${lang === "en" ? "العربية" : "الإنجليزية"}`,

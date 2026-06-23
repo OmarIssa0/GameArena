@@ -1,29 +1,37 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useConnection } from "./useConnection";
-import { GamesKindEnum, GameState } from "@/types";
+import { GamesKindEnum, TicTacToeGameState } from "@/public/types";
+import { useAuth } from "@/app/AuthProvider";
 
 function useTicTacToe() {
+  const { user } = useAuth();
+
   const { connection, isConnected } = useConnection("gameHub");
 
   const [roomId, setRoomId] = useState<string | null>(null);
-  const [gameState, setGameState] = useState<GameState | null>(null);
+
+  const [gameState, setGameState] = useState<TicTacToeGameState | null>(null);
+
   const [isSearching, setIsSearching] = useState(false);
+
   const [opponentDisconnected, setOpponentDisconnected] = useState(false);
 
   useEffect(() => {
     if (!connection) return;
 
-    const handleGameStateRoom = (state: GameState) => {
+    const handleGameState = (state: TicTacToeGameState) => {
       setRoomId(state.roomId);
-      setIsSearching(false);
       setGameState(state);
+      setIsSearching(false);
       setOpponentDisconnected(false);
     };
 
-    const handleDisconnect = () => {
+    const handleOpponentDisconnected = () => {
       setOpponentDisconnected(true);
+
       setGameState((prev) => {
         if (!prev) return null;
+
         return {
           ...prev,
           isFinished: true,
@@ -31,28 +39,33 @@ function useTicTacToe() {
       });
     };
 
-    connection.on("gameState", handleGameStateRoom);
-    connection.on("OpponentDisconnected", handleDisconnect);
+    connection.on("gameState", handleGameState);
+
+    connection.on("OpponentDisconnected", handleOpponentDisconnected);
 
     return () => {
-      connection.off("gameState", handleGameStateRoom);
-      connection.off("OpponentDisconnected", handleDisconnect);
+      connection.off("gameState", handleGameState);
+
+      connection.off("OpponentDisconnected", handleOpponentDisconnected);
     };
   }, [connection]);
 
   const findMatch = async () => {
     if (!connection || !isConnected) return;
 
-    setIsSearching(true);
-    setOpponentDisconnected(false);
-    setGameState(null);
     setRoomId(null);
+    setGameState(null);
+    setOpponentDisconnected(false);
+    setIsSearching(true);
 
     await connection.invoke("FindMatch", GamesKindEnum.TicTacTao);
   };
 
   const makeMove = async (cell: number) => {
-    if (!connection || !roomId) return;
+    if (!connection || !gameState) return;
+
+    if (gameState.isFinished) return;
+
     await connection.invoke("SendAction", "MAKE_MOVE", cell.toString());
   };
 
@@ -63,13 +76,46 @@ function useTicTacToe() {
     setOpponentDisconnected(false);
   };
 
+  const myPlayerId = user?.id;
+
+  const isMyTurn = useMemo(() => {
+    if (!gameState || !myPlayerId) return false;
+
+    return gameState.currentTurnPlayerId === myPlayerId;
+  }, [gameState, myPlayerId]);
+
+  const amPlayer1 = gameState?.player1Id === myPlayerId;
+
+  const mySymbol = amPlayer1 ? "X" : "O";
+
+  const result = useMemo(() => {
+    if (!gameState?.isFinished) return "playing";
+
+    if (opponentDisconnected) return "opponentDisconnected";
+
+    if (!gameState.winnerPlayerId) return "draw";
+
+    if (gameState.winnerPlayerId === myPlayerId) return "win";
+
+    return "lose";
+  }, [gameState, opponentDisconnected, myPlayerId]);
+
   return {
     board: gameState?.board ?? Array(9).fill(""),
-    gameState,
+
     roomId,
-    isSearching,
+    gameState,
+
     isConnected,
+    isSearching,
+
     opponentDisconnected,
+
+    isMyTurn,
+    mySymbol,
+
+    result,
+
     findMatch,
     makeMove,
     resetGame,

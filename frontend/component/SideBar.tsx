@@ -17,8 +17,8 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import ar from "./i18n/sidebar.ar.i18n";
-import en, { TSidebarTranslation } from "./i18n/sidebar.en.i18n";
+import ar from "./i18n/SideBar/ar.i18n";
+import en, { TSidebarTranslation } from "./i18n/SideBar/en.i18n";
 
 const navItems = [
   { id: "home", labelKey: "home", icon: Home },

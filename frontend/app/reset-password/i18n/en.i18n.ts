@@ -1,0 +1,15 @@
+const en = {
+  resetPassword: "Reset Password",
+  enterOtp: "Enter the OTP sent to your email",
+  newPassword: "New Password",
+  confirmPassword: "Confirm Password",
+  reset: "Reset",
+  otpSent: "OTP has been sent to your email",
+  otpVerified: "OTP verified successfully",
+  passwordResetSuccess: "Password reset successfully",
+  passwordResetError: "Failed to reset password",
+};
+
+export default en;
+
+export type TResetPasswordTranslation = typeof en;

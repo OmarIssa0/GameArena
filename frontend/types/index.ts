@@ -1,10 +1,8 @@
-// app/i18n/types/index.ts
-
 type TLocale = "en" | "ar";
 
 type TSetLocale = (locale: TLocale) => void;
 
-type THashMap = Record<string, any>;
+type THashMap = Record<string, unknown>;
 
 type TTranslate = { en: THashMap; ar: THashMap };
 type TNullable<T> = T | null;
@@ -21,17 +19,52 @@ type Callable<T> = {
 enum GamesKindEnum {
   TicTacTao,
 }
-export interface GameState {
+type TFieldRegister =
+  | "email"
+  | "password"
+  | "firstName"
+  | "lastName"
+  | "username";
+type TFieldLogin = "email" | "password";
+export interface TicTacToeGameState {
   roomId: string;
-  board: TNullable<string>[];
+  board: string[];
+
   currentTurnPlayerId: string;
-  winnerPlayerId: TNullable<string>;
-  winnerSymbol: string;
+
+  winnerPlayerId?: string;
+  winnerSymbol?: string;
+
   isFinished: boolean;
+
   player1Id: string;
-  player1Username?: string;
-  player2Id: string;
+  player1Username: string;
+
+  player2Id?: string;
   player2Username?: string;
+}
+
+export type TError = {
+  response?: {
+    data?: {
+      errorCode: ErrorCode;
+      success: boolean;
+      data?: TNullable<unknown>;
+      message?: TNullable<string>;
+    };
+  };
+  status?: number;
+};
+export type Validator = (value: string) => string | null;
+
+export enum PasswordValidationEnum {
+  MinLength,
+  MaxLength,
+  Number,
+  Uppercase,
+  Lowercase,
+  SpecialChar,
+  NoSpaces,
 }
 
 export enum ErrorCode {
@@ -67,5 +100,14 @@ export interface IApiResponse<T> {
   message: string;
 }
 
-export type { TLocale, TSetLocale, THashMap, Callable, TTranslate };
+export type {
+  TLocale,
+  TSetLocale,
+  THashMap,
+  Callable,
+  TTranslate,
+  TNullable,
+  TFieldRegister,
+  TFieldLogin,
+};
 export { GamesKindEnum };

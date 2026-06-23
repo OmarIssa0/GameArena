@@ -11,7 +11,7 @@ export function useConnection(endPoint: string) {
 
   useEffect(() => {
     const newConnection = new HubConnectionBuilder()
-      .withUrl(`https://https://localhost:7127/${endPoint}`, {
+      .withUrl(`https://localhost:7127/${endPoint}`, {
         withCredentials: true,
       })
       .withAutomaticReconnect()
