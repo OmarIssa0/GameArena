@@ -1,5 +1,5 @@
 import dynamic from "next/dynamic";
-import { useTranslation } from "@/Hooks/useTranslation";
+import { useTranslation } from "@/hooks/useSetting";
 import { en, TAuthAnimation } from "../i18n/AuthAnimation/en.i18n";
 import { ar } from "../i18n/AuthAnimation/ar.i18n";
 import type { TAnimationProps } from "./def/TAnimation";

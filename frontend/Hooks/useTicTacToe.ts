@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useConnection } from "./useConnection";
 import { TicTacToeGameState } from "@/types";
-import { useAuth } from "@/app/AuthProvider";
+import { useAuth } from "@/app/providers/AuthProvider";
 import { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
 
 function useTicTacToe() {

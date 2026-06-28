@@ -1,7 +1,7 @@
 "use client";
 
 import { useTicTacToe } from "@/Hooks/useTicTacToe";
-import { useAuth } from "@/app/AuthProvider";
+import { useAuth } from "@/app/providers/AuthProvider";
 import { TButton } from "@/component/common/TButton";
 import {
   Swords,

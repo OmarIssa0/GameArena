@@ -1,7 +1,7 @@
 "use client";
-import { useAuth } from "@/app/AuthProvider";
-import { useTranslation } from "@/Hooks/useTranslation";
-import { useDashboardNotifications } from "@/app/(dashboard)/DashboardNotificationsProvider";
+import { useAuth } from "@/app/providers/AuthProvider";
+import { useTranslation } from "@/hooks/useSetting";
+import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
 import { LogOut, Hexagon, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";

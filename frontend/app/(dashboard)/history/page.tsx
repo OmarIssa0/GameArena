@@ -1,5 +1,5 @@
 "use client";
-import { useTranslation } from "@/Hooks/useTranslation";
+import { useTranslation } from "@/hooks/useSetting";
 import { ar } from "./i18n/ar.i18n";
 import { en, type THistoryTranslation } from "./i18n/en.i18n";
 

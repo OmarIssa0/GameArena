@@ -1,11 +1,11 @@
 "use client";
 
-import { useAuth } from "@/app/AuthProvider";
+import { useAuth } from "@/app/providers/AuthProvider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Sidebar } from "@/component/SideBar";
 import { SocialPanel } from "@/component/SocialMedia";
-import { DashboardNotificationsProvider } from "./DashboardNotificationsProvider";
+import { DashboardNotificationsProvider } from "../providers/DashboardNotificationsProvider";
 
 function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();

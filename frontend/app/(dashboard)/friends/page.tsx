@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Gamepad2, Search, UserCheck, Users } from "lucide-react";
 import { useConnection } from "@/Hooks/useConnection";
-import { useTranslation } from "@/Hooks/useTranslation";
+import { useTranslation } from "@/hooks/useSetting";
 import { ar } from "./i18n/ar.i18n";
 import { en, type TFriendsTranslation } from "./i18n/en.i18n";
 import { TTabs } from "@/component/common/TTabs";

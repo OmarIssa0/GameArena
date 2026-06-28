@@ -1,4 +1,4 @@
-import { useLocale, useTheme } from "@/Hooks/useTranslation";
+import { useLocale, useTheme } from "@/hooks/useSetting";
 import { Globe, Sun, Moon } from "lucide-react";
 import { TButton } from "./TButton";
 import clsx from "clsx";

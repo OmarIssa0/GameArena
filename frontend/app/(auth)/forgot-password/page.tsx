@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { AuthLayout } from "@/component/auth/AuthLayout";
+import { AuthLayout } from "@/app/(auth)/layout";
 import { TTextField } from "@/component/common/TTextField";
 import { TButton } from "@/component/common/TButton";
 import { authFlow } from "@/repositories/proxy/authflow";
@@ -10,7 +10,7 @@ import { en, type TForgotPasswordTranslation } from "./i18n/en.i18n";
 import { ar } from "./i18n/ar.i18n";
 import { en as EnTextField } from "@/component/i18n/TTextField/en.i18n";
 import { ar as ArTextField } from "@/component/i18n/TTextField/ar.i18n";
-import { useTranslation } from "@/Hooks/useTranslation";
+import { useTranslation } from "@/hooks/useSetting";
 import { emailValidator } from "@/utils";
 import { AuthFlowAnimationEnum } from "@/types";
 import { authService } from "@/services/def/AuthService";

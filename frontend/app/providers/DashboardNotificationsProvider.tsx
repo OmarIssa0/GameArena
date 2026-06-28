@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useAuth } from "@/app/AuthProvider";
+import { useAuth } from "@/app/providers/AuthProvider";
 import { useConnection } from "@/Hooks/useConnection";
 import { chatService } from "@/services/def/ChatService";
 import { friendService } from "@/services/def/FriendService";

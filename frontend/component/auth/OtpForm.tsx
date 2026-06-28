@@ -9,7 +9,7 @@ import {
 import { TButton } from "@/component/common/TButton";
 import { en, type TOtpTranslation } from "../i18n/Otp/en.i18n";
 import { ar } from "../i18n/Otp/ar.i18n";
-import { useTranslation } from "@/Hooks/useTranslation";
+import { useTranslation } from "@/hooks/useSetting";
 import type { IOtpFormProps } from "./def/OtpForm";
 import { emailVerficationService } from "@/services/def/EmailVerficationService";
 
@@ -136,7 +136,7 @@ function OtpForm({ email, onSuccess }: IOtpFormProps) {
           onClick={resend}
           className="w-full shadow-md"
         >
-          { t.resendCode}
+          {t.resendCode}
         </TButton>
       </div>
     </div>

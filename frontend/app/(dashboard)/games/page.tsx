@@ -1,7 +1,7 @@
 "use client";
 import { Gamepad2, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useTranslation } from "@/Hooks/useTranslation";
+import { useTranslation } from "@/hooks/useSetting";
 import { ar } from "./i18n/ar.i18n";
 import { en, type TGamesTranslation } from "./i18n/en.i18n";
 

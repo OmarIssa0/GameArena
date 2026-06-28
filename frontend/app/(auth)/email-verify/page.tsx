@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { AuthLayout } from "@/component/auth/AuthLayout";
+import { AuthLayout } from "@/app/(auth)/layout";
 import { OtpForm } from "@/component/auth/OtpForm";
 import { authFlow } from "@/repositories/proxy/authflow";
 import { AuthFlowAnimationEnum } from "@/types";

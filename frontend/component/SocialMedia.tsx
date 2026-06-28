@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useTranslation } from "@/Hooks/useTranslation";
+import { useTranslation } from "@/hooks/useSetting";
 import { ar } from "./i18n/SocialMedia/ar.i18n";
 import { en, type TSocialTranslation } from "./i18n/SocialMedia/en.i18n";
 import { friendService } from "@/services/def/FriendService";
@@ -17,7 +17,7 @@ import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
 import { TTile } from "./common/TTile";
 import { TBadge } from "./common/TBadge";
 import { TButton } from "./common/TButton";
-import { useDashboardNotifications } from "@/app/(dashboard)/DashboardNotificationsProvider";
+import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
 import type { IUser } from "@/domain/meta/IUser";
 
 const statusColor: Record<string, string> = {

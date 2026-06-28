@@ -2,10 +2,10 @@
 
 import { useEffect, ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/app/AuthProvider";
-import { AuthAnimation } from "./AuthAnimation";
+import { useAuth } from "@/app/providers/AuthProvider";
+import { AuthAnimation } from "../../component/auth/AuthAnimation";
 import { AuthFlowAnimationEnum } from "@/types";
-import { LangTheme } from "../common/LangTheme";
+import { LangTheme } from "../../component/common/LangTheme";
 
 function AuthLayout({
   page,

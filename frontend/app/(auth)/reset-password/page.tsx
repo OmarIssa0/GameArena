@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AuthLayout } from "@/component/auth/AuthLayout";
+import { AuthLayout } from "@/app/(auth)/layout";
 import { TTextField } from "@/component/common/TTextField";
 import { TButton } from "@/component/common/TButton";
 import { OtpForm } from "@/component/auth/OtpForm";
 import { authFlow } from "@/repositories/proxy/authflow";
-import { useTranslation } from "@/Hooks/useTranslation";
+import { useTranslation } from "@/hooks/useSetting";
 import { en, TResetPasswordTranslation } from "./i18n/en.i18n";
 import { ar } from "./i18n/ar.i18n";
 import { en as EnTextField } from "@/component/i18n/TTextField/en.i18n";

@@ -4,7 +4,7 @@ import { forwardRef } from "react";
 import clsx from "clsx";
 import { TButtonProps } from "./def/TButton";
 import { sizes } from "@/types";
-import { useTranslation } from "@/Hooks/useTranslation";
+import { useTranslation } from "@/hooks/useSetting";
 import { en, type TButtonTranslation } from "@/component/i18n/TButton/en.i18n";
 import { ar } from "@/component/i18n/TButton/ar.i18n";
 const variants = {

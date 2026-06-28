@@ -6,7 +6,7 @@ import type { IUser } from "@/domain/meta/IUser";
 import { chatService } from "@/services/def/ChatService";
 import { useConnection } from "./useConnection";
 import { useFriends } from "./useFriends";
-import { useDashboardNotifications } from "@/app/(dashboard)/DashboardNotificationsProvider";
+import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
 
 type TPrivateMessagePayload = {
   senderId: string;
@@ -63,7 +63,8 @@ export function useMessages(initialFriendId?: string | null) {
       setError(null);
 
       try {
-        const response = await chatService.getMessagesByFriendId(selectedFriendId);
+        const response =
+          await chatService.getMessagesByFriendId(selectedFriendId);
         if (!alive) return;
         setMessages((response.data ?? []).map(normalizeHistoryMessage));
         await refreshUnreadMessages();

@@ -6,14 +6,17 @@ import { TTextField } from "@/component/common/TTextField";
 import { TButton } from "@/component/common/TButton";
 import { authFlow } from "@/repositories/proxy/authflow";
 import { emailValidator, passwordValidator } from "@/utils";
-import { en, type TRegisterTranslation } from "@/app/register/i18n/en.i18n";
-import { ar } from "@/app/register/i18n/ar.i18n";
+import {
+  en,
+  type TRegisterTranslation,
+} from "@/app/(auth)/register/i18n/en.i18n";
+import { ar } from "@/app/(auth)/register/i18n/ar.i18n";
 import {
   en as EnTextField,
   TTextFieldTranslation,
 } from "@/component/i18n/TTextField/en.i18n";
 import { ar as ArTextField } from "@/component/i18n/TTextField/ar.i18n";
-import { useTranslation } from "@/Hooks/useTranslation";
+import { useTranslation } from "@/hooks/useSetting";
 import Link from "next/link";
 import { ErrorCodeEnum } from "@/domain/enum/ErrorCodeEnum";
 import { authService } from "@/services/def/AuthService";

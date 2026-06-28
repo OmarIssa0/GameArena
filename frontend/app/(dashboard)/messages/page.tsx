@@ -10,7 +10,7 @@ import {
   WifiOff,
   MessagesSquare,
 } from "lucide-react";
-import { useTranslation } from "@/Hooks/useTranslation";
+import { useTranslation } from "@/hooks/useSetting";
 import { useMessages } from "@/Hooks/useMessages";
 import { EmptyState } from "@/component/common/TEmpty";
 import { TTile } from "@/component/common/TTile";

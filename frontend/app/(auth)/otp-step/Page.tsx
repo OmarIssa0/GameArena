@@ -10,7 +10,7 @@ import { api } from "@/app/network";
 import { TButton } from "@/component/common/TButton";
 import { en, type TOtpStepTranslation } from "./i18n/en.i18n";
 import { ar } from "./i18n/ar.i18n";
-import { useTranslation } from "@/Hooks/useTranslation";
+import { useTranslation } from "@/hooks/useSetting";
 
 type TOtpStepProps = {
   email: string;

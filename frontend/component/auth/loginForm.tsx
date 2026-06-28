@@ -10,11 +10,11 @@ import {
   type TTextFieldTranslation,
 } from "@/component/i18n/TTextField/en.i18n";
 import { ar as ArTextField } from "@/component/i18n/TTextField/ar.i18n";
-import { useTranslation } from "@/Hooks/useTranslation";
-import { en, type TLoginTranslation } from "@/app/login/i18n/en.i18n";
-import { ar } from "@/app/login/i18n/ar.i18n";
+import { useTranslation } from "@/hooks/useSetting";
+import { en, type TLoginTranslation } from "@/app/(auth)/login/i18n/en.i18n";
+import { ar } from "@/app/(auth)/login/i18n/ar.i18n";
 import { emailValidator, passwordValidator } from "@/utils";
-import { useAuth } from "@/app/AuthProvider";
+import { useAuth } from "@/app/providers/AuthProvider";
 import { authService } from "@/services/def/AuthService";
 import { AxiosError } from "axios";
 import { ErrorCodeEnum } from "@/domain/enum/ErrorCodeEnum";
