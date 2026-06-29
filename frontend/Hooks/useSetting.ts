@@ -51,6 +51,7 @@ export function setLocale(locale: TLocale) {
   if (locale === currentLocale) return;
   currentLocale = locale;
   localStorage.setItem("locale", locale);
+  document.cookie = `locale=${locale}; path=/; max-age=31536000; SameSite=Lax`;
   updateLocaleDOM(locale);
   emit();
 }
@@ -66,6 +67,7 @@ export function setTheme(theme: TTheme) {
   if (theme === currentTheme) return;
   currentTheme = theme;
   localStorage.setItem("theme", theme);
+  document.cookie = `theme=${theme}; path=/; max-age=31536000; SameSite=Lax`;
   updateThemeDOM(theme);
   emit();
 }

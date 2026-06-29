@@ -32,7 +32,7 @@ const TTextField = forwardRef<HTMLInputElement, TTextFieldProps>(
           <input
             ref={ref}
             className={clsx(
-              "w-full rounded-xl border border-border bg-surface px-4 py-3 outline-none transition-all",
+              "w-full rounded-xl border border-border bg-surface px-4 py-3 outline-none transition-all placeholder:text-text-muted",
               "focus:border-primary focus:ring-2 focus:ring-primary/20",
               error &&
                 "border-red-500 focus:border-red-500 focus:ring-red-500/20",
