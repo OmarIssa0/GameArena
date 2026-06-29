@@ -104,22 +104,24 @@ function LoginForm() {
             label={t.email}
             placeholder={t.placeholder.email}
             value={email}
-            type="email"
-            required
             error={errors.email}
-            onChange={(e) => handleChange("email", e.target.value)}
             className="w-full transition-all duration-200 focus-within:ring-2 focus-within:ring-primary/40"
+            type="email"
+            autoComplete="email"
+            required
+            onChange={(e) => handleChange("email", e.target.value)}
           />
 
           <TTextField
             label={t.password}
             placeholder={t.placeholder.password}
             value={password}
-            type="password"
-            required
             error={errors.password}
-            onChange={(e) => handleChange("password", e.target.value)}
             className="w-full transition-all duration-200 focus-within:ring-2 focus-within:ring-primary/40"
+            type="password"
+            autoComplete="current-password"
+            required
+            onChange={(e) => handleChange("password", e.target.value)}
           />
 
           {/* API Error Callout */}

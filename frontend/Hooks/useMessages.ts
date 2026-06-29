@@ -4,9 +4,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { IMessage } from "@/domain/meta/IMessage";
 import type { IUser } from "@/domain/meta/IUser";
 import { chatService } from "@/services/def/ChatService";
-import { useConnection } from "./useConnection";
 import { useFriends } from "./useFriends";
 import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
+import { useConnections } from "@/app/providers/ConnectionProvider";
 
 type TPrivateMessagePayload = {
   senderId: string;
@@ -30,14 +30,15 @@ const normalizeHistoryMessage = (message: IMessage): IMessage => ({
   sentAt: new Date(message.sentAt),
 });
 
-const areSameMessage = (left: IMessage, right: IMessage) =>
+const areSameMessage = (left: IMessage, right: IMessage): boolean =>
   left.senderId === right.senderId &&
   left.receiverId === right.receiverId &&
   left.content === right.content &&
   left.sentAt.getTime() === right.sentAt.getTime();
 
 export function useMessages(initialFriendId?: string | null) {
-  const { connection, isConnected } = useConnection("chatHub");
+  const { chatConnection: connection, isChatConnected: isConnected } =
+    useConnections();
   const { friends, loading: friendsLoading } = useFriends();
   const { refreshUnreadMessages } = useDashboardNotifications();
   const [selectedFriendId, setSelectedFriendId] = useState<string | null>(
@@ -50,7 +51,7 @@ export function useMessages(initialFriendId?: string | null) {
 
   const selectedFriend = useMemo<IUser | null>(() => {
     if (!selectedFriendId) return null;
-    return friends.find((friend) => friend.id === selectedFriendId) ?? null;
+    return friends.find((f) => f.id === selectedFriendId) ?? null;
   }, [friends, selectedFriendId]);
 
   useEffect(() => {
@@ -99,7 +100,7 @@ export function useMessages(initialFriendId?: string | null) {
       if (!isCurrentConversation) return;
 
       setMessages((prev) =>
-        prev.some((message) => areSameMessage(message, incoming))
+        prev.some((m) => areSameMessage(m, incoming))
           ? prev
           : [...prev, incoming],
       );

@@ -1,9 +1,9 @@
 const ar = {
-  loadingEllipse: "جار التحميل...",
-  verifyYourEmail: "تأكيد بريدك الإلكتروني",
-  enterSixDigit: "أدخل الرمز المكون من 6 أرقام المرسل إلى بريدك الإلكتروني",
-  verify: "تأكيد",
+  verify: "تحقق",
   resendCode: "إعادة إرسال الرمز",
+  loadingEllipse: "جارٍ التحقق…",
+  errorIncomplete: "يرجى إدخال جميع الأرقام الستة",
+  errorInvalid: "الرمز غير صحيح — يرجى المحاولة مجدداً",
+  errorResend: "فشل إعادة إرسال الرمز",
 };
-
 export { ar };

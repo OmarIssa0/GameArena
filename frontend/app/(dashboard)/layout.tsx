@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Sidebar } from "@/component/SideBar";
 import { SocialPanel } from "@/component/SocialMedia";
-import { DashboardNotificationsProvider } from "../providers/DashboardNotificationsProvider";
+import { ConnectionProvider } from "@/app/providers/ConnectionProvider";
+import { DashboardNotificationsProvider } from "@/app/providers/DashboardNotificationsProvider";
 
 function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -20,34 +21,23 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
   if (loading || !user) {
     return (
       <div className="flex h-screen w-screen bg-bg items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary" />
       </div>
     );
   }
 
   return (
-    <DashboardNotificationsProvider>
-      <div className="flex h-screen w-screen bg-bg text-text overflow-hidden font-sans antialiased">
-        <Sidebar />
-        <main className="flex-1 flex flex-col min-w-0 overflow-y-auto scrollbar-hide relative">
-          {/* Shared background layers */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,#7c5cfc12,transparent_70%)] pointer-events-none" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,#00d2ff08,transparent_50%)] pointer-events-none" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,#e040fb08,transparent_50%)] pointer-events-none" />
-          <div className="absolute top-1/4 left-1/3 w-125 h-125 bg-primary/10 rounded-full blur-[150px] animate-pulse pointer-events-none" />
-          <div className="absolute bottom-1/4 right-1/4 w-100 h-100 bg-neon-cyan/5 rounded-full blur-[120px] animate-glow pointer-events-none" />
-          <div
-            className="absolute inset-0 opacity-[0.02] pointer-events-none"
-            style={{
-              backgroundImage: `linear-gradient(rgba(124,92,252,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(124,92,252,0.3) 1px, transparent 1px)`,
-              backgroundSize: "60px 60px",
-            }}
-          />
-          {children}
-        </main>
-        <SocialPanel />
-      </div>
-    </DashboardNotificationsProvider>
+    <ConnectionProvider>
+      <DashboardNotificationsProvider>
+        <div className="flex h-screen w-screen bg-bg text-text overflow-hidden font-sans antialiased">
+          <Sidebar />
+          <main className="flex-1 flex flex-col min-w-0 overflow-y-auto scrollbar-hide relative">
+            {children}
+          </main>
+          <SocialPanel />
+        </div>
+      </DashboardNotificationsProvider>
+    </ConnectionProvider>
   );
 }
 export default DashboardLayout;

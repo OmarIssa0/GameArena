@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Gamepad2, Search, UserCheck, Users } from "lucide-react";
-import { useConnection } from "@/Hooks/useConnection";
+import { useConnections } from "@/app/providers/ConnectionProvider";
 import { useTranslation } from "@/hooks/useSetting";
 import { ar } from "./i18n/ar.i18n";
 import { en, type TFriendsTranslation } from "./i18n/en.i18n";
@@ -18,7 +18,7 @@ type TFriendsTab = "friends" | "requests" | "search";
 
 function FriendsPage() {
   const router = useRouter();
-  const { connection: gameHub } = useConnection("gameHub");
+  const { gameConnection: gameHub } = useConnections();
   const t = useTranslation({ en, ar }) as TFriendsTranslation;
   const [activeTab, setActiveTab] = useState<TFriendsTab>("friends");
 

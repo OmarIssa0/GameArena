@@ -10,7 +10,6 @@ import {
 } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useAuth } from "@/app/providers/AuthProvider";
-import { useConnection } from "@/Hooks/useConnection";
 import { chatService } from "@/services/def/ChatService";
 import { friendService } from "@/services/def/FriendService";
 import type {
@@ -22,6 +21,7 @@ import type {
   TFriendRequestPayload,
   TGameInvitePayload,
 } from "@/types";
+import { useConnections } from "./ConnectionProvider";
 
 const NotificationContext = createContext<INotificationState | undefined>(
   undefined,
@@ -35,8 +35,7 @@ export function DashboardNotificationsProvider({
   const { user } = useAuth();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { connection: chatConnection } = useConnection("chatHub");
-  const { connection: gameConnection } = useConnection("gameHub");
+  const { chatConnection, gameConnection } = useConnections();
 
   const [friendRequestCount, setFriendRequestCount] = useState(0);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
@@ -71,7 +70,6 @@ export function DashboardNotificationsProvider({
       setGameInvites([]);
       return;
     }
-
     void syncCounts();
   }, [syncCounts, user]);
 
@@ -84,7 +82,6 @@ export function DashboardNotificationsProvider({
 
     const handleChatNotification = (payload: TChatNotificationPayload) => {
       if (!user) return;
-
       const selectedFriendId = searchParams.get("friend");
       const isOpenConversation =
         pathname === "/messages" && selectedFriendId === payload.senderId;
@@ -158,14 +155,12 @@ export function DashboardNotificationsProvider({
   );
 }
 
-export function useDashboardNotifications() {
+export function useDashboardNotifications(): INotificationState {
   const ctx = useContext(NotificationContext);
-
   if (!ctx) {
     throw new Error(
-      "useDashboardNotifications must be used within DashboardNotificationsProvider",
+      "useDashboardNotifications must be used within DashboardNotificationsProvider.",
     );
   }
-
   return ctx;
 }

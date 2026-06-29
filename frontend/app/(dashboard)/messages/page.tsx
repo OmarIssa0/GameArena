@@ -11,7 +11,7 @@ import {
   MessagesSquare,
 } from "lucide-react";
 import { useTranslation } from "@/hooks/useSetting";
-import { useMessages } from "@/Hooks/useMessages";
+import { useMessages } from "@/hooks/useMessages";
 import { EmptyState } from "@/component/common/TEmpty";
 import { TTile } from "@/component/common/TTile";
 import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";

@@ -18,7 +18,6 @@ function ResendCode({ onResend, label }: IResendCodeProps) {
 
   return (
     <TButton
-      variant="ghost"
       disabled={loading}
       onClick={handle}
       className="text-sm text-primary hover:underline disabled:opacity-50"

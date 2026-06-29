@@ -1,9 +1,10 @@
 const en = {
-  loadingEllipse: "Loading...",
-  verifyYourEmail: "Verify your email",
-  enterSixDigit: "Enter the 6-digit code sent to your email",
   verify: "Verify",
-  resendCode: "Resend code",
+  resendCode: "Resend Code",
+  loadingEllipse: "Verifying…",
+  errorIncomplete: "Please enter all 6 digits",
+  errorInvalid: "Invalid code — please try again",
+  errorResend: "Failed to resend code",
 };
 
 type TOtpStepTranslation = typeof en;

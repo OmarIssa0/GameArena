@@ -1,12 +1,15 @@
+"use client";
+
 import { useEffect, useMemo, useState } from "react";
-import { useConnection } from "./useConnection";
-import { TicTacToeGameState } from "@/types";
+import { useConnections } from "@/app/providers/ConnectionProvider";
+import type { TicTacToeGameState } from "@/types";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
 
-function useTicTacToe() {
+export function useTicTacToe() {
   const { user } = useAuth();
-  const { connection, isConnected } = useConnection("gameHub");
+  const { gameConnection: connection, isGameConnected: isConnected } =
+    useConnections();
 
   const [roomId, setRoomId] = useState<string | null>(null);
   const [gameState, setGameState] = useState<TicTacToeGameState | null>(null);
@@ -25,10 +28,7 @@ function useTicTacToe() {
 
     const handleOpponentDisconnected = () => {
       setOpponentDisconnected(true);
-      setGameState((prev) => {
-        if (!prev) return null;
-        return { ...prev, isFinished: true };
-      });
+      setGameState((prev) => (prev ? { ...prev, isFinished: true } : null));
     };
 
     connection.on("gameState", handleGameState);
@@ -55,7 +55,6 @@ function useTicTacToe() {
   };
 
   const resetGame = async () => {
-    // If we are currently searching, cancel the server‑side room
     if (isSearching && connection) {
       try {
         await connection.invoke("CancelSearch");
@@ -101,5 +100,3 @@ function useTicTacToe() {
     resetGame,
   };
 }
-
-export { useTicTacToe };

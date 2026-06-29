@@ -5,7 +5,6 @@ import { useState } from "react";
 import { AuthLayout } from "@/app/(auth)/layout";
 import { TTextField } from "@/component/common/TTextField";
 import { TButton } from "@/component/common/TButton";
-import { authFlow } from "@/repositories/proxy/authflow";
 import { en, type TForgotPasswordTranslation } from "./i18n/en.i18n";
 import { ar } from "./i18n/ar.i18n";
 import { en as EnTextField } from "@/component/i18n/TTextField/en.i18n";
@@ -15,26 +14,22 @@ import { emailValidator } from "@/utils";
 import { AuthFlowAnimationEnum } from "@/types";
 import { authService } from "@/services/def/AuthService";
 import type { TTextFieldTranslation } from "@/component/i18n/TTextField/en.i18n";
+import { useAuth } from "@/app/providers/AuthProvider";
 
 function ForgotPasswordPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
-
   const t = useTranslation({
     en: { ...en, ...EnTextField },
     ar: { ...ar, ...ArTextField },
   }) as TForgotPasswordTranslation & TTextFieldTranslation;
 
-  const [errors, setErrors] = useState({
-    email: "",
-  });
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({ email: "" });
 
-  const validate = (emailVal: string) => {
-    return {
-      email: emailValidator(t)(emailVal) || "",
-    };
-  };
+  const validate = (value: string) => ({
+    email: emailValidator(t)(value) || "",
+  });
 
   const handleChange = (value: string) => {
     setEmail(value);
@@ -44,13 +39,12 @@ function ForgotPasswordPage() {
   const send = async () => {
     const nextErrors = validate(email);
     setErrors(nextErrors);
-    if (Object.values(nextErrors).some((error) => error) || loading) return;
+    if (Object.values(nextErrors).some(Boolean) || loading) return;
 
     try {
       setLoading(true);
       await authService.forgotPassword({ email });
-      authFlow.set({ email });
-      router.push("/reset-password");
+      router.push("/reset-password?email=" + encodeURIComponent(email));
     } catch (error) {
       console.error("Forgot password request failed:", error);
     } finally {

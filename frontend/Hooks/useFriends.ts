@@ -1,4 +1,3 @@
-// Hooks/useFriends.ts
 "use client";
 
 import { friendService } from "@/services/def/FriendService";
@@ -18,7 +17,10 @@ export function useFriends() {
     setLoading(true);
     try {
       const [friendsRes, requestsRes, sentRes] = await Promise.all([
-        friendService.getFriends({ name: null, userStatus: UserStatusEnum.All }),
+        friendService.getFriends({
+          name: null,
+          userStatus: UserStatusEnum.All,
+        }),
         friendService.getReceivedFriendRequests(),
         friendService.getSentFriendRequests(),
       ]);

@@ -1,61 +1,83 @@
+"use client";
+
 import {
   HubConnection,
   HubConnectionBuilder,
+  HubConnectionState,
   LogLevel,
 } from "@microsoft/signalr";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://localhost:7127";
 
 export function useConnection(endPoint: string) {
   const [connection, setConnection] = useState<HubConnection | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  // Keep a ref so the cleanup closure always sees the latest instance.
+  const connectionRef = useRef<HubConnection | null>(null);
 
   useEffect(() => {
-    const newConnection = new HubConnectionBuilder()
-      .withUrl(`https://localhost:7127/${endPoint}`, {
-        withCredentials: true,
-      })
+    let cancelled = false;
+
+    const conn = new HubConnectionBuilder()
+      .withUrl(`${BASE_URL}/${endPoint}`, { withCredentials: true })
       .withAutomaticReconnect()
-      .configureLogging(LogLevel.Information)
+      .configureLogging(
+        process.env.NODE_ENV === "development"
+          ? LogLevel.Information
+          : LogLevel.Error,
+      )
       .build();
 
-    newConnection.onreconnecting(() => {
-      setIsConnected(false);
-      console.warn("SignalR: Connection lost. Reconnecting...");
+    connectionRef.current = conn;
+
+    conn.onreconnecting(() => {
+      if (!cancelled) setIsConnected(false);
     });
 
-    newConnection.onreconnected(() => {
-      setIsConnected(true);
-      console.log("SignalR: Connection re-established.");
+    conn.onreconnected(() => {
+      if (!cancelled) setIsConnected(true);
     });
 
-    newConnection.onclose(() => {
-      setIsConnected(false);
-      console.error("SignalR: Connection permanently closed.");
-    });
-
-    async function startHub() {
-      try {
-        await newConnection.start();
-        console.log(`SignalR: Connected to hub at /${endPoint}`);
-        setConnection(newConnection);
-        setIsConnected(true);
-      } catch (error) {
-        console.error("SignalR: Initial connection failed: ", error);
+    conn.onclose(() => {
+      if (!cancelled) {
+        setIsConnected(false);
+        setConnection(null);
       }
-    }
+    });
 
-    startHub();
-    return () => {
-      if (newConnection) {
-        try {
-          newConnection.stop();
-          console.log(`SignalR: Disconnected from /${endPoint}`);
-        } catch (err) {
-          console.error("SignalR: Error during teardown: ", err);
+    const start = async () => {
+      try {
+        await conn.start();
+        if (!cancelled) {
+          setConnection(conn);
+          setIsConnected(true);
+        }
+      } catch (err) {
+        if (cancelled) return;
+        console.error(`SignalR: Failed to connect to /${endPoint}`, err);
+        if (
+          err instanceof Error &&
+          err.message.toLowerCase().includes("unauthorized")
+        ) {
+          window.location.replace("/login");
         }
       }
     };
-  }, [endPoint]); // Triggers fresh teardown and rebuild safely if the endpoint changes
+
+    void start();
+    return () => {
+      cancelled = true;
+      connectionRef.current = null;
+      if (conn.state !== HubConnectionState.Disconnected) {
+        conn.stop().catch(() => {
+          console.error(`SignalR: Failed to stop connection to /${endPoint}`);
+        });
+      }
+      setConnection(null);
+      setIsConnected(false);
+    };
+  }, [endPoint]);
 
   return { connection, isConnected };
 }

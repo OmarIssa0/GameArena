@@ -2,7 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from "./providers/AuthProvider";
-import { getLocaleFromCookie } from "@/lib/getLocaleFromCookie";
+import { getSettingFromCookie } from "@/lib/getLocaleFromCookie";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,27 +14,27 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const metadata: Metadata = {
+export const metadata: Metadata = {
   title: "GameArena",
   description: "Game platform",
 };
 
-async function RootLayout({ children }: { children: React.ReactNode }) {
-  const locale = (await getLocaleFromCookie()) as "en" | "ar";
-  const dir = locale === "ar" ? "rtl" : "ltr";
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { locale, theme } = await getSettingFromCookie();
   return (
     <html
       lang={locale}
-      dir={dir}
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-      data-theme="light"
+      dir={locale === "ar" ? "rtl" : "ltr"}
+      data-theme={theme}
+      className={`${geistSans.variable} ${geistMono.variable} antialiased h-full`}
     >
-      <body className="min-h-full bg-slate-950 text-white">
+      <body className="min-h-full">
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
 }
-
-export default RootLayout;
-export { metadata };

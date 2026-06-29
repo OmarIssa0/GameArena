@@ -1,16 +1,14 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AuthLayout } from "@/app/(auth)/layout";
 import { OtpForm } from "@/component/auth/OtpForm";
-import { authFlow } from "@/repositories/proxy/authflow";
 import { AuthFlowAnimationEnum } from "@/types";
 import { useEffect } from "react";
 
 function EmailVerifyPage() {
   const router = useRouter();
-  const flow = authFlow.get();
-  const email = flow?.email;
+  const email = useSearchParams().get("email");
 
   useEffect(() => {
     if (!email) {
@@ -22,13 +20,7 @@ function EmailVerifyPage() {
 
   return (
     <AuthLayout page={AuthFlowAnimationEnum.VERIFY_OTP}>
-      <OtpForm
-        email={email}
-        onSuccess={() => {
-          authFlow.clear();
-          router.replace("/home");
-        }}
-      />
+      <OtpForm email={email} onSuccess={() => router.replace("/home")} />
     </AuthLayout>
   );
 }

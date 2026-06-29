@@ -1,6 +1,6 @@
 "use client";
 
-import { AuthLayout } from "@/app/(auth)/layout";
+import { AuthLayout } from "../layout";
 import { LoginForm } from "@/component/auth/loginForm";
 import { AuthFlowAnimationEnum } from "@/types";
 
