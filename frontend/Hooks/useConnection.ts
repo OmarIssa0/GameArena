@@ -15,11 +15,9 @@ export function useConnection(endPoint: string) {
   const [isConnected, setIsConnected] = useState(false);
   // Keep a ref so the cleanup closure always sees the latest instance.
   const connectionRef = useRef<HubConnection | null>(null);
-  const isStartingRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
-    console.log("start");
 
     const conn = new HubConnectionBuilder()
       .withUrl(`${BASE_URL}/${endPoint}`, { withCredentials: true })
@@ -49,20 +47,11 @@ export function useConnection(endPoint: string) {
     });
 
     const start = async () => {
-      if (
-        conn.state !== HubConnectionState.Disconnected ||
-        isStartingRef.current
-      ) {
-        return;
-      }
-
-      isStartingRef.current = true;
       try {
         await conn.start();
         if (!cancelled) {
           setConnection(conn);
           setIsConnected(true);
-          console.log("connected");
         }
       } catch (err) {
         if (cancelled) return;
@@ -73,18 +62,14 @@ export function useConnection(endPoint: string) {
         ) {
           window.location.replace("/login");
         }
-      } finally {
-        isStartingRef.current = false;
       }
     };
 
     void start();
     return () => {
       cancelled = true;
-      console.log("unmounted");
       connectionRef.current = null;
       if (conn.state !== HubConnectionState.Disconnected) {
-        console.log("stopping");
         conn.stop().catch(() => {
           console.error(`SignalR: Failed to stop connection to /${endPoint}`);
         });
