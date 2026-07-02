@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { AuthLayout } from "@/app/(auth)/layout";
 import { OtpForm } from "@/component/auth/OtpForm";
-import { AuthFlowAnimationEnum } from "@/types";
+import { AuthFlowAnimationEnum } from "@/domain/enum/AuthFlowAnimationEnum";
 import { useEffect } from "react";
 
 function EmailVerifyPage() {

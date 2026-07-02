@@ -1,4 +1,4 @@
-import { AuthFlowAnimationEnum } from "@/types";
+import { AuthFlowAnimationEnum } from "@/domain/enum/AuthFlowAnimationEnum";
 
 const ar = {
   authTitle: {

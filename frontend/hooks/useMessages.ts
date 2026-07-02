@@ -1,23 +1,16 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { IMessage } from "@/domain/meta/IMessage";
-import type { IUser } from "@/domain/meta/IUser";
 import { chatService } from "@/services/def/ChatService";
 import { useFriends } from "./useFriends";
 import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
 import { useConnections } from "@/app/providers/ConnectionProvider";
+import type { IMessage } from "@/domain/meta/IMessage";
+import type { IUser } from "@/domain/meta/IUser";
+import type { TNullable } from "@/domain/type/TCommon";
+import type { IPrivateMessagePayload } from "@/domain/meta/IPrivateMessagePayload";
 
-type TPrivateMessagePayload = {
-  senderId: string;
-  receiverId: string;
-  content?: string | null;
-  message?: string | null;
-  sentAt: string | Date;
-  isRead?: boolean;
-};
-
-const normalizeMessage = (payload: TPrivateMessagePayload): IMessage => ({
+const normalizeMessage = (payload: IPrivateMessagePayload): IMessage => ({
   senderId: payload.senderId,
   receiverId: payload.receiverId,
   content: payload.content ?? payload.message ?? "",
@@ -89,7 +82,7 @@ export function useMessages(initialFriendId?: string | null) {
   useEffect(() => {
     if (!connection) return;
 
-    const handlePrivateMessage = (payload: TPrivateMessagePayload) => {
+    const handlePrivateMessage = (payload: IPrivateMessagePayload) => {
       if (!selectedFriendId) return;
 
       const incoming = normalizeMessage(payload);
@@ -113,7 +106,7 @@ export function useMessages(initialFriendId?: string | null) {
     };
   }, [connection, selectedFriendId]);
 
-  const selectFriend = useCallback((friendId: string) => {
+  const selectFriend = useCallback((friendId: TNullable<string>) => {
     setSelectedFriendId(friendId);
   }, []);
 

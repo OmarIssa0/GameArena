@@ -16,6 +16,7 @@ const ar = {
   selectConversationTitle: "اختر محادثة",
   selectConversationDescription: "اختر صديقاً من القائمة اليسرى لفتح الدردشة.",
   noUsername: "بدون اسم مستخدم",
+  unknownUser: "مستخدم غير معروف",
 };
 
 export { ar };

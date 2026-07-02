@@ -4,6 +4,6 @@ namespace backend.Services.Interface
 {
     public interface IGameService
     {
-         Task SaveMatchHistoryAsync(TicTacTaoRoom room);
+         Task SaveMatchHistoryAsync(BaseGameRoom room);
     }
 }

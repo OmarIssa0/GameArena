@@ -1,4 +1,4 @@
-import { PasswordValidationEnum } from "@/types";
+import { PasswordValidationEnum } from "@/domain/enum/PasswordValidationEnum";
 
 type TEmailValidationText = {
   email: string;

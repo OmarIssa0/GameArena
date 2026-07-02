@@ -3,25 +3,25 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AuthLayout } from "@/app/(auth)/layout";
-import { TTextField } from "@/component/common/TTextField";
-import { TButton } from "@/component/common/TButton";
+import { GTextField } from "@/component/common/GTextField";
+import { GButton } from "@/component/common/GButton";
 import { OtpForm } from "@/component/auth/OtpForm";
 import { useTranslation } from "@/hooks/useSetting";
 import { en, type TResetPasswordTranslation } from "./i18n/en.i18n";
 import { ar } from "./i18n/ar.i18n";
-import { en as EnTextField } from "@/component/i18n/TTextField/en.i18n";
-import { ar as ArTextField } from "@/component/i18n/TTextField/ar.i18n";
+import { en as EnTextField } from "@/component/i18n/GTextField/en.i18n";
+import { ar as ArTextField } from "@/component/i18n/GTextField/ar.i18n";
 import { passwordValidator } from "@/utils";
-import { AuthFlowAnimationEnum } from "@/types";
+import { AuthFlowAnimationEnum } from "@/domain/enum/AuthFlowAnimationEnum";
 import { authService } from "@/services/def/AuthService";
-import type { TTextFieldTranslation } from "@/component/i18n/TTextField/en.i18n";
+import type { GTextFieldTranslation } from "@/component/i18n/GTextField/en.i18n";
 
 function ResetPasswordPage() {
   const router = useRouter();
   const t = useTranslation({
     en: { ...en, ...EnTextField },
     ar: { ...ar, ...ArTextField },
-  }) as TResetPasswordTranslation & TTextFieldTranslation;
+  }) as TResetPasswordTranslation & GTextFieldTranslation;
 
   const email = useSearchParams().get("email");
 
@@ -90,7 +90,7 @@ function ResetPasswordPage() {
 
       {step === "reset" && (
         <div className="w-full space-y-5">
-          <TTextField
+          <GTextField
             label={t.newPassword}
             placeholder={t.placeholder.newPassword}
             type="password"
@@ -100,13 +100,13 @@ function ResetPasswordPage() {
             onChange={(e) => handlePasswordChange(e.target.value)}
             className="w-full"
           />
-          <TButton
+          <GButton
             loading={loading}
             onClick={reset}
             className="w-full shadow-md"
           >
             {t.resetPassword}
-          </TButton>
+          </GButton>
         </div>
       )}
     </AuthLayout>

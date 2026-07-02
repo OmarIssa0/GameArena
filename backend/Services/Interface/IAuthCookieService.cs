@@ -1,4 +1,4 @@
-﻿using backend.DTOs;
+﻿using backend.DTOs.Responses;
 
 namespace backend.Services.Interface
 {

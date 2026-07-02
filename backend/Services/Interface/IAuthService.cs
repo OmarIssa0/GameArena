@@ -1,5 +1,3 @@
-using backend.Domain;
-using backend.DTOs;
 using backend.DTOs.Requests;
 using backend.DTOs.Responses;
 

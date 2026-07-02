@@ -4,27 +4,23 @@ import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   CheckCheck,
-  Loader2,
-  Search,
   Send,
   WifiOff,
   MessagesSquare,
+  Gamepad2,
+  ArrowLeft,
 } from "lucide-react";
 import { useTranslation } from "@/hooks/useSetting";
 import { useMessages } from "@/hooks/useMessages";
-import { EmptyState } from "@/component/common/TEmpty";
-import { TTile } from "@/component/common/TTile";
+import { EmptyState } from "@/component/common/GEmpty";
+import { GTile } from "@/component/common/GTile";
 import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
 import { ar } from "./i18n/ar.i18n";
 import { en, type TMessagesTranslation } from "./i18n/en.i18n";
-import { TButton } from "@/component/common/TButton";
-
-const statusClass: Record<UserStatusEnum, string> = {
-  [UserStatusEnum.Online]: "bg-emerald-500",
-  [UserStatusEnum.Offline]: "text-text",
-  [UserStatusEnum.InGame]: "bg-cyan-500",
-  [UserStatusEnum.All]: "bg-slate-500",
-};
+import { GButton } from "@/component/common/GButton";
+import { GInputSearch } from "@/component/common/GInputSearch";
+import { GSpinner } from "@/component/common/GSpinner";
+import { GStatusDot } from "@/component/common/GStatusDot";
 
 const formatStatus = (status: UserStatusEnum, t: TMessagesTranslation) => {
   switch (status) {
@@ -32,7 +28,6 @@ const formatStatus = (status: UserStatusEnum, t: TMessagesTranslation) => {
       return t.online;
     case UserStatusEnum.InGame:
       return t.playing;
-    case UserStatusEnum.Offline:
     default:
       return t.offline;
   }
@@ -43,11 +38,11 @@ const displayName = (user: {
   firstName: string | null;
   lastName: string | null;
   userName: string | null;
-}) =>
+}, fallback: string) =>
   user.fullName ??
   ([user.firstName, user.lastName].filter(Boolean).join(" ") ||
     user.userName ||
-    "Unknown user");
+    fallback);
 
 function MessagesPage() {
   const router = useRouter();
@@ -73,11 +68,9 @@ function MessagesPage() {
 
   const filteredFriends = useMemo(() => {
     const term = query.trim().toLowerCase();
-
     if (!term) return friends;
-
     return friends.filter((friend) => {
-      const name = displayName(friend).toLowerCase();
+      const name = displayName(friend, t.unknownUser).toLowerCase();
       const username = friend.userName?.toLowerCase() ?? "";
       return name.includes(term) || username.includes(term);
     });
@@ -88,24 +81,39 @@ function MessagesPage() {
     router.replace(`/messages?friend=${friendId}`);
   };
 
+  const handleBack = () => {
+    selectFriend(null);
+    router.replace("/messages");
+  };
+
+  // On phones we show either the conversation list OR the open chat, never both.
+  const showList = !selectedFriendId;
+
   return (
-    <div className="flex h-full min-h-0 relative z-10 overflow-hidden bg-transparent">
-      <aside className="w-80 shrink-0 border-r border-border/70 bg-bg-sidebar/50 flex flex-col">
-        <div className="p-4 border-b border-border/70 space-y-3">
+    <div className="flex h-full min-h-0 relative overflow-hidden">
+      {/* Conversations list */}
+      <aside
+        className={`w-full sm:w-80 shrink-0 border-r border-border/50 bg-bg-sidebar flex-col z-20 ${
+          showList ? "flex" : "hidden sm:flex"
+        }`}
+      >
+        <div className="p-4 border-b border-border/50 space-y-4">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <h1 className="text-xl font-bold text-text">{t.title}</h1>
+              <h1 className="text-xl font-bold text-text tracking-wide">
+                {t.title}
+              </h1>
               <p className="text-xs text-text-muted">{t.subtitle}</p>
             </div>
             <span
-              className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-medium ${
+              className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider border ${
                 isConnected
-                  ? "bg-emerald-500/15 text-emerald-300"
-                  : "bg-rose-500/15 text-rose-300"
+                  ? "bg-neon-green/10 text-neon-green border-neon-green/20"
+                  : "bg-error-bg text-error border-error/20"
               }`}
             >
               {isConnected ? (
-                <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                <span className="h-1.5 w-1.5 rounded-full bg-neon-green animate-pulse" />
               ) : (
                 <WifiOff className="h-3 w-3" />
               )}
@@ -113,58 +121,52 @@ function MessagesPage() {
             </span>
           </div>
 
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={t.search}
-              className="w-full rounded-xl border border-border bg-bg-card/90 py-3 pl-9 pr-3 text-sm text-text outline-none transition focus:border-primary"
-            />
-          </div>
+          <GInputSearch
+            value={query}
+            onChange={setQuery}
+            placeholder={t.search}
+          />
         </div>
 
-        <div className="flex-1 overflow-y-auto p-3">
+        <div className="flex-1 overflow-y-auto p-3 custom-scrollbar">
           {friendsLoading ? (
-            <div className="flex items-center justify-center py-10 text-text-muted">
-              <Loader2 className="h-5 w-5 animate-spin" />
+            <div className="flex justify-center py-10">
+              <GSpinner />
             </div>
           ) : filteredFriends.length === 0 ? (
-            <EmptyState
-              icon={<MessagesSquare className="h-10 w-10" />}
-              title={t.noFriendsTitle}
-              description={t.noFriendsDescription}
-            />
+            <div className="py-10 opacity-70">
+              <EmptyState
+                icon={<MessagesSquare className="h-10 w-10 text-text-muted" />}
+                title={t.noFriendsTitle}
+                description={t.noFriendsDescription}
+              />
+            </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-1">
               {filteredFriends.map((friend) => {
                 const active = friend.id === selectedFriendId;
-
                 return (
-                  <TButton
+                  <button
                     key={friend.id}
                     onClick={() => handleSelectFriend(friend.id)}
-                    className={`flex w-full items-center gap-3 rounded-2xl border px-3 py-3 text-left transition ${
-                      active
-                        ? "border-primary/60 bg-primary/10"
-                        : "border-transparent bg-bg-card/50 hover:border-border hover:bg-bg-card/80"
-                    }`}
+                    className={`nav-link w-full ${active ? "active" : ""}`}
                   >
-                    <TTile user={friend} size="sm" />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="truncate text-sm font-semibold text-text">
-                          {displayName(friend)}
-                        </p>
-                        <span
-                          className={`h-2.5 w-2.5 shrink-0 rounded-full ${statusClass[friend.status]}`}
-                        />
-                      </div>
-                      <p className="truncate text-xs text-text-muted">
+                    <div className="relative shrink-0">
+                      <GTile user={friend} size="sm" />
+                      <GStatusDot status={friend.status} />
+                    </div>
+                    <div className="min-w-0 flex-1 text-left">
+                      <p className="truncate text-sm font-bold">
+                        {displayName(friend, t.unknownUser)}
+                      </p>
+                      <p className="truncate text-xs text-text-muted flex items-center gap-1 mt-0.5">
+                        {friend.status === UserStatusEnum.InGame && (
+                          <Gamepad2 className="w-3 h-3 text-primary" />
+                        )}
                         {friend.userName ? `@${friend.userName}` : t.noUsername}
                       </p>
                     </div>
-                  </TButton>
+                  </button>
                 );
               })}
             </div>
@@ -172,81 +174,82 @@ function MessagesPage() {
         </div>
       </aside>
 
-      <section className="flex min-w-0 flex-1 flex-col">
+      {/* Chat area */}
+      <section
+        className={`min-w-0 flex-1 flex-col relative bg-bg-card/30 ${showList ? "hidden sm:flex" : "flex"}`}
+      >
         {selectedFriend ? (
           <>
-            <header className="flex items-center gap-3 border-b border-border/70 bg-bg-sidebar/40 px-4 py-4">
-              <TTile user={selectedFriend} size="sm" />
+            <header className="flex items-center gap-3 border-b border-border/50 bg-surface-alt/40 px-4 sm:px-6 py-4 shrink-0">
+              <button
+                onClick={handleBack}
+                className="sm:hidden p-1.5 -ml-1 text-text-secondary hover:text-text rounded-lg"
+              >
+                <ArrowLeft size={20} />
+              </button>
+              <div className="relative shrink-0">
+                <GTile user={selectedFriend} size="md" />
+                <GStatusDot status={selectedFriend.status} />
+              </div>
               <div className="min-w-0 flex-1">
-                <h2 className="truncate text-sm font-semibold text-text">
-                  {displayName(selectedFriend)}
+                <h2 className="truncate text-base font-bold text-text">
+                  {displayName(selectedFriend, t.unknownUser)}
                 </h2>
-                <p className="text-xs text-text-muted">
+                <p
+                  className={`text-xs font-medium ${selectedFriend.status === UserStatusEnum.InGame ? "text-primary" : "text-text-muted"}`}
+                >
                   {formatStatus(selectedFriend.status, t)}
                 </p>
               </div>
               {!isConnected && (
-                <span className="rounded-full bg-rose-500/15 px-3 py-1 text-[11px] text-rose-300">
+                <span className="rounded-lg bg-error-bg px-3 py-1.5 text-xs font-bold text-error border border-error/20">
                   {t.disconnected}
                 </span>
               )}
             </header>
 
-            <div className="flex-1 overflow-y-auto px-4 py-5">
+            <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 custom-scrollbar">
               {loadingMessages ? (
-                <div className="flex h-full items-center justify-center text-text-muted">
-                  <Loader2 className="h-6 w-6 animate-spin" />
+                <div className="flex h-full items-center justify-center">
+                  <GSpinner size="lg" />
                 </div>
               ) : messages.length === 0 ? (
-                <EmptyState
-                  icon={<MessagesSquare className="h-10 w-10" />}
-                  title={t.noMessagesTitle}
-                  description={t.noMessagesDescription}
-                />
+                <div className="flex h-full items-center justify-center opacity-60">
+                  <EmptyState
+                    icon={
+                      <MessagesSquare className="h-12 w-12 text-text-muted mb-4" />
+                    }
+                    title={t.noMessagesTitle}
+                    description={t.noMessagesDescription}
+                  />
+                </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-6">
                   {messages.map((message, index) => {
                     const outgoing = message.senderId !== selectedFriend.id;
                     const time = new Date(message.sentAt).toLocaleTimeString(
                       [],
-                      {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      },
+                      { hour: "2-digit", minute: "2-digit" },
                     );
 
                     return (
                       <div
                         key={`${message.senderId}-${message.sentAt.toISOString()}-${index}`}
-                        className={`flex ${
-                          outgoing ? "justify-end" : "justify-start"
-                        }`}
+                        className={`flex ${outgoing ? "justify-end" : "justify-start"}`}
                       >
                         <div
-                          className={`max-w-[75%] rounded-2xl px-4 py-3 shadow-sm ${
-                            outgoing
-                              ? "rounded-br-md bg-primary text-text"
-                              : "rounded-bl-md border border-border bg-bg-card text-text"
-                          }`}
+                          className={`msg-bubble ${outgoing ? "out" : "in"}`}
                         >
-                          <p className="whitespace-pre-wrap text-sm leading-6">
+                          <p className="whitespace-pre-wrap text-sm leading-relaxed wrap-anywhere">
                             {message.content}
                           </p>
                           <div
-                            className={`mt-2 flex items-center gap-2 text-[10px] ${
-                              outgoing
-                                ? "justify-end text-text/70"
-                                : "text-text-muted"
-                            }`}
+                            className={`mt-1.5 flex items-center gap-1.5 text-[10px] font-medium ${outgoing ? "justify-end text-white/70" : "text-text-muted"}`}
                           >
                             <span>{time}</span>
                             {outgoing && (
                               <CheckCheck
-                                className={`h-3.5 w-3.5 ${
-                                  message.isRead
-                                    ? "text-cyan-300"
-                                    : "text-text/40"
-                                }`}
+                                className={`h-3.5 w-3.5 ${message.isRead ? "text-white" : "text-white/40"}`}
                               />
                             )}
                           </div>
@@ -258,9 +261,13 @@ function MessagesPage() {
               )}
             </div>
 
-            <footer className="border-t border-border/70 bg-bg-sidebar/50 px-4 py-4 ">
-              {error && <p className="mb-3 text-sm text-rose-400">{error}</p>}
-              <div className="flex items-center gap-3 rounded-2xl border border-border bg-bg-card px-4 py-3">
+            <footer className="border-t border-border/50 bg-surface-alt/40 px-4 sm:px-6 py-4 shrink-0 pb-safe">
+              {error && (
+                <p className="mb-3 text-xs font-bold text-error bg-error-bg inline-block px-3 py-1 rounded-lg border border-error/20">
+                  {error}
+                </p>
+              )}
+              <div className="flex items-center gap-3 rounded-xl border border-border bg-bg-card px-2 py-2 focus-within:border-primary transition-colors">
                 <input
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
@@ -271,26 +278,32 @@ function MessagesPage() {
                     }
                   }}
                   placeholder={t.placeholder}
-                  className="flex-1 bg-transparent text-sm text-text outline-none placeholder:text-text-muted"
+                  className="flex-1 bg-transparent px-3 text-sm text-text outline-none placeholder:text-text-muted h-10"
                 />
-                <TButton
+                <GButton
                   onClick={() => void sendMessage()}
                   disabled={!draft.trim() || !isConnected}
-                  className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-text transition hover:bg-primary-hover disabled:cursor-not-allowed disabled:opacity-50"
+                  size="sm"
+                  leftIcon={<Send className="h-4 w-4" />}
                 >
-                  <Send className="h-4 w-4" />
-                  {t.send}
-                </TButton>
+                  <span className="hidden sm:inline">{t.send}</span>
+                </GButton>
               </div>
             </footer>
           </>
         ) : (
           <div className="flex flex-1 items-center justify-center p-6">
-            <EmptyState
-              icon={<MessagesSquare className="h-10 w-10" />}
-              title={t.selectConversationTitle}
-              description={t.selectConversationDescription}
-            />
+            <div className="max-w-md text-center opacity-70">
+              <div className="icon-tile w-20 h-20 bg-surface-alt mx-auto mb-6 border border-border/50 rotate-3">
+                <MessagesSquare className="h-10 w-10 text-primary -rotate-3" />
+              </div>
+              <h3 className="text-xl font-bold text-text mb-2">
+                {t.selectConversationTitle}
+              </h3>
+              <p className="text-sm text-text-muted">
+                {t.selectConversationDescription}
+              </p>
+            </div>
           </div>
         )}
       </section>

@@ -2,24 +2,37 @@
 
 import { useTicTacToe } from "@/hooks/useTicTacToe";
 import { useAuth } from "@/app/providers/AuthProvider";
-import { TButton } from "@/component/common/TButton";
+import { GButton } from "@/component/common/GButton";
+import { GSpinner } from "@/component/common/GSpinner";
+import { GTabs } from "@/component/common/GTabs";
+import { GTabItem } from "@/component/common/def/GTabs";
+import { GInputSearch } from "@/component/common/GInputSearch";
+import { friendService } from "@/services/def/FriendService";
+import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
+import { useTranslation } from "@/hooks/useSetting";
+import { en, type TicTacToeTranslations } from "./i18n/en.i18n";
+import { ar } from "./i18n/ar.i18n";
 import {
   Swords,
   Trophy,
   Frown,
   Handshake,
-  Loader2,
   User,
   Home,
   Sparkles,
   Zap,
+  Play,
+  UserPlus,
 } from "lucide-react";
-// import { useTranslation } from "@/Hooks/useTranslation";
-// import { en, type TicTacToeTranslations } from "./i18n/en.i18n";
-// import { ar } from "./i18n/ar.i18n";
+import { useState, useEffect, useMemo } from "react";
+import type { IFriend } from "@/domain/meta/ICommon";
+import { FriendsList } from "@/component/SocialPanel/FriendsList";
+
+type LobbyTab = "quick" | "invite";
 
 function TicTacToePage() {
   const { user } = useAuth();
+  const t = useTranslation({ en, ar }) as TicTacToeTranslations;
   const {
     board,
     gameState,
@@ -27,20 +40,65 @@ function TicTacToePage() {
     isSearching,
     isConnected,
     opponentDisconnected,
+    isMyTurn,
+    mySymbol,
     findMatch,
+    inviteFriend,
     makeMove,
     resetGame,
+    startGame,
   } = useTicTacToe();
 
-  //   const t = useTranslation({ en, ar }) as TicTacToeTranslations; // used if you want i18n later
+  // Local UI States
+  const [lobbyTab, setLobbyTab] = useState<LobbyTab>("quick");
+  const [, setLocalGameStarted] = useState(false);
 
-  const isMyTurn = gameState?.currentTurnPlayerId === user?.id;
-  const mySymbol = gameState?.player1Id === user?.id ? "X" : "O";
+  // Friend Fetching States
+  const [friends, setFriends] = useState<IFriend[]>([]);
+  const [loadingFriends, setLoadingFriends] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const opponentName =
     gameState?.player1Id === user?.id
-      ? gameState?.player2Username || "Opponent"
-      : gameState?.player1Username || "Opponent";
-  const myName = user?.userName || "You";
+      ? gameState?.player2Username || t.game.opponent
+      : gameState?.player1Username || t.game.opponent;
+  const myName = user?.userName || t.game.you;
+
+  // Fetch friends when invite tab is active
+  useEffect(() => {
+    let ignore = false;
+    if (lobbyTab === "invite" && friends.length === 0) {
+      setLoadingFriends(true);
+      friendService
+        .getFriends({ name: null, userStatus: UserStatusEnum.All })
+        .then((res) => {
+          if (!ignore) setFriends(res.data || []);
+        })
+        .catch(() => {})
+        .finally(() => {
+          if (!ignore) setLoadingFriends(false);
+        });
+    }
+    return () => {
+      ignore = true;
+    };
+  }, [lobbyTab, friends.length]);
+
+  useEffect(() => {
+    if (!roomId || !gameState?.player2Id) {
+      setLocalGameStarted(false);
+    }
+  }, [roomId, gameState?.player2Id]);
+
+  const filteredFriends = useMemo(() => {
+    const term = searchQuery.trim().toLowerCase();
+    if (!term) return friends;
+    return friends.filter((f) =>
+      `${f.firstName ?? ""} ${f.lastName ?? ""} ${f.userName ?? ""}`
+        .toLowerCase()
+        .includes(term),
+    );
+  }, [friends, searchQuery]);
 
   const handleClick = (index: number) => {
     if (!gameState || gameState.isFinished) return;
@@ -48,35 +106,67 @@ function TicTacToePage() {
     if (board[index]) return;
     makeMove(index);
   };
+  const startGameNew = () => {
+    if (
+      !gameState ||
+      user?.id !== gameState?.player1Id ||
+      !gameState?.player2Id
+    )
+      return;
+    setLocalGameStarted(true);
+    startGame(gameState.player2Id);
+    console.log("Game ", gameState);
+  };
+
+  const handleInvite = (friendId: string) => {
+    inviteFriend(friendId);
+    setLobbyTab("quick");
+  };
+
+  const lobbyTabs = useMemo<GTabItem<LobbyTab>[]>(
+    () => [
+      {
+        id: "quick",
+        label: t.lobby.tabs.quick,
+        icon: <Sparkles className="w-4 h-4" />,
+      },
+      {
+        id: "invite",
+        label: t.lobby.tabs.invite,
+        icon: <UserPlus className="w-4 h-4" />,
+      },
+    ],
+    [t],
+  );
 
   const getWinnerMessage = () => {
     if (opponentDisconnected) {
       return {
-        title: "Opponent Forfeited!",
-        description: "Your opponent left the game. You win by default!",
+        title: t.game.opponentForfeited,
+        description: t.game.opponentForfeitedDesc,
         icon: <Trophy className="w-16 h-16 text-neon-green animate-bounce" />,
         color: "text-neon-green",
       };
     }
     if (gameState?.winnerPlayerId === user?.id) {
       return {
-        title: "VICTORY! 🎉",
-        description: "Spectacular play! You defeated your opponent.",
+        title: t.game.victory,
+        description: t.game.victoryDesc,
         icon: <Trophy className="w-16 h-16 text-yellow-400 animate-bounce" />,
         color: "text-yellow-400",
       };
     }
     if (gameState?.isFinished && !gameState.winnerPlayerId) {
       return {
-        title: "IT'S A DRAW! 🤝",
-        description: "A hard-fought battle! It's a tie.",
+        title: t.game.draw,
+        description: t.game.drawDesc,
         icon: <Handshake className="w-16 h-16 text-neon-cyan" />,
         color: "text-neon-cyan",
       };
     }
     return {
-      title: "DEFEAT! 😢",
-      description: "Good effort, but opponent claimed victory this time.",
+      title: t.game.defeat,
+      description: t.game.defeatDesc,
       icon: <Frown className="w-16 h-16 text-red-400" />,
       color: "text-red-400",
     };
@@ -86,59 +176,95 @@ function TicTacToePage() {
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-80px)] w-full py-8 px-4 md:px-8 relative z-10">
       {/* LOBBY / MATCHMAKING CARD */}
       {!roomId && (
-        <div className="w-full max-w-md bg-bg-card/70 border border-border/80 rounded-3xl p-8 shadow-2xl text-center animate-fade-in relative overflow-hidden">
+        <div className="w-full max-w-md bg-bg-card/70 border border-border/80 rounded-3xl p-8 shadow-2xl text-center animate-fade-in relative overflow-hidden transition-all duration-300">
           <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-2xl" />
           <div className="absolute bottom-0 left-0 w-32 h-32 bg-neon-cyan/5 rounded-full blur-2xl" />
-          <div className="flex justify-center mb-6">
-            <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-primary to-neon-purple flex items-center justify-center shadow-[0_0_25px_-5px_#7c5cfc]">
-              <Swords className="w-8 h-8 text-text" />
-            </div>
-          </div>
-          <h1 className="text-3xl font-black tracking-tight mb-2 text-text">
-            Tic Tac{" "}
-            <span className="bg-linear-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
-              Toe
-            </span>
-          </h1>
-          <p className="text-text-secondary text-sm mb-8">
-            Deploy strategic marks in a classic 3x3 duel
-          </p>
 
-          {isSearching ? (
+          {!isSearching ? (
+            <div className="animate-fade-in">
+              <div className="flex justify-center mb-6">
+                <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-primary to-neon-purple flex items-center justify-center shadow-[0_0_25px_-5px_#7c5cfc]">
+                  <Swords className="w-8 h-8 text-text" />
+                </div>
+              </div>
+              <h1 className="text-3xl font-black tracking-tight mb-2 text-text">
+                {t.lobby.title}
+              </h1>
+              <p className="text-text-secondary text-sm mb-6">
+                {t.lobby.subtitle}
+              </p>
+
+              <GTabs
+                tabs={lobbyTabs}
+                value={lobbyTab}
+                onChange={setLobbyTab}
+                variant="pills"
+                fullWidth
+                className="mb-6"
+              />
+
+              {lobbyTab === "quick" ? (
+                <div className="space-y-4">
+                  <GButton
+                    onClick={findMatch}
+                    disabled={!isConnected}
+                    fullWidth
+                    leftIcon={<Sparkles className="w-5 h-5" />}
+                  >
+                    {t.lobby.findMatch}
+                  </GButton>
+                  {!isConnected && (
+                    <p className="text-xs text-error bg-error-bg py-2 rounded-lg">
+                      {t.lobby.connecting}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div className="animate-fade-in flex flex-col text-left">
+                  <div className="mb-4">
+                    <GInputSearch
+                      value={searchQuery}
+                      onChange={setSearchQuery}
+                      placeholder={t.lobby.searchFriends}
+                    />
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto max-h-62.5 pr-2 custom-scrollbar bg-surface/30 rounded-xl border border-border/50 p-2">
+                    {loadingFriends ? (
+                      <div className="flex justify-center items-center h-32">
+                        <GSpinner />
+                      </div>
+                    ) : filteredFriends.length > 0 ? (
+                      <FriendsList
+                        friends={filteredFriends}
+                        onSelectFriend={handleInvite}
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center h-32 text-text-muted text-sm">
+                        <Frown className="w-8 h-8 mb-2 opacity-50" />
+                        {t.lobby.noFriendsFound}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
             <div className="space-y-6 animate-fade-in">
               <div className="flex justify-center">
-                <Loader2 className="w-10 h-10 text-primary animate-spin" />
+                <GSpinner size="lg" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-text animate-pulse">
-                  Searching for opponent...
+                  {t.lobby.searchingTitle}
                 </p>
                 <p className="text-xs text-text-muted mt-1">
-                  Checking GameArena servers
+                  {t.lobby.searchingSubtitle}
                 </p>
               </div>
-              <TButton
-                onClick={resetGame}
-                className="w-full py-3 bg-surface hover:bg-surface-alt text-text-secondary hover:text-text rounded-xl border border-border transition-all text-sm font-bold"
-              >
-                Cancel Search
-              </TButton>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <TButton
-                onClick={findMatch}
-                disabled={!isConnected}
-                className="w-full py-4 bg-linear-to-r from-primary to-primary-hover text-text rounded-xl font-bold shadow-[0_4px_20px_rgba(124,92,252,0.3)] hover:shadow-[0_4px_25px_rgba(124,92,252,0.5)] transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                <Sparkles className="w-5 h-5" />
-                Find Match
-              </TButton>
-              {!isConnected && (
-                <p className="text-xs text-error bg-error-bg py-2 rounded-lg">
-                  Connecting to Game Server...
-                </p>
-              )}
+              <GButton onClick={resetGame} variant="secondary" fullWidth>
+                {t.lobby.cancelSearch}
+              </GButton>
             </div>
           )}
         </div>
@@ -147,16 +273,16 @@ function TicTacToePage() {
       {/* WAITING FOR OPPONENT */}
       {roomId && !gameState?.player2Id && (
         <div className="w-full max-w-lg space-y-6 animate-fade-in">
-          <div className="grid grid-cols-7 items-center bg-bg-card/50  border border-border/60 rounded-2xl p-4 shadow-lg">
+          <div className="grid grid-cols-7 items-center bg-bg-card/50 border border-border/60 rounded-2xl p-4 shadow-lg">
             {/* Player 1 */}
             <div className="col-span-3 flex flex-col items-center text-center p-2 relative">
-              <div className="relative w-16 h-16 rounded-xl flex items-center justify-center border-2 border-border-light bg-surface">
-                <User className="w-8 h-8 text-text-secondary" />
+              <div className="relative w-16 h-16 rounded-xl flex items-center justify-center border-2 border-border-light bg-surface shadow-[0_0_15px_rgba(124,92,252,0.15)]">
+                <User className="w-8 h-8 text-primary" />
               </div>
               <span className="text-sm font-semibold text-text mt-3 truncate max-w-full">
                 {gameState?.player1Id === user?.id
                   ? `${myName} (You)`
-                  : gameState?.player1Username || "Player 1"}
+                  : gameState?.player1Username || t.game.player1}
               </span>
             </div>
             {/* VS */}
@@ -165,28 +291,79 @@ function TicTacToePage() {
               <div className="w-px h-10 bg-border/40 mt-1" />
             </div>
             {/* Player 2 (waiting) */}
-            <div className="col-span-3 flex flex-col items-center text-center p-2 relative">
-              <div className="relative w-16 h-16 rounded-xl flex items-center justify-center border-2 border-border-light bg-surface">
-                <User className="w-8 h-8 text-text-secondary" />
+            <div className="col-span-3 flex flex-col items-center text-center p-2 relative opacity-50">
+              <div className="relative w-16 h-16 rounded-xl flex items-center justify-center border-2 border-dashed border-border-light bg-surface/50">
+                <GSpinner size="sm" className="text-text-secondary" />
               </div>
               <span className="text-sm font-semibold text-text mt-3 truncate max-w-full">
-                {gameState?.player2Id === user?.id
-                  ? `${myName} (You)`
-                  : gameState?.player2Username || "Player 2"}
+                {t.game.waiting}
               </span>
             </div>
           </div>
           <p className="text-center text-text-secondary text-sm animate-pulse">
-            Waiting for opponent to join...
+            {t.lobby.waitingForOpponent}
           </p>
+          <div className="flex justify-center">
+            <GButton onClick={resetGame} variant="secondary">
+              {t.lobby.cancelMatch}
+            </GButton>
+          </div>
         </div>
       )}
 
-      {/* GAME IN PROGRESS */}
-      {roomId && gameState?.player2Id && (
+      {/* GAME FOUND - PRE-START SCREEN */}
+      {roomId && gameState?.player2Id && !gameState.hasStarted && (
+        <div className="w-full max-w-lg bg-bg-card/70 border border-border/80 rounded-3xl p-8 shadow-2xl text-center animate-fade-in relative overflow-hidden">
+          <div className="absolute top-0 inset-x-0 h-1 bg-linear-to-r from-neon-blue via-primary to-neon-magenta animate-pulse" />
+          <h2 className="text-2xl font-black text-text mb-6">
+            {t.lobby.opponentFound}
+          </h2>
+
+          <div className="flex items-center justify-center gap-6 mb-10">
+            <div className="flex flex-col items-center">
+              <div className="w-20 h-20 rounded-2xl border-2 border-neon-blue bg-neon-blue/10 flex items-center justify-center shadow-[0_0_20px_rgba(0,210,255,0.2)]">
+                <span className="text-3xl font-black text-neon-blue">X</span>
+              </div>
+              <span className="text-sm font-bold mt-3 text-text truncate max-w-25">
+                {gameState.player1Id === user?.id
+                  ? t.game.you
+                  : gameState.player1Username}
+              </span>
+            </div>
+
+            <div className="text-text-muted font-black italic text-xl">VS</div>
+
+            <div className="flex flex-col items-center">
+              <div className="w-20 h-20 rounded-2xl border-2 border-neon-magenta bg-neon-magenta/10 flex items-center justify-center shadow-[0_0_20px_rgba(224,64,251,0.2)]">
+                <span className="text-3xl font-black text-neon-magenta">O</span>
+              </div>
+              <span className="text-sm font-bold mt-3 text-text truncate max-w-25">
+                {gameState.player2Id === user?.id
+                  ? t.game.you
+                  : gameState.player2Username}
+              </span>
+            </div>
+          </div>
+
+          <GButton
+            disabled={user?.id !== gameState.player1Id}
+            onClick={startGameNew}
+            fullWidth
+            size="lg"
+            leftIcon={<Play className="w-6 h-6 fill-current" />}
+          >
+            {user?.id === gameState.player1Id
+              ? t.lobby.startGame
+              : t.lobby.waitingForStart}
+          </GButton>
+        </div>
+      )}
+
+      {/* GAME IN PROGRESS (BOARD) */}
+      {roomId && gameState?.player2Id && gameState.hasStarted && (
         <div className="w-full max-w-lg space-y-6 animate-fade-in">
           {/* PLAYERS PANEL */}
-          <div className="grid grid-cols-7 items-center bg-bg-card/50  border border-border/60 rounded-2xl p-4 shadow-lg">
+          <div className="grid grid-cols-7 items-center bg-bg-card/50 border border-border/60 rounded-2xl p-4 shadow-lg">
             {/* Player 1 (X) */}
             <div className="col-span-3 flex flex-col items-center text-center p-2 relative">
               <div
@@ -205,7 +382,7 @@ function TicTacToePage() {
               <span className="text-sm font-semibold text-text mt-3 truncate max-w-full">
                 {gameState?.player1Id === user?.id
                   ? `${myName} (You)`
-                  : gameState?.player1Username || "Player 1"}
+                  : gameState?.player1Username || t.game.player1}
               </span>
               {gameState?.currentTurnPlayerId === gameState?.player1Id &&
                 !gameState?.isFinished && (
@@ -239,7 +416,7 @@ function TicTacToePage() {
               <span className="text-sm font-semibold text-text mt-3 truncate max-w-full">
                 {gameState?.player2Id === user?.id
                   ? `${myName} (You)`
-                  : gameState?.player2Username || "Player 2"}
+                  : gameState?.player2Username || t.game.player2}
               </span>
               {gameState?.currentTurnPlayerId === gameState?.player2Id &&
                 !gameState?.isFinished && (
@@ -263,8 +440,8 @@ function TicTacToePage() {
                 className={`w-4 h-4 ${isMyTurn ? "text-neon-cyan" : "text-text-muted"}`}
               />
               {isMyTurn
-                ? "Your Turn - Make your move!"
-                : `Waiting for ${opponentName}...`}
+                ? t.game.yourTurn
+                : t.game.waitingFor.replace("{name}", opponentName)}
             </div>
           )}
 
@@ -275,7 +452,7 @@ function TicTacToePage() {
                 const isCellActive =
                   !cell && isMyTurn && !gameState?.isFinished;
                 return (
-                  <TButton
+                  <GButton
                     key={i}
                     onClick={() => handleClick(i)}
                     disabled={!isCellActive}
@@ -302,7 +479,7 @@ function TicTacToePage() {
                         {mySymbol}
                       </span>
                     )}
-                  </TButton>
+                  </GButton>
                 );
               })}
             </div>
@@ -320,19 +497,17 @@ function TicTacToePage() {
                   {getWinnerMessage().description}
                 </p>
                 <div className="flex gap-4 mt-8 w-full max-w-xs">
-                  <TButton
-                    onClick={findMatch}
-                    className="flex-1 py-3 bg-linear-to-r from-primary to-primary-hover hover:from-primary-hover hover:to-primary text-text font-bold rounded-xl transition-all shadow-lg text-sm"
-                  >
-                    Play Again
-                  </TButton>
-                  <TButton
+                  <GButton onClick={findMatch} className="flex-1">
+                    {t.end.playAgain}
+                  </GButton>
+                  <GButton
                     onClick={resetGame}
-                    className="flex-1 py-3 bg-surface hover:bg-surface-alt border border-border text-text-secondary hover:text-text font-bold rounded-xl transition-all text-sm flex items-center justify-center gap-1.5"
+                    variant="secondary"
+                    className="flex-1"
+                    leftIcon={<Home className="w-4 h-4" />}
                   >
-                    <Home className="w-4 h-4" />
-                    Lobby
-                  </TButton>
+                    {t.end.lobby}
+                  </GButton>
                 </div>
               </div>
             )}

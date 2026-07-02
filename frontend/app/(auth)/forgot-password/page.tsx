@@ -3,25 +3,24 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { AuthLayout } from "@/app/(auth)/layout";
-import { TTextField } from "@/component/common/TTextField";
-import { TButton } from "@/component/common/TButton";
+import { GTextField } from "@/component/common/GTextField";
+import { GButton } from "@/component/common/GButton";
 import { en, type TForgotPasswordTranslation } from "./i18n/en.i18n";
 import { ar } from "./i18n/ar.i18n";
-import { en as EnTextField } from "@/component/i18n/TTextField/en.i18n";
-import { ar as ArTextField } from "@/component/i18n/TTextField/ar.i18n";
+import { en as EnTextField } from "@/component/i18n/GTextField/en.i18n";
+import { ar as ArTextField } from "@/component/i18n/GTextField/ar.i18n";
 import { useTranslation } from "@/hooks/useSetting";
 import { emailValidator } from "@/utils";
-import { AuthFlowAnimationEnum } from "@/types";
+import { AuthFlowAnimationEnum } from "@/domain/enum/AuthFlowAnimationEnum";
 import { authService } from "@/services/def/AuthService";
-import type { TTextFieldTranslation } from "@/component/i18n/TTextField/en.i18n";
-import { useAuth } from "@/app/providers/AuthProvider";
+import type { GTextFieldTranslation } from "@/component/i18n/GTextField/en.i18n";
 
 function ForgotPasswordPage() {
   const router = useRouter();
   const t = useTranslation({
     en: { ...en, ...EnTextField },
     ar: { ...ar, ...ArTextField },
-  }) as TForgotPasswordTranslation & TTextFieldTranslation;
+  }) as TForgotPasswordTranslation & GTextFieldTranslation;
 
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -55,7 +54,7 @@ function ForgotPasswordPage() {
   return (
     <AuthLayout page={AuthFlowAnimationEnum.RESET_PASSWORD}>
       <div className="w-full space-y-5">
-        <TTextField
+        <GTextField
           label={t.email}
           placeholder={t.placeholder.email}
           value={email}
@@ -65,9 +64,9 @@ function ForgotPasswordPage() {
           onChange={(e) => handleChange(e.target.value)}
           className="w-full"
         />
-        <TButton loading={loading} onClick={send} className="w-full shadow-md">
+        <GButton loading={loading} onClick={send} className="w-full shadow-md">
           {t.sendCode}
-        </TButton>
+        </GButton>
       </div>
     </AuthLayout>
   );

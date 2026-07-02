@@ -6,7 +6,7 @@ import {
   type ClipboardEvent,
   type KeyboardEvent,
 } from "react";
-import { TButton } from "@/component/common/TButton";
+import { GButton } from "@/component/common/GButton";
 import { en, type TOtpTranslation } from "../i18n/Otp/en.i18n";
 import { ar } from "../i18n/Otp/ar.i18n";
 import { useTranslation } from "@/hooks/useSetting";
@@ -120,24 +120,23 @@ function OtpForm({ email, onSuccess }: IOtpFormProps) {
         </p>
       )}
 
-      {/* Action CTA Row Matrix */}
       <div className="space-y-2 pt-1">
-        <TButton
+        <GButton
           loading={loading.verify}
           onClick={verify}
           className="w-full shadow-md"
         >
           {t.verify}
-        </TButton>
+        </GButton>
 
-        <TButton
+        <GButton
           type="button"
           disabled={loading.verify || loading.resend}
           onClick={resend}
           className="w-full shadow-md"
         >
           {t.resendCode}
-        </TButton>
+        </GButton>
       </div>
     </div>
   );

@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { TTextField } from "@/component/common/TTextField";
-import { TButton } from "@/component/common/TButton";
+import { GTextField } from "@/component/common/GTextField";
+import { GButton } from "@/component/common/GButton";
 import { emailValidator, passwordValidator } from "@/utils";
 import {
   en,
@@ -12,14 +12,14 @@ import {
 import { ar } from "@/app/(auth)/register/i18n/ar.i18n";
 import {
   en as EnTextField,
-  TTextFieldTranslation,
-} from "@/component/i18n/TTextField/en.i18n";
-import { ar as ArTextField } from "@/component/i18n/TTextField/ar.i18n";
+  GTextFieldTranslation,
+} from "@/component/i18n/GTextField/en.i18n";
+import { ar as ArTextField } from "@/component/i18n/GTextField/ar.i18n";
 import { useTranslation } from "@/hooks/useSetting";
 import Link from "next/link";
 import { ErrorCodeEnum } from "@/domain/enum/ErrorCodeEnum";
 import { authService } from "@/services/def/AuthService";
-import { FieldRegisterEnum } from "@/types/meta/TFieldRegister";
+import { FieldRegisterEnum } from "@/domain/enum/FieldRegisterEnum";
 import { AxiosError } from "axios";
 import { IApiResponse } from "@/domain/meta/IApiResponse";
 
@@ -28,7 +28,7 @@ function RegisterForm() {
   const t = useTranslation({
     en: { ...en, ...EnTextField },
     ar: { ...ar, ...ArTextField },
-  }) as TRegisterTranslation & TTextFieldTranslation;
+  }) as TRegisterTranslation & GTextFieldTranslation;
   const [loading, setLoading] = useState(false);
 
   const [email, setEmail] = useState("");
@@ -128,7 +128,7 @@ function RegisterForm() {
       }}
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <TTextField
+        <GTextField
           label={t.firstName}
           placeholder={t.placeholder.firstName}
           value={firstName}
@@ -139,7 +139,7 @@ function RegisterForm() {
             handleChange(FieldRegisterEnum.firstName, e.target.value)
           }
         />
-        <TTextField
+        <GTextField
           label={t.lastName}
           placeholder={t.placeholder.lastName}
           value={lastName}
@@ -150,7 +150,7 @@ function RegisterForm() {
             handleChange(FieldRegisterEnum.lastName, e.target.value)
           }
         />
-        <TTextField
+        <GTextField
           label={t.email}
           placeholder={t.placeholder.email}
           value={email}
@@ -162,7 +162,7 @@ function RegisterForm() {
             handleChange(FieldRegisterEnum.email, e.target.value)
           }
         />
-        <TTextField
+        <GTextField
           label={t.userName}
           placeholder={t.placeholder.userName}
           value={userName}
@@ -174,7 +174,7 @@ function RegisterForm() {
             handleChange(FieldRegisterEnum.userName, e.target.value)
           }
         />
-        <TTextField
+        <GTextField
           label={t.password}
           placeholder={t.placeholder.password}
           value={password}
@@ -187,7 +187,7 @@ function RegisterForm() {
             handleChange(FieldRegisterEnum.password, e.target.value)
           }
         />
-        <TTextField
+        <GTextField
           label={t.confirmPassword}
           placeholder={t.placeholder.confirmPassword}
           value={confirmPassword}
@@ -215,13 +215,13 @@ function RegisterForm() {
         </div>
       )}
       <div className="mt-6 space-y-4">
-        <TButton
+        <GButton
           loading={loading}
           className="w-full shadow-sm hover:shadow-glow"
           type="submit"
         >
           {loading ? t.createElipses : t.create}
-        </TButton>
+        </GButton>
 
         <div className="text-sm text-center text-text-secondary pt-2 border-t border-border/40">
           {t.haveAccount}{" "}

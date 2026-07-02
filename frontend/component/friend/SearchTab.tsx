@@ -1,13 +1,20 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Filter, Loader2, Search, UserPlus, X } from "lucide-react";
+import { Filter, UserPlus } from "lucide-react";
 import type { IUserFilterRequest } from "@/domain/meta/IUserFilterRequest";
 import type { IUser } from "@/domain/meta/IUser";
 import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
 import { friendService } from "@/services/def/FriendService";
 import { userService } from "@/services/def/UserService";
-import { TButton } from "../common/TButton";
+import { GButton } from "../common/GButton";
+import { GInputSearch } from "../common/GInputSearch";
+import { GSelect } from "../common/GSelect";
+import { GSpinner } from "../common/GSpinner";
+import { GErrorBanner } from "../common/GErrorBanner";
+import { useTranslation } from "@/hooks/useSetting";
+import { en, type TFriendsTranslation } from "@/app/(dashboard)/friends/i18n/en.i18n";
+import { ar } from "@/app/(dashboard)/friends/i18n/ar.i18n";
 
 type TSearchResult = IUser & {
   isSendRequest: boolean;
@@ -18,13 +25,14 @@ const defaultFilter: IUserFilterRequest = {
   userStatus: UserStatusEnum.All,
 };
 
-const displayName = (user: IUser) =>
+const displayName = (user: IUser, fallback: string) =>
   user.fullName ??
   ([user.firstName, user.lastName].filter(Boolean).join(" ") ||
     user.userName ||
-    "Unknown user");
+    fallback);
 
 function SearchTab() {
+  const t = useTranslation({ en, ar }) as TFriendsTranslation;
   const [userFilter, setUserFilter] =
     useState<IUserFilterRequest>(defaultFilter);
   const [searchResults, setSearchResults] = useState<TSearchResult[]>([]);
@@ -34,16 +42,19 @@ function SearchTab() {
   const query = useMemo(() => userFilter.name?.trim() ?? "", [userFilter.name]);
 
   useEffect(() => {
+    let ignore = false;
     const timer = window.setTimeout(async () => {
       if (!query) {
-        setSearchResults([]);
-        setSearchError(null);
-        setSearching(false);
+        if (!ignore) {
+          setSearchResults([]);
+          setSearchError(null);
+          setSearching(false);
+        }
         return;
       }
 
-      setSearching(true);
-      setSearchError(null);
+      if (!ignore) setSearching(true);
+      if (!ignore) setSearchError(null);
 
       try {
         const [usersRes, sentRes] = await Promise.all([
@@ -55,22 +66,29 @@ function SearchTab() {
           (sentRes.data ?? []).map((request) => request.receiverId),
         );
 
-        setSearchResults(
-          (usersRes.data ?? []).map((user) => ({
-            ...user,
-            isSendRequest: sentIds.has(user.id),
-          })),
-        );
+        if (!ignore) {
+          setSearchResults(
+            (usersRes.data ?? []).map((user) => ({
+              ...user,
+              isSendRequest: sentIds.has(user.id),
+            })),
+          );
+        }
       } catch (err) {
-        console.error("Failed to search users", err);
-        setSearchResults([]);
-        setSearchError("Failed to search users. Please try again.");
+        if (!ignore) {
+          console.error("Failed to search users", err);
+          setSearchResults([]);
+          setSearchError(t.searchTab.searchError);
+        }
       } finally {
-        setSearching(false);
+        if (!ignore) setSearching(false);
       }
     }, 300);
 
-    return () => window.clearTimeout(timer);
+    return () => {
+      window.clearTimeout(timer);
+      ignore = true;
+    };
   }, [query, userFilter]);
 
   const handleSendRequest = async (receiverId: string) => {
@@ -83,7 +101,7 @@ function SearchTab() {
       );
     } catch (err) {
       console.error("Failed to send friend request", err);
-      setSearchError("Failed to send request. Please try again.");
+      setSearchError(t.searchTab.sendError);
     }
   };
 
@@ -96,69 +114,46 @@ function SearchTab() {
   return (
     <div className="space-y-5">
       <div className="grid gap-3 lg:grid-cols-[1fr_auto]">
-        <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
-          <input
-            type="text"
-            placeholder="Search users by name or email..."
-            value={userFilter.name ?? ""}
-            onChange={(e) =>
-              setUserFilter((prev) => ({ ...prev, name: e.target.value }))
-            }
-            className="w-full rounded-2xl border border-border bg-bg-card px-10 py-3 text-sm text-text outline-none transition focus:border-primary"
-          />
-          {userFilter.name && (
-            <TButton
-              onClick={clearSearch}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted transition hover:text-text"
-              aria-label="Clear search"
-            >
-              <X className="h-4 w-4" />
-            </TButton>
-          )}
-        </div>
+        <GInputSearch
+          value={userFilter.name ?? ""}
+          onChange={(value) => setUserFilter((prev) => ({ ...prev, name: value }))}
+          placeholder={t.searchTab.placeholder}
+          onClear={clearSearch}
+          clearLabel={t.searchTab.clearSearch}
+        />
 
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <Filter className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
-            <select
-              value={userFilter.userStatus}
-              onChange={(e) =>
-                setUserFilter((prev) => ({
-                  ...prev,
-                  userStatus: Number(e.target.value) as UserStatusEnum,
-                }))
-              }
-              className="min-w-40 appearance-none rounded-2xl border border-border bg-bg-card py-3 pl-9 pr-8 text-sm text-text outline-none transition focus:border-primary"
-            >
-              <option value={UserStatusEnum.All}>All Statuses</option>
-              <option value={UserStatusEnum.Online}>Online</option>
-              <option value={UserStatusEnum.Offline}>Offline</option>
-              <option value={UserStatusEnum.InGame}>In Game</option>
-            </select>
-          </div>
-        </div>
+        <GSelect
+          startIcon={<Filter className="h-4 w-4" />}
+          value={userFilter.userStatus}
+          onChange={(e) =>
+            setUserFilter((prev) => ({
+              ...prev,
+              userStatus: Number(e.target.value) as UserStatusEnum,
+            }))
+          }
+          className="min-w-40"
+          options={[
+            { value: UserStatusEnum.All, label: t.searchTab.allStatuses },
+            { value: UserStatusEnum.Online, label: t.searchTab.online },
+            { value: UserStatusEnum.Offline, label: t.searchTab.offline },
+            { value: UserStatusEnum.InGame, label: t.searchTab.inGame },
+          ]}
+        />
       </div>
 
-      <p className="text-xs text-text-muted">
-        Start typing a name or email to search available users.
-      </p>
+      <p className="text-xs text-text-muted">{t.searchTab.hint}</p>
 
-      {searchError && (
-        <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 px-4 py-4 text-sm text-rose-200">
-          {searchError}
-        </div>
-      )}
+      {searchError && <GErrorBanner message={searchError} />}
 
       {searching ? (
-        <div className="flex items-center justify-center py-12 text-text-muted">
-          <Loader2 className="h-6 w-6 animate-spin" />
+        <div className="flex justify-center py-12">
+          <GSpinner />
         </div>
       ) : query ? (
         <div className="space-y-3">
           {searchResults.length === 0 ? (
             <div className="rounded-2xl border border-border bg-bg-card/70 px-4 py-8 text-center text-sm text-text-muted">
-              No users matched your search.
+              {t.searchTab.noResults}
             </div>
           ) : (
             searchResults.map((user) => (
@@ -168,25 +163,27 @@ function SearchTab() {
               >
                 <div className="min-w-0">
                   <p className="truncate font-medium text-text">
-                    {displayName(user)}
+                    {displayName(user, t.searchTab.unknownUser)}
                   </p>
                   <p className="truncate text-xs text-text-muted">
-                    {user.userName ? `@${user.userName}` : "No username"}
+                    {user.userName
+                      ? `@${user.userName}`
+                      : t.searchTab.noUsername}
                   </p>
                 </div>
 
                 {user.isSendRequest ? (
                   <span className="rounded-xl border border-border px-3 py-2 text-xs font-medium text-text-muted">
-                    Request Sent
+                    {t.searchTab.requestSent}
                   </span>
                 ) : (
-                  <TButton
+                  <GButton
                     onClick={() => void handleSendRequest(user.id)}
                     size="sm"
                     leftIcon={<UserPlus className="h-4 w-4" />}
                   >
-                    Add
-                  </TButton>
+                    {t.searchTab.add}
+                  </GButton>
                 )}
               </div>
             ))
@@ -194,7 +191,7 @@ function SearchTab() {
         </div>
       ) : (
         <div className="rounded-2xl border border-dashed border-border bg-bg-card/40 px-4 py-10 text-center text-sm text-text-muted">
-          Use the search field above to look up users.
+          {t.searchTab.emptyHint}
         </div>
       )}
     </div>

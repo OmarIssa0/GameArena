@@ -3,7 +3,7 @@
 import { useEffect, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { AuthAnimation } from "@/component/auth/AuthAnimation";
-import { AuthFlowAnimationEnum } from "@/types";
+import { AuthFlowAnimationEnum } from "@/domain/enum/AuthFlowAnimationEnum";
 import { LangTheme } from "@/component/common/LangTheme";
 import { useAuth } from "@/app/providers/AuthProvider";
 

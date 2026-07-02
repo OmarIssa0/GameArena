@@ -1,14 +1,19 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Check, RefreshCw, UserCheck, X } from "lucide-react";
+import { Check, UserCheck, X } from "lucide-react";
 import { friendService } from "@/services/def/FriendService";
-import { EmptyState } from "@/component/common/TEmpty";
-import { SkeletonRow } from "./SkeletonRow";
+import { EmptyState } from "@/component/common/GEmpty";
 import type { IFriendRequestReceived } from "@/domain/meta/IFriendRequestReceived";
-import { TButton } from "../common/TButton";
+import { GButton } from "../common/GButton";
+import { GErrorBanner } from "../common/GErrorBanner";
+import { GSkeleton } from "../common/GSkeleton";
+import { useTranslation } from "@/hooks/useSetting";
+import { en, type TFriendsTranslation } from "@/app/(dashboard)/friends/i18n/en.i18n";
+import { ar } from "@/app/(dashboard)/friends/i18n/ar.i18n";
 
 function RequestsTab() {
+  const t = useTranslation({ en, ar }) as TFriendsTranslation;
   const [requests, setRequests] = useState<IFriendRequestReceived[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionId, setActionId] = useState<string | null>(null);
@@ -23,12 +28,12 @@ function RequestsTab() {
       setRequests(response.data ?? []);
     } catch (err) {
       console.error("Failed to load friend requests", err);
-      setError("Failed to load requests. Please try again.");
+      setError(t.requestsTab.loadError);
       setRequests([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t.requestsTab.loadError]);
 
   useEffect(() => {
     let active = true;
@@ -41,7 +46,7 @@ function RequestsTab() {
       } catch (err) {
         if (!active) return;
         console.error("Failed to load friend requests", err);
-        setError("Failed to load requests. Please try again.");
+        setError(t.requestsTab.loadError);
         setRequests([]);
       } finally {
         if (active) setLoading(false);
@@ -51,7 +56,7 @@ function RequestsTab() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [t.requestsTab.loadError]);
 
   const acceptRequest = async (senderId: string) => {
     setActionId(senderId);
@@ -60,7 +65,7 @@ function RequestsTab() {
       await loadRequests();
     } catch (err) {
       console.error("Failed to accept friend request", err);
-      setError("Failed to accept request. Please try again.");
+      setError(t.requestsTab.acceptError);
     } finally {
       setActionId(null);
     }
@@ -73,7 +78,7 @@ function RequestsTab() {
       await loadRequests();
     } catch (err) {
       console.error("Failed to decline friend request", err);
-      setError("Failed to decline request. Please try again.");
+      setError(t.requestsTab.declineError);
     } finally {
       setActionId(null);
     }
@@ -81,37 +86,36 @@ function RequestsTab() {
 
   if (loading) {
     return (
-      <div className="space-y-3">
+        <div className="space-y-3">
         {Array.from({ length: 3 }).map((_, i) => (
-          <SkeletonRow key={i} />
+          <div key={i} className="bg-bg-card border border-border rounded-xl p-4 animate-pulse flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <GSkeleton variant="rect" className="w-10 h-10" />
+              <div>
+                <GSkeleton variant="text" className="w-32" />
+                <GSkeleton variant="text" className="w-20 mt-1" />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <GSkeleton variant="circle" className="w-8 h-8" />
+              <GSkeleton variant="circle" className="w-8 h-8" />
+            </div>
+          </div>
         ))}
       </div>
     );
   }
 
   if (error) {
-    return (
-      <div className="rounded-2xl border border-rose-500/30 bg-rose-500/10 px-4 py-5 text-rose-200">
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-sm">{error}</p>
-          <TButton
-            onClick={() => void loadRequests()}
-            className="inline-flex items-center gap-2 rounded-xl border border-rose-500/30 px-3 py-2 text-xs font-medium text-rose-100 transition hover:bg-rose-500/10"
-          >
-            <RefreshCw className="h-3.5 w-3.5" />
-            Retry
-          </TButton>
-        </div>
-      </div>
-    );
+    return <GErrorBanner message={error} onRetry={() => void loadRequests()} retryLabel={t.retry} />;
   }
 
   if (requests.length === 0) {
     return (
       <EmptyState
         icon={<UserCheck className="h-12 w-12 text-text-muted" />}
-        title="No pending requests"
-        description="You're all caught up! No friend requests to review."
+        title={t.requestsTab.emptyTitle}
+        description={t.requestsTab.emptyDescription}
       />
     );
   }
@@ -138,27 +142,33 @@ function RequestsTab() {
                     ? `${req.senderFirstName} ${req.senderLastName}`
                     : req.senderUserName}
                 </p>
-                <p className="text-xs text-text-muted">Wants to be friends</p>
+                <p className="text-xs text-text-muted">
+                  {t.requestsTab.wantsToBeFriends}
+                </p>
               </div>
             </div>
 
             <div className="flex shrink-0 gap-2">
-              <TButton
+              <GButton
+                variant="ghost"
+                size="icon"
                 onClick={() => void acceptRequest(req.senderId)}
                 disabled={isBusy}
-                className="inline-flex items-center justify-center rounded-xl bg-emerald-500/15 p-3 text-emerald-300 transition hover:bg-emerald-500/25 disabled:cursor-not-allowed disabled:opacity-60"
-                aria-label="Accept request"
+                className="bg-neon-green/15 text-neon-green hover:bg-neon-green/25"
+                aria-label={t.requestsTab.accept}
               >
                 <Check className="h-4 w-4" />
-              </TButton>
-              <TButton
+              </GButton>
+              <GButton
+                variant="ghost"
+                size="icon"
                 onClick={() => void declineRequest(req.senderId)}
                 disabled={isBusy}
-                className="inline-flex items-center justify-center rounded-xl bg-rose-500/15 p-3 text-rose-300 transition hover:bg-rose-500/25 disabled:cursor-not-allowed disabled:opacity-60"
-                aria-label="Decline request"
+                className="bg-error/15 text-error hover:bg-error/25"
+                aria-label={t.requestsTab.decline}
               >
                 <X className="h-4 w-4" />
-              </TButton>
+              </GButton>
             </div>
           </div>
         );

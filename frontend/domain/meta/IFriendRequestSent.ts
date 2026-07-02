@@ -1,4 +1,4 @@
-import type { TNullable } from "@/types";
+import type { TNullable } from "@/domain/type/TCommon";
 
 interface IFriendRequestSent {
   receiverId: string;

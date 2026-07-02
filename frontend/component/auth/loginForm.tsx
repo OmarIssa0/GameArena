@@ -1,15 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { TTextField } from "@/component/common/TTextField";
-import { TButton } from "@/component/common/TButton";
+import { GTextField } from "@/component/common/GTextField";
+import { GButton } from "@/component/common/GButton";
 import { SubmitEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   en as EnTextField,
-  type TTextFieldTranslation,
-} from "@/component/i18n/TTextField/en.i18n";
-import { ar as ArTextField } from "@/component/i18n/TTextField/ar.i18n";
+  type GTextFieldTranslation,
+} from "@/component/i18n/GTextField/en.i18n";
+import { ar as ArTextField } from "@/component/i18n/GTextField/ar.i18n";
 import { useTranslation } from "@/hooks/useSetting";
 import { en, type TLoginTranslation } from "@/app/(auth)/login/i18n/en.i18n";
 import { ar } from "@/app/(auth)/login/i18n/ar.i18n";
@@ -19,14 +19,14 @@ import { authService } from "@/services/def/AuthService";
 import { AxiosError } from "axios";
 import { ErrorCodeEnum } from "@/domain/enum/ErrorCodeEnum";
 import type { IApiResponse } from "@/domain/meta/IApiResponse";
-import type { TFieldLogin } from "@/types";
+import type { TFieldLogin } from "@/domain/type/TCommon";
 
 function LoginForm() {
   const router = useRouter();
   const t = useTranslation({
     en: { ...en, ...EnTextField },
     ar: { ...ar, ...ArTextField },
-  }) as TLoginTranslation & TTextFieldTranslation;
+  }) as TLoginTranslation & GTextFieldTranslation;
 
   const { refreshUser } = useAuth();
   const [email, setEmail] = useState("");
@@ -100,7 +100,7 @@ function LoginForm() {
     <div className="w-full max-w-md p-6 sm:p-8 bg-surface-alt/40 border border-border/60 rounded-lg shadow-md ">
       <form onSubmit={submit} className="space-y-5">
         <div className="space-y-4">
-          <TTextField
+          <GTextField
             label={t.email}
             placeholder={t.placeholder.email}
             value={email}
@@ -112,7 +112,7 @@ function LoginForm() {
             onChange={(e) => handleChange("email", e.target.value)}
           />
 
-          <TTextField
+          <GTextField
             label={t.password}
             placeholder={t.placeholder.password}
             value={password}
@@ -124,7 +124,6 @@ function LoginForm() {
             onChange={(e) => handleChange("password", e.target.value)}
           />
 
-          {/* API Error Callout */}
           {apiError.message && (
             <div className="text-sm p-3 rounded-md bg-error-bg border border-error/20 text-error animate-fade-in flex flex-col gap-1">
               <span>{apiError.message}</span>
@@ -139,13 +138,13 @@ function LoginForm() {
             </div>
           )}
 
-          <TButton
+          <GButton
             type="submit"
             loading={loading}
             className="w-full mt-2 shadow-sm hover:shadow-glow"
           >
             {loading ? t.loggingIn : t.login}
-          </TButton>
+          </GButton>
         </div>
 
         {/* Footer actions with logical multi-directional padding support */}

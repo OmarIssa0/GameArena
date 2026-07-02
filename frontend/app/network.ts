@@ -1,6 +1,12 @@
-import { TEndpoint, TEndpointsMap, THashMap, TPromise, TProxy } from "@/types";
-import { IApiResponse } from "@/domain/meta/IApiResponse";
 import axios, { AxiosRequestConfig } from "axios";
+import type {
+  TEndpoint,
+  TEndpointsMap,
+  THashMap,
+  TPromise,
+  TProxy,
+} from "@/domain/type/TCommon";
+import type { IApiResponse } from "@/domain/meta/IApiResponse";
 
 export const baseURL = "https://localhost:7127/api/";
 
@@ -104,7 +110,6 @@ export function buildUrl(template: string, payload?: THashMap) {
 
   return { url: formattedUrl, leftover };
 }
-
 
 /* ---------------- REQUEST ---------------- */
 

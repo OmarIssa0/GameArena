@@ -1,5 +1,5 @@
-import type { TNullable } from "@/types";
 import { ErrorCodeEnum } from "../enum/ErrorCodeEnum";
+import type { TNullable } from "../type/TCommon";
 
 interface IApiResponse<T> {
   success: boolean;

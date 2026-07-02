@@ -1,6 +1,5 @@
 ﻿
 using backend.Domain;
-using backend.DTOs.Requests;
 using Microsoft.EntityFrameworkCore;
 
 namespace backend.Data

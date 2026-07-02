@@ -1,6 +1,6 @@
 import { UserRoleEnum } from "../enum/UserRoleEnum";
 import { UserStatusEnum } from "../enum/UserStatusEnum";
-import type { TNullable } from "@/types";
+import type { TNullable } from "@/domain/type/TCommon";
 
 interface IUser {
   id: string;

@@ -17,6 +17,7 @@ const en = {
   selectConversationDescription:
     "Choose a friend from the list on the left to open the chat.",
   noUsername: "No username",
+  unknownUser: "Unknown user",
 };
 
 type TMessagesTranslation = typeof en;

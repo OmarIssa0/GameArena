@@ -1,9 +1,8 @@
-using Azure.Core;
 using backend.Auth;
 using backend.Data;
 using backend.Domain;
-using backend.DTOs;
 using backend.DTOs.Requests;
+using backend.DTOs.Responses;
 using backend.Enums;
 using backend.Services.Interface;
 using backend.Utils;

@@ -9,7 +9,7 @@ namespace backend.Services
 {
     public class GameService(IDbContextFactory<AppDbContext> _contextFactory) : IGameService
     {
-        public async Task SaveMatchHistoryAsync(TicTacTaoRoom room)
+        public async Task SaveMatchHistoryAsync(BaseGameRoom room)
         {
             if (room == null) throw new AppException(ErrorCode.RoomNotFound);
 
@@ -25,8 +25,6 @@ namespace backend.Services
                 GameType = GamesKind.TicTacToe,
                 Player1Id = room.Player1Id!,
                 Player2Id = room.Player2Id!,
-                WinnerId = room.WinnerPlayerId,
-                Status = room.WinnerSymbol,
                 CompletedAt = DateTime.UtcNow
             });
             await context.SaveChangesAsync();

@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import type { TLocale, TTheme } from "@/types";
+import type { TLocale, TTheme } from "@/domain/type/TCommon";
 
 export async function getSettingFromCookie(): Promise<{
   locale: TLocale;

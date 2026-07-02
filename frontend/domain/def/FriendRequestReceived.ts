@@ -1,4 +1,5 @@
-import { EMPTY_GUID, type TNullable } from "@/types";
+import { EMPTY_GUID } from "../constant/empty_guid";
+import type { TNullable } from "@/domain/type/TCommon";
 import type { IFriendRequestReceived } from "../meta/IFriendRequestReceived";
 
 class FriendRequestReceived implements IFriendRequestReceived {

@@ -1,9 +1,25 @@
 const en = {
   lobby: {
     title: "Tic Tac Toe",
-    subtitle: "Classic 3×3 duel — first to align three wins",
-    findMatch: "Find a match",
-    connecting: "Connecting to game server…",
+    subtitle: "Deploy strategic marks in a classic 3x3 duel",
+    findMatch: "Find Match",
+    createGame: "Create Game",
+    connecting: "Connecting to Game Server...",
+    tabs: {
+      quick: "Quick Match",
+      invite: "Invite Friend",
+    },
+    inviteTitle: "Invite a Friend",
+    searchFriends: "Search friends...",
+    noFriendsFound: "No friends found",
+    searchingTitle: "Searching for opponent...",
+    searchingSubtitle: "Checking GameArena servers",
+    cancelSearch: "Cancel Search",
+    waitingForOpponent: "Waiting for opponent to accept invite or join...",
+    cancelMatch: "Cancel Match",
+    opponentFound: "OPPONENT FOUND!",
+    startGame: "Start Game",
+    waitingForStart: "Waiting for opponent to start...",
   },
 
   searching: {
@@ -63,6 +79,24 @@ const en = {
     },
     playAgain: "Play again",
     lobby: "Lobby",
+  },
+
+  game: {
+    you: "You",
+    opponent: "Opponent",
+    waiting: "Waiting...",
+    player1: "Player 1",
+    player2: "Player 2",
+    opponentForfeited: "Opponent Forfeited!",
+    opponentForfeitedDesc: "Your opponent left the game. You win by default!",
+    victory: "VICTORY! 🎉",
+    victoryDesc: "Spectacular play! You defeated your opponent.",
+    draw: "IT'S A DRAW! 🤝",
+    drawDesc: "A hard-fought battle! It's a tie.",
+    defeat: "DEFEAT! 😢",
+    defeatDesc: "Good effort, but opponent claimed victory this time.",
+    yourTurn: "Your Turn - Make your move!",
+    waitingFor: "Waiting for {name}...",
   },
 };
 

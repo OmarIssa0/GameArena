@@ -11,17 +11,14 @@ import {
 import { usePathname, useSearchParams } from "next/navigation";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { chatService } from "@/services/def/ChatService";
+import { useConnections } from "./ConnectionProvider";
 import { friendService } from "@/services/def/FriendService";
 import type {
   IGameInvite,
   INotificationState,
 } from "@/domain/meta/INotification";
-import type {
-  TChatNotificationPayload,
-  TFriendRequestPayload,
-  TGameInvitePayload,
-} from "@/types";
-import { useConnections } from "./ConnectionProvider";
+import type { IChatNotificationPayload } from "@/domain/meta/IChatNotificationPayload";
+import type { IFriendRequestPayload } from "@/domain/meta/IFriendRequestPayload";
 
 const NotificationContext = createContext<INotificationState | undefined>(
   undefined,
@@ -32,19 +29,36 @@ export function DashboardNotificationsProvider({
 }: {
   children: React.ReactNode;
 }) {
+  // ======================
+  // hooks / context
+  // ======================
   const { user } = useAuth();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { chatConnection, gameConnection } = useConnections();
 
-  const [friendRequestCount, setFriendRequestCount] = useState(0);
-  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
-  const [gameInvites, setGameInvites] = useState<IGameInvite[]>([]);
+  // ======================
+  // state
+  // ======================
+  const [notifications, setNotifications] = useState({
+    friendRequestCount: 0,
+    unreadMessageCount: 0,
+    gameInvites: [] as IGameInvite[],
+  });
 
+  const { friendRequestCount, unreadMessageCount, gameInvites } = notifications;
+
+  // ======================
+  // sync functions
+  // ======================
   const syncFriendRequests = useCallback(async () => {
     try {
       const response = await friendService.getReceivedFriendRequests();
-      setFriendRequestCount(response.data?.length ?? 0);
+
+      setNotifications((prev) => ({
+        ...prev,
+        friendRequestCount: response.data?.length ?? 0,
+      }));
     } catch (error) {
       console.error("Failed to sync friend requests", error);
     }
@@ -53,7 +67,11 @@ export function DashboardNotificationsProvider({
   const syncUnreadMessages = useCallback(async () => {
     try {
       const response = await chatService.getUnreadMessageCount();
-      setUnreadMessageCount(response.data ?? 0);
+
+      setNotifications((prev) => ({
+        ...prev,
+        unreadMessageCount: response.data ?? 0,
+      }));
     } catch (error) {
       console.error("Failed to sync unread messages", error);
     }
@@ -63,40 +81,57 @@ export function DashboardNotificationsProvider({
     await Promise.all([syncFriendRequests(), syncUnreadMessages()]);
   }, [syncFriendRequests, syncUnreadMessages]);
 
+  // ======================
+  // user effect (init/reset)
+  // ======================
   useEffect(() => {
     if (!user) {
-      setFriendRequestCount(0);
-      setUnreadMessageCount(0);
-      setGameInvites([]);
+      setNotifications({
+        friendRequestCount: 0,
+        unreadMessageCount: 0,
+        gameInvites: [],
+      });
       return;
     }
-    void syncCounts();
-  }, [syncCounts, user]);
 
+    void syncCounts();
+  }, [user, syncCounts]);
+
+  // ======================
+  // realtime subscriptions
+  // ======================
   useEffect(() => {
     if (!chatConnection) return;
 
-    const handleFriendRequest = (_payload: TFriendRequestPayload) => {
-      setFriendRequestCount((prev) => prev + 1);
+    const handleFriendRequest = (_payload: IFriendRequestPayload) => {
+      setNotifications((prev) => ({
+        ...prev,
+        friendRequestCount: prev.friendRequestCount + 1,
+      }));
     };
 
-    const handleChatNotification = (payload: TChatNotificationPayload) => {
+    const handleChatNotification = (payload: IChatNotificationPayload) => {
       if (!user) return;
+
       const selectedFriendId = searchParams.get("friend");
       const isOpenConversation =
         pathname === "/messages" && selectedFriendId === payload.senderId;
 
       if (!isOpenConversation) {
-        setUnreadMessageCount((prev) => prev + 1);
+        setNotifications((prev) => ({
+          ...prev,
+          unreadMessageCount: prev.unreadMessageCount + 1,
+        }));
       }
     };
 
-    const handleGameInvite = (payload: TGameInvitePayload) => {
-      setGameInvites((prev) =>
-        prev.some((invite) => invite.roomId === payload.roomId)
-          ? prev
-          : [...prev, payload],
-      );
+    const handleGameInvite = (payload: IGameInvite) => {
+      setNotifications((prev) => ({
+        ...prev,
+        gameInvites: prev.gameInvites.some((i) => i.roomId === payload.roomId)
+          ? prev.gameInvites
+          : [...prev.gameInvites, payload],
+      }));
     };
 
     chatConnection.on("friend:request", handleFriendRequest);
@@ -110,41 +145,55 @@ export function DashboardNotificationsProvider({
     };
   }, [chatConnection, pathname, searchParams, user]);
 
+  // ======================
+  // actions
+  // ======================
   const acceptGameInvite = useCallback(
     async (roomId: string) => {
       if (!gameConnection) return;
+
       await gameConnection.invoke("AcceptInvite", roomId);
-      setGameInvites((prev) =>
-        prev.filter((invite) => invite.roomId !== roomId),
-      );
+
+      setNotifications((prev) => ({
+        ...prev,
+        gameInvites: prev.gameInvites.filter((i) => i.roomId !== roomId),
+      }));
     },
     [gameConnection],
   );
 
   const dismissGameInvite = useCallback((roomId: string) => {
-    setGameInvites((prev) => prev.filter((invite) => invite.roomId !== roomId));
+    setNotifications((prev) => ({
+      ...prev,
+      gameInvites: prev.gameInvites.filter((i) => i.roomId !== roomId),
+    }));
   }, []);
 
+  // ======================
+  // memoized context value
+  // ======================
   const value = useMemo<INotificationState>(
     () => ({
       friendRequestCount,
       unreadMessageCount,
       gameInvites,
+
       syncCounts,
       refreshUnreadMessages: syncUnreadMessages,
       refreshFriendRequests: syncFriendRequests,
+
       dismissGameInvite,
       acceptGameInvite,
     }),
     [
-      acceptGameInvite,
-      dismissGameInvite,
       friendRequestCount,
+      unreadMessageCount,
       gameInvites,
       syncCounts,
-      syncFriendRequests,
       syncUnreadMessages,
-      unreadMessageCount,
+      syncFriendRequests,
+      dismissGameInvite,
+      acceptGameInvite,
     ],
   );
 

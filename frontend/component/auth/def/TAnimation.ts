@@ -1,4 +1,4 @@
-import { AuthFlowAnimationEnum } from "@/types";
+import { AuthFlowAnimationEnum } from "@/domain/enum/AuthFlowAnimationEnum";
 
 type TAnimationProps = {
   page: AuthFlowAnimationEnum;

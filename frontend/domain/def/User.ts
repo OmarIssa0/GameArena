@@ -1,7 +1,8 @@
-import { EMPTY_GUID, TNullable } from "@/types";
 import { UserRoleEnum } from "../enum/UserRoleEnum";
-import { IUser } from "../meta/IUser";
 import { UserStatusEnum } from "../enum/UserStatusEnum";
+import { EMPTY_GUID } from "../constant/empty_guid";
+import type { TNullable } from "@/domain/type/TCommon";
+import type { IUser } from "../meta/IUser";
 
 class User implements IUser {
   id: string;

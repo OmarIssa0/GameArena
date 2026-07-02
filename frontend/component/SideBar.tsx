@@ -1,28 +1,52 @@
 "use client";
+
 import { useAuth } from "@/app/providers/AuthProvider";
-import { useTranslation } from "@/hooks/useSetting";
+import { useLocale, useTranslation } from "@/hooks/useSetting";
 import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
-import { LogOut, Hexagon, ChevronLeft, ChevronRight } from "lucide-react";
-import Link from "next/link";
+import {
+  LogOut,
+  Hexagon,
+  ChevronLeft,
+  ChevronRight,
+  X,
+  Menu,
+} from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { ar } from "./i18n/SideBar/ar.i18n";
 import { en, type TSidebarTranslation } from "./i18n/SideBar/en.i18n";
 import { authService } from "@/services/def/AuthService";
-import { TBadge } from "./common/TBadge";
-import { TTile } from "./common/TTile";
-import { navItems } from "@/types";
+import { GTile } from "./common/GTile";
 import { LangTheme } from "./common/LangTheme";
-import { TButton } from "./common/TButton";
+import { GBackdrop } from "./common/GBackdrop";
+import { GTabs } from "./common/GTabs";
+import { GButton } from "./common/GButton";
+import { GTabItem } from "./common/def/GTabs";
+import { GStatusDot } from "./common/GStatusDot";
+import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
+import { sidebarNav } from "@/domain/constant/sidebar_nav";
 
 function Sidebar() {
   const { user, setUser } = useAuth();
   const router = useRouter();
-  const [collapsed, setCollapsed] = useState(true);
+  const [locale] = useLocale();
   const pathname = usePathname();
   const t = useTranslation({ en, ar }) as TSidebarTranslation;
   const { friendRequestCount, unreadMessageCount } =
     useDashboardNotifications();
+  const [collapsed, setCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      setCollapsed(mobile);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -34,122 +58,147 @@ function Sidebar() {
       router.replace("/login");
     }
   };
-  const isActive = (id: string) => {
-    if (id === "home") return pathname === "/home";
-    return pathname.startsWith(`/${id}`);
-  };
+
+  const activeTab = sidebarNav.find((n) => pathname.startsWith(`/${n.id}`))?.id;
+
+  const handleTabChange = useCallback(
+    (tabId: string) => {
+      router.push(`/${tabId}`);
+      if (isMobile) setCollapsed(true);
+    },
+    [router, isMobile],
+  );
+
+  const tabs = useMemo<GTabItem[]>(
+    () =>
+      sidebarNav.map(({ id, labelKey, icon: Icon, badge }) => ({
+        id,
+        icon: <Icon size={20} />,
+        label: t[labelKey as keyof TSidebarTranslation],
+        badge:
+          badge === "friends"
+            ? friendRequestCount
+            : badge === "messages"
+              ? unreadMessageCount
+              : undefined,
+      })),
+    [t, friendRequestCount, unreadMessageCount],
+  );
+
+  const open = !collapsed;
 
   return (
-    <aside
-      className={`shrink-0 bg-bg-sidebar border-r border-border flex flex-col h-full ${collapsed ? "w-20" : "w-64"}`}
-    >
-      {/* Logo / Toggle */}
-      <div className="flex items-center h-16 px-4 border-b border-border">
-        {collapsed ? (
-          <TButton
-            onClick={() => setCollapsed(false)}
-            className="mx-auto text-text-secondary hover:text-text cursor-pointer"
+    <>
+      {isMobile && open && <GBackdrop onClick={() => setCollapsed(true)} />}
+
+      <aside
+        className={`relative flex shrink-0 bg-bg-sidebar border-r border-border flex-col h-dvh-safe lg:h-full transition-[width,transform] duration-300 ease-in-out shadow-2xl lg:shadow-none ${
+          collapsed ? "w-20" : "w-full sm:w-72"
+        } ${isMobile ? (collapsed ? "-translate-x-full fixed z-50" : "translate-x-0 fixed z-50") : "translate-x-0"}`}
+      >
+        {!isMobile && (
+          <GButton
+            onClick={() => setCollapsed(!collapsed)}
+            variant="ghost"
+            size="icon"
+            className="absolute -right-3 bottom-24 w-6 h-6 flex items-center justify-center bg-surface-alt border border-border rounded-full text-text-secondary hover:text-text hover:border-primary transition-all shadow-md z-10"
           >
-            <ChevronRight className="w-5 h-5" />
-          </TButton>
-        ) : (
-          <div className="flex items-center justify-between w-full">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-linear-to-br from-primary to-neon-magenta flex items-center justify-center">
-                <Hexagon className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-bold text-white text-base">
-                Game<span className="text-neon-cyan">Arena</span>
-              </span>
-            </div>
-            <TButton
-              onClick={() => setCollapsed(true)}
-              className="text-text-secondary hover:text-text cursor-pointer"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </TButton>
-          </div>
+            {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+          </GButton>
         )}
-      </div>
 
-      {/* Nav Items */}
-      <nav className="flex-1 py-2 px-3 flex flex-col gap-1 overflow-y-auto custom-scrollbar">
-        {navItems.map(({ id, labelKey, icon: Icon, badge }) => {
-          const active = isActive(id);
-          const badgeCount =
-            badge === "friends"
-              ? friendRequestCount
-              : badge === "messages"
-                ? unreadMessageCount
-                : 0;
-
-          return (
-            <Link
-              key={id}
-              href={`/${id}`}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                collapsed ? "justify-center" : ""
-              } ${
-                active
-                  ? "bg-primary/15 text-white"
-                  : "text-text-secondary hover:bg-surface-alt hover:text-text"
-              }`}
-            >
-              <Icon size={20} />
-              {!collapsed && (
-                <span className="flex min-w-0 flex-1 items-center justify-between gap-2">
-                  <span className="truncate">
-                    {t[labelKey as keyof TSidebarTranslation]}
-                  </span>
-                  {badgeCount > 0 && <TBadge count={badgeCount} />}
-                </span>
-              )}
-              {collapsed && badgeCount > 0 && (
-                <span className="absolute right-2 top-2">
-                  <TBadge count={badgeCount} />
-                </span>
-              )}
-            </Link>
-          );
-        })}
-      </nav>
-
-      {/* Logout */}
-      <div className={`px-3 mb-2 ${collapsed ? "flex justify-center" : ""}`}>
-        <TButton
-          onClick={handleLogout}
-          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-text-secondary hover:bg-error-bg hover:text-error transition-colors ${
-            collapsed ? "justify-center" : ""
-          }`}
-        >
-          <LogOut size={20} />
-          {!collapsed && <span>{t.logout}</span>}
-        </TButton>
-      </div>
-
-      {/* User Profile */}
-      <div className="p-4 border-t border-border">
-        <div
-          className={`flex items-center gap-3 ${collapsed ? "justify-center" : ""}`}
-        >
-          <div className="relative shrink-0">
-            {user && <TTile user={user} size="sm" />}
-            <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-neon-green border-2 border-bg-sidebar" />
-          </div>
-          {!collapsed && (
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-semibold text-text truncate">
-                  {user?.firstName} {user?.lastName}
-                </span>
+        <div className="flex items-center h-20 px-4 border-b border-border/50 shrink-0">
+          <div
+            className={`flex items-center w-full ${collapsed ? "justify-center" : "justify-between"}`}
+          >
+            <div className="flex items-center gap-3">
+              <div className="icon-tile w-10 h-10 bg-linear-to-br from-primary to-neon-magenta shadow-lg shadow-primary/20">
+                <Hexagon className="w-5 h-5 text-text" />
               </div>
-              <p className="text-xs text-neon-cyan">{user?.userName}</p>
+              {!collapsed && (
+                <span className="font-bold text-text text-lg tracking-wide whitespace-nowrap">
+                  Game<span className="text-neon-cyan">Arena</span>
+                </span>
+              )}
             </div>
-          )}
+            {isMobile && open && (
+              <GButton
+                onClick={() => setCollapsed(true)}
+                variant="ghost"
+                size="icon"
+                className="p-2 text-text-secondary hover:text-text rounded-lg hover:bg-surface-alt"
+              >
+                <X size={20} />
+              </GButton>
+            )}
+          </div>
         </div>
-      </div>
-      <LangTheme collapsed={collapsed} />
-    </aside>
+
+        <div className="flex-1 py-6 px-3 flex flex-col gap-1.5 overflow-y-auto custom-scrollbar">
+          <GTabs
+            tabs={tabs}
+            value={activeTab ?? "home"}
+            onChange={handleTabChange}
+            direction="V"
+            variant="sidebar"
+            fullWidth
+            renderLabel={(tab) =>
+              collapsed ? null : <span className="truncate">{tab.label}</span>
+            }
+          />
+        </div>
+
+        <div className="mt-auto flex flex-col gap-2 p-3 border-t border-border/50 pb-safe">
+          <div className="px-1">
+            <LangTheme collapsed={collapsed} />
+          </div>
+
+          <div
+            className={`flex p-2 rounded-xl bg-surface/30 border border-border/50 ${
+              collapsed ? "flex-col items-center gap-2" : "items-center gap-3"
+            }`}
+          >
+            <div className="relative shrink-0">
+              {user && <GTile user={user} size="sm" />}
+              <GStatusDot status={UserStatusEnum.Online} />
+            </div>
+
+            {!collapsed && (
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-text truncate">
+                  {user?.firstName} {user?.lastName}
+                </p>
+                <p className="text-xs text-neon-cyan font-medium truncate">
+                  @{user?.userName}
+                </p>
+              </div>
+            )}
+
+            <GButton
+              onClick={handleLogout}
+              variant="ghost"
+              size="icon"
+              title={t.logout}
+              className="shrink-0 p-1.5 rounded-lg text-text-secondary hover:text-error hover:bg-error-bg transition-colors"
+            >
+              <LogOut size={18} />
+            </GButton>
+          </div>
+        </div>
+      </aside>
+
+      {/* Mobile open button */}
+      {isMobile && collapsed && (
+        <GButton
+          onClick={() => setCollapsed(false)}
+          variant="secondary"
+          size="icon"
+          className={`fab top-4 ${locale === "en" ? "left-4" : "right-4"}`}
+        >
+          <Menu size={20} />
+        </GButton>
+      )}
+    </>
   );
 }
 

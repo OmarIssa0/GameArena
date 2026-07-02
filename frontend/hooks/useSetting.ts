@@ -1,7 +1,12 @@
 "use client";
 
 import { useMemo, useSyncExternalStore } from "react";
-import type { THashMap, TLocale, TTheme, TTranslate } from "@/types";
+import type {
+  THashMap,
+  TLocale,
+  TTheme,
+  TTranslate,
+} from "@/domain/type/TCommon";
 
 let currentLocale: TLocale = "ar";
 let currentTheme: TTheme = "dark";
@@ -28,26 +33,19 @@ function updateThemeDOM(theme: TTheme) {
   document.documentElement.dataset.theme = theme;
 }
 
-let initialized = false;
-
-function init() {
-  if (initialized || typeof window === "undefined") return;
-  initialized = true;
-
+(() => {
+  if (typeof window === "undefined") return;
   currentLocale = (localStorage.getItem("locale") as TLocale) ?? "ar";
   currentTheme = (localStorage.getItem("theme") as TTheme) ?? "dark";
-
   updateLocaleDOM(currentLocale);
   updateThemeDOM(currentTheme);
-}
+})();
 
 export function getLocale(): TLocale {
-  init();
   return currentLocale;
 }
 
 export function setLocale(locale: TLocale) {
-  init();
   if (locale === currentLocale) return;
   currentLocale = locale;
   localStorage.setItem("locale", locale);
@@ -57,13 +55,10 @@ export function setLocale(locale: TLocale) {
 }
 
 export function getTheme(): TTheme {
-  init();
-
   return currentTheme;
 }
 
 export function setTheme(theme: TTheme) {
-  init();
   if (theme === currentTheme) return;
   currentTheme = theme;
   localStorage.setItem("theme", theme);
@@ -73,12 +68,12 @@ export function setTheme(theme: TTheme) {
 }
 
 export function useLocale() {
-  const locale = useSyncExternalStore(subscribe, getLocale, () => "ar");
+  const locale = useSyncExternalStore(subscribe, getLocale, () => "en");
   return [locale, setLocale] as const;
 }
 
 export function useTheme() {
-  const theme = useSyncExternalStore(subscribe, getTheme, () => "light");
+  const theme = useSyncExternalStore(subscribe, getTheme, () => "dark");
   return [theme, setTheme] as const;
 }
 

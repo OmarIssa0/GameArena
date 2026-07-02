@@ -1,5 +1,6 @@
-import { EMPTY_GUID, type TNullable } from "@/types";
-import { IMessage } from "../meta/IMessage";
+import { EMPTY_GUID } from "../constant/empty_guid";
+import type { TNullable } from "@/domain/type/TCommon";
+import type { IMessage } from "../meta/IMessage";
 
 class Message implements IMessage {
   senderId: string;

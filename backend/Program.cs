@@ -3,7 +3,6 @@ using backend.Data;
 using backend.Hubs;
 using backend.Services;
 using backend.Services.Interface;
-using ChatWebSignalR.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
