@@ -9,15 +9,15 @@ class ApiResponse<T> implements IApiResponse<T> {
   errorCode: ErrorCodeEnum;
 
   constructor(
-    success: boolean,
-    data: TNullable<T>,
-    message: string,
-    errorCode: ErrorCodeEnum,
+    Success: boolean,
+    Data: TNullable<T>,
+    Message: string,
+    ErrorCode: ErrorCodeEnum,
   ) {
-    this.success = success;
-    this.data = data;
-    this.message = message;
-    this.errorCode = errorCode;
+    this.success = Success;
+    this.data = Data;
+    this.message = Message;
+    this.errorCode = ErrorCode;
   }
 }
 

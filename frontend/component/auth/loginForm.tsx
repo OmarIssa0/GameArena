@@ -73,16 +73,17 @@ function LoginForm() {
       }
     } catch (e: unknown) {
       const err = e as AxiosError<IApiResponse<unknown>>;
-      const code = err?.response?.data?.errorCode;
-
+      const code = err?.response?.data?.ErrorCode;
+      console.log(err?.response?.data);
+      console.log(code);
       const errorMessage =
         t.loginErrorCodeEnum[code as keyof typeof t.loginErrorCodeEnum] ||
-        err?.response?.data?.message ||
+        err?.response?.data?.Message ||
         t.unknownError;
 
       if (code === ErrorCodeEnum.EmailNotVerified) {
         setApiError({
-          link: "/email-verify",
+          link: "/email-verify?email=" + encodeURIComponent(email),
           message: errorMessage,
         });
       } else {

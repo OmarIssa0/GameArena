@@ -4,19 +4,33 @@ using MimeKit;
 
 namespace backend.Services
 {
-    public class EmailService(IConfiguration _config) : IEmailService
+    public class EmailService(IConfiguration _config, ILogger<EmailService> _logger) : IEmailService
     {
 
         public async Task SendAsync(string to, string subject, string body)
         {
-            // configure the email message
-            var emailConfig = _config["EmailSettings:Email"] ?? throw new Exception("Email user not configured");
-            var hostConfig = _config["EmailSettings:Host"] ?? throw new Exception("Email host not configured");
-            var passConfig = _config["EmailSettings:Password"] ?? throw new Exception("Email password not configured");
-            var portConfig = _config["EmailSettings:Port"] ?? throw new Exception("Email port not configured");
-            int port = int.TryParse(portConfig, out var parsedPort) ? parsedPort : throw new Exception("Email port is not a valid number");
+            var emailConfig = _config["EmailSettings:Email"];
+            var hostConfig = _config["EmailSettings:Host"];
+            var passConfig = _config["EmailSettings:Password"];
+            var portConfig = _config["EmailSettings:Port"];
 
-            // create the email message
+            if (string.IsNullOrEmpty(emailConfig) || string.IsNullOrEmpty(hostConfig) ||
+                string.IsNullOrEmpty(passConfig) || string.IsNullOrEmpty(portConfig))
+            {
+                _logger.LogWarning("EmailSettings not configured. Logging OTP to console instead of sending to {Email}", to);
+                Console.WriteLine($"\n=== OTP for {to} ===");
+                Console.WriteLine($"Subject: {subject}");
+                Console.WriteLine($"Body: {body}");
+                Console.WriteLine("=======================\n");
+                return;
+            }
+
+            if (!int.TryParse(portConfig, out var port))
+            {
+                _logger.LogError("EmailSettings:Port is not a valid number: {Port}", portConfig);
+                return;
+            }
+
             var email = new MimeMessage();
             email.From.Add(MailboxAddress.Parse(emailConfig));
             email.To.Add(MailboxAddress.Parse(to));
@@ -24,15 +38,9 @@ namespace backend.Services
             var bodyBuilder = new BodyBuilder { HtmlBody = body };
             email.Body = bodyBuilder.ToMessageBody();
 
-
             using var smtp = new SmtpClient();
             smtp.Timeout = 20_000;
-            await smtp.ConnectAsync(
-                hostConfig,
-                port,
-                MailKit.Security.SecureSocketOptions.SslOnConnect
-            );
-
+            await smtp.ConnectAsync(hostConfig, port, MailKit.Security.SecureSocketOptions.SslOnConnect);
             await smtp.AuthenticateAsync(emailConfig, passConfig);
             await smtp.SendAsync(email);
             await smtp.DisconnectAsync(true);

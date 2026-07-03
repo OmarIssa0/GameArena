@@ -102,12 +102,13 @@ function RegisterForm() {
       router.push("/email-verify?email=" + encodeURIComponent(email));
     } catch (e) {
       const err = e as AxiosError<IApiResponse<unknown>>;
-      const code = err?.response?.data?.errorCode;
+      const data = err?.response?.data;
+      const code = data?.ErrorCode;
 
       const errorMessage =
-        t.RegisterErrorCodeEnum[code as keyof typeof t.RegisterErrorCodeEnum] ||
-        err?.response?.data?.message ||
-        t.unknownError;
+        code !== undefined && t.RegisterErrorCodeEnum[code as keyof typeof t.RegisterErrorCodeEnum]
+          ? t.RegisterErrorCodeEnum[code as keyof typeof t.RegisterErrorCodeEnum]
+          : data?.Message || t.unknownError;
 
       if (code === ErrorCodeEnum.EmailAlreadyExists) {
         setApiError({ link: "/login", message: errorMessage });
