@@ -89,8 +89,10 @@ var app = builder.Build();
 // Auto-apply pending migrations on startup
 using (var scope = app.Services.CreateScope())
 {
-    using var db = scope.ServiceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>().CreateDbContext();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    Console.WriteLine("Running database migrations...");
     db.Database.Migrate();
+    Console.WriteLine("Database migrations completed.");
 }
 
 if (app.Environment.IsDevelopment())

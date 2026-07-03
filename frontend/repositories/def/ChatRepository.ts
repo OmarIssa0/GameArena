@@ -1,7 +1,7 @@
 import type { IMessage } from "@/domain/meta/IMessage";
 import { chatApi } from "../proxy/chat.api";
 import type { IChatRepository } from "../meta/IChatRepository";
-import { TPromise } from "@/types";
+import type { TPromise } from "@/domain/type/TCommon";
 
 class ChatRepository implements IChatRepository {
   private static instance: ChatRepository;
