@@ -92,6 +92,7 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     Console.WriteLine("Running database migrations...");
+    db.Database.ExecuteSqlRaw("DROP TABLE IF EXISTS \"__EFMigrationsHistory\"");
     db.Database.EnsureCreated();
     Console.WriteLine("Database migrations completed.");
 }
