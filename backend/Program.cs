@@ -74,6 +74,7 @@ builder.Services.AddCors(options =>
 });
 
 // === Application Layer (Feature Services) ===
+builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();

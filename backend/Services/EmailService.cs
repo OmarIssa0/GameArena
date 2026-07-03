@@ -1,46 +1,54 @@
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using backend.Services.Interface;
-using MailKit.Net.Smtp;
-using MimeKit;
 
 namespace backend.Services
 {
-    public class EmailService(IConfiguration _config, ILogger<EmailService> _logger) : IEmailService
+    public class EmailService(IConfiguration _config, IHttpClientFactory _httpClientFactory, ILogger<EmailService> _logger) : IEmailService
     {
         public async Task SendAsync(string to, string subject, string body)
         {
-            var emailConfig = _config["EmailSettings:Email"];
-            var hostConfig = _config["EmailSettings:Host"];
-            var passConfig = _config["EmailSettings:Password"];
-            var portConfig = _config["EmailSettings:Port"];
+            var apiKey = _config["EmailSettings:Password"];
+            var fromEmail = _config["EmailSettings:Email"] ?? "noreply@gamearena.com";
 
-            if (string.IsNullOrEmpty(emailConfig) || string.IsNullOrEmpty(hostConfig) ||
-                string.IsNullOrEmpty(passConfig) || string.IsNullOrEmpty(portConfig) ||
-                !int.TryParse(portConfig, out var port))
+            if (string.IsNullOrEmpty(apiKey))
             {
-                _logger.LogWarning("EmailSettings not fully configured. OTP logged to console for {Email}", to);
+                _logger.LogWarning("EmailSettings:Password not configured. OTP logged to console for {Email}", to);
                 Console.WriteLine($"\n=== OTP for {to} ===\nSubject: {subject}\nBody: {body}\n=======================\n");
                 return;
             }
 
-            try
+            var payload = new
             {
-                var email = new MimeMessage();
-                email.From.Add(MailboxAddress.Parse(emailConfig));
-                email.To.Add(MailboxAddress.Parse(to));
-                email.Subject = subject;
-                email.Body = new BodyBuilder { HtmlBody = body }.ToMessageBody();
+                sender = new { email = fromEmail, name = "GameArena" },
+                to = new[] { new { email = to } },
+                subject,
+                htmlContent = body
+            };
 
-                using var smtp = new SmtpClient();
-                smtp.Timeout = 10_000;
-                await smtp.ConnectAsync(hostConfig, port, MailKit.Security.SecureSocketOptions.Auto);
-                await smtp.AuthenticateAsync(emailConfig, passConfig);
-                await smtp.SendAsync(email);
-                await smtp.DisconnectAsync(true);
-                _logger.LogInformation("Email sent to {Email}", to);
-            }
-            catch (Exception ex)
+            var json = JsonSerializer.Serialize(payload, new JsonSerializerOptions
             {
-                _logger.LogWarning(ex, "Failed to send email to {Email}. OTP logged to console.", to);
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
+            using var client = _httpClientFactory.CreateClient();
+            client.DefaultRequestHeaders.Add("api-key", apiKey);
+
+            var response = await client.PostAsync(
+                "https://api.brevo.com/v3/smtp/email",
+                new StringContent(json, Encoding.UTF8, "application/json")
+            );
+
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogInformation("Email sent via Brevo to {Email}", to);
+            }
+            else
+            {
+                var errBody = await response.Content.ReadAsStringAsync();
+                _logger.LogWarning("Brevo returned {Status}: {Body}", response.StatusCode, errBody);
                 Console.WriteLine($"\n=== OTP for {to} ===\nSubject: {subject}\nBody: {body}\n=======================\n");
             }
         }
