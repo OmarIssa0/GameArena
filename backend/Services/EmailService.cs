@@ -42,7 +42,7 @@ namespace backend.Services
 
                 using var smtp = new SmtpClient();
                 smtp.Timeout = 20_000;
-                await smtp.ConnectAsync(hostConfig, port, MailKit.Security.SecureSocketOptions.SslOnConnect);
+                await smtp.ConnectAsync(hostConfig, port, MailKit.Security.SecureSocketOptions.Auto);
                 await smtp.AuthenticateAsync(emailConfig, passConfig);
                 await smtp.SendAsync(email);
                 await smtp.DisconnectAsync(true);
