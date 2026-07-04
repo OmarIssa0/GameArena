@@ -104,6 +104,8 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     Console.WriteLine("Ensuring database schema...");
+    db.Database.Migrate();
+    Console.WriteLine("Migration applied.");
     db.Database.EnsureCreated();
     Console.WriteLine("Database schema ready.");
 }
