@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using backend.Services.Interface;
+using System.Text.Json.Serialization;
 
 namespace backend.Services
 {
@@ -11,14 +11,6 @@ namespace backend.Services
         {
             var apiKey = _config["EmailSettings:Password"];
             var fromEmail = _config["EmailSettings:Email"] ?? "noreply@gamearena.com";
-
-            if (string.IsNullOrEmpty(apiKey))
-            {
-                _logger.LogWarning("EmailSettings:Password not configured. OTP logged to console for {Email}", to);
-                Console.WriteLine($"\n=== OTP for {to} ===\nSubject: {subject}\nBody: {body}\n=======================\n");
-                return;
-            }
-
             var payload = new
             {
                 sender = new { email = fromEmail, name = "GameArena" },
@@ -48,8 +40,7 @@ namespace backend.Services
             else
             {
                 var errBody = await response.Content.ReadAsStringAsync();
-                _logger.LogWarning("Brevo returned {Status}: {Body}", response.StatusCode, errBody);
-                Console.WriteLine($"\n=== OTP for {to} ===\nSubject: {subject}\nBody: {body}\n=======================\n");
+                _logger.LogWarning("Fallback: email delivery failed for {Email}", to);
             }
         }
     }

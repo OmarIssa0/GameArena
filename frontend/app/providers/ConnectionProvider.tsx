@@ -1,15 +1,8 @@
 "use client";
 
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-import type { HubConnection } from "@microsoft/signalr";
 import { useConnection } from "@/hooks/useConnection";
-
-interface IConnectionContext {
-  chatConnection: HubConnection | null;
-  gameConnection: HubConnection | null;
-  isChatConnected: boolean;
-  isGameConnected: boolean;
-}
+import type { IConnectionContext } from "@/domain/meta/IConnectionContext";
 
 const ConnectionContext = createContext<IConnectionContext | undefined>(
   undefined,
@@ -20,15 +13,28 @@ export function ConnectionProvider({ children }: { children: ReactNode }) {
     useConnection("chatHub");
   const { connection: gameConnection, isConnected: isGameConnected } =
     useConnection("gameHub");
+  const {
+    connection: notificationConnection,
+    isConnected: isNotificationConnected,
+  } = useConnection("notificationHub");
 
   const value = useMemo<IConnectionContext>(
     () => ({
       chatConnection,
       gameConnection,
+      notificationConnection,
       isChatConnected,
       isGameConnected,
+      isNotificationConnected,
     }),
-    [chatConnection, gameConnection, isChatConnected, isGameConnected],
+    [
+      chatConnection,
+      gameConnection,
+      notificationConnection,
+      isChatConnected,
+      isGameConnected,
+      isNotificationConnected,
+    ],
   );
 
   return (

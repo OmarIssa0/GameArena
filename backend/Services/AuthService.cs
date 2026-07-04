@@ -115,22 +115,14 @@ namespace backend.Services
 
         public async Task ResetPasswordAsync(string email, string otp, string newPassword)
         {
-            if (string.IsNullOrWhiteSpace(email) ||
-                string.IsNullOrWhiteSpace(otp) ||
-                string.IsNullOrWhiteSpace(newPassword))
+            if (string.IsNullOrWhiteSpace(newPassword))
                 throw new AppException(ErrorCode.ValidationError);
+
+            await _emailVerificationService.VerifyOtpAsync(email, otp, OtpPurpose.PasswordReset);
 
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Email == email) ?? throw new AppException(ErrorCode.EmailNotFound);
-            var record = await _context.EmailVerfications
-                .Where(x => x.UserId == user.Id && !x.IsUsed && x.Purpose == OtpPurpose.PasswordReset)
-                .OrderByDescending(x => x.ExpiresAt)
-                .FirstOrDefaultAsync() ?? throw new AppException(ErrorCode.OtpInvalid);
 
-            if (string.IsNullOrWhiteSpace(newPassword)) throw new AppException(ErrorCode.ValidationError);
-            if (record.ExpiresAt < DateTime.UtcNow) throw new AppException(ErrorCode.OtpExpired);
-            if (record.OtpHash != AuthHelper.Hash(otp)) throw new AppException(ErrorCode.OtpInvalid);
-            record.IsUsed = true;
             user.PasswordHash = AuthHelper.HashPassword(user, newPassword);
             await _context.SaveChangesAsync();
         }

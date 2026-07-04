@@ -59,6 +59,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSignalR();
 
 // CORS
+// when deploying, change the origin to your frontend domain
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("cors", policy =>
@@ -81,22 +82,16 @@ builder.Services.AddScoped<IFriendService, FriendService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddSingleton<IGameRoomService, GameRoomService>();
 builder.Services.AddScoped<IGameService, GameService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddSingleton<IGameBotService, GameBotService>();
 var app = builder.Build();
 
-// Auto-apply pending migrations on startup
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    Console.WriteLine("Running database migrations...");
-    db.Database.ExecuteSqlRaw("DROP TABLE IF EXISTS \"__EFMigrationsHistory\"");
+    Console.WriteLine("Ensuring database schema...");
     db.Database.EnsureCreated();
-    Console.WriteLine("Database migrations completed.");
-}
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    Console.WriteLine("Database schema ready.");
 }
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseCors("cors");
@@ -106,5 +101,6 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHub<ChatHub>("/chatHub");
 app.MapHub<GameHub>("/gameHub");
+app.MapHub<NotificationHub>("/notificationHub");
 
 app.Run();

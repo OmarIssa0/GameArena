@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend.Services
 {
-    public class FriendService(AppDbContext _context) : IFriendService
+    public class FriendService(AppDbContext _context, INotificationService _notification) : IFriendService
     {
         public async Task SendFriendRequestAsync(Guid senderId, Guid receiverId)
         {
@@ -39,6 +39,8 @@ namespace backend.Services
             });
 
             await _context.SaveChangesAsync();
+
+            await _notification.SendToUserAsync(receiverId.ToString(), "friend:request", new { senderId, receiverId });
         }
 
         public async Task AcceptFriendRequestAsync(Guid userId, Guid senderId)
@@ -62,6 +64,8 @@ namespace backend.Services
             }
 
             await _context.SaveChangesAsync();
+
+            await _notification.SendToUserAsync(senderId.ToString(), "friend:accepted", new { userId });
         }
 
         public async Task DeclineFriendRequestAsync(Guid userId, Guid senderId)

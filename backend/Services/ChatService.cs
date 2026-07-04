@@ -8,22 +8,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend.Services
 {
-    public class ChatService(AppDbContext context) : IChatService
+    public class ChatService(AppDbContext _context, INotificationService _notification) : IChatService
     {
         public async Task<List<MessageResponse>> GetMessagesAsync(Guid userId, Guid friendId)
         {
-            var unreadMessages = await context.Messages
+            await _context.Messages
                 .Where(m => m.ReceiverId == userId && m.SenderId == friendId && !m.IsRead)
-                .ToListAsync();
+                .ExecuteUpdateAsync(setters => setters.SetProperty(m => m.IsRead, true));
 
-            if (unreadMessages.Count > 0)
-            {
-                foreach (var msg in unreadMessages)
-                    msg.IsRead = true;
-                await context.SaveChangesAsync();
-            }
-
-            var messages = await context.Messages
+            var messages = await _context.Messages
                 .Where(m =>
                     (m.SenderId == userId && m.ReceiverId == friendId) ||
                     (m.SenderId == friendId && m.ReceiverId == userId))
@@ -33,11 +26,11 @@ namespace backend.Services
             return messages.Select(MapperHelper.ToDto).ToList();
         }
 
-        
+
 
         public async Task<Message> CreatePrivateMessageAsync(Guid senderId, Guid receiverId, string message)
         {
-            var isFriend = await context.UserFriends.AnyAsync(x => x.UserId == senderId && x.FriendId == receiverId);
+            var isFriend = await _context.UserFriends.AnyAsync(x => x.UserId == senderId && x.FriendId == receiverId);
 
             if (!isFriend) throw new AppException(ErrorCode.IsNotFriend);
 
@@ -49,8 +42,10 @@ namespace backend.Services
                 SentAt = DateTime.UtcNow
             };
 
-            context.Messages.Add(msg);
-            await context.SaveChangesAsync();
+            _context.Messages.Add(msg);
+            await _context.SaveChangesAsync();
+
+            await _notification.SendToUserAsync(receiverId.ToString(), "chat:notification", msg);
 
             return msg;
         }
@@ -63,15 +58,15 @@ namespace backend.Services
                 Content = message,
                 SentAt = DateTime.UtcNow
             };
-            context.Messages.Add(msg);
-            await context.SaveChangesAsync();
+            _context.Messages.Add(msg);
+            await _context.SaveChangesAsync();
 
             return msg;
         }
 
         public async Task<int> GetUnreadMessagesCountAsync(Guid userId)
         {
-            return await context.Messages.CountAsync(m => m.ReceiverId == userId && m.IsRead == false);
+            return await _context.Messages.CountAsync(m => m.ReceiverId == userId && m.IsRead == false);
         }
     }
 }

@@ -19,6 +19,7 @@ namespace backend.Services
                 GameType = room.GameType,
                 Player1Id = room.Player1Id,
                 Player2Id = room.Player2Id,
+                WinnerId = room.WinnerPlayerId,
                 CompletedAt = DateTime.UtcNow
             });
             await _context.SaveChangesAsync();

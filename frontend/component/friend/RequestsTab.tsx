@@ -9,7 +9,10 @@ import { GButton } from "../common/GButton";
 import { GErrorBanner } from "../common/GErrorBanner";
 import { GSkeleton } from "../common/GSkeleton";
 import { useTranslation } from "@/hooks/useSetting";
-import { en, type TFriendsTranslation } from "@/app/(dashboard)/friends/i18n/en.i18n";
+import {
+  en,
+  type TFriendsTranslation,
+} from "@/app/(dashboard)/friends/i18n/en.i18n";
 import { ar } from "@/app/(dashboard)/friends/i18n/ar.i18n";
 
 function RequestsTab() {
@@ -36,27 +39,8 @@ function RequestsTab() {
   }, [t.requestsTab.loadError]);
 
   useEffect(() => {
-    let active = true;
-
-    void (async () => {
-      try {
-        const response = await friendService.getReceivedFriendRequests();
-        if (!active) return;
-        setRequests(response.data ?? []);
-      } catch (err) {
-        if (!active) return;
-        console.error("Failed to load friend requests", err);
-        setError(t.requestsTab.loadError);
-        setRequests([]);
-      } finally {
-        if (active) setLoading(false);
-      }
-    })();
-
-    return () => {
-      active = false;
-    };
-  }, [t.requestsTab.loadError]);
+    void loadRequests();
+  }, [loadRequests]);
 
   const acceptRequest = async (senderId: string) => {
     setActionId(senderId);
@@ -86,9 +70,12 @@ function RequestsTab() {
 
   if (loading) {
     return (
-        <div className="space-y-3">
+      <div className="space-y-3">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="bg-bg-card border border-border rounded-xl p-4 animate-pulse flex items-center justify-between">
+          <div
+            key={i}
+            className="bg-bg-card border border-border rounded-xl p-4 animate-pulse flex items-center justify-between"
+          >
             <div className="flex items-center gap-3">
               <GSkeleton variant="rect" className="w-10 h-10" />
               <div>
@@ -107,7 +94,13 @@ function RequestsTab() {
   }
 
   if (error) {
-    return <GErrorBanner message={error} onRetry={() => void loadRequests()} retryLabel={t.retry} />;
+    return (
+      <GErrorBanner
+        message={error}
+        onRetry={() => void loadRequests()}
+        retryLabel={t.retry}
+      />
+    );
   }
 
   if (requests.length === 0) {

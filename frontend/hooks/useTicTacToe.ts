@@ -68,12 +68,13 @@ export function useTicTacToe() {
 
   useEffect(() => {
     if (!connection) return;
+    let cancelled = false;
 
     const handleReconnected = () => {
       connection
         .invoke("GetCurrentState")
         .then((state: TNullable<ITicTacToeGameState>) => {
-          if (state) {
+          if (state && !cancelled) {
             setRoomId(state.roomId);
             setGameState(state);
             setOpponentDisconnected(false);
@@ -83,11 +84,11 @@ export function useTicTacToe() {
     };
 
     connection.onreconnected(handleReconnected);
+    return () => {
+      cancelled = true;
+    };
   }, [connection]);
 
-  // ======================
-  // actions
-  // ======================
   const findMatch = async () => {
     if (!connection || !isConnected) return;
 

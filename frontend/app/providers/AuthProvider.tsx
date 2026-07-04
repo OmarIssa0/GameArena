@@ -49,20 +49,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let ignore = false;
-    (async () => {
-      setLoading(true);
-      try {
-        const res = await userService.profile();
+
+    userService.profile()
+      .then(res => {
         if (!ignore) setUser(res.data ?? null);
-      } catch {
+      })
+      .catch(() => {
         if (!ignore) setUser(null);
-      } finally {
+      })
+      .finally(() => {
         if (!ignore) setLoading(false);
-      }
-    })();
-    return () => {
-      ignore = true;
-    };
+      });
+
+    return () => { ignore = true; };
   }, []);
 
   /* ---------------- REFRESH ---------------- */

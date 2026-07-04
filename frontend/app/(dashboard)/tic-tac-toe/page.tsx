@@ -55,12 +55,9 @@ function TicTacToePage() {
     leaveGame,
   } = useTicTacToe();
 
-  // Local UI States
   const [lobbyTab, setLobbyTab] = useState<LobbyTab>("quick");
   const [, setLocalGameStarted] = useState(false);
   const [showInvitePicker, setShowInvitePicker] = useState(false);
-
-  // Friend Fetching States
   const [friends, setFriends] = useState<IFriend[]>([]);
   const [loadingFriends, setLoadingFriends] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -72,7 +69,6 @@ function TicTacToePage() {
       : gameState?.player1Username || t.game.opponent;
   const myName = user?.userName || t.game.you;
 
-  // Fetch friends when invite tab is active
   useEffect(() => {
     let ignore = false;
     if (lobbyTab === "invite" && friends.length === 0) {

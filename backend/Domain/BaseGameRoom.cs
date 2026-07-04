@@ -4,7 +4,6 @@ namespace backend.Domain
 {
     public abstract class BaseGameRoom(GamesKind _gameType)
     {
-        // data vars
         public string RoomId { get; set; } = Guid.NewGuid().ToString();
         public GamesKind GameType { get; } = _gameType;
         public string? Player1Id { get; set; }
@@ -20,10 +19,9 @@ namespace backend.Domain
         public string? WinnerSymbol { get; set; }
         public string? DisconnectedPlayerId { get; set; }
         public bool IsBotGame { get; set; } = false;
-        // methods
-        public abstract void UpdatePhysics(float deltaTime); // for ping pong & snake 
-        public abstract object GetStatePayload(); // for sending to clients
-        public abstract void ProcessInput(string playerId, string inputType, object payload); // for processing input from clients
+        public abstract void UpdatePhysics(float deltaTime); 
+        public abstract object GetStatePayload();
+        public abstract void ProcessInput(string playerId, string inputType, object payload);
     }
 
 }

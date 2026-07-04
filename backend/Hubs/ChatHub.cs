@@ -1,8 +1,10 @@
 ﻿using backend.Services.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace backend.Hubs
 {
+    [Authorize]
     public class ChatHub(IChatService chatService) : Hub
     {
         public override async Task OnConnectedAsync()
@@ -19,7 +21,6 @@ namespace backend.Hubs
             var msg = await chatService.CreatePrivateMessageAsync(senderId, receiverId, message);
             await Clients.Group($"user:{senderId}").SendAsync("chat:private", msg);
             await Clients.Group($"user:{receiverId}").SendAsync("chat:private", msg);
-            await Clients.Group($"user:{receiverId}").SendAsync("chat:notification", msg);
         }
 
         public async Task SendGlobalMessage(string message)

@@ -1,10 +1,8 @@
 using backend.DTOs.Requests;
 using backend.DTOs.Responses;
-using backend.Hubs;
 using backend.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
 
 namespace backend.Controllers
 {
@@ -13,20 +11,18 @@ namespace backend.Controllers
     [Authorize]
     public class FriendController(
         IFriendService _friendService,
-        ICurrentUserService _currentUser,
-        IHubContext<ChatHub> _chatHubContext) : ControllerBase
+        ICurrentUserService _currentUser) : ControllerBase
     {
         [HttpPost("request/{receiverId}")]
         public async Task<ActionResult<ApiResponse<object>>> SendRequest(Guid receiverId)
         {
             var senderId = _currentUser.UserId;
             await _friendService.SendFriendRequestAsync(senderId, receiverId);
-            await _chatHubContext.Clients.User(receiverId.ToString()).SendAsync("friend:request", new {senderId,receiverId});
             return Ok(new ApiResponse<object> { Message = "Friend request sent" });
         }
 
         [HttpGet("requests")]
-        public async Task<ActionResult<ApiResponse<FriendRequestReceivedResponse>>> GetRequests()
+        public async Task<ActionResult<ApiResponse<List<FriendRequestReceivedResponse>>>> GetRequests()
         {
             var senderId = _currentUser.UserId;
             var requests = await _friendService.GetFriendRequestsAsync(senderId);
@@ -34,7 +30,7 @@ namespace backend.Controllers
         }
 
         [HttpGet("sent")]
-        public async Task<ActionResult<ApiResponse<FriendRequestSentResponse>>> GetSentRequests()
+        public async Task<ActionResult<ApiResponse<List<FriendRequestSentResponse>>>> GetSentRequests()
         {
             var senderId = _currentUser.UserId;
             var requests = await _friendService.GetSentRequestsAsync(senderId);
@@ -42,7 +38,7 @@ namespace backend.Controllers
         }
 
         [HttpPost("friends")]
-        public async Task<ActionResult<ApiResponse<UserResponse>>> GetFriends([FromBody] UserFilterRequest filter)
+        public async Task<ActionResult<ApiResponse<List<UserResponse>>>> GetFriends([FromBody] UserFilterRequest filter)
         {
             var senderId = _currentUser.UserId;
             var friends = await _friendService.GetFriendsAsync(senderId, filter);

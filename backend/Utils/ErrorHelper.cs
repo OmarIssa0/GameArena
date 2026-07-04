@@ -60,8 +60,11 @@ namespace backend.Utils
 
              [ErrorCode.OtpAlreadyUsed] =
              (400, "OTP already used"),
-             [ErrorCode.OtpGenerationFailed] =
+              [ErrorCode.OtpGenerationFailed] =
              (500, "Failed to generate OTP"),
+
+              [ErrorCode.RateLimited] =
+             (429, "Too many requests. Please wait before requesting a new OTP."),
 
              // USER
 

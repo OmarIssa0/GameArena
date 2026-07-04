@@ -51,31 +51,8 @@ function FriendsTab({
   }, [t.loadError]);
 
   useEffect(() => {
-    let active = true;
-
-    void (async () => {
-      try {
-        const response = await friendService.getFriends({
-          name: null,
-          userStatus: UserStatusEnum.All,
-        });
-
-        if (!active) return;
-        setFriends(response.data ?? []);
-      } catch (err) {
-        if (!active) return;
-        console.error("Failed to load friends", err);
-        setError(t.loadError);
-        setFriends([]);
-      } finally {
-        if (active) setLoading(false);
-      }
-    })();
-
-    return () => {
-      active = false;
-    };
-  }, [t.loadError]);
+    void loadFriends();
+  }, [loadFriends]);
 
   if (loading) {
     return (

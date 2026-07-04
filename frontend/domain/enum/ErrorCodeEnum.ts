@@ -16,6 +16,7 @@ enum ErrorCodeEnum {
   EmailAlreadyExists = 2005,
   EmailAlreadyVerified = 2006,
   OtpGenerationFailed = 2007,
+  RateLimited = 2008,
 
   // User
   UserNotFound = 3001,

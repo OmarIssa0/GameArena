@@ -35,9 +35,7 @@ export function useFriends() {
   }, []);
 
   useEffect(() => {
-    void (async () => {
-      await load();
-    })();
+    void load();
   }, [load]);
 
   const sendRequest = useCallback(

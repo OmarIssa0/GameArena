@@ -1,12 +1,10 @@
 ﻿using backend.Utils;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace backend.Data
 {
-    public class GlobalExceptionMiddleware(RequestDelegate next)
+    public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> _logger)
     {
-        // used for make the json response camelCase instead of PascalCase
         private static readonly JsonSerializerOptions _jsonOptions = new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -20,7 +18,8 @@ namespace backend.Data
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                // this only for debugginh in production
+                _logger.LogError(ex, "Unhandled exception");
                 var error = ErrorHelper.GetErrorResponse(ex);
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = error.StatusCode;

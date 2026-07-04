@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.SignalR;
 namespace backend.Hubs
 {
     [Authorize]
-    public class GameHub(IGameRoomService _roomService, IGameService _gameService, IHubContext<ChatHub> _chatHubContext) : Hub
+    public class GameHub(IGameRoomService _roomService, IGameService _gameService, INotificationService _notificationService, IGameBotService _botService) : Hub
     {
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
@@ -53,7 +53,7 @@ namespace backend.Hubs
                 if (room is TicTacToeRoom xo && xo.CurrentTurnPlayerId == playerId)
                 {
                     var botSymbol = xo.Player1Id == playerId ? "X" : "O";
-                    var botMove = TicTacToeMinimax.GetBestMove(xo.Board, botSymbol);
+                    var botMove = _botService.GetBotMove(xo.Board, botSymbol);
                     if (botMove >= 0)
                         room.ProcessInput(playerId, "MAKE_MOVE", botMove.ToString());
                 }
@@ -104,7 +104,7 @@ namespace backend.Hubs
             {
                 var botId = room.Player1Id == playerId ? room.Player2Id! : room.Player1Id!;
                 var botSymbol = botId == xoRoom.Player1Id ? "X" : "O";
-                var botMove = TicTacToeMinimax.GetBestMove(xoRoom.Board, botSymbol);
+                var botMove = _botService.GetBotMove(xoRoom.Board, botSymbol);
                 if (botMove >= 0)
                 {
                     room.ProcessInput(botId, "MAKE_MOVE", botMove.ToString());
@@ -185,17 +185,17 @@ namespace backend.Hubs
                     room.Player1Username = "AI Bot";
                 else
                     room.Player2Username = "AI Bot";
-
                 if (room is TicTacToeRoom xo && xo.CurrentTurnPlayerId == playerId)
                 {
                     var botSymbol = xo.Player1Id == playerId ? "X" : "O";
-                    var botMove = TicTacToeMinimax.GetBestMove(xo.Board, botSymbol);
+                    var botMove = _botService.GetBotMove(xo.Board, botSymbol);
                     if (botMove >= 0)
                         room.ProcessInput(playerId, "MAKE_MOVE", botMove.ToString());
                 }
+
             }
 
-            await Clients.Group(roomId!).SendAsync("gameState", room.GetStatePayload());
+                await Clients.Group(roomId!).SendAsync("gameState", room.GetStatePayload());
         }
 
         public async Task InviteToRoom(string friendId)
@@ -210,7 +210,7 @@ namespace backend.Hubs
             room.InvitedPlayerId = friendId;
 
             var username = Context.User?.Identity?.Name ?? "Player";
-            await _chatHubContext.Clients.User(friendId).SendAsync("GameInvite", new
+            await _notificationService.SendToUserAsync(friendId, "GameInvite", new
             {
                 roomId = room.RoomId,
                 gameType = room.GameType,
@@ -267,7 +267,7 @@ namespace backend.Hubs
 
             await Groups.AddToGroupAsync(Context.ConnectionId, room.RoomId);
             await Clients.Group(room.RoomId).SendAsync("gameState", room.GetStatePayload());
-            await _chatHubContext.Clients.User(friendId).SendAsync("GameInvite", new
+            await _notificationService.SendToUserAsync(friendId, "GameInvite", new
             {
                 roomId = room.RoomId,
                 gameType,
@@ -279,7 +279,7 @@ namespace backend.Hubs
         public async Task AcceptInvite(string roomId)
         {
             var playerId = Context.UserIdentifier ?? throw new AppException(ErrorCode.Unauthorized);
-            if (roomId == null) throw new AppException(ErrorCode.InvalidRoomId);
+            if (string.IsNullOrEmpty(roomId)) throw new AppException(ErrorCode.InvalidRoomId);
             var username = Context.User?.Identity?.Name;
 
             if (_roomService.TryJoinRoom(roomId, playerId, username))

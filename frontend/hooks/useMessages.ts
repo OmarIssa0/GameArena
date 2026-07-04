@@ -39,7 +39,7 @@ export function useMessages(initialFriendId?: string | null) {
   );
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [draft, setDraft] = useState("");
-  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [loadingMessages, setLoadingMessages] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const selectedFriend = useMemo<IUser | null>(() => {
@@ -51,32 +51,24 @@ export function useMessages(initialFriendId?: string | null) {
     if (!selectedFriendId) return;
 
     let alive = true;
+    setError(null);
 
-    const loadMessages = async () => {
-      setLoadingMessages(true);
-      setError(null);
-
-      try {
-        const response =
-          await chatService.getMessagesByFriendId(selectedFriendId);
+    chatService.getMessagesByFriendId(selectedFriendId)
+      .then(response => {
         if (!alive) return;
         setMessages((response.data ?? []).map(normalizeHistoryMessage));
-        await refreshUnreadMessages();
-      } catch (err) {
+        return refreshUnreadMessages();
+      })
+      .catch(() => {
         if (!alive) return;
-        console.error("Failed to load messages", err);
         setMessages([]);
         setError("Failed to load messages. Please try again.");
-      } finally {
+      })
+      .finally(() => {
         if (alive) setLoadingMessages(false);
-      }
-    };
+      });
 
-    void loadMessages();
-
-    return () => {
-      alive = false;
-    };
+    return () => { alive = false; };
   }, [refreshUnreadMessages, selectedFriendId]);
 
   useEffect(() => {
@@ -108,6 +100,7 @@ export function useMessages(initialFriendId?: string | null) {
 
   const selectFriend = useCallback((friendId: TNullable<string>) => {
     setSelectedFriendId(friendId);
+    if (friendId) setLoadingMessages(true);
   }, []);
 
   const sendMessage = useCallback(async () => {

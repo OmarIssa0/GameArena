@@ -29,17 +29,10 @@ export function DashboardNotificationsProvider({
 }: {
   children: React.ReactNode;
 }) {
-  // ======================
-  // hooks / context
-  // ======================
   const { user } = useAuth();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { chatConnection, gameConnection } = useConnections();
-
-  // ======================
-  // state
-  // ======================
+  const { notificationConnection, gameConnection } = useConnections();
   const [notifications, setNotifications] = useState({
     friendRequestCount: 0,
     unreadMessageCount: 0,
@@ -48,9 +41,6 @@ export function DashboardNotificationsProvider({
 
   const { friendRequestCount, unreadMessageCount, gameInvites } = notifications;
 
-  // ======================
-  // sync functions
-  // ======================
   const syncFriendRequests = useCallback(async () => {
     try {
       const response = await friendService.getReceivedFriendRequests();
@@ -81,9 +71,6 @@ export function DashboardNotificationsProvider({
     await Promise.all([syncFriendRequests(), syncUnreadMessages()]);
   }, [syncFriendRequests, syncUnreadMessages]);
 
-  // ======================
-  // user effect (init/reset)
-  // ======================
   useEffect(() => {
     if (!user) {
       setNotifications({
@@ -96,12 +83,8 @@ export function DashboardNotificationsProvider({
 
     void syncCounts();
   }, [user, syncCounts]);
-
-  // ======================
-  // realtime subscriptions
-  // ======================
   useEffect(() => {
-    if (!chatConnection) return;
+    if (!notificationConnection) return;
 
     const handleFriendRequest = (_payload: IFriendRequestPayload) => {
       setNotifications((prev) => ({
@@ -134,20 +117,17 @@ export function DashboardNotificationsProvider({
       }));
     };
 
-    chatConnection.on("friend:request", handleFriendRequest);
-    chatConnection.on("chat:notification", handleChatNotification);
-    chatConnection.on("GameInvite", handleGameInvite);
+    notificationConnection.on("friend:request", handleFriendRequest);
+    notificationConnection.on("chat:notification", handleChatNotification);
+    notificationConnection.on("GameInvite", handleGameInvite);
 
     return () => {
-      chatConnection.off("friend:request", handleFriendRequest);
-      chatConnection.off("chat:notification", handleChatNotification);
-      chatConnection.off("GameInvite", handleGameInvite);
+      notificationConnection.off("friend:request", handleFriendRequest);
+      notificationConnection.off("chat:notification", handleChatNotification);
+      notificationConnection.off("GameInvite", handleGameInvite);
     };
-  }, [chatConnection, pathname, searchParams, user]);
+  }, [notificationConnection, pathname, searchParams, user]);
 
-  // ======================
-  // actions
-  // ======================
   const acceptGameInvite = useCallback(
     async (roomId: string) => {
       if (!gameConnection) return;
@@ -169,9 +149,6 @@ export function DashboardNotificationsProvider({
     }));
   }, []);
 
-  // ======================
-  // memoized context value
-  // ======================
   const value = useMemo<INotificationState>(
     () => ({
       friendRequestCount,
