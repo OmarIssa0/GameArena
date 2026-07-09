@@ -2,15 +2,7 @@
 
 type GSize = "xs" | "sm" | "md" | "lg" | "xl";
 type GRounded = "sm" | "md" | "lg" | "full";
-type GGradient =
-  | "brand"
-  | "subtle-brand"
-  | "game-green"
-  | "game-cyan"
-  | "game-magenta"
-  | "play-cyan"
-  | "play-green"
-  | "play-magenta";
+type GGradient = "brand" | "subtle-brand" | "game-green" | "game-cyan" | "game-magenta" | "play-cyan" | "play-green" | "play-magenta";
 type GNavIndicator = "start" | "end" | "top" | "bottom" | "none";
 
 const rounded: Record<GRounded, string> = {
@@ -23,8 +15,8 @@ const rounded: Record<GRounded, string> = {
 const pageWidth = {
   sm: "max-w-xl",
   md: "max-w-3xl",
-  lg: "max-w-7xl",
-  xl: "max-w-2xl",
+  lg: "max-w-5xl",
+  xl: "max-w-7xl",
 };
 
 const buttonSize: Record<GSize, string> = {
@@ -60,11 +52,11 @@ const iconTileSize: Record<GSize, string> = {
 };
 
 const inputSize: Record<GSize, string> = {
-  xs: "px-3 py-1.5 text-xs",
-  sm: "px-3 py-2 text-sm",
-  md: "px-4 py-3 text-sm",
-  lg: "px-4 py-3.5 text-base",
-  xl: "px-5 py-4 text-base",
+  xs: "px-1 py-1.5 text-xs",
+  sm: "px-1 py-1 text-sm",
+  md: "px-2 py-2 text-sm",
+  lg: "px-2 py-2.5 text-base",
+  xl: "px-3 py-3 text-base",
 };
 
 /** Classic flat fills — no white, no glow */
@@ -81,14 +73,11 @@ const gradient: Record<GGradient, string> = {
 
 const navBase = {
   item: "relative flex w-full items-center gap-3 px-3 py-2.5 text-sm font-medium min-w-0",
-  itemIdle: "text-text-secondary hover:bg-surface-alt hover:text-text",
+  itemIdle: "text-text-secondary hover:bg-primary-muted hover:text-text",
   itemActive: "bg-primary-muted text-primary font-semibold",
 };
 
-const navIndicator: Record<
-  GNavIndicator,
-  { active: string; idle: string }
-> = {
+const navIndicator: Record<GNavIndicator, { active: string; idle: string }> = {
   start: {
     active: "border-s-[3px] border-s-primary",
     idle: "border-s-[3px] border-s-transparent",
@@ -114,8 +103,7 @@ const messageBubble = {
   in: "rounded-es-sm border border-border bg-surface text-text",
 };
 
-const focusRing =
-  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25";
+const focusRing = "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/25";
 
 /** Color-only — no transform/shadow transitions */
 const transition = "transition-colors duration-150";

@@ -1,7 +1,7 @@
-import type { IUser } from "@/domain/meta/IUser";
+import type { IUserSummary } from "@/domain/meta/IUserSummary";
 
 interface IFriendCardProps {
-  user: IUser;
+  user: IUserSummary;
   onMessage: () => void;
   onInvite: () => void;
 }

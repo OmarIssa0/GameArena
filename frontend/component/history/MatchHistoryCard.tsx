@@ -38,9 +38,6 @@ function MatchHistoryCard({
         <p className="text-text-secondary text-xs sm:text-sm truncate">
           {versusLabel}{" "}
           <span className="text-text font-medium">@{match.opponentName}</span>
-          {match.score ? (
-            <span className="text-text-muted"> · {match.score}</span>
-          ) : null}
         </p>
         {!compact && (
           <p className="text-text-muted text-2xs mt-1">{playedAtLabel}</p>

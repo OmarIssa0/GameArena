@@ -61,7 +61,7 @@ function FriendsPage() {
       </GCard>
 
       <GCard padding="sm">
-        <GTabs tabs={tabs} value={activeTab} onChange={setActiveTab} variant="pills" fullWidth indicator="bottom">
+        <GTabs tabs={tabs} value={activeTab} onChange={setActiveTab} variant="pills" fullWidth>
           <div className="pt-5 text-start">
             {activeTab === "friends" && (
               <FriendsTab

@@ -1,4 +1,5 @@
 import { PasswordValidationEnum } from "@/domain/enum/PasswordValidationEnum";
+import type { TNullable, THashMap } from "@/domain/type/TCommon";
 
 type TEmailValidationText = {
   email: string;
@@ -8,13 +9,13 @@ type TEmailValidationText = {
 
 type TPasswordValidationText = {
   password: string;
-  invalidPassword: Record<PasswordValidationEnum, string>;
+  invalidPassword: THashMap<string, PasswordValidationEnum>;
   dynamicFieldRequired: (field: string) => string;
 };
 
 const emailValidator =
   (t: TEmailValidationText) =>
-  (value: string): string | null => {
+  (value: string): TNullable<string> => {
     if (!value.trim()) return t.dynamicFieldRequired(t.email);
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
       ? null
@@ -23,7 +24,7 @@ const emailValidator =
 
 const passwordValidator =
   (t: TPasswordValidationText) =>
-  (value: string): string | null => {
+  (value: string): TNullable<string> => {
     if (!value.trim()) return t.dynamicFieldRequired(t.password);
     const rules: string[] = [];
     if (value.length < 8)

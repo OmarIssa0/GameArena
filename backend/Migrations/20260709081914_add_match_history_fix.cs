@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace backend.Migrations
 {
     /// <inheritdoc />
-    public partial class initial : Migration
+    public partial class add_match_history_fix : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "EmailVerfications",
+                name: "EmailVerifications",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -24,25 +24,7 @@ namespace backend.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EmailVerfications", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "MatchHistories",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    RoomId = table.Column<string>(type: "text", nullable: false),
-                    GameType = table.Column<int>(type: "integer", nullable: false),
-                    WinnerId = table.Column<string>(type: "text", nullable: true),
-                    Status = table.Column<string>(type: "text", nullable: true),
-                    Player1Id = table.Column<string>(type: "text", nullable: false),
-                    Player2Id = table.Column<string>(type: "text", nullable: false),
-                    CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MatchHistories", x => x.Id);
+                    table.PrimaryKey("PK_EmailVerifications", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -63,6 +45,31 @@ namespace backend.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Blocks",
+                columns: table => new
+                {
+                    BlockerId = table.Column<Guid>(type: "uuid", nullable: false),
+                    BlockedId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Blocks", x => new { x.BlockerId, x.BlockedId });
+                    table.ForeignKey(
+                        name: "FK_Blocks_Users_BlockedId",
+                        column: x => x.BlockedId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Blocks_Users_BlockerId",
+                        column: x => x.BlockerId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -90,6 +97,41 @@ namespace backend.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "MatchHistories",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    RoomId = table.Column<string>(type: "text", nullable: false),
+                    GameType = table.Column<int>(type: "integer", nullable: false),
+                    WinnerId = table.Column<Guid>(type: "uuid", nullable: true),
+                    Status = table.Column<int>(type: "integer", nullable: true),
+                    Player1Id = table.Column<Guid>(type: "uuid", nullable: true),
+                    Player2Id = table.Column<Guid>(type: "uuid", nullable: true),
+                    CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MatchHistories", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MatchHistories_Users_Player1Id",
+                        column: x => x.Player1Id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MatchHistories_Users_Player2Id",
+                        column: x => x.Player2Id,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_MatchHistories_Users_WinnerId",
+                        column: x => x.WinnerId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -146,7 +188,8 @@ namespace backend.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    FriendId = table.Column<Guid>(type: "uuid", nullable: false)
+                    FriendId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -166,9 +209,29 @@ namespace backend.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Blocks_BlockedId",
+                table: "Blocks",
+                column: "BlockedId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_FriendRequests_ReceiverId",
                 table: "FriendRequests",
                 column: "ReceiverId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MatchHistories_Player1Id",
+                table: "MatchHistories",
+                column: "Player1Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MatchHistories_Player2Id",
+                table: "MatchHistories",
+                column: "Player2Id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_MatchHistories_WinnerId",
+                table: "MatchHistories",
+                column: "WinnerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Messages_ReceiverId",
@@ -201,7 +264,10 @@ namespace backend.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "EmailVerfications");
+                name: "Blocks");
+
+            migrationBuilder.DropTable(
+                name: "EmailVerifications");
 
             migrationBuilder.DropTable(
                 name: "FriendRequests");

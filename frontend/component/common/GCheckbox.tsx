@@ -3,8 +3,7 @@
 import clsx from "clsx";
 import { forwardRef } from "react";
 import { focusRing, rounded } from "./tokens";
-
-interface GCheckboxProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+import type { GCheckboxProps } from "./def/GCheckbox";
 
 const GCheckbox = forwardRef<HTMLInputElement, GCheckboxProps>(
   ({ className, ...props }, ref) => {

@@ -1,6 +1,7 @@
 ﻿using backend.DTOs.Requests;
 using backend.DTOs.Responses;
 using backend.Services.Interface;
+using backend.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,13 +10,19 @@ namespace backend.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    public class UserController(IUserService _userService, ICurrentUserService _currentUser) : ControllerBase
+    public class UserController(
+        IUserService _userService,
+        ICurrentUserService _currentUser) : ControllerBase
     {
         [HttpGet("{id}")]
-        public async Task<ActionResult<ApiResponse<UserResponse>>> GetUserById(Guid id)
+        public async Task<ActionResult<ApiResponse<object>>> GetUserById(Guid id)
         {
             var user = await _userService.GetUserByIdAsync(id);
-            return Ok(new ApiResponse<UserResponse> { Data = user });
+
+            if (id == _currentUser.UserId)
+                return Ok(new ApiResponse<UserResponse> { Data = user });
+
+            return Ok(new ApiResponse<UserSummaryResponse> { Data = MapperHelper.ToDtoSummary(user) });
         }
 
         [HttpGet("profile")]
@@ -26,10 +33,32 @@ namespace backend.Controllers
         }
 
         [HttpPost("search")]
-        public async Task<ActionResult<ApiResponse<List<UserResponse>>>> GetUsers([FromBody] UserFilterRequest filter)
+        public async Task<ActionResult<ApiResponse<List<UserSummaryResponse>>>> GetUsers([FromBody] UserFilterRequest filter)
         {
             var users = await _userService.GetUsersAsync(_currentUser.UserId, filter);
-            return Ok(new ApiResponse<List<UserResponse>> { Data = users });
+            return Ok(new ApiResponse<List<UserSummaryResponse>> { Data = users });
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("update")]
+        public async Task<ActionResult<ApiResponse<UserResponse>>> UpdateUser([FromBody] UserResponse request)
+        {
+            var updatedUser = await _userService.UpdateUserAsync(_currentUser.UserId, request);
+            return Ok(new ApiResponse<UserResponse> { Data = updatedUser });
+        }
+
+        [HttpPut("update-profile")]
+        public async Task<ActionResult<ApiResponse<UserResponse>>> UpdateProfile([FromBody] RegisterRequest request)
+        {
+            var updatedUser = await _userService.UpdateProfileAsync(_currentUser.UserId, request);
+            return Ok(new ApiResponse<UserResponse> { Data = updatedUser });
+        }
+
+        [HttpPut("change-password")]
+        public async Task<ActionResult<ApiResponse<object>>> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            await _userService.ChangePasswordAsync(_currentUser.UserId, request.OldPassword, request.NewPassword);
+            return Ok(new ApiResponse<object>());
         }
     }
 }

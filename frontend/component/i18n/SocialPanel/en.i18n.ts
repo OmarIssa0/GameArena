@@ -1,6 +1,7 @@
 const en = {
   title: "Friends",
   online: "online",
+  searchPlaceholder: "Search friends...",
   tabs: {
     friends: "Friends",
     invites: "Invites",

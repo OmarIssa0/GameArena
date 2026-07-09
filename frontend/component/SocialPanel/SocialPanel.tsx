@@ -1,58 +1,101 @@
 "use client";
 
-import { Users, X, Bell } from "lucide-react";
+import { Users, Bell } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import clsx from "clsx";
 
 import { GameInvitesList } from "./GameInvitesList";
 import { GInputSearch } from "@/component/common/GInputSearch";
 import { FriendsList } from "./FriendsList";
 import { GTabs } from "@/component/common/GTabs";
-import { GTabItem } from "@/component/common/def/GTabs";
+import type { GTabItem } from "@/component/common/def/GTabs";
 import { useTranslation } from "@/hooks/useSetting";
 import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
 import { useFriendList } from "@/hooks/useFriends";
-import {
-  en,
-  type TSocialPanelTranslation,
-} from "@/component/i18n/SocialPanel/en.i18n";
+import { en, type TSocialPanelTranslation } from "@/component/i18n/SocialPanel/en.i18n";
 import { ar } from "@/component/i18n/SocialPanel/ar.i18n";
-import { GButton } from "../common/GButton";
-import { GBackdrop } from "../common/GBackdrop";
-import { GIcon } from "../common/GIcon";
+import { GAside, useAsideCtx } from "../common/GAside";
+import { GTile } from "../common/GTile";
+import { GStatusDot } from "../common/GStatusDot";
 import { GSpinner } from "../common/GSpinner";
-
+import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
+import { GButton } from "../common/GButton";
 type SocialPanelTab = "friends" | "invites";
 
-export function SocialPanel() {
+/** Header content shown when the panel is expanded (or open on compact) */
+function SocialBrand() {
+  const t = useTranslation({ en, ar }) as TSocialPanelTranslation;
+  const { onlineCount } = useFriendList();
+
+  return (
+    <div className="min-w-0">
+      <p className="font-bold text-text flex items-center gap-2">
+        <Users size={16} className="text-text shrink-0" />
+        <span className="truncate">{t.title}</span>
+      </p>
+      <p className="text-xs text-text-muted">
+        {onlineCount} {t.online}
+      </p>
+    </div>
+  );
+}
+
+function SocialRail() {
   const router = useRouter();
+  const { friends } = useFriendList();
+  const { closeMobile, isCompact } = useAsideCtx();
+
+  const online = friends.filter((f) => f.status === UserStatusEnum.Online).slice(0, 8);
+
+  const goToChat = (id: string) => {
+    router.push(`/messages?friend=${id}`);
+    if (isCompact) closeMobile();
+  };
+
+  if (online.length === 0) {
+    return (
+      <div className="flex justify-center pt-4">
+        <Users size={18} className="text-text-muted" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-3 py-3">
+      {online.map((f) => (
+        <GButton
+          key={f.id}
+          type="button"
+          onClick={() => goToChat(f.id)}
+          title={`${f.firstName ?? ""} ${f.lastName ?? ""}`.trim() || (f.userName ?? undefined)}
+          className="relative shrink-0 rounded-full transition hover:ring-2 hover:ring-primary focus-visible:ring-2 focus-visible:ring-primary outline-none">
+          <GTile user={f} size="sm" />
+          <GStatusDot status={f.status} className="absolute -bottom-0.5 -end-0.5 ring-2 ring-bg-sidebar" />
+        </GButton>
+      ))}
+    </div>
+  );
+}
+
+function SocialExpanded() {
   const t = useTranslation({ en, ar }) as TSocialPanelTranslation;
   const { gameInvites } = useDashboardNotifications();
-  const { friends, loading, onlineCount } = useFriendList();
+  const { friends, loading } = useFriendList();
+  const router = useRouter();
+  const { isCompact, closeMobile } = useAsideCtx();
 
   const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<SocialPanelTab>("friends");
 
   const filteredFriends = useMemo(() => {
     const term = query.trim().toLowerCase();
     if (!term) return friends;
-
-    return friends.filter((f) =>
-      `${f.firstName ?? ""} ${f.lastName ?? ""} ${f.userName ?? ""}`
-        .toLowerCase()
-        .includes(term),
-    );
+    return friends.filter((f) => `${f.firstName ?? ""} ${f.lastName ?? ""} ${f.userName ?? ""}`.toLowerCase().includes(term));
   }, [friends, query]);
 
   const tabs = useMemo<GTabItem<SocialPanelTab>[]>(
     () => [
-      {
-        id: "friends",
-        label: t.tabs.friends,
-        icon: <Users size={16} />,
-      },
+      { id: "friends", label: t.tabs.friends, icon: <Users size={16} /> },
       {
         id: "invites",
         label: t.tabs.invites,
@@ -65,52 +108,24 @@ export function SocialPanel() {
 
   const goToChat = (id: string) => {
     router.push(`/messages?friend=${id}`);
-    setOpen(false);
+    if (isCompact) closeMobile();
   };
 
-  const panel = (
-    <aside className="w-full sm:w-80 h-dvh-safe bg-bg-sidebar flex flex-col">
-      <div className="h-20 flex items-center justify-between px-5 border-b border-border/50">
-        <div>
-          <p className="font-bold text-text flex items-center gap-2">
-            <GIcon icon={Users} size="sm" color="inherit" className="text-text" />
-            {t.title}
-          </p>
-          <p className="text-xs text-text-muted">
-            {onlineCount} {t.online}
-          </p>
-        </div>
+  return (
+    <div className="flex flex-col h-full">
+      <div className="sticky top-0 z-10 bg-bg-sidebar px-4 pt-4">
+        <GTabs tabs={tabs} value={activeTab} onChange={setActiveTab} variant="pills" fullWidth />
 
-        <GButton
-          variant="ghost"
-          size="icon"
-          rounded="full"
-          onClick={() => setOpen(false)}
-          aria-label="Close panel"
-        >
-          <X size={20} />
-        </GButton>
+        {activeTab === "friends" && (
+          <div className="pt-4 pb-2">
+            <GInputSearch value={query} onChange={setQuery} placeholder={t.searchPlaceholder} />
+          </div>
+        )}
       </div>
 
-      <div className="px-4 pt-4">
-        <GTabs
-          tabs={tabs}
-          value={activeTab}
-          onChange={setActiveTab}
-          variant="pills"
-          fullWidth
-        />
-      </div>
-
-      {activeTab === "friends" && (
-        <div className="p-4">
-          <GInputSearch value={query} onChange={setQuery} />
-        </div>
-      )}
-
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
+      <div className="flex-1 p-4 space-y-4">
         {activeTab === "invites" ? (
-          <GameInvitesList onAfterAccept={() => setOpen(false)} />
+          <GameInvitesList onAfterAccept={() => isCompact && closeMobile()} />
         ) : loading ? (
           <div className="flex justify-center py-10">
             <GSpinner />
@@ -119,37 +134,39 @@ export function SocialPanel() {
           <FriendsList friends={filteredFriends} onSelectFriend={goToChat} />
         )}
       </div>
-    </aside>
+    </div>
+  );
+}
+
+/** Switches between the rail and the full panel based on aside state */
+function SocialBody() {
+  const { collapsed, isDesktop } = useAsideCtx();
+  return collapsed && isDesktop ? <SocialRail /> : <SocialExpanded />;
+}
+
+function SocialPanel() {
+  const { gameInvites } = useDashboardNotifications();
+
+  // Embedded badge dot so it shows up in the collapsed header button
+  // AND the compact FAB (GAside falls back to collapsedIcon for both).
+  const collapsedIcon = (
+    <span className="relative inline-flex">
+      <Users size={20} />
+      {gameInvites.length > 0 && <span className="absolute -top-1 -end-1 w-2 h-2 rounded-full bg-primary ring-2 ring-bg-sidebar" />}
+    </span>
   );
 
   return (
-    <>
-      {open && (
-        <>
-          <GBackdrop onClick={() => setOpen(false)} />
-          <div
-            className={clsx(
-              "fixed z-50 inset-y-0 end-0 w-full sm:w-80 h-dvh-safe",
-            )}
-          >
-            {panel}
-          </div>
-        </>
-      )}
-
-      {!open && (
-        <GButton
-          variant="secondary"
-          size="icon"
-          rounded="full"
-          fab
-          className="bottom-4 end-4"
-          onClick={() => setOpen(true)}
-          aria-label="Open social panel"
-        >
-          <Users size={20} />
-        </GButton>
-      )}
-    </>
+    <GAside
+      side="end"
+      widthExpanded="w-80"
+      mode="inline"
+      ariaLabel="Friends and invites"
+      collapsedIcon={collapsedIcon}
+      expandedBrand={<SocialBrand />}>
+      <SocialBody />
+    </GAside>
   );
 }
+
+export { SocialPanel };

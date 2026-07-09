@@ -1,10 +1,11 @@
+import type { TNullable } from "@/domain/type/TCommon";
 import type { GGradient, GSize } from "../tokens";
 
 export interface GAvatarProps {
-  firstName: string | null;
-  lastName: string | null;
-  userName: string | null;
-  src?: string | null;
+  firstName: TNullable<string>;
+  lastName: TNullable<string>;
+  userName: TNullable<string>;
+  src?: TNullable<string>;
   size?: GSize;
   shape?: "rounded" | "circle";
   gradient?: GGradient;

@@ -39,12 +39,14 @@ const formatStatus = (status: UserStatusEnum, t: TMessagesTranslation) => {
   }
 };
 
+import type { TNullable } from "@/domain/type/TCommon";
+
 const displayName = (
   user: {
-    fullName?: string | null;
-    firstName: string | null;
-    lastName: string | null;
-    userName: string | null;
+    fullName?: TNullable<string>;
+    firstName: TNullable<string>;
+    lastName: TNullable<string>;
+    userName: TNullable<string>;
   },
   fallback: string,
 ) =>
@@ -257,6 +259,7 @@ function MessagesPage() {
                     }
                   }}
                   placeholder={t.placeholder}
+                  aria-label={t.placeholder}
                   className="flex-1"
                 />
                 <GButton

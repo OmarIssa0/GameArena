@@ -83,6 +83,7 @@ builder.Services.AddScoped<IAuthCookieService, AuthCookieService>();
 builder.Services.AddScoped<IFriendService, FriendService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IGameService, GameService>();
+builder.Services.AddScoped<IMatchHistoryService, MatchHistoryService>();
 builder.Services.AddSingleton<IGameBotService, GameBotService>();
 
 // Event bus this for notification system like friend request, game invitation, message notification, user online/offline status.
@@ -103,11 +104,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    Console.WriteLine("Ensuring database schema...");
     db.Database.Migrate();
-    Console.WriteLine("Migration applied.");
-    db.Database.EnsureCreated();
-    Console.WriteLine("Database schema ready.");
 }
 app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseCors("cors");

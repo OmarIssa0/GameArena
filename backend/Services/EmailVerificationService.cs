@@ -24,7 +24,7 @@ namespace backend.Services
                 .Where(x => x.UserId == user.Id && x.Purpose == purpose && !x.IsUsed)
                 .OrderByDescending(x => x.ExpiresAt)
                 .FirstOrDefaultAsync();
-            if (recent != null && recent.ExpiresAt > DateTime.UtcNow.AddMinutes(-1))
+            if (recent != null && recent.ExpiresAt > DateTime.UtcNow - OtpCooldown)
                 throw new AppException(ErrorCode.RateLimited);
 
             var otp = RandomNumberGenerator.GetInt32(100000, 999999).ToString();

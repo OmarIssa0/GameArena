@@ -2,7 +2,10 @@ import type { IApiResponse } from "../meta/IApiResponse";
 
 type TLocale = "en" | "ar";
 type TTheme = "light" | "dark";
-type THashMap<T = unknown> = Record<string, T>;
+type THashMap<
+  T = unknown,
+  K extends string | number | symbol = string | number | symbol,
+> = Record<K, T>;
 type TTranslate = { en: THashMap; ar: THashMap };
 type TNullable<T> = T | null;
 type TEndpointsMap = THashMap<TEndpoint>;

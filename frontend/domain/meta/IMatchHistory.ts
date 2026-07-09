@@ -1,5 +1,5 @@
+import { MatchResultEnum } from "@/domain/enum/MatchResultEnum";
 import type { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
-import type { MatchResultEnum } from "@/domain/enum/MatchResultEnum";
 
 interface IMatchHistory {
   id: string;
@@ -7,7 +7,6 @@ interface IMatchHistory {
   opponentName: string;
   result: MatchResultEnum;
   playedAt: Date;
-  score?: string;
 }
 
 interface IMatchHistorySummary {

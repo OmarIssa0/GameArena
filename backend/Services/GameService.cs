@@ -17,10 +17,11 @@ namespace backend.Services
             {
                 RoomId = room.RoomId,
                 GameType = room.GameType,
-                Player1Id = room.Player1Id,
-                Player2Id = room.Player2Id,
-                WinnerId = room.WinnerPlayerId,
-                CompletedAt = DateTime.UtcNow
+                Player1Id = Guid.Parse(room.Player1Id!),
+                Player2Id = Guid.Parse(room.Player2Id!),
+                WinnerId = room.WinnerPlayerId != null ? Guid.Parse(room.WinnerPlayerId) : null,
+                CompletedAt = DateTime.UtcNow,
+                Status = room.WinnerPlayerId != null ? MatchStatus.Win : MatchStatus.Draw
             });
             await _context.SaveChangesAsync();
         }

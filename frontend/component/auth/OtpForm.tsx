@@ -10,6 +10,7 @@ import { GButton } from "@/component/common/GButton";
 import { en, type TOtpTranslation } from "../i18n/Otp/en.i18n";
 import { ar } from "../i18n/Otp/ar.i18n";
 import { useTranslation } from "@/hooks/useSetting";
+import type { TNullable } from "@/domain/type/TCommon";
 import type { OtpFormProps } from "./def/OtpForm";
 import { emailVerificationService } from "@/services/def/EmailVerificationService";
 
@@ -18,7 +19,7 @@ function OtpForm({ email, onSuccess }: OtpFormProps) {
   const [loading, setLoading] = useState({ verify: false, resend: false });
   const [error, setError] = useState("");
   const t = useTranslation({ en, ar }) as TOtpTranslation;
-  const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
+  const inputsRef = useRef<TNullable<HTMLInputElement>[]>([]);
 
   const setDigit = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;

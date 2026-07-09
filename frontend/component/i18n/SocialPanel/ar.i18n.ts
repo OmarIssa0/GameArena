@@ -1,6 +1,7 @@
 const ar = {
   title: "الأصدقاء",
   online: "متصل",
+  searchPlaceholder: "بحث عن الأصدقاء...",
   tabs: {
     friends: "الأصدقاء",
     invites: "الدعوات",

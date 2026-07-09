@@ -70,9 +70,6 @@ namespace backend.Services
         public bool TryGetPlayerRoom(string playerId, out string? roomId)
             => _playerToRoom.TryGetValue(playerId, out roomId);
 
-        public void SetPlayerRoom(string playerId, string roomId)
-            => _playerToRoom[playerId] = roomId;
-
         public bool TryRemovePlayer(string playerId)
             => _playerToRoom.TryRemove(playerId, out _);
 

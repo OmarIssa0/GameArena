@@ -3,7 +3,7 @@
 import clsx from "clsx";
 import { forwardRef } from "react";
 import { GLabel } from "./GLabel";
-import { GTextareaProps } from "./def/GTextarea";
+import type { GTextareaProps } from "./def/GTextarea";
 import { focusRing, inputSize, rounded, transition } from "./tokens";
 
 const GTextarea = forwardRef<HTMLTextAreaElement, GTextareaProps>(
@@ -14,7 +14,7 @@ const GTextarea = forwardRef<HTMLTextAreaElement, GTextareaProps>(
         <textarea
           ref={ref}
           className={clsx(
-            "w-full border border-border bg-surface-alt text-text outline-none resize-none placeholder:text-text-muted",
+            "w-full border border-border bg-surface text-text outline-none resize-none placeholder:text-text-muted",
             rounded.md,
             transition,
             focusRing,

@@ -56,10 +56,10 @@ namespace backend.Controllers
         }
 
         [HttpPost("friends")]
-        public async Task<ActionResult<ApiResponse<List<UserResponse>>>> GetFriends([FromBody] UserFilterRequest filter)
+        public async Task<ActionResult<ApiResponse<List<UserSummaryResponse>>>> GetFriends([FromBody] UserFilterRequest filter)
         {
             var friends = await _friendService.GetFriendsAsync(_currentUser.UserId, filter);
-            return Ok(new ApiResponse<List<UserResponse>> { Data = friends });
+            return Ok(new ApiResponse<List<UserSummaryResponse>> { Data = friends });
         }
 
         [HttpGet("requests")]

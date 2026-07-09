@@ -5,18 +5,21 @@ import { forwardRef } from "react";
 import { useTranslation } from "@/hooks/useSetting";
 import { en, type GButtonTranslation } from "@/component/i18n/GButton/en.i18n";
 import { ar } from "@/component/i18n/GButton/ar.i18n";
-import { GButtonProps } from "./def/GButton";
+import type { GButtonProps } from "./def/GButton";
 import { buttonSize, focusRing, rounded, transition } from "./tokens";
 
 const variants = {
   primary: "bg-primary text-on-primary hover:bg-primary-hover",
   secondary: "bg-surface border border-border text-text hover:border-primary",
-  outline: "border border-border bg-transparent text-text hover:bg-surface-alt",
-  ghost: "bg-transparent text-text-secondary hover:bg-primary/10 hover:text-text",
+  outline:
+    "border border-border bg-transparent text-text hover:bg-primary-muted",
+  ghost:
+    "bg-transparent text-text-secondary hover:bg-primary-muted hover:text-text",
   danger: "bg-danger text-on-primary hover:bg-danger/90",
   success: "bg-success text-on-primary hover:bg-success/90",
   link: "bg-transparent text-primary hover:text-primary-hover underline-offset-4 hover:underline h-auto p-0",
-  dangerOutline: "border border-danger/30 text-danger bg-transparent hover:bg-danger-bg",
+  dangerOutline:
+    "border border-danger/30 text-danger bg-transparent hover:bg-danger-bg",
 };
 
 const GButton = forwardRef<HTMLButtonElement, GButtonProps>(
@@ -42,7 +45,8 @@ const GButton = forwardRef<HTMLButtonElement, GButtonProps>(
     const t = useTranslation({ en, ar }) as GButtonTranslation;
     const isDisabled = disabled || loading;
     const resolvedLoadingText = loadingText ?? t.loading;
-    const isIconOnly = size === "icon" || (!children && (leftIcon || rightIcon));
+    const isIconOnly =
+      size === "icon" || (!children && (leftIcon || rightIcon));
 
     return (
       <button

@@ -1,9 +1,8 @@
 import { friendsApi } from "../proxy/friends.api";
 import type { TPromise } from "@/domain/type/TCommon";
-
 import type { IFriendRequestReceived } from "@/domain/meta/IFriendRequestReceived";
 import type { IFriendRequestSent } from "@/domain/meta/IFriendRequestSent";
-import type { IUser } from "@/domain/meta/IUser";
+import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import type { IUserFilterRequest } from "@/domain/meta/IUserFilterRequest";
 import type { IFriendRepository } from "../meta/IFriendRepository";
 
@@ -23,7 +22,7 @@ class FriendRepository implements IFriendRepository {
     return this.api.getSentFriendRequests();
   }
 
-  getFriends(query: IUserFilterRequest): TPromise<IUser[]> {
+  getFriends(query: IUserFilterRequest): TPromise<IUserSummary[]> {
     return this.api.getFriends(query);
   }
 

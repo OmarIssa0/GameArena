@@ -19,14 +19,8 @@ import {
   en,
   type THistoryTranslation,
 } from "@/app/(dashboard)/history/i18n/en.i18n";
-
-interface RecentHistorySectionProps {
-  title: string;
-  viewAll: string;
-  emptyTitle: string;
-  emptyDescription: string;
-  limit?: number;
-}
+import type { TLocale } from "@/domain/type/TCommon";
+import type { RecentHistorySectionProps } from "./def/RecentHistorySection";
 
 function RecentHistorySection({
   title,
@@ -35,7 +29,7 @@ function RecentHistorySection({
   emptyDescription,
   limit = 3,
 }: RecentHistorySectionProps) {
-  const [locale] = useLocale();
+  const [locale] = useLocale() as [TLocale, (l: TLocale) => void];
   const historyT = useTranslation({ en, ar }) as THistoryTranslation;
   const { matches, summary, loading } = useMatchHistory("all", limit);
 
@@ -60,7 +54,14 @@ function RecentHistorySection({
         </div>
       ) : matches.length === 0 ? (
         <GEmpty
-          icon={<GIcon icon={History} size="xl" color="muted" className="opacity-50" />}
+          icon={
+            <GIcon
+              icon={History}
+              size="xl"
+              color="muted"
+              className="opacity-50"
+            />
+          }
           title={emptyTitle}
           description={emptyDescription}
         />

@@ -3,7 +3,10 @@
 import { useMemo, useState } from "react";
 import { History } from "lucide-react";
 import { useLocale, useTranslation } from "@/hooks/useSetting";
-import { useMatchHistory, type MatchHistoryFilter } from "@/hooks/useMatchHistory";
+import {
+  useMatchHistory,
+  type MatchHistoryFilter,
+} from "@/hooks/useMatchHistory";
 import { MatchResultEnum } from "@/domain/enum/MatchResultEnum";
 import { GTabs } from "@/component/common/GTabs";
 import { GSpinner } from "@/component/common/GSpinner";
@@ -15,6 +18,7 @@ import { GIcon } from "@/component/common/GIcon";
 import { GPage } from "@/component/common/GPage";
 import { MatchHistoryCard } from "@/component/history/MatchHistoryCard";
 import { MatchHistorySummary } from "@/component/history/MatchHistorySummary";
+import type { TLocale } from "@/domain/type/TCommon";
 import {
   formatMatchDate,
   getGameName,
@@ -25,7 +29,7 @@ import { ar } from "./i18n/ar.i18n";
 import { en, type THistoryTranslation } from "./i18n/en.i18n";
 
 function MatchHistoryPage() {
-  const [locale] = useLocale();
+  const [locale] = useLocale() as [TLocale, (l: TLocale) => void];
   const t = useTranslation({ en, ar }) as THistoryTranslation;
   const [filter, setFilter] = useState<MatchHistoryFilter>("all");
   const { matches, summary, loading } = useMatchHistory(filter);
@@ -56,7 +60,14 @@ function MatchHistoryPage() {
       <MatchHistorySummary summary={summary} labels={t.summary} />
 
       <GCard padding="sm">
-        <GTabs tabs={tabs} value={filter} onChange={setFilter} variant="pills" fullWidth indicator="bottom" className="mb-4" />
+        <GTabs
+          tabs={tabs}
+          value={filter}
+          onChange={setFilter}
+          variant="pills"
+          fullWidth
+          className="mb-4"
+        />
 
         {loading ? (
           <div className="flex justify-center py-16">
@@ -66,7 +77,9 @@ function MatchHistoryPage() {
           <GEmpty
             icon={<GIcon icon={History} size="xl" color="muted" />}
             title={t.empty.title}
-            description={filter === "all" ? t.empty.description : t.empty.filtered}
+            description={
+              filter === "all" ? t.empty.description : t.empty.filtered
+            }
           />
         ) : (
           <div className="flex flex-col gap-3">

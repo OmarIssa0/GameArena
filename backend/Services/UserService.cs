@@ -17,7 +17,7 @@ namespace backend.Services
             return MapperHelper.ToDto(user);
         }
 
-        public async Task<List<UserResponse>> GetUsersAsync(Guid currentUserId, UserFilterRequest? filter)
+        public async Task<List<UserSummaryResponse>> GetUsersAsync(Guid currentUserId, UserFilterRequest? filter)
         {
             if (string.IsNullOrWhiteSpace(filter?.Name)) return [];
 
@@ -26,14 +26,46 @@ namespace backend.Services
             var query = _context.Users
                 .Where(u => u.Id != currentUserId)
                 .Where(u =>
-                    (u.UserName != null && u.UserName.ToLower().Contains(name)) ||
-                    (u.Email != null && u.Email.ToLower().Contains(name))
+                    u.UserName != null && u.UserName.ToLower().Contains(name)
                 );
 
             if (filter.UserStatus != UserStatus.All) query = query.Where(u => u.Status == filter.UserStatus);
 
             var users = await query.ToListAsync();
-            return [.. users.Select(MapperHelper.ToDto)];
+            return [.. users.Select(MapperHelper.ToDtoSummary)];
+        }
+
+        public async Task<UserResponse> UpdateUserAsync(Guid currentUserId, UserResponse request)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == request.Id) ?? throw new AppException(ErrorCode.UserNotFound);
+            user.UserName = request.UserName;
+            user.Email = request.Email;
+            user.FirstName = request.FirstName;
+            user.LastName = request.LastName;
+            user.Role = request.Role;
+            user.Status = request.Status;
+            await _context.SaveChangesAsync();
+            return MapperHelper.ToDto(user);
+        }
+
+        public async Task<UserResponse> UpdateProfileAsync(Guid userId, RegisterRequest request)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId) ?? throw new AppException(ErrorCode.UserNotFound);
+            user.UserName = request.UserName;
+            user.Email = request.Email;
+            user.FirstName = request.FirstName;
+            user.LastName = request.LastName;
+            await _context.SaveChangesAsync();
+            return MapperHelper.ToDto(user);
+        }
+
+        public async Task ChangePasswordAsync(Guid userId, string oldPassword, string newPassword)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId) ?? throw new AppException(ErrorCode.UserNotFound);
+            if (!AuthHelper.VerifyPassword(user, user.PasswordHash, oldPassword))
+                throw new AppException(ErrorCode.InvalidCredentials);
+            user.PasswordHash = AuthHelper.HashPassword(user, newPassword);
+            await _context.SaveChangesAsync();
         }
     }
 }

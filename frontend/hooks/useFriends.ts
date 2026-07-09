@@ -1,19 +1,23 @@
 "use client";
 
 import { friendService } from "@/services/def/FriendService";
-import type { IUser } from "@/domain/meta/IUser";
-import type { IFriendRequestReceived } from "@/domain/meta/IFriendRequestReceived";
-import type { IFriendRequestSent } from "@/domain/meta/IFriendRequestSent";
 import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
+import { useFetch } from "./useFetch";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useConnections } from "@/app/providers/ConnectionProvider";
 import { notifyFriendRequestChange } from "@/lib/friendEvents";
-import { useFetch } from "./useFetch";
+import type { IUserSummary } from "@/domain/meta/IUserSummary";
+import type { IFriendRequestReceived } from "@/domain/meta/IFriendRequestReceived";
+import type { IFriendRequestSent } from "@/domain/meta/IFriendRequestSent";
 
 function useFriendList() {
   const { socialConnection } = useConnections();
-  const [friends, setFriends] = useState<IUser[]>([]);
-  const { data: fetched, loading, reload } = useFetch(
+  const [friends, setFriends] = useState<IUserSummary[]>([]);
+  const {
+    data: fetched,
+    loading,
+    reload,
+  } = useFetch(
     () =>
       friendService
         .getFriends({ name: null, userStatus: UserStatusEnum.All })
@@ -71,11 +75,20 @@ function useFriendRequests() {
   const [requests, setRequests] = useState<IFriendRequestReceived[]>([]);
   const [sentRequests, setSentRequests] = useState<IFriendRequestSent[]>([]);
 
-  const { data: recv, loading: recvLoading, reload: reloadRecv } = useFetch(
-    () => friendService.getReceivedFriendRequests().then((res) => res.data ?? []),
+  const {
+    data: recv,
+    loading: recvLoading,
+    reload: reloadRecv,
+  } = useFetch(
+    () =>
+      friendService.getReceivedFriendRequests().then((res) => res.data ?? []),
     [],
   );
-  const { data: sent, loading: sentLoading, reload: reloadSent } = useFetch(
+  const {
+    data: sent,
+    loading: sentLoading,
+    reload: reloadSent,
+  } = useFetch(
     () => friendService.getSentFriendRequests().then((res) => res.data ?? []),
     [],
   );
@@ -158,7 +171,12 @@ function useFriendRequests() {
 }
 
 function useFriends() {
-  const { friends, loading: friendsLoading, onlineCount, reload: reloadFriends } = useFriendList();
+  const {
+    friends,
+    loading: friendsLoading,
+    onlineCount,
+    reload: reloadFriends,
+  } = useFriendList();
   const {
     requests,
     sentRequests,
@@ -170,15 +188,21 @@ function useFriends() {
     reload: reloadRequests,
   } = useFriendRequests();
 
-  const removeFriend = useCallback(async (friendId: string) => {
-    await friendService.removeFriend(friendId);
-    await reloadFriends();
-  }, [reloadFriends]);
+  const removeFriend = useCallback(
+    async (friendId: string) => {
+      await friendService.removeFriend(friendId);
+      await reloadFriends();
+    },
+    [reloadFriends],
+  );
 
-  const blockUser = useCallback(async (blockedId: string) => {
-    await friendService.blockUser(blockedId);
-    await reloadFriends();
-  }, [reloadFriends]);
+  const blockUser = useCallback(
+    async (blockedId: string) => {
+      await friendService.blockUser(blockedId);
+      await reloadFriends();
+    },
+    [reloadFriends],
+  );
 
   const unblockUser = useCallback(async (blockedId: string) => {
     await friendService.unblockUser(blockedId);
@@ -197,7 +221,9 @@ function useFriends() {
     removeFriend,
     blockUser,
     unblockUser,
-    reload: async () => { await Promise.all([reloadFriends(), reloadRequests()]); },
+    reload: async () => {
+      await Promise.all([reloadFriends(), reloadRequests()]);
+    },
   };
 }
 

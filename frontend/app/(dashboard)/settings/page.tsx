@@ -1,25 +1,67 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "@/hooks/useSetting";
 import { ar } from "./i18n/ar.i18n";
 import { en, type TSettingsTranslation } from "./i18n/en.i18n";
 import { GTabs } from "@/component/common/GTabs";
-import { User, Bell, Shield, Save } from "lucide-react";
+import { User, Bell, Shield, Save, Loader } from "lucide-react";
 import { GButton } from "@/component/common/GButton";
-import { GTabItem } from "@/component/common/def/GTabs";
+import type { GTabItem } from "@/component/common/def/GTabs";
 import { GCard } from "@/component/common/GCard";
 import { GTextField } from "@/component/common/GTextField";
 import { GTextarea } from "@/component/common/GTextarea";
 import { GCheckbox } from "@/component/common/GCheckbox";
 import { GBadge } from "@/component/common/GBadge";
 import { GIcon } from "@/component/common/GIcon";
+import { GSpinner } from "@/component/common/GSpinner";
+import { userRepository } from "@/repositories/def/UserRepository";
+import type { IUser } from "@/domain/meta/IUser";
 
 type SettingsTab = "profile" | "notifications" | "privacy";
 
 function SettingsPage() {
   const t = useTranslation({ en, ar }) as TSettingsTranslation;
   const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
+
+  const [profile, setProfile] = useState<IUser | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [userName, setUserName] = useState("");
+
+  useEffect(() => {
+    let alive = true;
+    const load = async () => {
+      setLoading(true);
+      const res = await userRepository.profile();
+      if (!alive) return;
+      if (res.data) {
+        setProfile(res.data);
+        setFirstName(res.data.firstName ?? "");
+        setLastName(res.data.lastName ?? "");
+        setUserName(res.data.userName ?? "");
+      }
+      setLoading(false);
+    };
+    void load();
+    return () => { alive = false; };
+  }, []);
+
+  const handleSaveProfile = async () => {
+    if (!profile) return;
+    setSaving(true);
+    await userRepository.updateProfile({
+      firstName,
+      lastName,
+      userName,
+      email: profile.email,
+      password: null,
+    });
+    setSaving(false);
+  };
 
   const tabs = useMemo<GTabItem<SettingsTab>[]>(
     () => [
@@ -78,34 +120,50 @@ function SettingsPage() {
                 <h2 className="text-xl font-bold text-text mb-4">
                   {t.settings.profile.title}
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <GTextField
-                    label={t.settings.profile.firstName}
-                    defaultValue="John"
-                  />
-                  <GTextField
-                    label={t.settings.profile.lastName}
-                    defaultValue="Doe"
-                  />
-                  <div className="sm:col-span-2">
-                    <GTextField
-                      label={t.settings.profile.username}
-                      defaultValue="johndoe"
-                    />
+
+                {loading ? (
+                  <div className="flex justify-center py-10">
+                    <GSpinner />
                   </div>
-                  <div className="sm:col-span-2">
-                    <GTextarea
-                      label={t.settings.profile.bio}
-                      rows={3}
-                      defaultValue="A passionate gamer who loves strategy games."
-                    />
-                  </div>
-                </div>
-                <div className="mt-6 flex justify-end">
-                  <GButton leftIcon={<GIcon icon={Save} size="sm" color="inherit" className="text-on-primary" />}>
-                    {t.settings.profile.save}
-                  </GButton>
-                </div>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <GTextField
+                        label={t.settings.profile.firstName}
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                      />
+                      <GTextField
+                        label={t.settings.profile.lastName}
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                      />
+                      <div className="sm:col-span-2">
+                        <GTextField
+                          label={t.settings.profile.username}
+                          value={userName}
+                          onChange={(e) => setUserName(e.target.value)}
+                        />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <GTextarea
+                          label={t.settings.profile.bio}
+                          rows={3}
+                          defaultValue="A passionate gamer who loves strategy games."
+                        />
+                      </div>
+                    </div>
+                    <div className="mt-6 flex justify-end">
+                      <GButton
+                        leftIcon={saving ? <GIcon icon={Loader} size="sm" className="animate-spin" color="inherit" /> : <GIcon icon={Save} size="sm" color="inherit" className="text-on-primary" />}
+                        onClick={handleSaveProfile}
+                        disabled={saving}
+                      >
+                        {t.settings.profile.save}
+                      </GButton>
+                    </div>
+                  </>
+                )}
               </GCard>
 
               <GCard padding="lg">

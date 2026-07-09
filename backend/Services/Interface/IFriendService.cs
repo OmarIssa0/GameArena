@@ -11,7 +11,7 @@ namespace backend.Services.Interface
         Task RemoveFriendAsync(Guid userId, Guid friendId);
         Task BlockUserAsync(Guid blockerId, Guid blockedId);
         Task UnblockUserAsync(Guid blockerId, Guid blockedId);
-        Task<List<UserResponse>> GetFriendsAsync(Guid userId, UserFilterRequest? filter);
+        Task<List<UserSummaryResponse>> GetFriendsAsync(Guid userId, UserFilterRequest? filter);
         Task<List<FriendRequestReceivedResponse>> GetReceivedRequestsAsync(Guid userId);
         Task<List<FriendRequestSentResponse>> GetSentRequestsAsync(Guid userId);
     }

@@ -6,7 +6,7 @@ export interface GSelectOption<TValue extends string | number = string> {
 import type { GSize } from "../tokens";
 
 export interface GSelectProps<TValue extends string | number = string>
-  extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "children"> {
+  extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "children" | "size"> {
   label?: string;
   error?: string;
   startIcon?: React.ReactNode;

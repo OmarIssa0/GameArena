@@ -86,7 +86,18 @@ namespace backend.Data
                 .HasForeignKey(m => m.ReceiverId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // match history
+            modelBuilder.Entity<MatchHistory>()
+                .HasOne(m => m.Player1)
+                .WithMany(u => u.MatchesAsPlayer1)
+                .HasForeignKey(m => m.Player1Id)
+                .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<MatchHistory>()
+                .HasOne(m => m.Player2)
+                .WithMany(u => u.MatchesAsPlayer2)
+                .HasForeignKey(m => m.Player2Id)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

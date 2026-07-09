@@ -40,7 +40,7 @@ namespace backend.Services
             else
             {
                 var errBody = await response.Content.ReadAsStringAsync();
-                _logger.LogWarning("Fallback: email delivery failed for {Email}", to);
+                _logger.LogWarning("Fallback: email delivery failed for {Email}. Error: {Error}", to, errBody);
             }
         }
     }

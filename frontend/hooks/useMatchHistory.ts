@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { MatchResultEnum } from "@/domain/enum/MatchResultEnum";
-import { mockMatchHistory } from "@/domain/constant/match_history.config";
+import { matchHistoryRepository } from "@/repositories/def/MatchHistoryRepository";
 import type {
   IMatchHistory,
   IMatchHistorySummary,
@@ -32,13 +32,11 @@ function useMatchHistory(filter: MatchHistoryFilter = "all", limit?: number) {
 
     const load = async () => {
       setLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 400));
+      const res = await matchHistoryRepository.getMatchHistory();
       if (!alive) return;
-
-      const sorted = [...mockMatchHistory].sort(
-        (a, b) => b.playedAt.getTime() - a.playedAt.getTime(),
-      );
-      setMatches(sorted);
+      if (res.data) {
+        setMatches(res.data);
+      }
       setLoading(false);
     };
 
@@ -52,7 +50,7 @@ function useMatchHistory(filter: MatchHistoryFilter = "all", limit?: number) {
     const list =
       filter === "all"
         ? matches
-        : matches.filter((match) => match.result === filter);
+        : matches.filter((m) => m.result === filter);
     return limit ? list.slice(0, limit) : list;
   }, [filter, limit, matches]);
 

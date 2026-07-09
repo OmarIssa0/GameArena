@@ -1,9 +1,9 @@
+import { userRepository } from "@/repositories/def/UserRepository";
 import type { IUser } from "@/domain/meta/IUser";
+import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import type { TPromise } from "@/domain/type/TCommon";
-
 import type { IUserFilterRequest } from "@/domain/meta/IUserFilterRequest";
 import type { IUserService } from "../meta/IUserService";
-import { userRepository } from "@/repositories/def/UserRepository";
 import type { IUserRepository } from "@/repositories/meta/IUserRepository";
 
 class UserService implements IUserService {
@@ -16,7 +16,7 @@ class UserService implements IUserService {
     return this.repo.profile();
   }
 
-  list(data: IUserFilterRequest): TPromise<IUser[]> {
+  list(data: IUserFilterRequest): TPromise<IUserSummary[]> {
     return this.repo.list(data);
   }
 }

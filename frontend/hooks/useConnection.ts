@@ -9,12 +9,13 @@ import type {
   HubConnection,
 } from "@microsoft/signalr";
 import { useEffect, useState } from "react";
+import type { TNullable } from "@/domain/type/TCommon";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "https://gamearena-ppnc.onrender.com";
 
 export function useConnection(endPoint: string) {
-  const [connection, setConnection] = useState<HubConnection | null>(null);
+  const [connection, setConnection] = useState<TNullable<HubConnection>>(null);
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {

@@ -8,16 +8,17 @@ import {
   useCallback,
   useMemo,
 } from "react";
-import { IUser } from "@/domain/meta/IUser";
+import type { IUser } from "@/domain/meta/IUser";
 import { userService } from "@/services/def/UserService";
+import type { TNullable } from "@/domain/type/TCommon";
 
 /* ---------------- TYPES ---------------- */
 
 type AuthContextType = {
-  user: IUser | null;
+  user: TNullable<IUser>;
   loading: boolean;
-  refreshUser: () => Promise<IUser | null>;
-  setUser: (user: IUser | null) => void;
+  refreshUser: () => Promise<TNullable<IUser>>;
+  setUser: (user: TNullable<IUser>) => void;
 };
 
 /* ---------------- CONTEXT ---------------- */
@@ -27,10 +28,10 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 /* ---------------- PROVIDER ---------------- */
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<IUser | null>(null);
+  const [user, setUser] = useState<TNullable<IUser>>(null);
   const [loading, setLoading] = useState(true);
 
-  const loadUser = useCallback(async (): Promise<IUser | null> => {
+  const loadUser = useCallback(async (): Promise<TNullable<IUser>> => {
     try {
       const res = await userService.profile();
 

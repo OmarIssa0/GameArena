@@ -2,16 +2,7 @@
 
 import { Trophy, Frown, Handshake } from "lucide-react";
 import { GStatCard } from "@/component/common/GStatCard";
-import type { IMatchHistorySummary } from "@/domain/meta/IMatchHistory";
-
-interface MatchHistorySummaryProps {
-  summary: IMatchHistorySummary;
-  labels: {
-    wins: string;
-    losses: string;
-    draws: string;
-  };
-}
+import type { MatchHistorySummaryProps } from "./def/MatchHistorySummary";
 
 function MatchHistorySummary({ summary, labels }: MatchHistorySummaryProps) {
   const items = [

@@ -141,7 +141,7 @@ namespace backend.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<List<UserResponse>> GetFriendsAsync(Guid userId, UserFilterRequest? filter)
+        public async Task<List<UserSummaryResponse>> GetFriendsAsync(Guid userId, UserFilterRequest? filter)
         {
             var query = _context.UserFriends
                 .Where(x => x.UserId == userId)
@@ -153,11 +153,10 @@ namespace backend.Services
             {
                 var searchTerm = filter.Name.ToLower();
                 query = query.Where(u =>
-                    (u.UserName != null && u.UserName.ToLower().Contains(searchTerm)) ||
-                    (u.Email != null && u.Email.ToLower().Contains(searchTerm)));
+                    u.UserName != null && u.UserName.ToLower().Contains(searchTerm));
             }
 
-            return (await query.ToListAsync()).Select(MapperHelper.ToDto).ToList();
+            return (await query.ToListAsync()).Select(MapperHelper.ToDtoSummary).ToList();
         }
 
         public async Task<List<FriendRequestReceivedResponse>> GetReceivedRequestsAsync(Guid userId)

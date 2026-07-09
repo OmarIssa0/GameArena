@@ -1,12 +1,11 @@
+import { friendRepository } from "@/repositories/def/FriendRepository";
 import type { TPromise } from "@/domain/type/TCommon";
-
 import type { IFriendRequestReceived } from "@/domain/meta/IFriendRequestReceived";
 import type { IFriendRequestSent } from "@/domain/meta/IFriendRequestSent";
-import type { IUser } from "@/domain/meta/IUser";
+import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import type { IUserFilterRequest } from "@/domain/meta/IUserFilterRequest";
 import type { IFriendService } from "../meta/IFriendService";
 import type { IFriendRepository } from "@/repositories/meta/IFriendRepository";
-import { friendRepository } from "@/repositories/def/FriendRepository";
 
 class FriendService implements IFriendService {
   constructor(private repo: IFriendRepository) {}
@@ -23,7 +22,7 @@ class FriendService implements IFriendService {
     return this.repo.getSentFriendRequests();
   }
 
-  getFriends(data: IUserFilterRequest): TPromise<IUser[]> {
+  getFriends(data: IUserFilterRequest): TPromise<IUserSummary[]> {
     return this.repo.getFriends(data);
   }
 

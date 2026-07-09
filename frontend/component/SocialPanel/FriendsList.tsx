@@ -2,16 +2,17 @@
 
 import { Gamepad2 } from "lucide-react";
 import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
-import type { IFriend } from "@/domain/meta/ICommon";
+import type { IUserSummary } from "@/domain/meta/IUserSummary";
+import type { TNullable } from "@/domain/type/TCommon";
 import { GTile } from "../common/GTile";
 import { GStatusDot } from "../common/GStatusDot";
 import { GNav, GNavItem } from "../common/GNav";
 import { GIcon } from "../common/GIcon";
 
 interface IFriendsListProps {
-  friends: IFriend[];
+  friends: IUserSummary[];
   onSelectFriend: (id: string) => void;
-  activeId?: string | null;
+  activeId?: TNullable<string>;
   indicator?: "start" | "end" | "top" | "bottom" | "none";
 }
 

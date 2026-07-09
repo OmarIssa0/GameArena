@@ -15,11 +15,12 @@ import {
   type TFriendsTranslation,
 } from "@/app/(dashboard)/friends/i18n/en.i18n";
 import { ar } from "@/app/(dashboard)/friends/i18n/ar.i18n";
+import type { TNullable } from "@/domain/type/TCommon";
 
 function RequestsTab() {
   const t = useTranslation({ en, ar }) as TFriendsTranslation;
   const { requests, loading, accept, decline } = useFriendRequests();
-  const [actionId, setActionId] = useState<string | null>(null);
+  const [actionId, setActionId] = useState<TNullable<string>>(null);
 
   if (loading) {
     return (

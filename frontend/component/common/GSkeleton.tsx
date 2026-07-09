@@ -8,7 +8,7 @@ function GSkeleton({ variant = "text", width, height, className }: GSkeletonProp
   return (
     <div
       className={clsx(
-        "animate-pulse bg-surface-alt",
+        "animate-pulse bg-surface",
         variant === "circle" && rounded.full,
         variant === "rect" && rounded.md,
         variant === "text" && "h-4 rounded-sm",

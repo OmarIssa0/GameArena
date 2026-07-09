@@ -1,5 +1,6 @@
 ﻿using backend.Domain;
 using backend.DTOs.Responses;
+using backend.Enums;
 
 namespace backend.Utils
 {
@@ -18,6 +19,28 @@ namespace backend.Utils
                 Status = user.Status,
                 CreatedAt = user.CreatedAt,
                 IsVerified = user.IsVerified
+            };
+        }
+        public static UserSummaryResponse ToDtoSummary(UserResponse user)
+        {
+            return new UserSummaryResponse
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                UserName = user.UserName,
+                Status = user.Status
+            };
+        }
+        public static UserSummaryResponse ToDtoSummary(User user)
+        {
+            return new UserSummaryResponse
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                UserName = user.UserName,
+                Status = user.Status
             };
         }
         public static FriendRequestReceivedResponse ToDto(FriendRequest friendship)
@@ -51,6 +74,24 @@ namespace backend.Utils
                 Content = message.Content,
                 SentAt = message.SentAt,
                 IsRead = message.IsRead
+            };
+        }
+        public static MatchHistoryResponse ToDto(MatchHistory matchHistory, Guid userId)
+        {
+            var opponent = matchHistory.Player1Id == userId
+                ? matchHistory.Player2
+                : matchHistory.Player1;
+
+            return new MatchHistoryResponse
+            {
+                Id = matchHistory.Id,
+                Kind = matchHistory.GameType,
+                CompletedAt = matchHistory.CompletedAt,
+                Opponent = ToDtoSummary(opponent),
+                IsWinner = matchHistory.WinnerId == userId,
+                Result = matchHistory.WinnerId == null
+                    ? MatchStatus.Draw
+                    : (matchHistory.WinnerId == userId ? MatchStatus.Win : MatchStatus.Lost)
             };
         }
        

@@ -27,7 +27,7 @@ namespace backend.Services
             return messages.Select(MapperHelper.ToDto).ToList();
         }
 
-        public async Task<Message> CreatePrivateMessageAsync(Guid senderId, Guid receiverId, string message)
+        public async Task<MessageResponse> CreatePrivateMessageAsync(Guid senderId, Guid receiverId, string message)
         {
             var isFriend = await _context.UserFriends.AnyAsync(x => x.UserId == senderId && x.FriendId == receiverId);
 
@@ -46,10 +46,10 @@ namespace backend.Services
 
             await _eventBus.PublishAsync(new ChatMessageSentEvent(senderId, receiverId, message, msg.SentAt));
 
-            return msg;
+            return MapperHelper.ToDto(msg);
         }
 
-        public async Task<Message> CreateGlobalMessageAsync(Guid senderId, string message)
+        public async Task<MessageResponse> CreateGlobalMessageAsync(Guid senderId, string message)
         {
             var msg = new Message
             {
@@ -60,7 +60,7 @@ namespace backend.Services
             _context.Messages.Add(msg);
             await _context.SaveChangesAsync();
 
-            return msg;
+            return MapperHelper.ToDto(msg);
         }
 
         public async Task<int> GetUnreadMessagesCountAsync(Guid userId)

@@ -1,13 +1,8 @@
 "use client";
 
-import clsx from "clsx";
 import { MatchResultEnum } from "@/domain/enum/MatchResultEnum";
 import { GBadge } from "@/component/common/GBadge";
-
-interface MatchResultBadgeProps {
-  result: MatchResultEnum;
-  label: string;
-}
+import type { MatchResultBadgeProps } from "./def/MatchResultBadge";
 
 const resultVariant = {
   [MatchResultEnum.Win]: "success",

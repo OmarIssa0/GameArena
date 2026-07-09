@@ -9,13 +9,7 @@ import { en, type TLangThemeTranslation } from "@/component/i18n/LangTheme/en.i1
 import { ar } from "@/component/i18n/LangTheme/ar.i18n";
 import { rounded, transition } from "./tokens";
 
-function LangTheme({
-  collapsed,
-  className = "",
-}: {
-  collapsed: boolean;
-  className?: string;
-}) {
+function LangTheme({ collapsed, className = "" }: { collapsed: boolean; className?: string }) {
   const [locale, setLocale] = useLocale();
   const [theme, setTheme] = useTheme();
   const t = useTranslation({ en, ar }) as TLangThemeTranslation;
@@ -32,19 +26,12 @@ function LangTheme({
   );
 
   return (
-    <div
-      className={clsx(
-        "p-3 flex items-center justify-center gap-2",
-        collapsed ? "flex-col" : "w-full",
-        className,
-      )}
-    >
+    <div className={clsx(" flex items-center justify-center gap-2", collapsed ? "flex-col" : "w-full", className)}>
       <GButton
         variant="ghost"
         onClick={() => setLocale(locale === "en" ? "ar" : "en")}
         title={locale === "en" ? t.switchToArabic : t.switchToEnglish}
-        className={toggleBtn}
-      >
+        className={toggleBtn}>
         <GIcon icon={Globe} size="sm" color="inherit" />
         {!collapsed && <span>{locale === "en" ? t.english : t.arabic}</span>}
       </GButton>
@@ -53,8 +40,7 @@ function LangTheme({
         variant="ghost"
         onClick={() => setTheme(isDark ? "light" : "dark")}
         title={isDark ? t.switchToLight : t.switchToDark}
-        className={toggleBtn}
-      >
+        className={toggleBtn}>
         <GIcon icon={isDark ? Moon : Sun} size="sm" color="primary" />
         {!collapsed && <span>{isDark ? t.light : t.dark}</span>}
       </GButton>

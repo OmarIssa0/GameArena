@@ -1,11 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { TNullable } from "@/domain/type/TCommon";
 
 export interface UseFetchResult<T> {
-  data: T | null;
+  data: TNullable<T>;
   loading: boolean;
-  error: string | null;
+  error: TNullable<string>;
   reload: () => void;
 }
 
@@ -15,7 +16,7 @@ export function useFetch<T>(
 ): UseFetchResult<T> {
   const [data, setData] = useState<T>(null as unknown as T);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<TNullable<string>>(null);
   const genRef = useRef(0);
 
   const execute = useCallback(() => {

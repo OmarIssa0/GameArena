@@ -1,8 +1,10 @@
+import type { TNullable } from "@/domain/type/TCommon";
+
 interface IPrivateMessagePayload {
   senderId: string;
   receiverId: string;
-  content?: string | null;
-  message?: string | null;
+  content?: TNullable<string>;
+  message?: TNullable<string>;
   sentAt: string | Date;
   isRead?: boolean;
 }

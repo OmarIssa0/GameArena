@@ -11,12 +11,7 @@ import { useTranslation } from "@/hooks/useSetting";
 import { useFriendList } from "@/hooks/useFriends";
 import { en, type TFriendsTranslation } from "@/app/(dashboard)/friends/i18n/en.i18n";
 import { ar } from "@/app/(dashboard)/friends/i18n/ar.i18n";
-
-interface FriendsTabProps {
-  onMessage: (friendId: string) => void;
-  onInvite: (friendId: string) => void;
-  onNavigateToSearch: () => void;
-}
+import type { FriendsTabProps } from "./def/FriendsTab";
 
 function FriendsTab({
   onMessage,

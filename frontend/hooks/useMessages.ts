@@ -6,7 +6,7 @@ import { useFriends } from "./useFriends";
 import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
 import { useConnections } from "@/app/providers/ConnectionProvider";
 import type { IMessage } from "@/domain/meta/IMessage";
-import type { IUser } from "@/domain/meta/IUser";
+import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import type { TNullable } from "@/domain/type/TCommon";
 import type { IPrivateMessagePayload } from "@/domain/meta/IPrivateMessagePayload";
 import { useFetch } from "./useFetch";
@@ -30,26 +30,27 @@ const areSameMessage = (left: IMessage, right: IMessage): boolean =>
   left.content === right.content &&
   left.sentAt.getTime() === right.sentAt.getTime();
 
-export function useMessages(initialFriendId?: string | null) {
+export function useMessages(initialFriendId?: TNullable<string>) {
   const { chatConnection: connection, isChatConnected: isConnected } =
     useConnections();
   const { friends, loading: friendsLoading } = useFriends();
   const { refreshUnreadMessages } = useDashboardNotifications();
-  const [selectedFriendId, setSelectedFriendId] = useState<string | null>(
+  const [selectedFriendId, setSelectedFriendId] = useState<TNullable<string>>(
     initialFriendId ?? null,
   );
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [draft, setDraft] = useState("");
 
-  const { data: apiMessages, loading: loadingMessages, error } = useFetch(
-    () => {
-      if (!selectedFriendId) return Promise.resolve([] as IMessage[]);
-      return chatService
-        .getMessagesByFriendId(selectedFriendId)
-        .then((res) => (res.data ?? []).map(normalizeHistoryMessage));
-    },
-    [selectedFriendId],
-  );
+  const {
+    data: apiMessages,
+    loading: loadingMessages,
+    error,
+  } = useFetch(() => {
+    if (!selectedFriendId) return Promise.resolve([] as IMessage[]);
+    return chatService
+      .getMessagesByFriendId(selectedFriendId)
+      .then((res) => (res.data ?? []).map(normalizeHistoryMessage));
+  }, [selectedFriendId]);
 
   useEffect(() => {
     if (error) return;
@@ -59,7 +60,7 @@ export function useMessages(initialFriendId?: string | null) {
     refreshUnreadMessages();
   }, [apiMessages, error, loadingMessages, refreshUnreadMessages]);
 
-  const selectedFriend = useMemo<IUser | null>(() => {
+  const selectedFriend = useMemo<TNullable<IUserSummary>>(() => {
     if (!selectedFriendId) return null;
     return friends.find((f) => f.id === selectedFriendId) ?? null;
   }, [friends, selectedFriendId]);

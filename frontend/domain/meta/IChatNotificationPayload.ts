@@ -1,7 +1,9 @@
+import type { TNullable } from "@/domain/type/TCommon";
+
 interface IChatNotificationPayload {
   senderId: string;
   receiverId: string;
-  content?: string | null;
+  content?: TNullable<string>;
   sentAt: string | Date;
   isRead?: boolean;
 }

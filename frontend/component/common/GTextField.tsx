@@ -3,7 +3,7 @@
 import clsx from "clsx";
 import { forwardRef } from "react";
 import { GLabel } from "./GLabel";
-import { GTextFieldProps } from "./def/GTextField";
+import type { GTextFieldProps } from "./def/GTextField";
 import { focusRing, inputSize, rounded, transition } from "./tokens";
 
 const fieldBase = clsx(
@@ -19,10 +19,13 @@ const GTextField = forwardRef<HTMLInputElement, GTextFieldProps>(
       label,
       error,
       className,
+
       startIcon,
       endIcon,
+
       required,
       size = "md",
+
       ...props
     },
     ref,
@@ -33,29 +36,30 @@ const GTextField = forwardRef<HTMLInputElement, GTextFieldProps>(
 
         <div className="relative">
           {startIcon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">
+            <div
+              className="absolute start-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none
+           ">
               {startIcon}
             </div>
           )}
+
+          {endIcon && <div className="absolute end-3 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none">{endIcon}</div>}
 
           <input
             ref={ref}
             className={clsx(
               fieldBase,
               inputSize[size],
+
               error && "border-danger focus-visible:ring-danger/20",
+
               startIcon && "ps-10",
               endIcon && "pe-10",
+
               className,
             )}
             {...props}
           />
-
-          {endIcon && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2">
-              {endIcon}
-            </div>
-          )}
         </div>
 
         {error && <p className="text-sm text-danger">{error}</p>}

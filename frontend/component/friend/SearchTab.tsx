@@ -2,8 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Filter, UserPlus } from "lucide-react";
-import type { IUserFilterRequest } from "@/domain/meta/IUserFilterRequest";
-import type { IUser } from "@/domain/meta/IUser";
 import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
 import { friendService } from "@/services/def/FriendService";
 import { userService } from "@/services/def/UserService";
@@ -16,19 +14,22 @@ import { GCard } from "../common/GCard";
 import { GBadge } from "../common/GBadge";
 import { GIcon } from "../common/GIcon";
 import { useTranslation } from "@/hooks/useSetting";
-import { en, type TFriendsTranslation } from "@/app/(dashboard)/friends/i18n/en.i18n";
+import {
+  en,
+  type TFriendsTranslation,
+} from "@/app/(dashboard)/friends/i18n/en.i18n";
 import { ar } from "@/app/(dashboard)/friends/i18n/ar.i18n";
-
-type TSearchResult = IUser & {
-  isSendRequest: boolean;
-};
+import type { TNullable } from "@/domain/type/TCommon";
+import type { IUserFilterRequest } from "@/domain/meta/IUserFilterRequest";
+import type { IUserSummary } from "@/domain/meta/IUserSummary";
+import type { ISearchResult } from "./def/SearchTab";
 
 const defaultFilter: IUserFilterRequest = {
   name: "",
   userStatus: UserStatusEnum.All,
 };
 
-const displayName = (user: IUser, fallback: string) =>
+const displayName = (user: IUserSummary, fallback: string) =>
   user.fullName ??
   ([user.firstName, user.lastName].filter(Boolean).join(" ") ||
     user.userName ||
@@ -38,9 +39,9 @@ function SearchTab() {
   const t = useTranslation({ en, ar }) as TFriendsTranslation;
   const [userFilter, setUserFilter] =
     useState<IUserFilterRequest>(defaultFilter);
-  const [searchResults, setSearchResults] = useState<TSearchResult[]>([]);
+  const [searchResults, setSearchResults] = useState<ISearchResult[]>([]);
   const [searching, setSearching] = useState(false);
-  const [searchError, setSearchError] = useState<string | null>(null);
+  const [searchError, setSearchError] = useState<TNullable<string>>(null);
 
   const query = useMemo(() => userFilter.name?.trim() ?? "", [userFilter.name]);
 
@@ -66,12 +67,14 @@ function SearchTab() {
         ]);
 
         const sentIds = new Set(
-          (sentRes.data ?? []).map((request: { receiverId: string }) => request.receiverId),
+          (sentRes.data ?? []).map(
+            (request: { receiverId: string }) => request.receiverId,
+          ),
         );
 
         if (!ignore) {
           setSearchResults(
-            (usersRes.data ?? []).map((user: IUser) => ({
+            (usersRes.data ?? []).map((user: IUserSummary) => ({
               ...user,
               isSendRequest: sentIds.has(user.id),
             })),
@@ -119,7 +122,9 @@ function SearchTab() {
       <div className="grid gap-3 lg:grid-cols-[1fr_auto]">
         <GInputSearch
           value={userFilter.name ?? ""}
-          onChange={(value) => setUserFilter((prev) => ({ ...prev, name: value }))}
+          onChange={(value) =>
+            setUserFilter((prev) => ({ ...prev, name: value }))
+          }
           placeholder={t.searchTab.placeholder}
           onClear={clearSearch}
           clearLabel={t.searchTab.clearSearch}
@@ -181,7 +186,14 @@ function SearchTab() {
                   <GButton
                     onClick={() => void handleSendRequest(user.id)}
                     size="sm"
-                    leftIcon={<GIcon icon={UserPlus} size="sm" color="inherit" className="text-on-primary" />}
+                    leftIcon={
+                      <GIcon
+                        icon={UserPlus}
+                        size="sm"
+                        color="inherit"
+                        className="text-on-primary"
+                      />
+                    }
                   >
                     {t.searchTab.add}
                   </GButton>

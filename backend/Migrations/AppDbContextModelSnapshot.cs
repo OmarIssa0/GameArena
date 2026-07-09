@@ -103,25 +103,29 @@ namespace backend.Migrations
                     b.Property<int>("GameType")
                         .HasColumnType("integer");
 
-                    b.Property<string>("Player1Id")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid?>("Player1Id")
+                        .HasColumnType("uuid");
 
-                    b.Property<string>("Player2Id")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid?>("Player2Id")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("RoomId")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Status")
-                        .HasColumnType("text");
+                    b.Property<int?>("Status")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("WinnerId")
-                        .HasColumnType("text");
+                    b.Property<Guid?>("WinnerId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Player1Id");
+
+                    b.HasIndex("Player2Id");
+
+                    b.HasIndex("WinnerId");
 
                     b.ToTable("MatchHistories");
                 });
@@ -288,6 +292,29 @@ namespace backend.Migrations
                     b.Navigation("Sender");
                 });
 
+            modelBuilder.Entity("backend.Domain.MatchHistory", b =>
+                {
+                    b.HasOne("backend.Domain.User", "Player1")
+                        .WithMany("MatchesAsPlayer1")
+                        .HasForeignKey("Player1Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("backend.Domain.User", "Player2")
+                        .WithMany("MatchesAsPlayer2")
+                        .HasForeignKey("Player2Id")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("backend.Domain.User", "Winner")
+                        .WithMany()
+                        .HasForeignKey("WinnerId");
+
+                    b.Navigation("Player1");
+
+                    b.Navigation("Player2");
+
+                    b.Navigation("Winner");
+                });
+
             modelBuilder.Entity("backend.Domain.Message", b =>
                 {
                     b.HasOne("backend.Domain.User", "Receiver")
@@ -346,6 +373,10 @@ namespace backend.Migrations
                     b.Navigation("FriendshipsReceived");
 
                     b.Navigation("FriendshipsSent");
+
+                    b.Navigation("MatchesAsPlayer1");
+
+                    b.Navigation("MatchesAsPlayer2");
 
                     b.Navigation("ReceivedMessages");
 

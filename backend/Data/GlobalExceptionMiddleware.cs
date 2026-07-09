@@ -3,7 +3,7 @@ using System.Text.Json;
 
 namespace backend.Data
 {
-    public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExceptionMiddleware> _logger)
+    public class GlobalExceptionMiddleware(RequestDelegate _next, ILogger<GlobalExceptionMiddleware> _logger)
     {
         private static readonly JsonSerializerOptions _jsonOptions = new()
         {
@@ -14,11 +14,11 @@ namespace backend.Data
         {
             try
             {
-                await next(context);
+                await _next(context);
             }
             catch (Exception ex)
             {
-                // this only for debugginh in production
+                // this only for debugging in production
                 _logger.LogError(ex, "Unhandled exception");
                 var error = ErrorHelper.GetErrorResponse(ex);
                 context.Response.ContentType = "application/json";
