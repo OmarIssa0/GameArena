@@ -1,11 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
-import type {
-  TEndpoint,
-  TEndpointsMap,
-  THashMap,
-  TPromise,
-  TProxy,
-} from "@/domain/type/TCommon";
+import type { TEndpoint, TEndpointsMap, THashMap, TPromise, TProxy } from "@/domain/type/TCommon";
 import type { IApiResponse } from "@/domain/meta/IApiResponse";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "https://gamearena-ppnc.onrender.com";
@@ -36,12 +30,13 @@ api.interceptors.response.use(
     if (
       error.response?.status !== 401 ||
       original._retry ||
-      original.url.includes("/auth/login") ||
-      original.url.includes("/auth/register") ||
-      original.url.includes("/auth/refresh") ||
-      original.url.includes("/auth/logout") ||
-      original.url.includes("/auth/forgot-password") ||
-      original.url.includes("/auth/reset-password")
+      original?.url?.includes("/auth/login") ||
+      original?.url?.includes("/auth/register") ||
+      original?.url?.includes("/auth/refresh") ||
+      original?.url?.includes("/auth/logout") ||
+      original?.url?.includes("/auth/forgot-password") ||
+      original?.url?.includes("/auth/reset-password") ||
+      original?.url?.includes("/auth/verify-email")
     ) {
       return Promise.reject(error);
     }
@@ -61,18 +56,18 @@ api.interceptors.response.use(
 
     try {
       await api.post("/auth/refresh");
-
       flushQueue();
-
       return api(original);
     } catch (err: unknown) {
       flushQueue(err as THashMap);
 
-      if (
-        typeof window !== "undefined" &&
-        !["/login", "/register"].includes(window.location.pathname)
-      ) {
-        window.location.replace("/login");
+      if (typeof window !== "undefined") {
+        const path = window.location.pathname;
+        const authPages = ["/login", "/register", "/forgot-password", "/reset-password", "/verify-email"];
+        if (!authPages.includes(path)) {
+          window.localStorage.setItem("auth:logout", Date.now().toString());
+          window.location.replace("/login");
+        }
       }
 
       return Promise.reject(err);
@@ -101,10 +96,7 @@ export function buildUrl(template: string, payload?: THashMap): { url: string; l
     const placeholder = `{${key}}`;
 
     if (formattedUrl.includes(placeholder)) {
-      formattedUrl = formattedUrl.replace(
-        placeholder,
-        encodeURIComponent(`${value}`),
-      );
+      formattedUrl = formattedUrl.replace(placeholder, encodeURIComponent(`${value}`));
       delete leftover[key];
     }
   }
@@ -156,14 +148,7 @@ export function clientFactory<T extends TEndpointsMap>(
   for (const key in endpoints) {
     const endpoint = endpoints[key];
 
-    proxy[key] = ((payload?: unknown) =>
-      request(
-        endpoint,
-        base,
-        payload,
-        config,
-        resolver,
-      )) as TProxy<T>[typeof key];
+    proxy[key] = ((payload?: unknown) => request(endpoint, base, payload, config, resolver)) as TProxy<T>[typeof key];
   }
 
   return { api: proxy };

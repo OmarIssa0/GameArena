@@ -1,36 +1,22 @@
 "use client";
 
-import {
-  HubConnectionBuilder,
-  HubConnectionState,
-  LogLevel,
-} from "@microsoft/signalr";
-import type {
-  HubConnection,
-} from "@microsoft/signalr";
+import { HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr";
+import type { HubConnection } from "@microsoft/signalr";
 import { useEffect, useState } from "react";
 import type { TNullable } from "@/domain/type/TCommon";
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "https://gamearena-ppnc.onrender.com";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://gamearena-ppnc.onrender.com";
 
 export function useConnection(endPoint: string) {
   const [connection, setConnection] = useState<TNullable<HubConnection>>(null);
   const [isConnected, setIsConnected] = useState(false);
-
   useEffect(() => {
     let cancelled = false;
-
     const conn = new HubConnectionBuilder()
       .withUrl(`${BASE_URL}/${endPoint}`, { withCredentials: true })
       .withAutomaticReconnect()
-      .configureLogging(
-        process.env.NODE_ENV === "development"
-          ? LogLevel.Information
-          : LogLevel.Error,
-      )
+      .configureLogging(process.env.NODE_ENV === "development" ? LogLevel.Information : LogLevel.Error)
       .build();
-
     conn.onreconnecting(() => {
       if (!cancelled) setIsConnected(false);
     });
@@ -56,10 +42,7 @@ export function useConnection(endPoint: string) {
       } catch (err) {
         if (cancelled) return;
         console.error(`SignalR: Failed to connect to /${endPoint}`, err);
-        if (
-          err instanceof Error &&
-          err.message.toLowerCase().includes("unauthorized")
-        ) {
+        if (err instanceof Error && err.message.toLowerCase().includes("unauthorized")) {
           window.location.replace("/login");
         }
       }
@@ -68,10 +51,8 @@ export function useConnection(endPoint: string) {
     void start();
     return () => {
       cancelled = true;
-      if (conn.state !== HubConnectionState.Disconnected) {
-        conn.stop().catch(() => {
-          console.error(`SignalR: Failed to stop connection to /${endPoint}`);
-        });
+      if (conn.state === HubConnectionState.Connected) {
+        conn.stop().catch(() => {});
       }
       setConnection(null);
       setIsConnected(false);

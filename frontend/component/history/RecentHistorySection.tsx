@@ -1,48 +1,34 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, History } from "lucide-react";
+import { ArrowRight, Frown, Handshake, History, Trophy } from "lucide-react";
 import { useLocale, useTranslation } from "@/hooks/useSetting";
 import { useMatchHistory } from "@/hooks/useMatchHistory";
 import { GSpinner } from "@/component/common/GSpinner";
 import { GEmpty } from "@/component/common/GEmpty";
 import { GIcon } from "@/component/common/GIcon";
 import { MatchHistoryCard } from "./MatchHistoryCard";
-import { MatchHistorySummary } from "./MatchHistorySummary";
-import {
-  formatMatchDate,
-  getGameName,
-  getResultLabel,
-} from "./matchHistory.utils";
 import { ar } from "@/app/(dashboard)/history/i18n/ar.i18n";
-import {
-  en,
-  type THistoryTranslation,
-} from "@/app/(dashboard)/history/i18n/en.i18n";
+import { en, type THistoryTranslation } from "@/app/(dashboard)/history/i18n/en.i18n";
 import type { TLocale } from "@/domain/type/TCommon";
 import type { RecentHistorySectionProps } from "./def/RecentHistorySection";
+import { MatchStatusEnum } from "@/domain/enum/MatchStatusEnum";
+import { GStatCard } from "../common/GStatCard";
 
-function RecentHistorySection({
-  title,
-  viewAll,
-  emptyTitle,
-  emptyDescription,
-  limit = 3,
-}: RecentHistorySectionProps) {
+function RecentHistorySection({ title, viewAll, emptyTitle, emptyDescription, limit = 3 }: RecentHistorySectionProps) {
   const [locale] = useLocale() as [TLocale, (l: TLocale) => void];
   const historyT = useTranslation({ en, ar }) as THistoryTranslation;
-  const { matches, summary, loading } = useMatchHistory("all", limit);
-
+  const { matches, summary, loading } = useMatchHistory(MatchStatusEnum.All, limit);
+  const items = [
+    { label: historyT.summary.wins, value: summary.wins, icon: Trophy, iconColor: "success" as const },
+    { label: historyT.summary.losses, value: summary.losses, icon: Frown, iconColor: "danger" as const },
+    { label: historyT.summary.draws, value: summary.draws, icon: Handshake, iconColor: "primary" as const },
+  ];
   return (
     <section>
       <div className="flex items-center justify-between gap-3 mb-3">
-        <h2 className="text-sm font-bold text-text-secondary uppercase tracking-wider">
-          {title}
-        </h2>
-        <Link
-          href="/history"
-          className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary-hover"
-        >
+        <h2 className="text-sm font-bold text-text-secondary uppercase tracking-wider">{title}</h2>
+        <Link href="/history" className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary-hover">
           {viewAll}
           <GIcon icon={ArrowRight} size="xs" color="primary" />
         </Link>
@@ -53,30 +39,29 @@ function RecentHistorySection({
           <GSpinner />
         </div>
       ) : matches.length === 0 ? (
-        <GEmpty
-          icon={
-            <GIcon
-              icon={History}
-              size="xl"
-              color="muted"
-              className="opacity-50"
-            />
-          }
-          title={emptyTitle}
-          description={emptyDescription}
-        />
+        <GEmpty icon={<GIcon icon={History} size="xl" color="muted" className="opacity-50" />} title={emptyTitle} description={emptyDescription} />
       ) : (
         <div className="flex flex-col gap-4">
-          <MatchHistorySummary summary={summary} labels={historyT.summary} />
+          <div className="grid grid-cols-3 gap-3">
+            {items.map((item) => (
+              <GStatCard key={item.label} {...item} size="sm" />
+            ))}
+          </div>
           <div className="flex flex-col gap-2">
             {matches.map((match) => (
               <MatchHistoryCard
                 key={match.id}
                 match={match}
                 compact
-                gameName={getGameName(match.game, historyT.games)}
-                resultLabel={getResultLabel(match.result, historyT.results)}
-                playedAtLabel={formatMatchDate(match.playedAt, locale)}
+                gameName={historyT.games[match.kind as keyof typeof historyT.games]}
+                resultLabel={
+                  match.result === MatchStatusEnum.Win
+                    ? historyT.results.win
+                    : match.result === MatchStatusEnum.Lost
+                      ? historyT.results.loss
+                      : historyT.results.draw
+                }
+                playedAtLabel={new Date(match.completedAt).toLocaleString(locale)}
                 versusLabel={historyT.versus}
               />
             ))}

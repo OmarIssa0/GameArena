@@ -1,19 +1,15 @@
-import { MatchResultEnum } from "@/domain/enum/MatchResultEnum";
+import { MatchStatusEnum } from "../enum/MatchStatusEnum";
 import type { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
+import type { IUserSummary } from "./IUserSummary";
 
 interface IMatchHistory {
   id: string;
-  game: GamesKindEnum;
   opponentName: string;
-  result: MatchResultEnum;
-  playedAt: Date;
+  result: MatchStatusEnum;
+  completedAt: Date;
+  isWinner: boolean;
+  opponent: IUserSummary;
+  kind: GamesKindEnum;
 }
 
-interface IMatchHistorySummary {
-  wins: number;
-  losses: number;
-  draws: number;
-  total: number;
-}
-
-export type { IMatchHistory, IMatchHistorySummary };
+export type { IMatchHistory };

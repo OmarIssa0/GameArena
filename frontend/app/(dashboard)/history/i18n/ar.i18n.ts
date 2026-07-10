@@ -1,3 +1,5 @@
+import { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
+
 const ar = {
   title: "سجل المباريات",
   subtitle: "راجع مبارياتك السابقة، تتبّع انتصاراتك، وتعلّم من كل مواجهة.",
@@ -20,9 +22,9 @@ const ar = {
     draw: "تعادل",
   },
   games: {
-    snake: "السمكة",
-    ticTacToe: "XO",
-    pong: "بونغ",
+    [GamesKindEnum.Snake]: "الثعبان",
+    [GamesKindEnum.TicTacToe]: "إكس أو",
+    [GamesKindEnum.PingPong]: "بينغ بونغ",
   },
   empty: {
     title: "لا توجد مباريات بعد",

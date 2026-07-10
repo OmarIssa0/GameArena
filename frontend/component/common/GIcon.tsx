@@ -12,24 +12,8 @@ const colors = {
   inherit: "",
 };
 
-function GIcon({
-  icon: Icon,
-  size = "md",
-  color = "inherit",
-  flip = true,
-  className,
-}: GIconProps) {
-  return (
-    <Icon
-      className={clsx(
-        "shrink-0",
-        iconSize[size],
-        colors[color],
-        flip && "icon-flip",
-        className,
-      )}
-    />
-  );
+function GIcon({ icon: Icon, size = "md", color = "inherit", flip = true, className }: GIconProps) {
+  return <Icon className={clsx("shrink-0", iconSize[size], colors[color], flip && "icon-flip", className)} />;
 }
 
 export { GIcon };

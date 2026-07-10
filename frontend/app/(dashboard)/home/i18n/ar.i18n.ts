@@ -14,11 +14,11 @@ const ar = {
   },
   games: {
     snake: "السمكة",
-    snakeDescription: "كلاسيكية الأركادية - تأكل وتنتفس",
+    snakeDesc: "كلاسيكية الأركادية - تأكل وتنتفس",
     ticTacToe: "لعبة المربعات والأشرطة",
-    ticTacToeDescription: "دورية 3×3",
+    ticTacToeDesc: "دورية 3×3",
     pong: "بونغ",
-    pongDescription: "تنس قديم",
+    pongDesc: "تنس قديم",
   },
   recentHistory: {
     title: "آخر المعارك",

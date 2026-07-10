@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { AuthAnimation } from "@/component/auth/AuthAnimation";
 import { AuthFlowAnimationEnum } from "@/domain/enum/AuthFlowAnimationEnum";
@@ -8,18 +8,14 @@ import { LangTheme } from "@/component/common/LangTheme";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { GSpinner } from "@/component/common/GSpinner";
 
-function AuthLayout({
-  page,
-  children,
-}: {
-  page: AuthFlowAnimationEnum;
-  children: ReactNode;
-}) {
+function AuthLayout({ page, children }: { page: AuthFlowAnimationEnum; children: ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const redirectedRef = useRef(false);
 
   useEffect(() => {
-    if (!loading && user) {
+    if (!loading && user && !redirectedRef.current) {
+      redirectedRef.current = true;
       router.replace("/home");
     }
   }, [loading, user, router]);
@@ -32,7 +28,13 @@ function AuthLayout({
     );
   }
 
-  if (user) return null;
+  if (user) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-bg">
+        <GSpinner size="lg" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row login-panel-bg lg:bg-none relative">
@@ -40,11 +42,7 @@ function AuthLayout({
         <LangTheme collapsed={false} className="flex gap-2" />
       </div>
 
-      <AuthAnimation
-        page={page}
-        pathAnimation="/game.json"
-        className="bg-transparent lg:login-panel-bg"
-      />
+      <AuthAnimation page={page} pathAnimation="/game.json" className="bg-transparent lg:login-panel-bg" />
 
       <div className="flex-1 flex items-center justify-center lg:bg-bg">
         <div className="w-full max-w-md">{children}</div>

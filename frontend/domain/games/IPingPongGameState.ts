@@ -1,10 +1,5 @@
-interface ITicTacToeGameState {
+interface IPingPongGameState {
   roomId: string;
-  board: string[];
-  currentTurnPlayerId: string;
-  winnerPlayerId?: string;
-  winnerSymbol?: string;
-  isFinished: boolean;
   player1Id: string;
   player1Username: string;
   player2Id?: string;
@@ -14,4 +9,5 @@ interface ITicTacToeGameState {
   isPrivate: boolean;
   isBotGame: boolean;
 }
-export type { ITicTacToeGameState };
+
+export type { IPingPongGameState };

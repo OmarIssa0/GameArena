@@ -14,11 +14,11 @@ const en = {
   },
   games: {
     snake: "Snake",
-    snakeDescription: "Classic arcade — eat & survive",
+    snakeDesc: "Classic arcade — eat & survive",
     ticTacToe: "Tic Tac Toe",
-    ticTacToeDescription: "3×3 tactical duel",
+    ticTacToeDesc: "3×3 tactical duel",
     pong: "Pong",
-    pongDescription: "Retro table tennis",
+    pongDesc: "Retro table tennis",
   },
   recentHistory: {
     title: "Recent Battles",

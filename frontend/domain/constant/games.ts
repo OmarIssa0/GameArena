@@ -1,36 +1,33 @@
 import { Orbit, Puzzle, Swords } from "lucide-react";
-import type { GGradient } from "@/component/common/tokens";
+import { GamesKindEnum } from "../enum/GamesKindEnum";
 
-type GameId = "snake" | "ticTacToe" | "pong";
+// type GameId = "snake" | "ticTacToe" | "pong";
 
-const games: {
-  id: GameId;
-  path: string;
-  icon: typeof Orbit;
-  gradient: GGradient;
-  color: "success" | "primary" | "warning";
-}[] = [
+const GamesList = [
   {
-    id: "snake",
-    path: "/snake",
-    icon: Orbit,
-    gradient: "game-green",
-    color: "success",
-  },
-  {
-    id: "ticTacToe",
-    path: "/tic-tac-toe",
+    name: "ticTacToe",
+    description: "ticTacToeDesc",
+    type: GamesKindEnum.TicTacToe,
+
     icon: Puzzle,
-    gradient: "game-cyan",
-    color: "primary",
+    path: "tic-tac-toe",
+    gradient: "play-cyan",
   },
   {
-    id: "pong",
-    path: "/pong",
-    icon: Swords,
-    gradient: "game-magenta",
-    color: "warning",
+    name: "snake",
+    description: "snakeDesc",
+    type: GamesKindEnum.Snake,
+    path: "snake",
+    icon: Orbit,
+    gradient: "play-green",
   },
-];
-
-export { games, type GameId };
+  {
+    name: "pong",
+    description: "pongDesc",
+    type: GamesKindEnum.PingPong,
+    path: "ping-pong",
+    icon: Swords,
+    gradient: "play-magenta",
+  },
+] as const;
+export { GamesList };

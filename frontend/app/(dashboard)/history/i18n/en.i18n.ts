@@ -1,3 +1,6 @@
+import { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
+import { MatchStatusEnum } from "@/domain/enum/MatchStatusEnum";
+
 const en = {
   title: "Match History",
   subtitle: "Review your past battles, track wins, and learn from every duel.",
@@ -20,9 +23,9 @@ const en = {
     draw: "Draw",
   },
   games: {
-    snake: "Snake",
-    ticTacToe: "Tic Tac Toe",
-    pong: "Pong",
+    [GamesKindEnum.Snake]: "Snake",
+    [GamesKindEnum.TicTacToe]: "Tic Tac Toe",
+    [GamesKindEnum.PingPong]: "Ping Pong",
   },
   empty: {
     title: "No matches yet",

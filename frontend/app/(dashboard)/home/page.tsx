@@ -6,18 +6,13 @@ import { useDashboardNotifications } from "@/app/providers/DashboardNotification
 import { Gamepad2, ArrowRight, MessagesSquare, UserPlus } from "lucide-react";
 import { ar } from "./i18n/ar.i18n";
 import { en, type THomeTranslation } from "./i18n/en.i18n";
-import { games, type GameId } from "@/domain/constant/games";
+import { GamesList } from "@/domain/constant/games";
 import { RecentHistorySection } from "@/component/history/RecentHistorySection";
 import { GPage } from "@/component/common/GPage";
 import { GStatCard } from "@/component/common/GStatCard";
 import { GIconTile } from "@/component/common/GIconTile";
 import { GCard } from "@/component/common/GCard";
 import { GIcon } from "@/component/common/GIcon";
-
-function getGameLabels(t: THomeTranslation, id: GameId) {
-  const descKey = `${id}Description` as keyof THomeTranslation["games"];
-  return { name: t.games[id], desc: t.games[descKey] };
-}
 
 function getGreeting(t: THomeTranslation) {
   const hour = new Date().getHours();
@@ -32,7 +27,7 @@ function Home() {
   const { friendRequestCount, unreadMessageCount } = useDashboardNotifications();
 
   const stats = [
-    { label: t.stats.gamesAvailable, value: games.length, icon: Gamepad2, iconColor: "primary" as const, href: "/games" },
+    { label: t.stats.gamesAvailable, value: GamesList.length, icon: Gamepad2, iconColor: "primary" as const, href: "/games" },
     { label: t.stats.unreadMessages, value: unreadMessageCount, icon: MessagesSquare, iconColor: "primary" as const, href: "/messages" },
     { label: t.stats.friendRequests, value: friendRequestCount, icon: UserPlus, iconColor: "warning" as const, href: "/friends" },
   ];
@@ -55,7 +50,13 @@ function Home() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         {stats.map(({ label, value, icon, iconColor, href }) => {
           const card = <GStatCard label={label} value={value} icon={icon} iconColor={iconColor} />;
-          return href ? <Link key={label} href={href}>{card}</Link> : <div key={label}>{card}</div>;
+          return href ? (
+            <Link key={label} href={href}>
+              {card}
+            </Link>
+          ) : (
+            <div key={label}>{card}</div>
+          );
         })}
       </div>
 
@@ -67,24 +68,21 @@ function Home() {
       />
 
       <div>
-        <h2 className="text-sm font-bold text-text-secondary uppercase tracking-wider mb-3">
-          {t.enterArena}
-        </h2>
+        <h2 className="text-sm font-bold text-text-secondary uppercase tracking-wider mb-3">{t.enterArena}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {games.map((game) => {
+          {GamesList.map((game) => {
             const Icon = game.icon;
-            const { name, desc } = getGameLabels(t, game.id);
             return (
-              <Link key={game.id} href={game.path}>
+              <Link key={game.name} href={"games/" + game.path}>
                 <GCard variant="interactive" className="flex items-center gap-4">
                   <GIconTile gradient={game.gradient} size="md">
                     <GIcon icon={Icon} size="md" color="inherit" className="text-text" />
                   </GIconTile>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-text">{name}</h3>
-                    <p className="text-text-secondary text-sm truncate">{desc}</p>
+                    <h3 className="font-bold text-text">{t.games[game.name]}</h3>
+                    <p className="text-text-secondary text-sm truncate">{t.games[game.description]}</p>
                   </div>
-                  <GIcon icon={ArrowRight} size="md" color={game.color} />
+                  <GIcon icon={ArrowRight} size="md" />
                 </GCard>
               </Link>
             );

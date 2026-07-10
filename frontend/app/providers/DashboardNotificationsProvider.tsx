@@ -1,34 +1,18 @@
 "use client";
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { chatService } from "@/services/def/ChatService";
 import { friendService } from "@/services/def/FriendService";
 import { useConnections } from "./ConnectionProvider";
 import { onFriendRequestChange } from "@/lib/friendEvents";
-import type {
-  IGameInvite,
-  INotificationState,
-} from "@/domain/meta/INotification";
+import type { IGameInvite, INotificationState } from "@/domain/meta/INotification";
 import type { IChatNotificationPayload } from "@/domain/meta/IChatNotificationPayload";
 
-const NotificationContext = createContext<INotificationState | undefined>(
-  undefined,
-);
+const NotificationContext = createContext<INotificationState | undefined>(undefined);
 
-export function DashboardNotificationsProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function DashboardNotificationsProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -67,53 +51,68 @@ export function DashboardNotificationsProvider({
       return;
     }
 
-    void syncCounts();
+    // Async function to avoid synchronous setState in effect
+    const fetchCounts = async () => {
+      await syncCounts();
+    };
+    void fetchCounts();
   }, [user, syncCounts]);
 
   useEffect(() => {
     if (!socialConnection) return;
 
-    const handleFriendRequest = () => { void refreshFriendRequests(); };
-    const handleAccepted = () => { void refreshFriendRequests(); };
-    const handleDeclined = () => { void refreshFriendRequests(); };
+    const handleFriendRequest = () => {
+      void refreshFriendRequests();
+    };
+    const handleAccepted = () => {
+      void refreshFriendRequests();
+    };
+    const handleDeclined = () => {
+      void refreshFriendRequests();
+    };
 
     const handleChatNotification = (payload: IChatNotificationPayload) => {
       if (!user) return;
 
       const selectedFriendId = searchParams.get("friend");
-      const isOpenConversation =
-        pathname === "/messages" && selectedFriendId === payload.senderId;
+      const isOpenConversation = pathname === "/messages" && selectedFriendId === payload.senderId;
 
       if (!isOpenConversation) {
         setUnreadMessageCount((prev) => prev + 1);
       }
     };
 
-    const handleGameInvite = (payload: IGameInvite) => {
-      setGameInvites((prev) =>
-        prev.some((i) => i.roomId === payload.roomId)
-          ? prev
-          : [...prev, payload],
-      );
-    };
-
     socialConnection.on("friend:request", handleFriendRequest);
     socialConnection.on("friend:accepted", handleAccepted);
     socialConnection.on("friend:declined", handleDeclined);
     socialConnection.on("chat:notification", handleChatNotification);
-    socialConnection.on("game:invite", handleGameInvite);
 
-    const unsub = onFriendRequestChange(() => { void refreshFriendRequests(); });
+    const unsub = onFriendRequestChange(() => {
+      void refreshFriendRequests();
+    });
 
     return () => {
       socialConnection.off("friend:request", handleFriendRequest);
       socialConnection.off("friend:accepted", handleAccepted);
       socialConnection.off("friend:declined", handleDeclined);
       socialConnection.off("chat:notification", handleChatNotification);
-      socialConnection.off("game:invite", handleGameInvite);
       unsub();
     };
   }, [socialConnection, pathname, searchParams, user, refreshFriendRequests]);
+
+  useEffect(() => {
+    if (!gameConnection) return;
+
+    const handleGameInvite = (payload: IGameInvite) => {
+      setGameInvites((prev) => (prev.some((i) => i.roomId === payload.roomId) ? prev : [...prev, payload]));
+    };
+
+    gameConnection.on("game:invite", handleGameInvite);
+
+    return () => {
+      gameConnection.off("game:invite", handleGameInvite);
+    };
+  }, [gameConnection]);
 
   const acceptGameInvite = useCallback(
     async (roomId: string) => {
@@ -153,19 +152,13 @@ export function DashboardNotificationsProvider({
     ],
   );
 
-  return (
-    <NotificationContext.Provider value={value}>
-      {children}
-    </NotificationContext.Provider>
-  );
+  return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;
 }
 
 export function useDashboardNotifications(): INotificationState {
   const ctx = useContext(NotificationContext);
   if (!ctx) {
-    throw new Error(
-      "useDashboardNotifications must be used within DashboardNotificationsProvider.",
-    );
+    throw new Error("useDashboardNotifications must be used within DashboardNotificationsProvider.");
   }
   return ctx;
 }

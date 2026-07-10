@@ -47,7 +47,8 @@ function SearchTab() {
 
   useEffect(() => {
     let ignore = false;
-    const timer = window.setTimeout(async () => {
+    
+    const performSearch = async () => {
       if (!query) {
         if (!ignore) {
           setSearchResults([]);
@@ -89,6 +90,10 @@ function SearchTab() {
       } finally {
         if (!ignore) setSearching(false);
       }
+    };
+
+    const timer = window.setTimeout(() => {
+      void performSearch();
     }, 300);
 
     return () => {

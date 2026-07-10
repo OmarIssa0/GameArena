@@ -1,17 +1,7 @@
 import { Orbit, Puzzle, Swords } from "lucide-react";
 import { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
-import type { GameId } from "@/domain/constant/games";
-import type { GGradient } from "@/component/common/tokens";
 
-const matchGameMeta: Record<
-  GamesKindEnum,
-  {
-    gameId: GameId;
-    icon: typeof Orbit;
-    gradient: GGradient;
-    color: "success" | "primary" | "warning";
-  }
-> = {
+const matchGameMeta = {
   [GamesKindEnum.Snake]: {
     gameId: "snake",
     icon: Orbit,
@@ -30,6 +20,12 @@ const matchGameMeta: Record<
     gradient: "game-magenta",
     color: "warning",
   },
-};
+  [GamesKindEnum.None]: {
+    gameId: "none",
+    icon: Puzzle,
+    gradient: "game-cyan",
+    color: "primary",
+  },
+} as const;
 
 export { matchGameMeta };

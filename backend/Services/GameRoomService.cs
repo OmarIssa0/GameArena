@@ -30,9 +30,10 @@ namespace backend.Services
                     return (openRoom, false);
                 }
 
-                var room = gameType switch
+                BaseGameRoom room = gameType switch
                 {
                     GamesKind.TicTacToe => new TicTacToeRoom(),
+                    GamesKind.PingPong => new PingPongRoom(),
                     _ => throw new AppException(ErrorCode.InvalidGameType)
                 };
                 room.Player1Id = playerId;
@@ -45,9 +46,16 @@ namespace backend.Services
 
         public BaseGameRoom CreatePrivateRoom(GamesKind gameType, string playerId, string username, string invitedPlayerId)
         {
-            var room = gameType switch
+            BaseGameRoom room = gameType switch
             {
                 GamesKind.TicTacToe => new TicTacToeRoom
+                {
+                    Player1Id = playerId,
+                    Player1Username = username,
+                    IsPrivate = true,
+                    InvitedPlayerId = invitedPlayerId,
+                },
+                GamesKind.PingPong => new PingPongRoom
                 {
                     Player1Id = playerId,
                     Player1Username = username,

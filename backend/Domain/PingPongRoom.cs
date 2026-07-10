@@ -26,6 +26,17 @@ namespace backend.Domain
 
         public override object GetStatePayload() => new 
         {
+            roomId = RoomId,
+            player1Id = Player1Id,
+            player1Username = Player1Username,
+            player2Id = Player2Id,
+            player2Username = Player2Username,
+            hasStarted = HasStarted,
+            isFull = IsFull,
+            isPrivate = IsPrivate,
+            isBotGame = IsBotGame,
+            isFinished = IsFinished,
+            winnerPlayerId = WinnerPlayerId,
             BallPX ,
             BallPY,
             BallVX,
@@ -42,7 +53,7 @@ namespace backend.Domain
 
         public override void ProcessInput(string playerId, object action)
         {
-            if(Player1Id != playerId || playerId != Player2Id) return;
+            if(Player1Id != playerId && playerId != Player2Id) return;
 
             if (action is not JsonElement json
                 || json.ValueKind != JsonValueKind.Object
