@@ -9,7 +9,7 @@ namespace backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController(IAuthService _authService, IAuthCookieService _authCookiesService) : ControllerBase
+    public class AuthController(IAuthService _authService) : ControllerBase
     {
         [HttpPost("register")]
         public async Task<ActionResult<ApiResponse<object>>> Register(RegisterRequest request)
@@ -24,7 +24,7 @@ namespace backend.Controllers
         {
             var response = await _authService.LoginAsync(request) ?? throw new AppException(ErrorCode.InvalidCredentials);
 
-            _authCookiesService.SetAuthCookies(Response, response);
+            AuthCookieHelper.SetAuthCookies(Response, response);
 
             return Ok(new ApiResponse<object> { Message = "Login successful" });
         }
@@ -34,7 +34,7 @@ namespace backend.Controllers
         {
             var refreshToken = Request.Cookies["refresh_token"] ?? throw new AppException(ErrorCode.Unauthorized);
             await _authService.RevokeRefreshTokenAsync(refreshToken);
-            _authCookiesService.ClearAuthCookies(Response);
+            AuthCookieHelper.ClearAuthCookies(Response);
             return Ok(new ApiResponse<object> { Message = "Logged out" });
         }
 
@@ -45,7 +45,7 @@ namespace backend.Controllers
                 ?? throw new AppException(ErrorCode.RefreshTokenInvalid);
 
             var response = await _authService.RefreshAccessTokenAsync(refreshToken);
-            _authCookiesService.SetAuthCookies(Response, response);
+            AuthCookieHelper.SetAuthCookies(Response, response);
 
             return Ok(new ApiResponse<object> { Message = "Token refreshed" });
         }

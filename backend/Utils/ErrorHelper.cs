@@ -58,24 +58,13 @@ namespace backend.Utils
              [ErrorCode.OtpExpired] =
              (400, "OTP has expired"),
 
-             [ErrorCode.OtpAlreadyUsed] =
-             (400, "OTP already used"),
-              [ErrorCode.OtpGenerationFailed] =
-             (500, "Failed to generate OTP"),
-
-              [ErrorCode.RateLimited] =
+             [ErrorCode.RateLimited] =
              (429, "Too many requests. Please wait before requesting a new OTP."),
 
              // USER
 
              [ErrorCode.UserNotFound] =
              (404, "User not found"),
-
-             [ErrorCode.UserAlreadyExists] =
-             (409, "User already exists"),
-
-             [ErrorCode.NoUsersFound] =
-             (404, "No users found"),
 
               [ErrorCode.AlreadyBlocked] =
               (400, "User is already blocked"),
@@ -113,9 +102,6 @@ namespace backend.Utils
 
              [ErrorCode.PlayerNotFound] =
              (404, "Player not found"),
-
-             [ErrorCode.MatchSaveFailed] =
-             (500, "Failed to save match history"),
 
              [ErrorCode.InvalidGameType] =
              (400, "Invalid game type"),

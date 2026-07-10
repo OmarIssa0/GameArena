@@ -6,5 +6,8 @@ namespace backend.Services.Interface
     {
         Task<NotificationCountersResponse> GetCountersAsync(Guid userId);
         Task SendCountersAsync(Guid userId);
+        Task SendFriendsAsync(Guid userId);
+        Task SendFriendRequestsAsync(Guid userId);
+        Task SendSocialDataAsync(Guid userId);
     }
 }

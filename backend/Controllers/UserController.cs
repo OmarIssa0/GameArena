@@ -43,7 +43,7 @@ namespace backend.Controllers
         [HttpPut("update")]
         public async Task<ActionResult<ApiResponse<UserResponse>>> UpdateUser([FromBody] UserResponse request)
         {
-            var updatedUser = await _userService.UpdateUserAsync(_currentUser.UserId, request);
+            var updatedUser = await _userService.UpdateUserAsync(request);
             return Ok(new ApiResponse<UserResponse> { Data = updatedUser });
         }
 

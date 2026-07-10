@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace backend.Hubs
 {
-
     [Authorize]
     public class SocialHub(IUserPresenceService _presence, INotificationService _notificationService) : Hub
     {
@@ -17,7 +16,7 @@ namespace backend.Hubs
                 _presence.SetOnline(userId);
                 await Clients.Others.SendAsync("friend:online", new { userId });
                 if (Guid.TryParse(userId, out var guid))
-                    await _notificationService.SendCountersAsync(guid);
+                    await _notificationService.SendSocialDataAsync(guid);
             }
 
             await base.OnConnectedAsync();
@@ -39,9 +38,28 @@ namespace backend.Hubs
         {
             var userId = Context.UserIdentifier;
             if (userId != null && Guid.TryParse(userId, out var guid))
-            {
                 await _notificationService.SendCountersAsync(guid);
-            }
+        }
+
+        public async Task RequestFriends()
+        {
+            var userId = Context.UserIdentifier;
+            if (userId != null && Guid.TryParse(userId, out var guid))
+                await _notificationService.SendFriendsAsync(guid);
+        }
+
+        public async Task RequestFriendRequests()
+        {
+            var userId = Context.UserIdentifier;
+            if (userId != null && Guid.TryParse(userId, out var guid))
+                await _notificationService.SendFriendRequestsAsync(guid);
+        }
+
+        public async Task RequestSocialData()
+        {
+            var userId = Context.UserIdentifier;
+            if (userId != null && Guid.TryParse(userId, out var guid))
+                await _notificationService.SendSocialDataAsync(guid);
         }
     }
 }

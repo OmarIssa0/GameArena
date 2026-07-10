@@ -79,12 +79,9 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IEmailVerificationService, EmailVerificationService>();
-builder.Services.AddScoped<IAuthCookieService, AuthCookieService>();
 builder.Services.AddScoped<IFriendService, FriendService>();
 builder.Services.AddScoped<IChatService, ChatService>();
-builder.Services.AddScoped<IGameService, GameService>();
 builder.Services.AddScoped<IMatchHistoryService, MatchHistoryService>();
-builder.Services.AddSingleton<IGameBotService, GameBotService>();
 
 // Event bus this for notification system like friend request, game invitation, message notification, user online/offline status.
 builder.Services.AddSingleton<IEventBus, EventBus>();

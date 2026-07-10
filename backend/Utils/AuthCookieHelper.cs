@@ -1,11 +1,10 @@
-﻿using backend.DTOs.Responses;
-using backend.Services.Interface;
+using backend.DTOs.Responses;
 
-namespace backend.Services;
+namespace backend.Utils;
 
-public class AuthCookieService : IAuthCookieService
+public static class AuthCookieHelper
 {
-    public void SetAuthCookies(HttpResponse response, AuthResponse auth)
+    public static void SetAuthCookies(HttpResponse response, AuthResponse auth)
     {
         response.Cookies.Append(
             "access_token",
@@ -32,7 +31,7 @@ public class AuthCookieService : IAuthCookieService
             });
     }
 
-    public void ClearAuthCookies(HttpResponse response)
+    public static void ClearAuthCookies(HttpResponse response)
     {
         var options = new CookieOptions
         {
@@ -45,5 +44,4 @@ public class AuthCookieService : IAuthCookieService
         response.Cookies.Delete("access_token", options);
         response.Cookies.Delete("refresh_token", options);
     }
-
 }

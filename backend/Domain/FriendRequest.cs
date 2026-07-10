@@ -4,7 +4,6 @@ namespace backend.Domain
 {
     public class FriendRequest
     {
-        public Guid Id { get; set; } = Guid.NewGuid();
         public Guid SenderId { get; set; }
         public User Sender { get; set; } = null!;
         public Guid ReceiverId { get; set; }

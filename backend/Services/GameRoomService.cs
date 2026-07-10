@@ -24,8 +24,7 @@ namespace backend.Services
                     openRoom.Player2Id = playerId;
                     openRoom.Player2Username = username;
                     openRoom.IsFull = true;
-                    if (openRoom is TicTacToeRoom xo)
-                        xo.CurrentTurnPlayerId = openRoom.Player1Id!;
+                    openRoom.CurrentTurnPlayerId = openRoom.Player1Id!;
                     _playerToRoom[playerId] = openRoom.RoomId;
                     return (openRoom, false);
                 }
@@ -91,8 +90,8 @@ namespace backend.Services
                 room.Player2Id = playerId;
                 room.Player2Username = username;
                 room.IsFull = true;
-                if (room.Player1Id != null && room is TicTacToeRoom xo)
-                    xo.CurrentTurnPlayerId = room.Player1Id;
+                if (room.Player1Id != null)
+                    room.CurrentTurnPlayerId = room.Player1Id;
                 _playerToRoom[playerId] = roomId;
                 return true;
             }

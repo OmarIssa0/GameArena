@@ -35,7 +35,7 @@ namespace backend.Services
             return [.. users.Select(MapperHelper.ToDtoSummary)];
         }
 
-        public async Task<UserResponse> UpdateUserAsync(Guid currentUserId, UserResponse request)
+        public async Task<UserResponse> UpdateUserAsync(UserResponse request)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == request.Id) ?? throw new AppException(ErrorCode.UserNotFound);
             user.UserName = request.UserName;

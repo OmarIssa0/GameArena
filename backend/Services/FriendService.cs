@@ -179,12 +179,6 @@ namespace backend.Services
             return requests.Select(MapperHelper.ToSentRequestDto).ToList();
         }
 
-        public async Task<int> GetPendingRequestCount(Guid userId) {
-            var count = await _context.FriendRequests
-                .CountAsync(fr => fr.ReceiverId == userId && fr.Status == FriendRequestStatus.Pending);
-            return count;
-        }
-
         public async Task<int> GetFriendRequestCountAsync(Guid userId)
         {
             return await _context.FriendRequests

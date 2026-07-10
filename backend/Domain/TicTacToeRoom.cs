@@ -8,7 +8,6 @@ public class TicTacToeRoom : BaseGameRoom
 {
     public TicTacToeRoom() : base(GamesKind.TicTacToe) { }
     public string[] Board { get; set; } = [.. Enumerable.Repeat(".", 9)];
-    public string CurrentTurnPlayerId { get; set; } = "";
     public override object GetStatePayload() => new
     {
         roomId = RoomId,
