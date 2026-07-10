@@ -1,6 +1,3 @@
-import { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
-
-// Base interface - common fields for ALL games
 export interface IGameStateBase {
   roomId: string;
   player1Id: string;
@@ -16,7 +13,6 @@ export interface IGameStateBase {
   winnerPlayerId?: string;
 }
 
-// TicTacToe specific state
 export interface ITicTacToeGameState extends IGameStateBase {
   board: string[];
   winnerSymbol?: string;
@@ -38,5 +34,4 @@ export interface IPingPongGameState extends IGameStateBase {
   player2Score: number;
 }
 
-// Union type - frontend discriminates based on presence of game-specific fields
 export type IGameState = ITicTacToeGameState | ISnakeGameState | IPingPongGameState;

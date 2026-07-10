@@ -18,36 +18,33 @@ function buildSummary(matches: IMatchHistory[]) {
   );
 }
 
-function useMatchHistory(filter: MatchStatusEnum, limit?: number) {
-  const [matches, setMatches] = useState<IMatchHistory[]>([]);
+function useMatchHistory(statusFilter: MatchStatusEnum = MatchStatusEnum.All, limit?: number) {
+  const [allMatches, setAllMatches] = useState<IMatchHistory[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let alive = true;
-    const load = async () => {
-      setLoading(true);
-      const res = await matchHistoryService.getMatchHistory();
-      if (!alive) return;
-      if (res.data) {
-        setMatches(res.data);
-      }
-      setLoading(false);
-    };
-
-    void load();
+    matchHistoryService
+      .getMatchHistory()
+      .then((res) => {
+        if (alive && res.data) setAllMatches(res.data);
+      })
+      .finally(() => {
+        if (alive) setLoading(false);
+      });
     return () => {
       alive = false;
     };
   }, []);
 
-  const filtered = useMemo(() => {
-    const list = filter === MatchStatusEnum.All ? matches : matches.filter((m) => m.result === filter);
+  const matches = useMemo(() => {
+    const list = statusFilter === MatchStatusEnum.All ? allMatches : allMatches.filter((m) => m.result === statusFilter);
     return limit ? list.slice(0, limit) : list;
-  }, [filter, limit, matches]);
+  }, [statusFilter, limit, allMatches]);
 
-  const summary = useMemo(() => buildSummary(matches), [matches]);
+  const summary = useMemo(() => buildSummary(allMatches), [allMatches]);
 
-  return { matches: filtered, summary, loading };
+  return { matches, summary, loading };
 }
 
 export { useMatchHistory };

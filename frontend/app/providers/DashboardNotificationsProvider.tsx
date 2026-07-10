@@ -3,12 +3,14 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useAuth } from "@/app/providers/AuthProvider";
-import { chatService } from "@/services/def/ChatService";
-import { friendService } from "@/services/def/FriendService";
 import { useConnections } from "./ConnectionProvider";
-import { onFriendRequestChange } from "@/lib/friendEvents";
 import type { IGameInvite, INotificationState } from "@/domain/meta/INotification";
 import type { IChatNotificationPayload } from "@/domain/meta/IChatNotificationPayload";
+
+interface INotificationCounters {
+  friendRequests: number;
+  unreadMessages: number;
+}
 
 const NotificationContext = createContext<INotificationState | undefined>(undefined);
 
@@ -16,59 +18,25 @@ export function DashboardNotificationsProvider({ children }: { children: React.R
   const { user } = useAuth();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { socialConnection, gameConnection } = useConnections();
+  const { socialConnection, isSocialConnected, gameConnection } = useConnections();
   const [friendRequestCount, setFriendRequestCount] = useState(0);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
   const [gameInvites, setGameInvites] = useState<IGameInvite[]>([]);
-
-  const refreshFriendRequests = useCallback(async () => {
-    try {
-      const response = await friendService.getReceivedFriendRequests();
-      setFriendRequestCount(response.data?.length ?? 0);
-    } catch (error) {
-      console.error("Failed to sync friend requests", error);
-    }
-  }, []);
-
-  const refreshUnreadMessages = useCallback(async () => {
-    try {
-      const response = await chatService.getUnreadMessageCount();
-      setUnreadMessageCount(response.data ?? 0);
-    } catch (error) {
-      console.error("Failed to sync unread messages", error);
-    }
-  }, []);
-
-  const syncCounts = useCallback(async () => {
-    await Promise.all([refreshFriendRequests(), refreshUnreadMessages()]);
-  }, [refreshFriendRequests, refreshUnreadMessages]);
 
   useEffect(() => {
     if (!user) {
       setFriendRequestCount(0);
       setUnreadMessageCount(0);
       setGameInvites([]);
-      return;
     }
-
-    // Async function to avoid synchronous setState in effect
-    const fetchCounts = async () => {
-      await syncCounts();
-    };
-    void fetchCounts();
-  }, [user, syncCounts]);
+  }, [user]);
 
   useEffect(() => {
     if (!socialConnection) return;
 
-    const handleFriendRequest = () => {
-      void refreshFriendRequests();
-    };
-    const handleAccepted = () => {
-      void refreshFriendRequests();
-    };
-    const handleDeclined = () => {
-      void refreshFriendRequests();
+    const handleNotificationUpdate = (counters: INotificationCounters) => {
+      setFriendRequestCount(counters.friendRequests);
+      setUnreadMessageCount(counters.unreadMessages);
     };
 
     const handleChatNotification = (payload: IChatNotificationPayload) => {
@@ -82,31 +50,19 @@ export function DashboardNotificationsProvider({ children }: { children: React.R
       }
     };
 
-    socialConnection.on("friend:request", handleFriendRequest);
-    socialConnection.on("friend:accepted", handleAccepted);
-    socialConnection.on("friend:declined", handleDeclined);
+    socialConnection.on("notification:update", handleNotificationUpdate);
     socialConnection.on("chat:notification", handleChatNotification);
 
-    const noop = () => {};
-    socialConnection.on("friend:online", noop);
-    socialConnection.on("friend:offline", noop);
-    socialConnection.on("friend:ingame", noop);
-
-    const unsub = onFriendRequestChange(() => {
-      void refreshFriendRequests();
-    });
-
     return () => {
-      socialConnection.off("friend:request", handleFriendRequest);
-      socialConnection.off("friend:accepted", handleAccepted);
-      socialConnection.off("friend:declined", handleDeclined);
+      socialConnection.off("notification:update", handleNotificationUpdate);
       socialConnection.off("chat:notification", handleChatNotification);
-      socialConnection.off("friend:online", noop);
-      socialConnection.off("friend:offline", noop);
-      socialConnection.off("friend:ingame", noop);
-      unsub();
     };
-  }, [socialConnection, pathname, searchParams, user, refreshFriendRequests]);
+  }, [socialConnection, pathname, searchParams, user]);
+
+  useEffect(() => {
+    if (!socialConnection || !isSocialConnected) return;
+    socialConnection.invoke("RequestCounters").catch(() => {});
+  }, [socialConnection, isSocialConnected]);
 
   useEffect(() => {
     if (!gameConnection) return;
@@ -142,22 +98,10 @@ export function DashboardNotificationsProvider({ children }: { children: React.R
       friendRequestCount,
       unreadMessageCount,
       gameInvites,
-      syncCounts,
-      refreshUnreadMessages,
-      refreshFriendRequests,
       dismissGameInvite,
       acceptGameInvite,
     }),
-    [
-      friendRequestCount,
-      unreadMessageCount,
-      gameInvites,
-      syncCounts,
-      refreshUnreadMessages,
-      refreshFriendRequests,
-      dismissGameInvite,
-      acceptGameInvite,
-    ],
+    [friendRequestCount, unreadMessageCount, gameInvites, dismissGameInvite, acceptGameInvite],
   );
 
   return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;

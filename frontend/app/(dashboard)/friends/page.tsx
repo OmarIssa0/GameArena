@@ -40,9 +40,7 @@ function FriendsPage() {
     if (!gameHub) return;
     try {
       await gameHub.invoke("InviteFriend", friendId, GamesKindEnum.TicTacToe);
-    } catch (error) {
-      console.error("Invite failed", error);
-    }
+    } catch {}
   };
 
   return (

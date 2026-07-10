@@ -44,8 +44,7 @@ function ForgotPasswordPage() {
       setLoading(true);
       await authService.forgotPassword({ email });
       router.push("/reset-password?email=" + encodeURIComponent(email));
-    } catch (error) {
-      console.error("Forgot password request failed:", error);
+    } catch {
     } finally {
       setLoading(false);
     }

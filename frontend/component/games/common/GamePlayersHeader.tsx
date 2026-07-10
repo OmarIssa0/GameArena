@@ -1,8 +1,6 @@
 "use client";
 
 import { PlayerCard } from "./PlayerCard";
-import type { TNullable } from "@/domain/type/TCommon";
-import type { IUser } from "@/domain/meta/IUser";
 
 interface Player {
   id?: string;
@@ -21,7 +19,6 @@ interface GamePlayersHeaderProps {
   myName: string;
   player1Fallback: string;
   player2Fallback: string;
-  // Optional custom colors for different games
   player1Colors?: {
     box: string;
     badge: string;
@@ -60,12 +57,12 @@ function GamePlayersHeader({
         isTurn={player1.isTurn}
         symbolColors={player1Colors}
       />
-      
+
       <div className="col-span-1 flex flex-col items-center justify-center">
         <span className="text-xs font-bold text-text-muted">VS</span>
         <div className="w-px h-10 bg-border/40 mt-1" />
       </div>
-      
+
       <PlayerCard
         playerId={player2.id ?? undefined}
         playerUsername={player2.username ?? undefined}

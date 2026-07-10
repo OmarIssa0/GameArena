@@ -2,7 +2,7 @@
 
 import { Users, Bell } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 
 import { GameInvitesList } from "./GameInvitesList";
 import { GInputSearch } from "@/component/common/GInputSearch";
@@ -20,12 +20,27 @@ import { GStatusDot } from "../common/GStatusDot";
 import { GSpinner } from "../common/GSpinner";
 import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
 import { GButton } from "../common/GButton";
+import type { IUserSummary } from "@/domain/meta/IUserSummary";
 type SocialPanelTab = "friends" | "invites";
 
-/** Header content shown when the panel is expanded (or open on compact) */
+interface FriendsContextValue {
+  friends: IUserSummary[];
+  loading: boolean;
+  onlineCount: number;
+  reload: () => void;
+}
+
+const FriendsContext = createContext<FriendsContextValue | null>(null);
+
+function useSharedFriends() {
+  const ctx = useContext(FriendsContext);
+  if (!ctx) throw new Error("useSharedFriends must be used within FriendsProvider");
+  return ctx;
+}
+
 function SocialBrand() {
   const t = useTranslation({ en, ar }) as TSocialPanelTranslation;
-  const { onlineCount } = useFriendList();
+  const { onlineCount } = useSharedFriends();
 
   return (
     <div className="min-w-0">
@@ -42,7 +57,7 @@ function SocialBrand() {
 
 function SocialRail() {
   const router = useRouter();
-  const { friends } = useFriendList();
+  const { friends } = useSharedFriends();
   const { closeMobile, isCompact } = useAsideCtx();
 
   const online = friends.filter((f) => f.status === UserStatusEnum.Online).slice(0, 8);
@@ -80,7 +95,7 @@ function SocialRail() {
 function SocialExpanded() {
   const t = useTranslation({ en, ar }) as TSocialPanelTranslation;
   const { gameInvites } = useDashboardNotifications();
-  const { friends, loading } = useFriendList();
+  const { friends, loading } = useSharedFriends();
   const router = useRouter();
   const { isCompact, closeMobile } = useAsideCtx();
 
@@ -138,17 +153,14 @@ function SocialExpanded() {
   );
 }
 
-/** Switches between the rail and the full panel based on aside state */
 function SocialBody() {
   const { collapsed, isDesktop } = useAsideCtx();
   return collapsed && isDesktop ? <SocialRail /> : <SocialExpanded />;
 }
 
-function SocialPanel() {
+function SocialPanelInner() {
   const { gameInvites } = useDashboardNotifications();
 
-  // Embedded badge dot so it shows up in the collapsed header button
-  // AND the compact FAB (GAside falls back to collapsedIcon for both).
   const collapsedIcon = (
     <span className="relative inline-flex">
       <Users size={20} />
@@ -166,6 +178,21 @@ function SocialPanel() {
       expandedBrand={<SocialBrand />}>
       <SocialBody />
     </GAside>
+  );
+}
+
+function SocialPanel() {
+  const { friends, loading, onlineCount, reload } = useFriendList();
+
+  const value = useMemo<FriendsContextValue>(
+    () => ({ friends, loading, onlineCount, reload }),
+    [friends, loading, onlineCount, reload],
+  );
+
+  return (
+    <FriendsContext.Provider value={value}>
+      <SocialPanelInner />
+    </FriendsContext.Provider>
   );
 }
 

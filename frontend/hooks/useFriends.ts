@@ -5,7 +5,6 @@ import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
 import { useFetch } from "./useFetch";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useConnections } from "@/app/providers/ConnectionProvider";
-import { notifyFriendRequestChange } from "@/lib/friendEvents";
 import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import type { IFriendRequestReceived } from "@/domain/meta/IFriendRequestReceived";
 import type { IFriendRequestSent } from "@/domain/meta/IFriendRequestSent";
@@ -18,7 +17,7 @@ function useFriendList() {
     loading,
     reload,
   } = useFetch(
-    () =>
+    (signal) =>
       friendService
         .getFriends({ name: null, userStatus: UserStatusEnum.All })
         .then((res) => res.data ?? []),
@@ -123,39 +122,36 @@ function useFriendRequests() {
     async (senderId: string) => {
       try {
         await friendService.acceptFriendRequest(senderId);
-        await reloadAll();
-        notifyFriendRequestChange();
-      } catch (error) {
-        console.error("Failed to accept friend request", error);
+        await reloadRecv();
+      } catch {
+        // accept failed — UI stays unchanged
       }
     },
-    [reloadAll],
+    [reloadRecv],
   );
 
   const decline = useCallback(
     async (senderId: string) => {
       try {
         await friendService.rejectFriendRequest(senderId);
-        await reloadAll();
-        notifyFriendRequestChange();
-      } catch (error) {
-        console.error("Failed to decline friend request", error);
+        await reloadRecv();
+      } catch {
+        // decline failed — UI stays unchanged
       }
     },
-    [reloadAll],
+    [reloadRecv],
   );
 
   const send = useCallback(
     async (friendId: string) => {
       try {
         await friendService.sendFriendRequest(friendId);
-        await reloadAll();
-        notifyFriendRequestChange();
-      } catch (error) {
-        console.error("Failed to send friend request", error);
+        await reloadSent();
+      } catch {
+        // send request failed — UI stays unchanged
       }
     },
-    [reloadAll],
+    [reloadSent],
   );
 
   return {

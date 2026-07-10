@@ -35,11 +35,7 @@ function ResetPasswordPage() {
       void import("next/navigation").then(({ redirect }) => {
         try {
           redirect("/forgot-password");
-        } catch {
-          console.error(
-            "Redirect failed. Please navigate to /forgot-password manually.",
-          );
-        }
+        } catch {}
       });
     }
     return null;
@@ -63,21 +59,15 @@ function ResetPasswordPage() {
       setLoading(true);
       await authService.resetPassword({ email, otp, newPassword });
       router.replace("/login");
-    } catch (error) {
-      console.error("Reset password failed:", error);
+    } catch {
+      // reset failed — user stays on page
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <AuthLayout
-      page={
-        step === "otp"
-          ? AuthFlowAnimationEnum.VERIFY_OTP
-          : AuthFlowAnimationEnum.SET_PASSWORD
-      }
-    >
+    <AuthLayout page={step === "otp" ? AuthFlowAnimationEnum.VERIFY_OTP : AuthFlowAnimationEnum.SET_PASSWORD}>
       {step === "otp" && (
         <OtpForm
           email={email}

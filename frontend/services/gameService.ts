@@ -2,11 +2,9 @@
 
 import { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
 import type { HubConnection } from "@microsoft/signalr";
-import type { TNullable } from "@/domain/type/TCommon";
 
 class GameService {
   constructor(private connection: HubConnection) {}
-  private static instance: TNullable<GameService> = null;
 
   async findMatch(gameKind: GamesKindEnum): Promise<void> {
     await this.connection.invoke("FindMatch", gameKind);
@@ -34,16 +32,6 @@ class GameService {
 
   async sendAction(action: object): Promise<void> {
     await this.connection.invoke("SendAction", action);
-  }
-
-  async getCurrentState<T>(): Promise<T | null> {
-    return this.connection.invoke<T | null>("GetCurrentState");
-  }
-  static getInstance(connection: HubConnection): GameService {
-    if (!this.instance) {
-      this.instance = new GameService(connection);
-    }
-    return this.instance;
   }
 }
 

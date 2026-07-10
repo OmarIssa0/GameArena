@@ -5,12 +5,16 @@ import { useDashboardNotifications } from "@/app/providers/DashboardNotification
 import { GButton } from "@/component/common/GButton";
 import { GCard } from "@/component/common/GCard";
 import { useTranslation } from "@/hooks/useSetting";
+import { GamesList } from "@/domain/constant/games";
 import {
   en,
   type TSocialPanelTranslation,
 } from "@/component/i18n/SocialPanel/en.i18n";
 import { ar } from "@/component/i18n/SocialPanel/ar.i18n";
 import type { IGameInvitesListProps } from "./def/GameInvitesList";
+
+const gamePath = (gameType: number) =>
+  GamesList.find((g) => g.type === gameType)?.path ?? "tic-tac-toe";
 
 export function GameInvitesList({ onAfterAccept }: IGameInvitesListProps) {
   const router = useRouter();
@@ -36,7 +40,7 @@ export function GameInvitesList({ onAfterAccept }: IGameInvitesListProps) {
               size="sm"
               onClick={async () => {
                 await acceptGameInvite(invite.roomId);
-                router.push("/tic-tac-toe");
+                router.push(`/${gamePath(invite.gameType)}`);
                 onAfterAccept?.();
               }}
             >

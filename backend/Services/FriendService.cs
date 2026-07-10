@@ -179,11 +179,30 @@ namespace backend.Services
             return requests.Select(MapperHelper.ToSentRequestDto).ToList();
         }
 
+        public async Task<int> GetPendingRequestCount(Guid userId) {
+            var count = await _context.FriendRequests
+                .CountAsync(fr => fr.ReceiverId == userId && fr.Status == FriendRequestStatus.Pending);
+            return count;
+        }
+
+        public async Task<int> GetFriendRequestCountAsync(Guid userId)
+        {
+            return await _context.FriendRequests
+                .CountAsync(fr => fr.ReceiverId == userId && fr.Status == FriendRequestStatus.Pending);
+        }
+
+        public async Task<int> GetFriendCountAsync(Guid userId)
+        {
+            return await _context.UserFriends
+                .CountAsync(uf => uf.UserId == userId);
+        }
+
         private async Task<bool> IsBlockedAsync(Guid userId, Guid blockedById)
         {
             return await _context.Blocks.AnyAsync(b =>
                 (b.BlockerId == blockedById && b.BlockedId == userId) ||
                 (b.BlockerId == userId && b.BlockedId == blockedById));
         }
+
     }
 }

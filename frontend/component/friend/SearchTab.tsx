@@ -81,9 +81,8 @@ function SearchTab() {
             })),
           );
         }
-      } catch (err) {
+      } catch {
         if (!ignore) {
-          console.error("Failed to search users", err);
           setSearchResults([]);
           setSearchError(t.searchTab.searchError);
         }
@@ -110,8 +109,7 @@ function SearchTab() {
           user.id === receiverId ? { ...user, isSendRequest: true } : user,
         ),
       );
-    } catch (err) {
-      console.error("Failed to send friend request", err);
+    } catch {
       setSearchError(t.searchTab.sendError);
     }
   };

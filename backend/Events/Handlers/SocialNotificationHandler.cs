@@ -7,7 +7,8 @@ namespace backend.Events.Handlers;
 
 public class SocialNotificationHandler(
     IHubContext<SocialHub> _hub,
-    IUserPresenceService _presence
+    IUserPresenceService _presence,
+    INotificationService _notificationService
 ) : IEventHandler<FriendRequestSentEvent>,
     IEventHandler<FriendRequestAcceptedEvent>,
     IEventHandler<FriendRequestDeclinedEvent>,
@@ -25,6 +26,7 @@ public class SocialNotificationHandler(
                 senderId = eventHappen.SenderId,
                 senderName = eventHappen.SenderName
             });
+        await _notificationService.SendCountersAsync(eventHappen.ReceiverId);
     }
 
     public async Task HandleAsync(FriendRequestAcceptedEvent eventHappen)
@@ -35,6 +37,7 @@ public class SocialNotificationHandler(
                 friendId = eventHappen.AccepterId,
                 friendName = eventHappen.AccepterName
             });
+        await _notificationService.SendCountersAsync(eventHappen.SenderId);
     }
 
     public async Task HandleAsync(FriendRequestDeclinedEvent eventHappen)
@@ -44,6 +47,7 @@ public class SocialNotificationHandler(
             {
                 userId = eventHappen.DeclinerId
             });
+        await _notificationService.SendCountersAsync(eventHappen.SenderId);
     }
 
     public async Task HandleAsync(FriendRemovedEvent eventHappen)
@@ -53,6 +57,7 @@ public class SocialNotificationHandler(
             {
                 userId = eventHappen.RemoverId
             });
+        await _notificationService.SendCountersAsync(eventHappen.RemovedFriendId);
     }
 
     public async Task HandleAsync(ChatMessageSentEvent eventHappen)
@@ -65,6 +70,7 @@ public class SocialNotificationHandler(
                 content = eventHappen.Content,
                 sentAt = eventHappen.SentAt
             });
+        await _notificationService.SendCountersAsync(eventHappen.ReceiverId);
     }
 
     public async Task HandleAsync(GameStartedEvent eventHappen)

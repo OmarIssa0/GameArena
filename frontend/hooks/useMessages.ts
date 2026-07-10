@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { chatService } from "@/services/def/ChatService";
 import { useFriends } from "./useFriends";
-import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
+import { useAuth } from "@/app/providers/AuthProvider";
 import { useConnections } from "@/app/providers/ConnectionProvider";
 import type { IMessage } from "@/domain/meta/IMessage";
 import type { IUserSummary } from "@/domain/meta/IUserSummary";
@@ -28,13 +28,13 @@ const areSameMessage = (left: IMessage, right: IMessage): boolean =>
   left.senderId === right.senderId &&
   left.receiverId === right.receiverId &&
   left.content === right.content &&
-  left.sentAt.getTime() === right.sentAt.getTime();
+  Math.abs(left.sentAt.getTime() - right.sentAt.getTime()) < 5000;
 
 export function useMessages(initialFriendId?: TNullable<string>) {
   const { chatConnection: connection, isChatConnected: isConnected } =
     useConnections();
+  const { user } = useAuth();
   const { friends, loading: friendsLoading } = useFriends();
-  const { refreshUnreadMessages } = useDashboardNotifications();
   const [selectedFriendId, setSelectedFriendId] = useState<TNullable<string>>(
     initialFriendId ?? null,
   );
@@ -57,8 +57,7 @@ export function useMessages(initialFriendId?: TNullable<string>) {
     if (loadingMessages) return;
     if (!apiMessages) return;
     setMessages(apiMessages);
-    refreshUnreadMessages();
-  }, [apiMessages, error, loadingMessages, refreshUnreadMessages]);
+  }, [apiMessages, error, loadingMessages]);
 
   const selectedFriend = useMemo<TNullable<IUserSummary>>(() => {
     if (!selectedFriendId) return null;
@@ -99,15 +98,25 @@ export function useMessages(initialFriendId?: TNullable<string>) {
   const sendMessage = useCallback(async () => {
     const content = draft.trim();
 
-    if (!connection || !selectedFriendId || !content) return;
+    if (!connection || !selectedFriendId || !content || !user) return;
+
+    const outgoing: IMessage = {
+      senderId: user.id,
+      receiverId: selectedFriendId,
+      content,
+      sentAt: new Date(),
+      isRead: false,
+    };
+
+    setMessages((prev) => [...prev, outgoing]);
+    setDraft("");
 
     try {
       await connection.invoke("SendPrivateMessage", selectedFriendId, content);
-      setDraft("");
-    } catch (err) {
-      console.error("Failed to send message", err);
+    } catch {
+      setMessages((prev) => prev.filter((m) => m !== outgoing));
     }
-  }, [connection, draft, selectedFriendId]);
+  }, [connection, draft, selectedFriendId, user]);
 
   return {
     connection,

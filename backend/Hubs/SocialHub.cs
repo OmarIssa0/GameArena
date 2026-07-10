@@ -4,8 +4,9 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace backend.Hubs
 {
+
     [Authorize]
-    public class SocialHub(IUserPresenceService _presence) : Hub
+    public class SocialHub(IUserPresenceService _presence, INotificationService _notificationService) : Hub
     {
         public override async Task OnConnectedAsync()
         {
@@ -15,6 +16,8 @@ namespace backend.Hubs
                 await Groups.AddToGroupAsync(Context.ConnectionId, $"user:{userId}");
                 _presence.SetOnline(userId);
                 await Clients.Others.SendAsync("friend:online", new { userId });
+                if (Guid.TryParse(userId, out var guid))
+                    await _notificationService.SendCountersAsync(guid);
             }
 
             await base.OnConnectedAsync();
@@ -30,6 +33,15 @@ namespace backend.Hubs
             }
 
             await base.OnDisconnectedAsync(exception);
+        }
+
+        public async Task RequestCounters()
+        {
+            var userId = Context.UserIdentifier;
+            if (userId != null && Guid.TryParse(userId, out var guid))
+            {
+                await _notificationService.SendCountersAsync(guid);
+            }
         }
     }
 }

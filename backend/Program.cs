@@ -97,6 +97,7 @@ builder.Services.AddScoped<IEventHandler<ChatMessageSentEvent>>(sp => sp.GetRequ
 builder.Services.AddScoped<IEventHandler<GameStartedEvent>>(sp => sp.GetRequiredService<SocialNotificationHandler>());
 builder.Services.AddScoped<IEventHandler<GameFinishedEvent>>(sp => sp.GetRequiredService<SocialNotificationHandler>());
 builder.Services.AddScoped<IEventHandler<GameLeftEvent>>(sp => sp.GetRequiredService<SocialNotificationHandler>());
+builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddSingleton<IUserPresenceService, UserPresenceService>();
 builder.Services.AddSingleton<IGameRoomService, GameRoomService>();
 var app = builder.Build();
