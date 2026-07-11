@@ -31,8 +31,11 @@ namespace backend.Hubs
         private async Task FinishGameAndSave(BaseGameRoom room, string? roomId)
         {
             _roomService.StopGameLoop(roomId!);
-            await _eventBus.PublishAsync(new GameFinishedEvent(room.Player1Id!, room.Player2Id!));
-            await _matchHistoryService.SaveMatchHistoryAsync(room);
+            if (!room.IsBotGame)
+            {
+                await _eventBus.PublishAsync(new GameFinishedEvent(room.Player1Id!, room.Player2Id!));
+                await _matchHistoryService.SaveMatchHistoryAsync(room);
+            }
             _roomService.RemoveRoomAndPlayers(roomId!);
         }
 

@@ -143,14 +143,22 @@ namespace backend.Services
                         if (!pong.HasStarted || pong.IsFinished)
                             break;
 
-                        pong.Tick();
-                        pong.TickBot();
+                        pong.Advance();
 
                         await _hubContext.Clients.Group(roomId)
                             .SendAsync("gameState", pong.GetStatePayload());
 
                         if (pong.IsFinished)
+                        {
+                            if (_rooms.TryRemove(roomId, out var finishedRoom))
+                            {
+                                if (finishedRoom.Player1Id != null)
+                                    _playerToRoom.TryRemove(finishedRoom.Player1Id, out _);
+                                if (finishedRoom.Player2Id != null)
+                                    _playerToRoom.TryRemove(finishedRoom.Player2Id, out _);
+                            }
                             break;
+                        }
                     }
                 }
                 catch (OperationCanceledException) { }
