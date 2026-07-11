@@ -98,7 +98,8 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddSingleton<IUserPresenceService, UserPresenceService>();
 builder.Services.AddSingleton<IGameRoomService, GameRoomService>();
 var app = builder.Build();
-
+app.UseSwagger();
+app.UseSwaggerUI();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
