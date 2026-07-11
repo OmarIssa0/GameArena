@@ -1,3 +1,4 @@
+using System.Text.Json;
 using backend.Enums;
 
 namespace backend.Domain
@@ -20,8 +21,38 @@ namespace backend.Domain
         public string? DisconnectedPlayerId { get; set; }
         public bool IsBotGame { get; set; } = false;
         public string? CurrentTurnPlayerId { get; set; }
-        public abstract object GetStatePayload();
-        public abstract void ProcessInput(string playerId, object action);
-    }
 
+        public abstract object GetStatePayload();
+
+        public abstract void HandleAction(string playerId, JsonElement action);
+
+        public virtual bool NeedsGameLoop => false;
+
+        public virtual int TickIntervalMs => 50;
+
+        public virtual void Tick() { }
+
+        public virtual void MakeBotMove() { }
+
+        public virtual void ReplacePlayerWithBot(string playerId)
+        {
+            IsBotGame = true;
+            if (Player1Id == playerId)
+            {
+                Player1Id = "__BOT__";
+                Player1Username = "AI Bot";
+            }
+            else
+            {
+                Player2Id = "__BOT__";
+                Player2Username = "AI Bot";
+            }
+        }
+
+        public virtual void OnPlayerDisconnected(string disconnectedPlayerId)
+        {
+            IsFinished = true;
+            WinnerPlayerId = disconnectedPlayerId == Player1Id ? Player2Id : Player1Id;
+        }
+    }
 }

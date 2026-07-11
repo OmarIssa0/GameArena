@@ -12,7 +12,6 @@ namespace backend.Hubs
     [Authorize]
     public class GameHub(
         IGameRoomService _roomService,
-        IMatchHistoryService _matchHistoryService,
         IEventBus _eventBus) : Hub
     {
         private string GetPlayerId() =>
@@ -26,37 +25,6 @@ namespace backend.Hubs
                 && roomId != null
                 && _roomService.TryGetRoom(roomId, out room)
                 && room != null;
-        }
-
-        private async Task FinishGameAndSave(BaseGameRoom room, string? roomId)
-        {
-            _roomService.StopGameLoop(roomId!);
-            if (!room.IsBotGame)
-            {
-                await _eventBus.PublishAsync(new GameFinishedEvent(room.Player1Id!, room.Player2Id!));
-                await _matchHistoryService.SaveMatchHistoryAsync(room);
-            }
-            _roomService.RemoveRoomAndPlayers(roomId!);
-        }
-
-        private async Task ReplaceWithBot(BaseGameRoom room, string playerId)
-        {
-            room.IsBotGame = true;
-            if (room.Player1Id == playerId)
-                room.Player1Username = "AI Bot";
-            else
-                room.Player2Username = "AI Bot";
-
-            if (room is TicTacToeRoom xo && room.CurrentTurnPlayerId == playerId)
-            {
-                var botSymbol = room.Player1Id == playerId ? "X" : "O";
-                var botMove = TicTacToeMinimax.GetBestMove(xo.Board, botSymbol);
-                if (botMove >= 0)
-                {
-                    var action = JsonSerializer.SerializeToElement(new { type = "MAKE_MOVE", cell = botMove });
-                    room.ProcessInput(playerId, action);
-                }
-            }
         }
 
         public override async Task OnDisconnectedAsync(Exception? exception)
@@ -90,16 +58,14 @@ namespace backend.Hubs
 
                 if (room.IsBotGame)
                 {
-                    room.IsFinished = true;
-                    room.WinnerPlayerId = room.Player1Id == playerId ? room.Player2Id : room.Player1Id;
-                    if (room is TicTacToeRoom xoRoom)
-                        xoRoom.WinnerSymbol = room.WinnerPlayerId == xoRoom.Player1Id ? "X" : "O";
-                    await FinishGameAndSave(room, roomId);
+                    room.OnPlayerDisconnected(playerId);
+                    await _roomService.FinishAndCleanupAsync(room, roomId!);
                     await Clients.Group(roomId!).SendAsync("OpponentDisconnected");
                     return;
                 }
 
-                await ReplaceWithBot(room, playerId);
+                room.ReplacePlayerWithBot(playerId);
+                room.MakeBotMove();
                 await Clients.Group(roomId!).SendAsync("gameState", room.GetStatePayload());
             }
 
@@ -143,24 +109,7 @@ namespace backend.Hubs
                 || (room.Player1Id != playerId && room.Player2Id != playerId))
                 return;
 
-            room.ProcessInput(playerId, action);
-
-            if (!room.IsFinished && room.IsBotGame && room is TicTacToeRoom xoRoom)
-            {
-                var botId = room.Player1Id == playerId ? room.Player2Id! : room.Player1Id!;
-                var botSymbol = botId == xoRoom.Player1Id ? "X" : "O";
-                var botMove = TicTacToeMinimax.GetBestMove(xoRoom.Board, botSymbol);
-                if (botMove >= 0)
-                {
-                    var botAction = JsonSerializer.SerializeToElement(new { type = "MAKE_MOVE", cell = botMove });
-                    room.ProcessInput(botId, botAction);
-                }
-            }
-
-            await Clients.Group(roomId!).SendAsync("gameState", room.GetStatePayload());
-
-            if (room.IsFinished)
-                await FinishGameAndSave(room, roomId);
+            await _roomService.ProcessActionAsync(roomId!, playerId, action);
         }
 
         public async Task StartGame(string? friendId, GamesKind gameKind)
@@ -187,13 +136,15 @@ namespace backend.Hubs
             room.HasStarted = true;
             room.CurrentTurnPlayerId = room.Player1Id!;
 
-            await _eventBus.PublishAsync(new GameStartedEvent(playerId, room.Player2Id!));
+            await PublishGameStartedEvent(room);
             await Clients.Group(roomId!).SendAsync("gameState", room.GetStatePayload());
 
-            if (room is PingPongRoom)
-            {
-                _roomService.StartGameLoop(roomId!);
-            }
+            _roomService.StartGameLoop(roomId!);
+        }
+
+        private async Task PublishGameStartedEvent(BaseGameRoom room)
+        {
+            await _eventBus.PublishAsync(new GameStartedEvent(room.Player1Id!, room.Player2Id!));
         }
 
         public async Task LeaveGame()
@@ -215,19 +166,22 @@ namespace backend.Hubs
 
             if (room.IsBotGame)
             {
-                room.IsFinished = true;
-                room.WinnerPlayerId = room.Player1Id == playerId ? room.Player2Id : room.Player1Id;
-                if (room is TicTacToeRoom xo)
-                    xo.WinnerSymbol = room.WinnerPlayerId == xo.Player1Id ? "X" : "O";
-                await FinishGameAndSave(room, roomId);
+                room.OnPlayerDisconnected(playerId);
+                await _roomService.FinishAndCleanupAsync(room, roomId!);
             }
             else
             {
-                await ReplaceWithBot(room, playerId);
-                await _eventBus.PublishAsync(new GameLeftEvent(playerId));
+                room.ReplacePlayerWithBot(playerId);
+                room.MakeBotMove();
+                await PublishGameLeftEvent(playerId);
             }
 
             await Clients.Group(roomId!).SendAsync("gameState", room.GetStatePayload());
+        }
+
+        private async Task PublishGameLeftEvent(string playerId)
+        {
+            await _eventBus.PublishAsync(new GameLeftEvent(playerId));
         }
 
         public async Task InviteToRoom(string friendId)

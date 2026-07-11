@@ -1,3 +1,4 @@
+using System.Text.Json;
 using backend.Domain;
 using backend.Enums;
 using backend.Events;
@@ -122,15 +123,51 @@ namespace backend.Services
             }
         }
 
+        public async Task ProcessActionAsync(string roomId, string playerId, JsonElement action)
+        {
+            if (!_rooms.TryGetValue(roomId, out var room)) return;
+
+            room.HandleAction(playerId, action);
+
+            if (!room.IsFinished && room.IsBotGame)
+                room.MakeBotMove();
+
+            await _hubContext.Clients.Group(roomId)
+                .SendAsync("gameState", room.GetStatePayload());
+
+            if (room.IsFinished)
+                await FinishAndCleanupAsync(room, roomId);
+        }
+
+        public async Task FinishAndCleanupAsync(BaseGameRoom room, string roomId)
+        {
+            StopGameLoop(roomId);
+            if (!room.IsBotGame)
+            {
+                if (Guid.TryParse(room.Player1Id, out var _)
+                    && Guid.TryParse(room.Player2Id, out var _))
+                {
+                    using var scope = _scopeFactory.CreateScope();
+                    var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
+                    await eventBus.PublishAsync(new GameFinishedEvent(room.Player1Id!, room.Player2Id!));
+
+                    var matchHistory = scope.ServiceProvider.GetRequiredService<IMatchHistoryService>();
+                    await matchHistory.SaveMatchHistoryAsync(room);
+                }
+            }
+            RemoveRoomAndPlayers(roomId);
+        }
+
         public void StartGameLoop(string roomId)
         {
             StopGameLoop(roomId);
 
-            if (!_rooms.TryGetValue(roomId, out var room) || room is not PingPongRoom)
+            if (!_rooms.TryGetValue(roomId, out var room) || !room.NeedsGameLoop)
                 return;
 
             var cts = new CancellationTokenSource();
             _gameLoops[roomId] = cts;
+            var interval = room.TickIntervalMs;
 
             _ = Task.Run(async () =>
             {
@@ -138,23 +175,22 @@ namespace backend.Services
                 {
                     while (!cts.Token.IsCancellationRequested)
                     {
-                        await Task.Delay(50, cts.Token);
+                        await Task.Delay(interval, cts.Token);
 
-                        if (!_rooms.TryGetValue(roomId, out var currentRoom) || currentRoom is not PingPongRoom pong)
+                        if (!_rooms.TryGetValue(roomId, out var currentRoom))
                             break;
 
-                        if (!pong.HasStarted || pong.IsFinished)
+                        if (!currentRoom.HasStarted || currentRoom.IsFinished)
                             break;
 
-                        pong.Advance();
+                        currentRoom.Tick();
 
                         await _hubContext.Clients.Group(roomId)
-                            .SendAsync("gameState", pong.GetStatePayload());
+                            .SendAsync("gameState", currentRoom.GetStatePayload());
 
-                        if (pong.IsFinished)
+                        if (currentRoom.IsFinished)
                         {
-                            await FinishPongMatchAsync(pong);
-                            RemoveRoomAndPlayers(roomId);
+                            await FinishAndCleanupAsync(currentRoom, roomId);
                             break;
                         }
                     }
@@ -165,22 +201,6 @@ namespace backend.Services
                     _gameLoops.TryRemove(roomId, out _);
                 }
             }, cts.Token);
-        }
-
-        private async Task FinishPongMatchAsync(PingPongRoom pong)
-        {
-            if (pong.IsBotGame) return;
-
-            if (!Guid.TryParse(pong.Player1Id, out var _)
-                || !Guid.TryParse(pong.Player2Id, out var _))
-                return;
-
-            using var scope = _scopeFactory.CreateScope();
-            var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
-            await eventBus.PublishAsync(new GameFinishedEvent(pong.Player1Id!, pong.Player2Id!));
-
-            var matchHistory = scope.ServiceProvider.GetRequiredService<IMatchHistoryService>();
-            await matchHistory.SaveMatchHistoryAsync(pong);
         }
 
         public void StopGameLoop(string roomId)

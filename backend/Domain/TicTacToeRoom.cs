@@ -28,15 +28,14 @@ public class TicTacToeRoom : BaseGameRoom
         player2Username = Player2Username
     };
 
-    public override void ProcessInput(string playerId, object action)
+    public override void HandleAction(string playerId, JsonElement action)
     {
         lock (_lock)
         {
-            if (action is not JsonElement json
-                || json.ValueKind != JsonValueKind.Object
-                || !json.TryGetProperty("type", out var typeProp)
+            if (action.ValueKind != JsonValueKind.Object
+                || !action.TryGetProperty("type", out var typeProp)
                 || typeProp.GetString() != "MAKE_MOVE"
-                || !json.TryGetProperty("cell", out var cellProp))
+                || !action.TryGetProperty("cell", out var cellProp))
                 return;
 
             var cell = cellProp.GetInt32();
@@ -73,5 +72,44 @@ public class TicTacToeRoom : BaseGameRoom
                 ? Player2Id!
                 : Player1Id!;
         }
+    }
+
+    public override void MakeBotMove()
+    {
+        lock (_lock)
+        {
+            if (IsFinished || CurrentTurnPlayerId == null) return;
+
+            var botId = Player1Id == "__BOT__" ? Player1Id : Player2Id;
+            if (CurrentTurnPlayerId != botId) return;
+
+            var botSymbol = botId == Player1Id ? "X" : "O";
+            var botMove = TicTacToeMinimax.GetBestMove(Board, botSymbol);
+            if (botMove < 0) return;
+
+            Board[botMove] = botSymbol;
+
+            if (GameHelper.CheckWinTicTacToe(Board))
+            {
+                IsFinished = true;
+                WinnerPlayerId = botId;
+                WinnerSymbol = Board[botMove];
+                return;
+            }
+
+            if (Board.All(x => x != "."))
+            {
+                IsFinished = true;
+                return;
+            }
+
+            CurrentTurnPlayerId = botId == Player1Id ? Player2Id! : Player1Id!;
+        }
+    }
+
+    public override void OnPlayerDisconnected(string disconnectedPlayerId)
+    {
+        base.OnPlayerDisconnected(disconnectedPlayerId);
+        WinnerSymbol = WinnerPlayerId == Player1Id ? "X" : "O";
     }
 }

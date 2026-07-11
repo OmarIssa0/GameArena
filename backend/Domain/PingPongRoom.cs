@@ -52,13 +52,9 @@ namespace backend.Domain
             BallVY = (float)(Random.Shared.NextDouble() * 0.01 - 0.005);
         }
 
-        /// <summary>
-        /// Advances ball physics and bot paddle AI for a single simulation step.
-        /// Combined into one call (instead of separate Tick()/TickBot() calls from
-        /// the game loop) so the hot 20Hz loop only acquires the room lock once
-        /// per tick instead of twice.
-        /// </summary>
-        public void Advance()
+        public override bool NeedsGameLoop => true;
+
+        public override void Tick()
         {
             lock (_lock)
             {
@@ -178,21 +174,18 @@ namespace backend.Domain
             player2Score = ScoreP2
         };
 
-        public override void ProcessInput(string playerId, object action)
+        public override void HandleAction(string playerId, JsonElement action)
         {
             lock (_lock)
             {
                 if (Player1Id != playerId && Player2Id != playerId) return;
 
-                if (action is not JsonElement json
-                    || json.ValueKind != JsonValueKind.Object
-                    || !json.TryGetProperty("type", out var typeProp)
+                if (action.ValueKind != JsonValueKind.Object
+                    || !action.TryGetProperty("type", out var typeProp)
                     || !typeProp.ValueEquals(ActionMovePaddle)
-                    || !json.TryGetProperty("direction", out var directionProp))
+                    || !action.TryGetProperty("direction", out var directionProp))
                     return;
 
-                // ValueEquals compares UTF-8 bytes directly instead of allocating
-                // a string via GetString() — this runs on every paddle input.
                 bool isUp = directionProp.ValueEquals(DirectionUp);
                 if (!isUp && !directionProp.ValueEquals(DirectionDown)) return;
 

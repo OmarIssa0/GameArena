@@ -1,3 +1,4 @@
+using System.Text.Json;
 using backend.Domain;
 using backend.Enums;
 
@@ -15,5 +16,7 @@ namespace backend.Services.Interface
         void RemoveRoomAndPlayers(string roomId);
         void StartGameLoop(string roomId);
         void StopGameLoop(string roomId);
+        Task ProcessActionAsync(string roomId, string playerId, JsonElement action);
+        Task FinishAndCleanupAsync(BaseGameRoom room, string roomId);
     }
 }
