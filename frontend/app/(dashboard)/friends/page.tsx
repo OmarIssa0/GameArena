@@ -61,6 +61,9 @@ function FriendsPage() {
     friendsLoading,
     requestsLoading,
     blockedLoading,
+    requestCount,
+    sentRequestCount,
+    blockedCount,
     removeFriend,
     blockUser,
     unblockUser,
@@ -81,11 +84,11 @@ function FriendsPage() {
 
   const tabs = useMemo<GTabItem<TFriendsTab>[]>(() => [
     { id: "friends", label: t.friends, icon: <GIcon icon={Users} size="sm" color="inherit" /> },
-    { id: "requests", label: t.requests, icon: <GIcon icon={UserCheck} size="sm" color="inherit" /> },
-    { id: "sent", label: t.sentRequests, icon: <GIcon icon={Send} size="sm" color="inherit" /> },
-    { id: "blocked", label: t.blockedUsers, icon: <GIcon icon={ShieldBan} size="sm" color="inherit" /> },
+    { id: "requests", label: t.requests, icon: <GIcon icon={UserCheck} size="sm" color="inherit" />, badge: requestCount || undefined },
+    { id: "sent", label: t.sentRequests, icon: <GIcon icon={Send} size="sm" color="inherit" />, badge: sentRequestCount || undefined },
+    { id: "blocked", label: t.blockedUsers, icon: <GIcon icon={ShieldBan} size="sm" color="inherit" />, badge: blockedCount || undefined },
     { id: "search", label: t.search, icon: <GIcon icon={Search} size="sm" color="inherit" /> },
-  ], [t]);
+  ], [t, requestCount, sentRequestCount, blockedCount]);
 
   const changeTab = useCallback((tab: TFriendsTab) => {
     const params = new URLSearchParams(searchParams);

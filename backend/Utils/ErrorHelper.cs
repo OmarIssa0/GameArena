@@ -78,6 +78,9 @@ namespace backend.Utils
               [ErrorCode.UserBlockedYou] =
               (403, "User has blocked you"),
 
+              [ErrorCode.YouBlockedUser] =
+              (403, "You have blocked this user"),
+
              // FRIEND SYSTEM
 
              [ErrorCode.RequestAlreadyExists] =
@@ -94,6 +97,9 @@ namespace backend.Utils
 
              [ErrorCode.IsNotFriend] =
              (400, "Users are not friends"),
+
+             [ErrorCode.RequestAlreadyProcessed] =
+             (409, "Friend request was already processed"),
 
              // GAME
 

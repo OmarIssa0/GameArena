@@ -60,6 +60,9 @@ namespace backend.Data
             modelBuilder.Entity<FriendRequest>()
                 .HasIndex(fr => new { fr.ReceiverId, fr.Status });
 
+            modelBuilder.Entity<FriendRequest>()
+                .HasIndex(fr => new { fr.SenderId, fr.Status });
+
             modelBuilder.Entity<Block>()
                 .HasKey(b => new { b.BlockerId, b.BlockedId });
             modelBuilder.Entity<Block>()
@@ -74,8 +77,7 @@ namespace backend.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Block>()
-                .HasIndex(b => b.BlockedId);
-
+                .HasIndex(b => new { b.BlockerId, b.BlockedId });
             // chat
             modelBuilder.Entity<Message>()
                 .HasOne(m => m.Sender)

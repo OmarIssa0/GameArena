@@ -11,7 +11,7 @@ namespace backend.Services
 {
     public class NotificationService(
         IHubContext<SocialHub> hub,
-        IFriendService friendService,
+        ISocialReadService socialReadService,
         AppDbContext context) : INotificationService
     {
         public async Task<NotificationCountersResponse> GetCountersAsync(Guid userId)
@@ -25,8 +25,9 @@ namespace backend.Services
                 await using var cmd = connection.CreateCommand();
                 cmd.CommandText = @"
                     SELECT
-                        (SELECT COUNT(*) FROM ""FriendRequests"" WHERE ""ReceiverId"" = @userId AND ""Status"" = @pendingStatus) AS friend_requests,
-                        (SELECT COUNT(*) FROM ""UserFriends"" WHERE ""UserId"" = @userId) AS friends,
+                        (SELECT COUNT(*) FROM ""FriendRequests"" WHERE ""ReceiverId"" = @userId AND ""Status"" = @pendingStatus) AS received_requests,
+                        (SELECT COUNT(*) FROM ""FriendRequests"" WHERE ""SenderId"" = @userId AND ""Status"" = @pendingStatus) AS sent_requests,
+                        (SELECT COUNT(*) FROM ""UserFriends"" uf WHERE uf.""UserId"" = @userId AND NOT EXISTS (SELECT 1 FROM ""Blocks"" b WHERE (b.""BlockerId"" = @userId AND b.""BlockedId"" = uf.""FriendId"") OR (b.""BlockerId"" = uf.""FriendId"" AND b.""BlockedId"" = @userId))) AS friends,
                         (SELECT COUNT(*) FROM ""Messages"" WHERE ""ReceiverId"" = @userId AND ""IsRead"" = false) AS unread_messages;";
 
                 var userIdParam = cmd.CreateParameter();
@@ -44,9 +45,10 @@ namespace backend.Services
 
                 return new NotificationCountersResponse
                 {
-                    FriendRequests = reader.GetInt32(0),
-                    Friends = reader.GetInt32(1),
-                    UnreadMessages = reader.GetInt32(2)
+                    ReceivedFriendRequests = reader.GetInt32(0),
+                    SentFriendRequests = reader.GetInt32(1),
+                    Friends = reader.GetInt32(2),
+                    UnreadMessages = reader.GetInt32(3)
                 };
             }
             finally
@@ -66,7 +68,7 @@ namespace backend.Services
 
         public async Task SendFriendsAsync(Guid userId)
         {
-            var friends = await friendService.GetFriendsAsync(userId, null);
+            var friends = await socialReadService.GetFriendsAsync(userId, null);
             await hub.Clients
                 .Group($"user:{userId}")
                 .SendAsync("social:friends", friends);
@@ -74,8 +76,8 @@ namespace backend.Services
 
         public async Task SendFriendRequestsAsync(Guid userId)
         {
-            var received = await friendService.GetReceivedRequestsAsync(userId);
-            var sent = await friendService.GetSentRequestsAsync(userId);
+            var received = await socialReadService.GetReceivedRequestsAsync(userId);
+            var sent = await socialReadService.GetSentRequestsAsync(userId);
             await hub.Clients
                 .Group($"user:{userId}")
                 .SendAsync("social:requests", new { received, sent });
@@ -83,7 +85,7 @@ namespace backend.Services
 
         public async Task SendBlockedAsync(Guid userId)
         {
-            var blocked = await friendService.GetBlockedUsersAsync(userId);
+            var blocked = await socialReadService.GetBlockedUsersAsync(userId);
             await hub.Clients
                 .Group($"user:{userId}")
                 .SendAsync("social:blocked", blocked);

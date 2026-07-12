@@ -29,6 +29,7 @@
         ReceiverHasAlreadySentRequest = 4003,
         FriendRequestNotFound = 4004,
         IsNotFriend = 4005,
+        RequestAlreadyProcessed = 4011,
 
         // Block
         AlreadyBlocked = 4006,

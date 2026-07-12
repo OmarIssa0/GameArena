@@ -5,7 +5,11 @@ using Microsoft.AspNetCore.SignalR;
 namespace backend.Hubs
 {
     [Authorize]
-    public class SocialHub(IUserPresenceService _presence, INotificationService _notificationService) : Hub
+    public class SocialHub(
+        IUserPresenceService _presence,
+        INotificationService _notificationService,
+        ISocialReadService _socialReadService,
+        ILogger<SocialHub> _logger) : Hub
     {
         public override async Task OnConnectedAsync()
         {
@@ -14,19 +18,22 @@ namespace backend.Hubs
             {
                 await Groups.AddToGroupAsync(Context.ConnectionId, $"user:{userId}");
                 _presence.SetOnline(userId);
-                await Clients.Others.SendAsync("friend:online", new { userId });
+
                 if (Guid.TryParse(userId, out var guid))
                 {
+                    var friendIds = await _socialReadService.GetFriendIdsAsync(guid);
+                    foreach (var friendId in friendIds)
+                    {
+                        await Clients.Group($"user:{friendId}").SendAsync("friend:online", new { userId });
+                    }
+
                     try
                     {
                         await _notificationService.SendSocialDataAsync(guid);
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Failed to send social data to user {userId} on connect.");
-                        Console.WriteLine(ex);
-                        // Connection stays alive even if initial push fails.
-                        // Client will invoke RequestSocialData after reconnect.
+                        _logger.LogWarning(ex, "Failed to send social data to user {UserId} on connect", userId);
                     }
                 }
             }
@@ -40,7 +47,15 @@ namespace backend.Hubs
             if (userId != null)
             {
                 _presence.SetOffline(userId);
-                await Clients.Others.SendAsync("friend:offline", new { userId });
+
+                if (Guid.TryParse(userId, out var guid))
+                {
+                    var friendIds = await _socialReadService.GetFriendIdsAsync(guid);
+                    foreach (var friendId in friendIds)
+                    {
+                        await Clients.Group($"user:{friendId}").SendAsync("friend:offline", new { userId });
+                    }
+                }
             }
 
             await base.OnDisconnectedAsync(exception);

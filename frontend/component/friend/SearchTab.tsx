@@ -62,9 +62,10 @@ function SearchTab() {
       if (!ignore) setSearchError(null);
 
       try {
-        const [usersRes, sentRes] = await Promise.all([
+        const [usersRes, sentRes, friendsRes] = await Promise.all([
           userService.list(userFilter),
           friendService.getSentFriendRequests(),
+          friendService.getFriends({ name: "", userStatus: UserStatusEnum.All }),
         ]);
 
         const sentIds = new Set(
@@ -73,12 +74,20 @@ function SearchTab() {
           ),
         );
 
+        const friendIds = new Set(
+          (friendsRes.data ?? []).map(
+            (friend: IUserSummary) => friend.id,
+          ),
+        );
+
         if (!ignore) {
           setSearchResults(
-            (usersRes.data ?? []).map((user: IUserSummary) => ({
-              ...user,
-              isSendRequest: sentIds.has(user.id),
-            })),
+            (usersRes.data ?? [])
+              .filter((user: IUserSummary) => !friendIds.has(user.id))
+              .map((user: IUserSummary) => ({
+                ...user,
+                isSendRequest: sentIds.has(user.id),
+              })),
           );
         }
       } catch {

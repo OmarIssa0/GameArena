@@ -80,6 +80,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IEmailVerificationService, EmailVerificationService>();
 builder.Services.AddScoped<IFriendService, FriendService>();
+builder.Services.AddScoped<ISocialReadService>(sp => (ISocialReadService)sp.GetRequiredService<IFriendService>());
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IMatchHistoryService, MatchHistoryService>();
 

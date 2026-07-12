@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ShieldBan } from "lucide-react";
+import { Loader2, ShieldBan } from "lucide-react";
 import { FriendsList } from "../SocialPanel/FriendsList";
 import { GEmpty } from "../common/GEmpty";
 import { GIcon } from "../common/GIcon";
@@ -14,11 +14,7 @@ function BlockedUsersTab({ blockedUsers, onUnblock, t }: BlockedUsersTabProps) {
 
   if (blockedUsers.length === 0) {
     return (
-      <GEmpty
-        icon={<GIcon icon={ShieldBan} size="xl" color="muted" />}
-        title={t.blockedTab.emptyTitle}
-        description={t.blockedTab.emptyDescription}
-      />
+      <GEmpty icon={<GIcon icon={ShieldBan} size="xl" color="muted" />} title={t.blockedTab.emptyTitle} description={t.blockedTab.emptyDescription} />
     );
   }
 
@@ -31,12 +27,17 @@ function BlockedUsersTab({ blockedUsers, onUnblock, t }: BlockedUsersTabProps) {
         const isBusy = actionId === friend.id;
         return (
           <div className="flex gap-1">
-            <GIconTile icon={ShieldBan} size="sm" gradient="text-success" className={isBusy ? "opacity-50 pointer-events-none" : ""}
-              onClick={() => {
+            <GIconTile
+              icon={isBusy ? Loader2 : ShieldBan}
+              size="sm"
+              gradient="text-success"
+              className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}
+              onClick={async () => {
                 setActionId(friend.id);
-                onUnblock(friend.id);
+                await onUnblock(friend.id);
                 setActionId(null);
-              }} />
+              }}
+            />
           </div>
         );
       }}
