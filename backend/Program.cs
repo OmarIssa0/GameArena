@@ -17,6 +17,8 @@ builder.Services.AddControllers();
 // Database
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContextFactory<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 // Authentication & Authorization
 var jwtKey = builder.Configuration["JWT:Token"]
     ?? throw new InvalidOperationException("JWT:Token is not configured");
@@ -80,7 +82,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IEmailVerificationService, EmailVerificationService>();
 builder.Services.AddScoped<IFriendService, FriendService>();
-builder.Services.AddScoped<ISocialReadService>(sp => (ISocialReadService)sp.GetRequiredService<IFriendService>());
+builder.Services.AddScoped<ISocialReadService, SocialReadService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IMatchHistoryService, MatchHistoryService>();
 

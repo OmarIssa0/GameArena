@@ -4,6 +4,10 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState } from 
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
 import type { HubConnection } from "@microsoft/signalr";
 import type { IConnectionContext } from "@/domain/meta/IConnectionContext";
+import { friendService } from "@/services/def/FriendService";
+import { notificationService } from "@/services/def/NotificationService";
+import { chatService } from "@/services/def/ChatService";
+import { gameService } from "@/services/def/GameService";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://gamearena-ppnc.onrender.com";
 
@@ -49,10 +53,16 @@ export function ConnectionProvider({ children }: { children: React.ReactNode }) 
           conn.stop().catch(() => {});
           return;
         }
-        if (name === "socialHub") {
+        if (name === "chatHub") {
+          conn.onreconnected(() => chatService.handleReconnect());
+        } else if (name === "gameHub") {
+          conn.onreconnected(() => gameService.handleReconnect());
+        } else if (name === "socialHub") {
           conn.onreconnected(() => {
             if (!socialKeyRef.current) return;
             setSocialReconnectKey((k) => k + 1);
+            notificationService.handleReconnect();
+            friendService.handleReconnect();
           });
         }
         ref.current = conn;
@@ -83,6 +93,23 @@ export function ConnectionProvider({ children }: { children: React.ReactNode }) 
       socialKeyRef.current = 0;
     };
   }, []);
+
+  // ── Initialize services with connections ─────────────────────────────
+  useEffect(() => {
+    if (socialConnection) friendService.setConnection(socialConnection);
+  }, [socialConnection]);
+
+  useEffect(() => {
+    if (socialConnection) notificationService.setConnection(socialConnection);
+  }, [socialConnection]);
+
+  useEffect(() => {
+    if (chatConnection) chatService.setConnection(chatConnection);
+  }, [chatConnection]);
+
+  useEffect(() => {
+    if (gameConnection) gameService.setConnection(gameConnection);
+  }, [gameConnection]);
 
   const value = useMemo<IConnectionContext>(
     () => ({

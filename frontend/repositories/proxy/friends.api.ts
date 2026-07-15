@@ -33,7 +33,7 @@ const friendsApi = clientFactory(
     },
     cancelFriendRequest: {
       verb: "post",
-      template: "/CancelRequest/{receiverId}",
+      template: "/cancel-request/{receiverId}",
     },
     blockUser: {
       verb: "post",

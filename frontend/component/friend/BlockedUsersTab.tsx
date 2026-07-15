@@ -34,8 +34,7 @@ function BlockedUsersTab({ blockedUsers, onUnblock, t }: BlockedUsersTabProps) {
               className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}
               onClick={async () => {
                 setActionId(friend.id);
-                await onUnblock(friend.id);
-                setActionId(null);
+                try { await onUnblock(friend.id); } finally { setActionId(null); }
               }}
             />
           </div>

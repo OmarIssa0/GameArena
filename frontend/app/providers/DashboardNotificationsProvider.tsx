@@ -4,13 +4,9 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { usePathname, useSearchParams } from "next/navigation";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { useConnections } from "./ConnectionProvider";
+import { notificationService } from "@/services/def/NotificationService";
+import { gameService } from "@/services/def/GameService";
 import type { IGameInvite, INotificationState } from "@/domain/meta/INotification";
-import type { IChatNotificationPayload } from "@/domain/meta/IChatNotificationPayload";
-
-interface INotificationCounters {
-  friendRequests: number;
-  unreadMessages: number;
-}
 
 const NotificationContext = createContext<INotificationState | undefined>(undefined);
 
@@ -18,7 +14,8 @@ export function DashboardNotificationsProvider({ children }: { children: React.R
   const { user } = useAuth();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { socialConnection, isSocialConnected, socialReconnectKey, gameConnection } = useConnections();
+  const { isSocialConnected, socialReconnectKey } = useConnections();
+
   const [friendRequestCount, setFriendRequestCount] = useState(0);
   const [unreadMessageCount, setUnreadMessageCount] = useState(0);
   const [gameInvites, setGameInvites] = useState<IGameInvite[]>([]);
@@ -36,73 +33,47 @@ export function DashboardNotificationsProvider({ children }: { children: React.R
     }
   }, [user]);
 
+  // ── Notification subscriptions via service ───────────────────────────
   useEffect(() => {
-    if (!socialConnection) return;
-
-    const handleNotificationUpdate = (counters: INotificationCounters) => {
+    const off1 = notificationService.onCountersUpdate((counters) => {
       setFriendRequestCount(counters.friendRequests);
       setUnreadMessageCount(counters.unreadMessages);
-    };
+    });
 
-    const handleChatNotification = (payload: IChatNotificationPayload) => {
+    const off2 = notificationService.onChatNotification((payload) => {
       if (!user) return;
-
       const selectedFriendId = searchParamsRef.current.get("friend");
-      const isOpenConversation = pathnameRef.current === "/messages" && selectedFriendId === payload.senderId;
+      const isOpen = pathnameRef.current === "/messages" && selectedFriendId === payload.senderId;
+      if (!isOpen) setUnreadMessageCount((prev) => prev + 1);
+    });
 
-      if (!isOpenConversation) {
-        setUnreadMessageCount((prev) => prev + 1);
-      }
-    };
+    return () => { off1(); off2(); };
+  }, [user]);
 
-    socialConnection.on("notification:update", handleNotificationUpdate);
-    socialConnection.on("chat:notification", handleChatNotification);
-
-    return () => {
-      socialConnection.off("notification:update", handleNotificationUpdate);
-      socialConnection.off("chat:notification", handleChatNotification);
-    };
-  }, [socialConnection, user]);
-
+  // ── Fetch counters on connect/reconnect ─────────────────────────────
   useEffect(() => {
-    if (!socialConnection || !isSocialConnected) return;
+    if (!isSocialConnected) return;
 
-    const invokeRequest = () => {
-      socialConnection.invoke("RequestCounters").catch(() => {});
-    };
+    notificationService.requestCounters().catch(() => {});
+    const retry = setTimeout(() => notificationService.requestCounters().catch(() => {}), 500);
+    return () => clearTimeout(retry);
+  }, [isSocialConnected, socialReconnectKey]);
 
-    invokeRequest();
-
-    const retryTimer = setTimeout(invokeRequest, 500);
-
-    return () => {
-      clearTimeout(retryTimer);
-    };
-  }, [socialConnection, isSocialConnected, socialReconnectKey]);
-
+  // ── Game invites via service ─────────────────────────────────────────
   useEffect(() => {
-    if (!gameConnection) return;
-
-    const handleGameInvite = (payload: IGameInvite) => {
+    const off = gameService.onGameInvite((payload) => {
       setGameInvites((prev) => (prev.some((i) => i.roomId === payload.roomId) ? prev : [...prev, payload]));
-    };
+    });
 
-    gameConnection.on("game:invite", handleGameInvite);
-
-    return () => {
-      gameConnection.off("game:invite", handleGameInvite);
-    };
-  }, [gameConnection]);
+    return () => { off(); };
+  }, []);
 
   const acceptGameInvite = useCallback(
     async (roomId: string) => {
-      if (!gameConnection) return;
-
-      await gameConnection.invoke("AcceptInvite", roomId);
-
+      await gameService.acceptInvite(roomId);
       setGameInvites((prev) => prev.filter((i) => i.roomId !== roomId));
     },
-    [gameConnection],
+    [],
   );
 
   const dismissGameInvite = useCallback((roomId: string) => {

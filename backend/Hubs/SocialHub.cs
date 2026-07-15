@@ -11,31 +11,29 @@ namespace backend.Hubs
         ISocialReadService _socialReadService,
         ILogger<SocialHub> _logger) : Hub
     {
+        private Guid? CurrentUserId =>
+            Context.UserIdentifier is { Length: > 0 } id && Guid.TryParse(id, out var guid) ? guid : null;
+
         public override async Task OnConnectedAsync()
         {
-            var userId = Context.UserIdentifier;
-            if (userId != null)
+            if (CurrentUserId is not { } userId) return;
+
+            await Groups.AddToGroupAsync(Context.ConnectionId, $"user:{userId}");
+            _presence.SetOnline(userId.ToString());
+
+            var friendIds = await _socialReadService.GetFriendIdsAsync(userId);
+            foreach (var friendId in friendIds)
             {
-                await Groups.AddToGroupAsync(Context.ConnectionId, $"user:{userId}");
-                _presence.SetOnline(userId);
+                await Clients.Group($"user:{friendId}").SendAsync("friend:online", new { userId = userId.ToString() });
+            }
 
-                if (Guid.TryParse(userId, out var guid))
-                {
-                    var friendIds = await _socialReadService.GetFriendIdsAsync(guid);
-                    foreach (var friendId in friendIds)
-                    {
-                        await Clients.Group($"user:{friendId}").SendAsync("friend:online", new { userId });
-                    }
-
-                    try
-                    {
-                        await _notificationService.SendSocialDataAsync(guid);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogWarning(ex, "Failed to send social data to user {UserId} on connect", userId);
-                    }
-                }
+            try
+            {
+                await _notificationService.SendSocialDataAsync(userId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to send social data to user {UserId} on connect", userId);
             }
 
             await base.OnConnectedAsync();
@@ -43,19 +41,14 @@ namespace backend.Hubs
 
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            var userId = Context.UserIdentifier;
-            if (userId != null)
-            {
-                _presence.SetOffline(userId);
+            if (CurrentUserId is not { } userId) return;
 
-                if (Guid.TryParse(userId, out var guid))
-                {
-                    var friendIds = await _socialReadService.GetFriendIdsAsync(guid);
-                    foreach (var friendId in friendIds)
-                    {
-                        await Clients.Group($"user:{friendId}").SendAsync("friend:offline", new { userId });
-                    }
-                }
+            _presence.SetOffline(userId.ToString());
+
+            var friendIds = await _socialReadService.GetFriendIdsAsync(userId);
+            foreach (var friendId in friendIds)
+            {
+                await Clients.Group($"user:{friendId}").SendAsync("friend:offline", new { userId = userId.ToString() });
             }
 
             await base.OnDisconnectedAsync(exception);
@@ -63,37 +56,32 @@ namespace backend.Hubs
 
         public async Task RequestCounters()
         {
-            var userId = Context.UserIdentifier;
-            if (userId != null && Guid.TryParse(userId, out var guid))
-                await _notificationService.SendCountersAsync(guid);
+            if (CurrentUserId is { } userId)
+                await _notificationService.SendCountersAsync(userId);
         }
 
         public async Task RequestFriends()
         {
-            var userId = Context.UserIdentifier;
-            if (userId != null && Guid.TryParse(userId, out var guid))
-                await _notificationService.SendFriendsAsync(guid);
+            if (CurrentUserId is { } userId)
+                await _notificationService.SendFriendsAsync(userId);
         }
 
         public async Task RequestFriendRequests()
         {
-            var userId = Context.UserIdentifier;
-            if (userId != null && Guid.TryParse(userId, out var guid))
-                await _notificationService.SendFriendRequestsAsync(guid);
+            if (CurrentUserId is { } userId)
+                await _notificationService.SendFriendRequestsAsync(userId);
         }
 
         public async Task RequestBlocked()
         {
-            var userId = Context.UserIdentifier;
-            if (userId != null && Guid.TryParse(userId, out var guid))
-                await _notificationService.SendBlockedAsync(guid);
+            if (CurrentUserId is { } userId)
+                await _notificationService.SendBlockedAsync(userId);
         }
 
         public async Task RequestSocialData()
         {
-            var userId = Context.UserIdentifier;
-            if (userId != null && Guid.TryParse(userId, out var guid))
-                await _notificationService.SendSocialDataAsync(guid);
+            if (CurrentUserId is { } userId)
+                await _notificationService.SendSocialDataAsync(userId);
         }
     }
 }

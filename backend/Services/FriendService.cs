@@ -1,7 +1,5 @@
 ﻿using backend.Data;
 using backend.Domain;
-using backend.DTOs.Requests;
-using backend.DTOs.Responses;
 using backend.Enums;
 using backend.Events;
 using backend.Services.Interface;
@@ -11,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace backend.Services
 {
-    public class FriendService(AppDbContext _context, IEventBus _eventBus, ILogger<FriendService> _logger) : IFriendService, ISocialReadService
+    public class FriendService(AppDbContext _context, IEventBus _eventBus, ILogger<FriendService> _logger) : IFriendService
     {
         public async Task SendRequestAsync(Guid senderId, Guid receiverId)
         {
@@ -207,97 +205,6 @@ namespace backend.Services
 
             _context.Blocks.Remove(block);
             await _context.SaveChangesAsync();
-        }
-
-        public async Task<List<UserSummaryResponse>> GetFriendsAsync(Guid userId, UserFilterRequest? filter)
-        {
-            var blockedIds = await _context.Blocks
-                .AsNoTracking()
-                .Where(b => b.BlockerId == userId || b.BlockedId == userId)
-                .Select(b => b.BlockerId == userId ? b.BlockedId : b.BlockerId)
-                .ToHashSetAsync();
-
-            var query = _context.UserFriends
-                .AsNoTracking()
-                .Where(x => x.UserId == userId && !blockedIds.Contains(x.FriendId))
-                .Select(x => x.Friend);
-
-            if (filter != null && !string.IsNullOrWhiteSpace(filter.Name))
-            {
-                var searchTerm = filter.Name.ToLower();
-                query = query.Where(u =>
-                    u.UserName != null && u.UserName.ToLower().Contains(searchTerm));
-            }
-
-            return (await query.ToListAsync()).Select(MapperHelper.ToDtoSummary).ToList();
-        }
-
-        public async Task<List<FriendRequestReceivedResponse>> GetReceivedRequestsAsync(Guid userId)
-        {
-            var requests = await _context.FriendRequests
-                .AsNoTracking()
-                .Where(fr => fr.ReceiverId == userId && fr.Status == FriendRequestStatus.Pending)
-                .Include(u => u.Sender)
-                .ToListAsync();
-
-            return requests.Select(MapperHelper.ToDto).ToList();
-        }
-
-        public async Task<List<FriendRequestSentResponse>> GetSentRequestsAsync(Guid userId)
-        {
-            var requests = await _context.FriendRequests
-                .AsNoTracking()
-                .Where(fr => fr.SenderId == userId && fr.Status == FriendRequestStatus.Pending)
-                .Include(fr => fr.Receiver)
-                .ToListAsync();
-
-            return requests.Select(MapperHelper.ToSentRequestDto).ToList();
-        }
-
-        public async Task<List<UserSummaryResponse>> GetBlockedUsersAsync(Guid userId)
-        {
-            var blocked = await _context.Blocks
-                .AsNoTracking()
-                .Where(b => b.BlockerId == userId)
-                .Select(b => b.Blocked)
-                .ToListAsync();
-
-            return blocked.Select(MapperHelper.ToDtoSummary).ToList();
-        }
-
-        public async Task<int> GetFriendRequestCountAsync(Guid userId)
-        {
-            return await _context.FriendRequests
-                .CountAsync(fr => fr.ReceiverId == userId && fr.Status == FriendRequestStatus.Pending);
-        }
-
-        public async Task<int> GetFriendCountAsync(Guid userId)
-        {
-            var blockedIds = await _context.Blocks
-                .AsNoTracking()
-                .Where(b => b.BlockerId == userId || b.BlockedId == userId)
-                .Select(b => b.BlockerId == userId ? b.BlockedId : b.BlockerId)
-                .ToHashSetAsync();
-
-            return await _context.UserFriends
-                .AsNoTracking()
-                .Where(uf => uf.UserId == userId && !blockedIds.Contains(uf.FriendId))
-                .CountAsync();
-        }
-
-        public async Task<HashSet<Guid>> GetFriendIdsAsync(Guid userId)
-        {
-            var blockedIds = await _context.Blocks
-                .AsNoTracking()
-                .Where(b => b.BlockerId == userId || b.BlockedId == userId)
-                .Select(b => b.BlockerId == userId ? b.BlockedId : b.BlockerId)
-                .ToHashSetAsync();
-
-            return await _context.UserFriends
-                .AsNoTracking()
-                .Where(uf => uf.UserId == userId && !blockedIds.Contains(uf.FriendId))
-                .Select(uf => uf.FriendId)
-                .ToHashSetAsync();
         }
 
         private async Task<(bool Blocked, Guid WhoBlocked)> IsBlockedAsync(Guid firstUserId, Guid secondUserId)

@@ -30,11 +30,7 @@ public class SocialNotificationHandler(
                 senderName = eventHappen.SenderName
             });
 
-        await _notificationService.SendCountersAsync(eventHappen.ReceiverId);
-        await _notificationService.SendFriendRequestsAsync(eventHappen.ReceiverId);
-
-        await _notificationService.SendCountersAsync(eventHappen.SenderId);
-        await _notificationService.SendFriendRequestsAsync(eventHappen.SenderId);
+        await NotifyRequestChangeAsync(eventHappen.SenderId, eventHappen.ReceiverId);
     }
 
     public async Task HandleAsync(FriendRequestAcceptedEvent eventHappen)
@@ -46,13 +42,14 @@ public class SocialNotificationHandler(
                 friendName = eventHappen.AccepterName
             });
 
-        await _notificationService.SendCountersAsync(eventHappen.SenderId);
-        await _notificationService.SendFriendsAsync(eventHappen.SenderId);
-        await _notificationService.SendFriendRequestsAsync(eventHappen.SenderId);
-
-        await _notificationService.SendCountersAsync(eventHappen.AccepterId);
-        await _notificationService.SendFriendsAsync(eventHappen.AccepterId);
-        await _notificationService.SendFriendRequestsAsync(eventHappen.AccepterId);
+        await Task.WhenAll(
+            _notificationService.SendCountersAsync(eventHappen.SenderId),
+            _notificationService.SendFriendsAsync(eventHappen.SenderId),
+            _notificationService.SendFriendRequestsAsync(eventHappen.SenderId),
+            _notificationService.SendCountersAsync(eventHappen.AccepterId),
+            _notificationService.SendFriendsAsync(eventHappen.AccepterId),
+            _notificationService.SendFriendRequestsAsync(eventHappen.AccepterId)
+        );
     }
 
     public async Task HandleAsync(FriendRequestDeclinedEvent eventHappen)
@@ -63,11 +60,7 @@ public class SocialNotificationHandler(
                 userId = eventHappen.DeclinerId
             });
 
-        await _notificationService.SendCountersAsync(eventHappen.SenderId);
-        await _notificationService.SendFriendRequestsAsync(eventHappen.SenderId);
-
-        await _notificationService.SendCountersAsync(eventHappen.DeclinerId);
-        await _notificationService.SendFriendRequestsAsync(eventHappen.DeclinerId);
+        await NotifyRequestChangeAsync(eventHappen.SenderId, eventHappen.DeclinerId);
     }
 
     public async Task HandleAsync(FriendRemovedEvent eventHappen)
@@ -78,11 +71,12 @@ public class SocialNotificationHandler(
                 userId = eventHappen.RemoverId
             });
 
-        await _notificationService.SendCountersAsync(eventHappen.RemovedFriendId);
-        await _notificationService.SendFriendsAsync(eventHappen.RemovedFriendId);
-
-        await _notificationService.SendCountersAsync(eventHappen.RemoverId);
-        await _notificationService.SendFriendsAsync(eventHappen.RemoverId);
+        await Task.WhenAll(
+            _notificationService.SendCountersAsync(eventHappen.RemovedFriendId),
+            _notificationService.SendFriendsAsync(eventHappen.RemovedFriendId),
+            _notificationService.SendCountersAsync(eventHappen.RemoverId),
+            _notificationService.SendFriendsAsync(eventHappen.RemoverId)
+        );
     }
 
     public async Task HandleAsync(ChatMessageSentEvent eventHappen)
@@ -118,14 +112,12 @@ public class SocialNotificationHandler(
 
     public async Task HandleAsync(UserBlockedEvent eventHappen)
     {
-        await _hub.Clients.Group($"user:{eventHappen.BlockedUserId}")
-            .SendAsync("friend:blocked", new
-            {
-                userId = eventHappen.BlockerId
-            });
-
-        await _notificationService.SendSocialDataAsync(eventHappen.BlockedUserId);
-        await _notificationService.SendSocialDataAsync(eventHappen.BlockerId);
+        await Task.WhenAll(
+            _hub.Clients.Group($"user:{eventHappen.BlockedUserId}")
+                .SendAsync("friend:blocked", new { userId = eventHappen.BlockerId }),
+            _notificationService.SendSocialDataAsync(eventHappen.BlockedUserId),
+            _notificationService.SendSocialDataAsync(eventHappen.BlockerId)
+        );
     }
 
     public async Task HandleAsync(FriendRequestCancelledEvent eventHappen)
@@ -136,11 +128,17 @@ public class SocialNotificationHandler(
                 senderId = eventHappen.SenderId
             });
 
-        await _notificationService.SendFriendRequestsAsync(eventHappen.SenderId);
-        await _notificationService.SendCountersAsync(eventHappen.SenderId);
+        await NotifyRequestChangeAsync(eventHappen.SenderId, eventHappen.ReceiverId);
+    }
 
-        await _notificationService.SendFriendRequestsAsync(eventHappen.ReceiverId);
-        await _notificationService.SendCountersAsync(eventHappen.ReceiverId);
+    private async Task NotifyRequestChangeAsync(Guid userA, Guid userB)
+    {
+        await Task.WhenAll(
+            _notificationService.SendCountersAsync(userA),
+            _notificationService.SendFriendRequestsAsync(userA),
+            _notificationService.SendCountersAsync(userB),
+            _notificationService.SendFriendRequestsAsync(userB)
+        );
     }
 
     private async Task SetPresenceAndBroadcastAsync(string userId, UserStatus status, string eventName)

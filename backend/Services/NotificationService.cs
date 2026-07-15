@@ -12,10 +12,11 @@ namespace backend.Services
     public class NotificationService(
         IHubContext<SocialHub> hub,
         ISocialReadService socialReadService,
-        AppDbContext context) : INotificationService
+        IDbContextFactory<AppDbContext> contextFactory) : INotificationService
     {
         public async Task<NotificationCountersResponse> GetCountersAsync(Guid userId)
         {
+            await using var context = await contextFactory.CreateDbContextAsync();
             var connection = context.Database.GetDbConnection();
             var wasClosed = connection.State != ConnectionState.Open;
             if (wasClosed) await connection.OpenAsync();
@@ -92,12 +93,11 @@ namespace backend.Services
         }
 
 
-        public async Task SendSocialDataAsync(Guid userId)
-        {
-            await SendCountersAsync(userId);
-            await SendFriendsAsync(userId);
-            await SendFriendRequestsAsync(userId);
-            await SendBlockedAsync(userId);
-        }
+        public Task SendSocialDataAsync(Guid userId) => Task.WhenAll(
+            SendCountersAsync(userId),
+            SendFriendsAsync(userId),
+            SendFriendRequestsAsync(userId),
+            SendBlockedAsync(userId)
+        );
     }
 }

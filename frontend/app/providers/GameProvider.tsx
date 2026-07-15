@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useConnections } from "@/app/providers/ConnectionProvider";
-import { GameService } from "@/services/gameService";
+import { gameService } from "@/services/def/GameService";
 import { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
 import type { TNullable } from "@/domain/type/TCommon";
 import type { IGameState } from "./def/IGameState";
@@ -12,8 +12,7 @@ import { useRouter } from "next/navigation";
 const GameContext = createContext<TNullable<IGameContext>>(null);
 
 export function GameProvider({ children }: { children: ReactNode }) {
-  const { gameConnection, isGameConnected } = useConnections();
-  const service = useMemo(() => (gameConnection ? new GameService(gameConnection) : null), [gameConnection]);
+  const { isGameConnected } = useConnections();
   const [state, setState] = useState<TNullable<IGameState>>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [opponentDisconnected, setOpponentDisconnected] = useState(false);
@@ -34,87 +33,77 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setOpponentDisconnected(false);
   }, []);
 
+  // ── SignalR subscriptions via service ───────────────────────────────
   useEffect(() => {
-    if (!gameConnection) return;
-    const handleGameState = (value: IGameState) => {
+    const offState = gameService.onGameState((value) => {
       setState(value);
       setIsSearching(false);
       setOpponentDisconnected(false);
-    };
-    const handleOpponentDisconnect = () => setOpponentDisconnected(true);
-    const syncState = () =>
-      gameConnection
-        .invoke<TNullable<IGameState>>("GetCurrentState")
-        .then((value) => {
-          if (value) handleGameState(value);
-        })
-        .finally(() => setIsInitialSyncDone(true));
+    });
 
-    gameConnection.on("gameState", handleGameState);
-    gameConnection.on("OpponentDisconnected", handleOpponentDisconnect);
-    gameConnection.onreconnected(syncState);
-    syncState();
+    const offDisconnect = gameService.onOpponentDisconnect(() => {
+      setOpponentDisconnected(true);
+    });
 
-    return () => {
-      gameConnection.off("gameState", handleGameState);
-      gameConnection.off("OpponentDisconnected", handleOpponentDisconnect);
-      gameConnection.onreconnected(() => {});
-      setIsInitialSyncDone(false);
-    };
-  }, [gameConnection]);
+    return () => { offState(); offDisconnect(); };
+  }, []);
 
+  // ── Initial state sync ──────────────────────────────────────────────
+  useEffect(() => {
+    gameService.requestCurrentState()
+      .then((value) => { if (value) setState(value); })
+      .finally(() => setIsInitialSyncDone(true));
+  }, []);
+
+  // ── Actions ─────────────────────────────────────────────────────────
   const findMatch = useCallback(
     async (game: GamesKindEnum) => {
-      if (!service || isSearching) return;
+      if (isSearching) return;
       clearGameState();
       setLastGameType(game);
       setIsSearching(true);
-      await service.findMatch(game);
+      await gameService.findMatch(game);
     },
-    [service, clearGameState, isSearching],
+    [clearGameState, isSearching],
   );
 
   const startGame = useCallback(
     async (friendId: TNullable<string>, gameKind: GamesKindEnum) => {
-      if (!service) return;
       setLastGameType(gameKind);
-      await service.startGame(friendId, gameKind);
+      await gameService.startGame(friendId, gameKind);
     },
-    [service],
+    [],
   );
 
   const inviteFriend = useCallback(
     async (friendId: string, game: GamesKindEnum) => {
-      if (!service) return;
-      await service.inviteFriend(friendId, game);
+      await gameService.inviteFriend(friendId, game);
     },
-    [service],
+    [],
   );
 
   const inviteToRoom = useCallback(
     async (friendId: string) => {
-      if (!service) return;
-      await service.inviteToRoom(friendId);
+      await gameService.inviteToRoom(friendId);
     },
-    [service],
+    [],
   );
 
   const leaveGame = useCallback(async () => {
-    if (!service) return;
-    await service.leaveGame();
+    await gameService.leaveGame();
     goToLobby();
-  }, [service, goToLobby]);
+  }, [goToLobby]);
 
   const resetGame = useCallback(async () => {
-    if (isSearching) await service?.cancelSearch();
+    if (isSearching) await gameService.cancelSearch();
     goToLobby();
-  }, [service, goToLobby, isSearching]);
+  }, [goToLobby, isSearching]);
 
   const sendAction = useCallback(
     async (action: object) => {
-      await service?.sendAction(action);
+      await gameService.sendAction(action);
     },
-    [service],
+    [],
   );
 
   const value = useMemo<IGameContext>(

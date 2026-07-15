@@ -16,5 +16,11 @@ interface IFriendService {
   blockUser(blockedId: string): TPromise<void>;
   unblockUser(blockedId: string): TPromise<void>;
   getBlockedUsers(): TPromise<IUserSummary[]>;
+
+  onFriendListUpdate(handler: (friends: IUserSummary[]) => void): () => void;
+  onFriendRequestUpdate(handler: (data: { received: IFriendRequestReceived[]; sent: IFriendRequestSent[] }) => void): () => void;
+  onBlockedUsersUpdate(handler: (blocked: IUserSummary[]) => void): () => void;
+  onFriendStatusChange(handler: (userId: string, status: "online" | "offline" | "ingame") => void): () => void;
 }
+
 export type { IFriendService };

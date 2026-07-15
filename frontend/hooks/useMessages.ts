@@ -8,16 +8,7 @@ import { useConnections } from "@/app/providers/ConnectionProvider";
 import type { IMessage } from "@/domain/meta/IMessage";
 import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import type { TNullable } from "@/domain/type/TCommon";
-import type { IPrivateMessagePayload } from "@/domain/meta/IPrivateMessagePayload";
 import { useFetch } from "./useFetch";
-
-const normalizeMessage = (payload: IPrivateMessagePayload): IMessage => ({
-  senderId: payload.senderId,
-  receiverId: payload.receiverId,
-  content: payload.content ?? payload.message ?? "",
-  sentAt: new Date(payload.sentAt),
-  isRead: payload.isRead ?? false,
-});
 
 const normalizeHistoryMessage = (message: IMessage): IMessage => ({
   ...message,
@@ -31,13 +22,10 @@ const areSameMessage = (left: IMessage, right: IMessage): boolean =>
   Math.abs(left.sentAt.getTime() - right.sentAt.getTime()) < 5000;
 
 export function useMessages(initialFriendId?: TNullable<string>) {
-  const { chatConnection: connection, isChatConnected: isConnected } =
-    useConnections();
+  const { isChatConnected: isConnected } = useConnections();
   const { user } = useAuth();
   const { friends, loading: friendsLoading } = useFriends();
-  const [selectedFriendId, setSelectedFriendId] = useState<TNullable<string>>(
-    initialFriendId ?? null,
-  );
+  const [selectedFriendId, setSelectedFriendId] = useState<TNullable<string>>(initialFriendId ?? null);
   const prevInitialRef = useRef(initialFriendId);
 
   useEffect(() => {
@@ -46,14 +34,11 @@ export function useMessages(initialFriendId?: TNullable<string>) {
       setSelectedFriendId(initialFriendId);
     }
   }, [initialFriendId]);
+
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [draft, setDraft] = useState("");
 
-  const {
-    data: apiMessages,
-    loading: loadingMessages,
-    error,
-  } = useFetch(() => {
+  const { data: apiMessages, loading: loadingMessages, error } = useFetch(() => {
     if (!selectedFriendId) return Promise.resolve([] as IMessage[]);
     return chatService
       .getMessagesByFriendId(selectedFriendId)
@@ -72,13 +57,11 @@ export function useMessages(initialFriendId?: TNullable<string>) {
     return friends.find((f) => f.id === selectedFriendId) ?? null;
   }, [friends, selectedFriendId]);
 
+  // ── Subscribe to incoming messages via service ──────────────────────
   useEffect(() => {
-    if (!connection) return;
-
-    const handlePrivateMessage = (payload: IPrivateMessagePayload) => {
+    const off = chatService.onPrivateMessage((incoming) => {
       if (!selectedFriendId) return;
 
-      const incoming = normalizeMessage(payload);
       const isCurrentConversation =
         incoming.senderId === selectedFriendId ||
         incoming.receiverId === selectedFriendId;
@@ -90,14 +73,10 @@ export function useMessages(initialFriendId?: TNullable<string>) {
           ? prev
           : [...prev, incoming],
       );
-    };
+    });
 
-    connection.on("chat:private", handlePrivateMessage);
-
-    return () => {
-      connection.off("chat:private", handlePrivateMessage);
-    };
-  }, [connection, selectedFriendId]);
+    return off;
+  }, [selectedFriendId]);
 
   const selectFriend = useCallback((friendId: TNullable<string>) => {
     setSelectedFriendId(friendId);
@@ -105,8 +84,7 @@ export function useMessages(initialFriendId?: TNullable<string>) {
 
   const sendMessage = useCallback(async () => {
     const content = draft.trim();
-
-    if (!connection || !selectedFriendId || !content || !user) return;
+    if (!selectedFriendId || !content || !user) return;
 
     const outgoing: IMessage = {
       senderId: user.id,
@@ -120,14 +98,13 @@ export function useMessages(initialFriendId?: TNullable<string>) {
     setDraft("");
 
     try {
-      await connection.invoke("SendPrivateMessage", selectedFriendId, content);
+      await chatService.sendMessage(selectedFriendId, content);
     } catch {
       setMessages((prev) => prev.filter((m) => m !== outgoing));
     }
-  }, [connection, draft, selectedFriendId, user]);
+  }, [draft, selectedFriendId, user]);
 
   return {
-    connection,
     isConnected,
     friends,
     friendsLoading,
