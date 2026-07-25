@@ -189,9 +189,13 @@ namespace backend.Services
 
             await _context.SaveChangesAsync();
 
-            foreach (var req in pendingRequests)
+            var cancelledEvents = pendingRequests
+                .Select(req => new FriendRequestCancelledEvent(req.SenderId, req.ReceiverId))
+                .ToList();
+
+            foreach (var evt in cancelledEvents)
             {
-                await _eventBus.PublishAsync(new FriendRequestCancelledEvent(req.SenderId, req.ReceiverId));
+                await _eventBus.PublishAsync(evt);
             }
 
             await _eventBus.PublishAsync(new UserBlockedEvent(blockerId, blockedId));

@@ -123,19 +123,24 @@ public class SocialNotificationHandler(
 
     public async Task HandleAsync(GameStartedEvent eventHappen)
     {
-        await SetPresenceAndBroadcastAsync(eventHappen.Player1Id, UserStatus.InGame, "friend:ingame");
-        await SetPresenceAndBroadcastAsync(eventHappen.Player2Id, UserStatus.InGame, "friend:ingame");
+        if (Guid.TryParse(eventHappen.Player1Id, out var p1))
+            await SetPresenceAndBroadcastAsync(p1, UserStatus.InGame, "friend:ingame");
+        if (Guid.TryParse(eventHappen.Player2Id, out var p2))
+            await SetPresenceAndBroadcastAsync(p2, UserStatus.InGame, "friend:ingame");
     }
 
     public async Task HandleAsync(GameFinishedEvent eventHappen)
     {
-        await SetPresenceAndBroadcastAsync(eventHappen.Player1Id, UserStatus.Online, "friend:online");
-        await SetPresenceAndBroadcastAsync(eventHappen.Player2Id, UserStatus.Online, "friend:online");
+        if (Guid.TryParse(eventHappen.Player1Id, out var p1))
+            await SetPresenceAndBroadcastAsync(p1, UserStatus.Online, "friend:online");
+        if (Guid.TryParse(eventHappen.Player2Id, out var p2))
+            await SetPresenceAndBroadcastAsync(p2, UserStatus.Online, "friend:online");
     }
 
     public async Task HandleAsync(GameLeftEvent eventHappen)
     {
-        await SetPresenceAndBroadcastAsync(eventHappen.PlayerId, UserStatus.Online, "friend:online");
+        if (Guid.TryParse(eventHappen.PlayerId, out var p))
+            await SetPresenceAndBroadcastAsync(p, UserStatus.Online, "friend:online");
     }
 
     public async Task HandleAsync(UserBlockedEvent eventHappen)
@@ -169,17 +174,16 @@ public class SocialNotificationHandler(
         );
     }
 
-    private async Task SetPresenceAndBroadcastAsync(string userId, UserStatus status, string eventName)
+    private async Task SetPresenceAndBroadcastAsync(Guid userId, UserStatus status, string eventName)
     {
-        if (string.IsNullOrEmpty(userId) || userId == "__BOT__") return;
+        if (userId == Guid.Empty) return;
 
-       if (!_presence.SetActivity(userId, status)) return;
+        if (!_presence.SetActivity(userId.ToString(), status)) return;
 
-        if (!Guid.TryParse(userId, out var userGuid)) return;
-        var friendIds = await _socialReadService.GetFriendIdsAsync(userGuid);
+        var friendIds = await _socialReadService.GetFriendIdsAsync(userId);
         foreach (var friendId in friendIds)
         {
-            await _hub.Clients.Group($"user:{friendId}").SendAsync(eventName, new { userId });
+            await _hub.Clients.Group($"user:{friendId}").SendAsync(eventName, new { userId = userId.ToString() });
         }
     }
 }

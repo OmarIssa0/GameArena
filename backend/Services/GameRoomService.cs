@@ -28,6 +28,7 @@ namespace backend.Services
 
         public (BaseGameRoom room, bool isNew) FindOrCreateRoom(GamesKind gameType, string playerId, string username)
         {
+            _playerToRoom.TryRemove(playerId, out _);
             lock (_matchLock)
             {
                 var openRoom = _rooms.Values.FirstOrDefault(r =>
@@ -54,6 +55,8 @@ namespace backend.Services
 
         public BaseGameRoom CreatePrivateRoom(GamesKind gameType, string playerId, string username, string? invitedPlayerId)
         {
+            _playerToRoom.TryRemove(playerId, out _);
+
             var room = BaseGameRoom.Create(gameType);
             room.Player1Id = playerId;
             room.Player1Username = username;
@@ -78,6 +81,7 @@ namespace backend.Services
 
         public bool TryJoinRoom(string roomId, string playerId, string? username)
         {
+            _playerToRoom.TryRemove(playerId, out _);
             if (_rooms.TryGetValue(roomId, out var room)
                 && !room.IsFull
                 && room.Player1Id != playerId
@@ -157,9 +161,13 @@ namespace backend.Services
 
         public async Task RespondPlayAgainAsync(string roomId, string playerId, bool accept)
         {
-            _playAgainRequests.TryRemove(roomId, out _);
+            if (!_rooms.TryGetValue(roomId, out var room))
+            {
+                _playAgainRequests.TryRemove(roomId, out _);
+                return;
+            }
 
-            if (!_rooms.TryGetValue(roomId, out var room)) return;
+            _playAgainRequests.TryRemove(roomId, out _);
 
             if (accept)
                 await AcceptPlayAgainAsync(roomId, room);

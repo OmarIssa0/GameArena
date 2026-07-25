@@ -29,7 +29,8 @@ namespace backend.Services
                     u.UserName != null && u.UserName.ToLower().Contains(searchTerm));
             }
 
-            return (await query.ToListAsync())
+            var users = await query.ToListAsync();
+            var result = users
                 .Select(user =>
                 {
                     var dto = MapperHelper.ToDtoSummary(user);
@@ -37,6 +38,10 @@ namespace backend.Services
                     return dto;
                 })
                 .ToList();
+
+           if (filter != null && filter.UserStatus != UserStatus.All)
+                result = result.Where(u => u.Status == filter.UserStatus).ToList();
+            return result;
         }
 
         public async Task<List<FriendRequestReceivedResponse>> GetReceivedRequestsAsync(Guid userId)

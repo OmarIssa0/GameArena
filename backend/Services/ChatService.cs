@@ -30,6 +30,13 @@ namespace backend.Services
 
         public async Task<MessageResponse> CreatePrivateMessageAsync(Guid senderId, Guid receiverId, string message)
         {
+            var isBlocked = await _context.Blocks.AnyAsync(b =>
+                (b.BlockerId == senderId && b.BlockedId == receiverId) ||
+                (b.BlockerId == receiverId && b.BlockedId == senderId));
+
+            if (isBlocked)
+                throw new AppException(ErrorCode.UserBlockedYou);
+
             var isFriend = await _context.UserFriends.AnyAsync(x =>
                 (x.UserId == senderId && x.FriendId == receiverId) ||
                 (x.UserId == receiverId && x.FriendId == senderId));

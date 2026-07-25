@@ -19,7 +19,6 @@ namespace backend.Hubs
         {
             var senderId = GetUserId();
             var msg = await _chatService.CreatePrivateMessageAsync(senderId, receiverId, message);
-            await Clients.Group($"user:{senderId}").SendAsync("chat:private", msg);
             await Clients.Group($"user:{receiverId}").SendAsync("chat:private", msg);
         }
 

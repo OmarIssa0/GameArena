@@ -1,5 +1,4 @@
-﻿using System.Data;
-using backend.Data;
+﻿using backend.Data;
 using backend.Domain;
 using backend.DTOs.Responses;
 using backend.Enums;
@@ -19,45 +18,28 @@ namespace backend.Services
         public async Task<NotificationCountersResponse> GetCountersAsync(Guid userId)
         {
             await using var context = await contextFactory.CreateDbContextAsync();
-            var connection = context.Database.GetDbConnection();
-            var wasClosed = connection.State != ConnectionState.Open;
-            if (wasClosed) await connection.OpenAsync();
 
-            try
+            var receivedRequests = await context.FriendRequests
+                .CountAsync(fr => fr.ReceiverId == userId && fr.Status == FriendRequestStatus.Pending);
+
+            var sentRequests = await context.FriendRequests
+                .CountAsync(fr => fr.SenderId == userId && fr.Status == FriendRequestStatus.Pending);
+
+            var friends = await context.UserFriends
+                .CountAsync(uf => uf.UserId == userId && !context.Blocks.Any(b =>
+                    (b.BlockerId == userId && b.BlockedId == uf.FriendId) ||
+                    (b.BlockerId == uf.FriendId && b.BlockedId == userId)));
+
+            var unreadMessages = await context.Messages
+                .CountAsync(m => m.ReceiverId == userId && !m.IsRead);
+
+            return new NotificationCountersResponse
             {
-                await using var cmd = connection.CreateCommand();
-                cmd.CommandText = @"
-                    SELECT
-                        (SELECT COUNT(*) FROM ""FriendRequests"" WHERE ""ReceiverId"" = @userId AND ""Status"" = @pendingStatus) AS received_requests,
-                        (SELECT COUNT(*) FROM ""FriendRequests"" WHERE ""SenderId"" = @userId AND ""Status"" = @pendingStatus) AS sent_requests,
-                        (SELECT COUNT(*) FROM ""UserFriends"" uf WHERE uf.""UserId"" = @userId AND NOT EXISTS (SELECT 1 FROM ""Blocks"" b WHERE (b.""BlockerId"" = @userId AND b.""BlockedId"" = uf.""FriendId"") OR (b.""BlockerId"" = uf.""FriendId"" AND b.""BlockedId"" = @userId))) AS friends,
-                        (SELECT COUNT(*) FROM ""Messages"" WHERE ""ReceiverId"" = @userId AND ""IsRead"" = false) AS unread_messages;";
-
-                var userIdParam = cmd.CreateParameter();
-                userIdParam.ParameterName = "userId";
-                userIdParam.Value = userId;
-                cmd.Parameters.Add(userIdParam);
-
-                var statusParam = cmd.CreateParameter();
-                statusParam.ParameterName = "pendingStatus";
-                statusParam.Value = (int)FriendRequestStatus.Pending;
-                cmd.Parameters.Add(statusParam);
-
-                await using var reader = await cmd.ExecuteReaderAsync();
-                await reader.ReadAsync();
-
-                return new NotificationCountersResponse
-                {
-                    ReceivedFriendRequests = reader.GetInt32(0),
-                    SentFriendRequests = reader.GetInt32(1),
-                    Friends = reader.GetInt32(2),
-                    UnreadMessages = reader.GetInt32(3)
-                };
-            }
-            finally
-            {
-                if (wasClosed) await connection.CloseAsync();
-            }
+                ReceivedFriendRequests = receivedRequests,
+                SentFriendRequests = sentRequests,
+                Friends = friends,
+                UnreadMessages = unreadMessages
+            };
         }
 
         public async Task SendCountersAsync(Guid userId)
@@ -122,9 +104,10 @@ namespace backend.Services
                     .Group($"user:{userId}")
                     .SendAsync("social:all", batch);
             }
-            catch
+            catch (Exception ex)
             {
-                // fire-and-forget; SignalR push is best-effort
+                System.Diagnostics.Debug.WriteLine(
+                    $"Failed to send social data to user {userId}: {ex.Message}");
             }
         }
 
@@ -153,7 +136,7 @@ namespace backend.Services
             await using var context = await contextFactory.CreateDbContextAsync();
 
             if (!Enum.TryParse<NotificationType>(type, true, out var notificationType))
-                notificationType = NotificationType.FriendRequest;
+                throw new ArgumentException($"Invalid notification type: {type}", nameof(type));
 
             var notification = new Notification
             {
@@ -177,9 +160,10 @@ namespace backend.Services
                     .Group($"user:{userId}")
                     .SendAsync("notification:new", response);
             }
-            catch
+            catch (Exception ex)
             {
-                // fire-and-forget; SignalR push is best-effort
+                System.Diagnostics.Debug.WriteLine(
+                    $"Failed to push notification:new to user {userId}: {ex.Message}");
             }
 
             return response;

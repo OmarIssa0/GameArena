@@ -3,22 +3,22 @@ import type { INotificationCounters, INotificationService } from "../meta/INotif
 import type { INotificationItem } from "@/domain/meta/INotification";
 import type { Handler } from "../lib/signalRUtils";
 import { requireConnection } from "../lib/signalRUtils";
+import { ReconnectManager } from "../lib/ReconnectManager";
 import { SubscriptionManager } from "../lib/SubscriptionManager";
 
 class NotificationService implements INotificationService {
   private connection: HubConnection | null = null;
   private subs = new SubscriptionManager();
-  private reconnectHandlers = new Set<() => void>();
+  private reconnectHandlers = new ReconnectManager();
 
   handleReconnect(): void {
     this.requestCounters().catch(() => {});
     this.requestNotificationList().catch(() => {});
-    this.reconnectHandlers.forEach((h) => { try { h(); } catch { /* isolated */ } });
+    this.reconnectHandlers.handleReconnect();
   }
 
   onReconnect(handler: () => void): () => void {
-    this.reconnectHandlers.add(handler);
-    return () => { this.reconnectHandlers.delete(handler); };
+    return this.reconnectHandlers.onReconnect(handler);
   }
 
   setConnection(connection: HubConnection): void {
