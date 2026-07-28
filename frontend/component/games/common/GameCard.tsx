@@ -20,7 +20,7 @@ function GameCard({ name, desc, icon, onClick, gradientClass, playLabel, animati
         "flex flex-col",
         "h-full",
         "transition-all duration-300",
-        "hover:-translate-y-1 hover:shadow-xl",
+        "hover:-translate-y-1",
         "hover:border-primary/30",
         "relative overflow-hidden",
         "before:absolute before:inset-0 before:bg-gradient-to-br before:from-primary/5 before:to-secondary/5 before:opacity-0 before:transition-opacity before:duration-300 group-hover:before:opacity-100",
@@ -47,20 +47,15 @@ function GameCard({ name, desc, icon, onClick, gradientClass, playLabel, animati
               tile
               tileSize="xl"
               tileGradient={gradientClass}
-              className="transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 drop-shadow-lg"
+              tileClassName="transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"
             />
           )
         )}
         {!page && (
-          <div className="absolute bottom-3 right-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <GIcon
-              icon={Gamepad2}
-              size="sm"
-              color="text"
-              className="w-8 h-8 rounded-full bg-bg/80 backdrop-blur-sm flex items-center justify-center"
-            />
-            <GIcon icon={Users} size="sm" color="text" className="w-8 h-8 rounded-full bg-bg/80 backdrop-blur-sm flex items-center justify-center" />
-            <GIcon icon={Zap} size="sm" color="text" className="w-8 h-8 rounded-full bg-bg/80 backdrop-blur-sm flex items-center justify-center" />
+          <div className="absolute bottom-3 inset-e-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <GIcon icon={Gamepad2} size="sm" color="text" className="w-8 h-8 rounded-full bg-bg/80 flex items-center justify-center" />
+            <GIcon icon={Users} size="sm" color="text" className="w-8 h-8 rounded-full bg-bg/80 flex items-center justify-center" />
+            <GIcon icon={Zap} size="sm" color="text" className="w-8 h-8 rounded-full bg-bg/80 flex items-center justify-center" />
           </div>
         )}
       </div>

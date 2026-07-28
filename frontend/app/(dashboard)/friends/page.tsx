@@ -14,6 +14,7 @@ import { GPage } from "@/component/common/GPage";
 import { PageHeader } from "@/component/common/PageHeader";
 import { GBadge } from "@/component/common/GBadge";
 import { GIcon } from "@/component/common/GIcon";
+import { GSpinner } from "@/component/common/GSpinner";
 
 import { FriendsListTab } from "@/component/friend/FriendsListTab";
 import { RequestsTab } from "@/component/friend/RequestsTab";
@@ -28,23 +29,6 @@ import type { GTabItem } from "@/component/common/def/GTabs";
 type TFriendsTab = "friends" | "requests" | "sent" | "blocked" | "search";
 
 const DEFAULT_TAB: TFriendsTab = "friends";
-
-function FriendsSkeleton() {
-  return (
-    <>
-      {Array.from({ length: 6 }).map((_, i) => (
-        <GCard key={i} padding="md" className="flex items-center mb-3">
-          <div className="animate-pulse bg-surface rounded-[var(--radius-md)] w-16 h-16 me-2" />
-          <div className="flex-1">
-            <div className="animate-pulse bg-surface h-4 rounded-sm w-24 mb-1" />
-            <div className="animate-pulse bg-surface h-4 rounded-sm w-24 mb-1" />
-          </div>
-          <div className="animate-pulse bg-surface h-8 rounded-sm w-16 ms-auto" />
-        </GCard>
-      ))}
-    </>
-  );
-}
 
 function FriendsPage() {
   const router = useRouter();
@@ -153,14 +137,9 @@ function FriendsPage() {
       />
 
       <GCard padding="sm" className="space-y-4">
-        <div className="lg:hidden">
-          <GTabs tabs={tabs} value={activeTab} onChange={changeTab} direction="V" variant="pills" fullWidth />
-        </div>
-        <div className="hidden lg:block">
-          <GTabs tabs={tabs} value={activeTab} onChange={changeTab} variant="pills" fullWidth />
-        </div>
+        <GTabs tabs={tabs} value={activeTab} onChange={changeTab} variant="pills" fullWidth responsive/>
 
-        <div className="pt-1 text-start gap-3">{tabLoading ? <FriendsSkeleton /> : renderTab()}</div>
+        <div className="pt-1 text-start gap-3">{tabLoading ? <div className="flex justify-center py-10"><GSpinner size="lg" /></div> : renderTab()}</div>
       </GCard>
     </GPage>
   );

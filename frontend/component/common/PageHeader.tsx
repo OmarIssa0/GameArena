@@ -19,7 +19,7 @@ function PageHeader({ icon, title, subtitle, badge, className }: PageHeaderProps
         <GIcon icon={icon} size="xl" tile tileSize="xl" tileGradient="bg-primary" tileColor="on-primary" />
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-3">
-            <h1 className="text-2xl font-extrabold text-text tracking-tight leading-tight truncate">{title}</h1>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-text tracking-tight leading-tight truncate">{title}</h1>
             {badge && <div className="mb-1 shrink-0">{badge}</div>}
           </div>
           {subtitle && <p className="text-sm text-text-muted mt-0.5">{subtitle}</p>}

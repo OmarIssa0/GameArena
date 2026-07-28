@@ -1,4 +1,4 @@
-import type { THashMap } from "../type/TCommon";
+import type { THashMap } from "@/domain/type/TCommon";
 
 const squareSize: THashMap<string, string> = {
   xs: "w-8 h-8",

@@ -9,6 +9,7 @@ import { GButton } from "../common/GButton";
 import { GSelect } from "../common/GSelect";
 import { GSpinner } from "../common/GSpinner";
 import { GCard } from "../common/GCard";
+import { GList } from "../common/GList";
 import { GBadge } from "../common/GBadge";
 import { GAvatar } from "../common/GAvatar";
 import { GIcon } from "../common/GIcon";
@@ -154,7 +155,7 @@ function SearchTab() {
       <p className="text-xs text-text-muted">{t.searchTab.hint}</p>
 
       {searchError && (
-        <GCard padding="md" className="text-center text-sm text-danger border-danger/30">
+        <GCard padding="md" className="text-center text-sm text-error border border-error/30 bg-error/5">
           {searchError}
         </GCard>
       )}
@@ -170,28 +171,30 @@ function SearchTab() {
               {t.searchTab.noResults}
             </GCard>
           ) : (
-            searchResults.map((user) => (
-              <GCard key={user.id} padding="sm" className="flex items-center justify-between gap-4">
-                <div className="flex min-w-0 items-center gap-3">
-                  <GAvatar firstName={user.firstName} lastName={user.lastName} status={user.status} size="sm" shape="circle" />
-                  <div className="min-w-0">
-                    <p className="truncate font-medium text-text">{displayName(user, t.searchTab.unknownUser)}</p>
-                    <p className="truncate text-xs text-text-muted">{user.userName ? `@${user.userName}` : t.searchTab.noUsername}</p>
+            <GList items={searchResults} keyExtractor={(user) => user.id}>
+              {(user) => (
+                <GCard padding="sm" className="flex items-center justify-between gap-4">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <GAvatar firstName={user.firstName} lastName={user.lastName} status={user.status} size="sm" shape="circle" />
+                    <div className="min-w-0">
+                      <p className="truncate font-medium text-text">{displayName(user, t.searchTab.unknownUser)}</p>
+                      <p className="truncate text-xs text-text-muted">{user.userName ? `@${user.userName}` : t.searchTab.noUsername}</p>
+                    </div>
                   </div>
-                </div>
 
-                {user.isSendRequest ? (
-                  <GBadge variant="muted">{t.searchTab.requestSent}</GBadge>
-                ) : (
-                  <GButton
-                    onClick={() => void handleSendRequest(user.id)}
-                    size="sm"
-                    leftIcon={<GIcon icon={UserPlus} size="sm" color="inherit" className="text-on-primary" />}>
-                    {t.searchTab.add}
-                  </GButton>
-                )}
-              </GCard>
-            ))
+                  {user.isSendRequest ? (
+                    <GBadge variant="muted">{t.searchTab.requestSent}</GBadge>
+                  ) : (
+                    <GButton
+                      onClick={() => void handleSendRequest(user.id)}
+                      size="sm"
+                      startIcon={<GIcon icon={UserPlus} size="sm" color="inherit" className="text-on-primary" />}>
+                      {t.searchTab.add}
+                    </GButton>
+                  )}
+                </GCard>
+              )}
+            </GList>
           )}
         </div>
       ) : (

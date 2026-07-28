@@ -44,6 +44,7 @@ const en = {
       secondaryColor: "Secondary Color",
       backgroundColor: "Background",
       bgPlaceholder: "Default",
+      pageSize: "Page Size",
     },
   },
 };

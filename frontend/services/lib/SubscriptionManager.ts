@@ -10,10 +10,11 @@ class SubscriptionManager {
       set = new Set();
       this.handlers.set(event, set);
     }
-    set.add(handler);
+    const handlerSet = set;
+    handlerSet.add(handler);
     return () => {
-      set!.delete(handler);
-      if (set!.size === 0) {
+      handlerSet.delete(handler);
+      if (handlerSet.size === 0) {
         this.handlers.delete(event);
       }
     };

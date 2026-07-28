@@ -5,7 +5,7 @@ import { useState, useMemo } from "react";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { useGame } from "@/app/providers/GameProvider";
 import { useGameTranslation } from "@/hooks/useGameTranslation";
-import { useFriendList } from "@/hooks/useFriends";
+import { useFriendList } from "@/hooks/useFriendList";
 import { GamePlayersHeader } from "@/component/games/common/GamePlayersHeader";
 import { InviteModal } from "@/component/games/common/InviteModal";
 import { GButton } from "@/component/common/GButton";
@@ -29,7 +29,9 @@ function GameLobby({ gameType }: GameLobbyProps) {
   const filteredFriends = useMemo(() => {
     const term = searchQuery.trim().toLowerCase();
     if (!term) return friends;
-    return friends.filter((f) => `${f.firstName ?? ""} ${f.lastName ?? ""} ${f.userName ?? ""}`.toLowerCase().includes(term));
+    return friends.filter((f) =>
+      `${f.firstName ?? ""} ${f.lastName ?? ""} ${f.userName ?? ""}`.toLowerCase().includes(term)
+    );
   }, [friends, searchQuery]);
 
   if (!state) return null;
@@ -56,14 +58,19 @@ function GameLobby({ gameType }: GameLobbyProps) {
           <div className="flex flex-col gap-3 mt-4">
             {state.player1Id === user?.id && (
               <>
-                <GButton onClick={() => startGame(null, gameType)} fullWidth leftIcon={<GIcon icon={Play} size="md" color="inherit" />}>
+                <GButton
+                  onClick={() => startGame(null, gameType)}
+                  fullWidth
+                  startIcon={<GIcon icon={Play} size="md" color="inherit" />}
+                >
                   {t.waiting.startVsAI}
                 </GButton>
                 <GButton
                   onClick={() => setShowInvitePicker(true)}
                   fullWidth
                   variant="secondary"
-                  leftIcon={<GIcon icon={UserPlus} size="md" color="inherit" />}>
+                  startIcon={<GIcon icon={UserPlus} size="md" color="inherit" />}
+                >
                   {t.waiting.inviteFriend}
                 </GButton>
               </>

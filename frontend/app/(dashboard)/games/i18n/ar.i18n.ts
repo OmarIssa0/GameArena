@@ -12,6 +12,8 @@ const ar = {
   leaveDesc: "لديك لعبة نشطة. هل تغادرها لبدء لعبة جديدة؟",
   cancel: "إلغاء",
   leaveConfirm: "غادر وابدأ جديدة",
+  returnToGame: "العودة إلى اللعبة",
+  gameRunning: "اللعبة جارية",
 };
 
 export { ar };

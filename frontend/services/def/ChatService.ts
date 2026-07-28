@@ -7,6 +7,7 @@ import type { IChatRepository, IPerFriendUnreadCount } from "@/repositories/meta
 import { chatRepository } from "@/repositories/def/ChatRepository";
 import type { Handler } from "../lib/signalRUtils";
 import { requireConnection } from "../lib/signalRUtils";
+import { ReconnectManager } from "../lib/ReconnectManager";
 import { SubscriptionManager } from "../lib/SubscriptionManager";
 
 const normalizeMessage = (payload: IPrivateMessagePayload): IMessage => ({
@@ -20,17 +21,16 @@ const normalizeMessage = (payload: IPrivateMessagePayload): IMessage => ({
 class ChatService implements IChatService {
   private connection: HubConnection | null = null;
   private subs = new SubscriptionManager();
-  private reconnectHandlers = new Set<() => void>();
+  private reconnectHandlers = new ReconnectManager();
 
   constructor(private repo: IChatRepository) {}
 
   handleReconnect(): void {
-    this.reconnectHandlers.forEach((h) => { try { h(); } catch { /* isolated */ } });
+    this.reconnectHandlers.handleReconnect();
   }
 
   onReconnect(handler: () => void): () => void {
-    this.reconnectHandlers.add(handler);
-    return () => { this.reconnectHandlers.delete(handler); };
+    return this.reconnectHandlers.onReconnect(handler);
   }
 
   setConnection(connection: HubConnection): void {

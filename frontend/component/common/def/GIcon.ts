@@ -14,6 +14,8 @@ export interface GIconProps {
   flip?: boolean;
   className?: string;
   onClick?: (e: MouseEvent<HTMLButtonElement | HTMLDivElement>) => void;
+  ariaLabel?: string;
+  hover?: boolean;
   // Tile props (when used as icon tile)
   tile?: boolean;
   tileSize?: TileSize;

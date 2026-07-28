@@ -6,17 +6,18 @@ import { CheckCheck, Send, WifiOff, MessagesSquare, ArrowLeft, Search } from "lu
 import { useTranslation } from "@/hooks/useSetting";
 import { useMessages } from "@/hooks/useMessages";
 import { GEmpty } from "@/component/common/GEmpty";
+import { GList } from "@/component/common/GList";
 import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
 import { ar } from "./i18n/ar.i18n";
 import { en, type TMessagesTranslation } from "./i18n/en.i18n";
 import { GButton } from "@/component/common/GButton";
 import { GSpinner } from "@/component/common/GSpinner";
-import { FriendsList } from "@/component/SocialPanel/FriendsList";
+import { GCard } from "@/component/common/GCard";
+import { GAvatar } from "@/component/common/GAvatar";
 import { GBadge } from "@/component/common/GBadge";
 import { GIcon } from "@/component/common/GIcon";
 import { GTextField } from "@/component/common/GTextField";
 import clsx from "clsx";
-import { GAvatar } from "@/component/common/GAvatar";
 import { chatService } from "@/services/def/ChatService";
 
 const formatStatus = (status: UserStatusEnum, t: TMessagesTranslation) => {
@@ -39,16 +40,22 @@ function MessagesPage() {
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
-    chatService.getPerFriendUnreadCounts().then((res) => {
-      if (res.data) {
-        const map: Record<string, number> = {};
-        res.data.forEach((item) => { map[item.friendId] = item.unreadCount; });
-        setUnreadCounts(map);
-      }
-    }).catch(() => {});
+    chatService
+      .getPerFriendUnreadCounts()
+      .then((res) => {
+        if (res.data) {
+          const map: Record<string, number> = {};
+          res.data.forEach((item) => {
+            map[item.friendId] = item.unreadCount;
+          });
+          setUnreadCounts(map);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const {
+    isConnected,
     friends,
     friendsLoading,
     selectedFriend,
@@ -58,8 +65,9 @@ function MessagesPage() {
     setDraft,
     loadingMessages,
     error,
+    sending,
+    sendError,
     selectFriend,
-    isConnected,
     sendMessage,
   } = useMessages(initialFriendId);
 
@@ -87,7 +95,7 @@ function MessagesPage() {
             <GIcon icon={MessagesSquare} size="xl" tile tileSize="xl" tileGradient="bg-primary" tileColor="on-primary" />
             <div className="flex-1">
               <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-extrabold text-text tracking-tight leading-tight">{t.title}</h1>
+                <h1 className="text-xl sm:text-2xl font-extrabold text-text tracking-tight leading-tight">{t.title}</h1>
                 <div className="mb-1">
                   <GBadge variant={isConnected ? "success" : "danger"} className="shrink-0">
                     {!isConnected && <GIcon icon={WifiOff} size="xs" color="inherit" />}
@@ -115,13 +123,51 @@ function MessagesPage() {
           ) : filteredFriends.length === 0 ? (
             <GEmpty icon={<GIcon icon={MessagesSquare} size="xl" color="muted" />} title={t.noFriendsTitle} description={t.noFriendsDescription} />
           ) : (
-            <FriendsList friends={filteredFriends} messageLabel={t.message} activeLabel={t.active} query={query} unreadCounts={unreadCounts} />
+            <GList
+              items={filteredFriends}
+              keyExtractor={(friend) => friend.id}
+              emptyMessage={t.noFriendsTitle}
+              emptyDescription={t.noFriendsDescription}
+              emptyIcon={<GIcon icon={MessagesSquare} size="xl" color="muted" />}>
+              {(friend) => (
+                <GCard
+                  key={friend.id}
+                  padding="sm"
+                  variant="outlined"
+                  rounded="xl"
+                  onClick={() => router.push(`/messages?friend=${friend.id}`)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      router.push(`/messages?friend=${friend.id}`);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={0}
+                  className="flex items-center gap-3 cursor-pointer transition hover:bg-bg-card-hover focus-visible:ring-2 focus-visible:ring-primary">
+                  <div className="relative shrink-0">
+                    <GAvatar firstName={friend.firstName} lastName={friend.lastName} status={friend.status} size="sm" shape="circle" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="truncate text-sm font-semibold text-inherit">{friend.fullName}</h3>
+                    <div className="mt-1 flex items-center gap-2 text-xs text-text-muted">
+                      <span>@{friend.userName}</span>
+                    </div>
+                  </div>
+                  {unreadCounts[friend.id] != null && unreadCounts[friend.id] > 0 && (
+                    <GBadge variant="danger" size="sm" className="shrink-0 min-w-5 justify-center">
+                      {unreadCounts[friend.id]}
+                    </GBadge>
+                  )}
+                </GCard>
+              )}
+            </GList>
           )}
         </div>
       </aside>
 
       <section className={clsx("min-w-0 flex-1 flex-col bg-bg", showList ? "hidden sm:flex" : "flex")}>
-        {selectedFriend ? (
+        {selectedFriendId ? (
           <>
             <header className="flex items-center gap-3 border-b border-border bg-surface px-4 sm:px-6 py-4 shrink-0">
               <GButton variant="ghost" size="icon" onClick={handleBack} className="sm:hidden" aria-label={t.back}>
@@ -129,17 +175,21 @@ function MessagesPage() {
               </GButton>
               <div className="relative shrink-0">
                 <GAvatar
-                  firstName={selectedFriend.firstName}
-                  lastName={selectedFriend.lastName}
-                  status={selectedFriend.status}
+                  firstName={selectedFriend?.firstName ?? ""}
+                  lastName={selectedFriend?.lastName ?? ""}
+                  status={selectedFriend?.status ?? UserStatusEnum.Offline}
                   size="sm"
                   shape="circle"
                 />
               </div>
               <div className="min-w-0 flex-1">
-                <h2 className="truncate text-base font-bold text-text">{selectedFriend.fullName}</h2>
-                <p className={clsx("text-xs font-medium", (selectedFriend.status ?? UserStatusEnum.Offline) === UserStatusEnum.InGame ? "text-primary" : "text-text-muted")}>
-                  {formatStatus(selectedFriend.status ?? UserStatusEnum.Offline, t)}
+                <h2 className="truncate text-base font-bold text-text">{selectedFriend?.fullName ?? selectedFriendId}</h2>
+                <p
+                  className={clsx(
+                    "text-xs font-medium",
+                    (selectedFriend?.status ?? UserStatusEnum.Offline) === UserStatusEnum.InGame ? "text-primary" : "text-text-muted",
+                  )}>
+                  {selectedFriend ? formatStatus(selectedFriend.status ?? UserStatusEnum.Offline, t) : ""}
                 </p>
               </div>
               {!isConnected && <GBadge variant="danger">{t.disconnected}</GBadge>}
@@ -149,6 +199,10 @@ function MessagesPage() {
               {loadingMessages ? (
                 <div className="flex h-full items-center justify-center">
                   <GSpinner size="lg" />
+                </div>
+              ) : error ? (
+                <div className="flex h-full items-center justify-center">
+                  <GEmpty icon={<GIcon icon={MessagesSquare} size="xl" color="danger" />} title="Unable to load messages" description={error} />
                 </div>
               ) : messages.length === 0 ? (
                 <div className="flex h-full items-center justify-center">
@@ -161,7 +215,7 @@ function MessagesPage() {
               ) : (
                 <div className="space-y-4">
                   {messages.map((message, index) => {
-                    const outgoing = message.senderId !== selectedFriend.id;
+                    const outgoing = message.senderId !== selectedFriendId;
                     const time = new Date(message.sentAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
                     return (
@@ -171,9 +225,7 @@ function MessagesPage() {
                         <div
                           className={clsx(
                             "max-w-[85%] sm:max-w-[70%] min-w-0 px-4 py-2.5 text-sm leading-relaxed wrap-anywhere break-words rounded-[var(--radius-lg)]",
-                            outgoing
-                              ? "ms-auto rounded-ee-sm bg-primary text-on-primary"
-                              : "rounded-es-sm border border-border bg-surface text-text",
+                            outgoing ? "ms-auto rounded-ee-sm bg-primary text-on-primary" : "rounded-es-sm border border-border bg-surface text-text",
                           )}>
                           <p className="whitespace-pre-wrap">{message.content}</p>
                           <div
@@ -200,7 +252,12 @@ function MessagesPage() {
                   {error}
                 </GBadge>
               )}
-              <div className="flex items-end gap-2">
+              {sendError && (
+                <GBadge variant="danger" className="mb-3">
+                  {sendError}
+                </GBadge>
+              )}
+              <div className="flex gap-2 items-center justify-between">
                 <GTextField
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
@@ -213,12 +270,14 @@ function MessagesPage() {
                   placeholder={t.placeholder}
                   aria-label={t.placeholder}
                   className="flex-1"
+                  disabled={sending}
                 />
                 <GButton
                   onClick={() => void sendMessage()}
-                  disabled={!draft.trim() || !isConnected}
-                  size="sm"
-                  leftIcon={<GIcon icon={Send} size="sm" color="inherit" className="text-on-primary" />}>
+                  disabled={!draft.trim() || !isConnected || sending}
+                  loading={sending}
+                  size="md"
+                  startIcon={<GIcon icon={Send} size="sm" color="inherit" className="text-on-primary" />}>
                   <span className="hidden sm:inline">{t.send}</span>
                 </GButton>
               </div>

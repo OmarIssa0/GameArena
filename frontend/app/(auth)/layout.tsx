@@ -39,7 +39,7 @@ function AuthLayout({ children }: { children: ReactNode }) {
         <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "linear-gradient(var(--color-border) 1px, transparent 1px), linear-gradient(90deg, var(--color-border) 1px, transparent 1px)", backgroundSize: "40px 40px" }} />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,var(--color-primary)_0%,transparent_70%)] opacity-20" />
         <div className="relative z-10 max-w-md w-full text-center">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-linear-to-br from-primary to-accent text-on-primary shadow-glow mb-8 animate-float">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-linear-to-br from-primary to-accent text-on-primary mb-8 animate-float">
             <GIcon icon={Hexagon} size="3xl" color="on-primary" />
           </div>
           <h1 className="text-4xl sm:text-5xl font-black tracking-tight mb-4 bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent">

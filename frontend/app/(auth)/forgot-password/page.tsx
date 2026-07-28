@@ -13,7 +13,7 @@ import { ar } from "./i18n/ar.i18n";
 import { en as EnTextField } from "@/component/i18n/GTextField/en.i18n";
 import { ar as ArTextField } from "@/component/i18n/GTextField/ar.i18n";
 import { useTranslation } from "@/hooks/useSetting";
-import { emailValidator } from "@/utils";
+import { emailValidator } from "@/lib/utils";
 import { authService } from "@/services/def/AuthService";
 import type { GTextFieldTranslation } from "@/component/i18n/GTextField/en.i18n";
 
@@ -61,7 +61,7 @@ function ForgotPasswordPage() {
         <div className="flex items-center gap-3 mb-8">
           <GIcon icon={KeyRound} size="xl" tile tileSize="xl" tileGradient="bg-primary" tileColor="on-primary" />
           <div className="min-w-0">
-            <h1 className="text-2xl font-bold text-text tracking-tight">{t.forgotPassword}</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-text tracking-tight">{t.forgotPassword}</h1>
             <p className="text-sm text-text-muted mt-0.5">{t.description}</p>
           </div>
         </div>
@@ -85,9 +85,7 @@ function ForgotPasswordPage() {
             {t.sendCode}
           </GButton>
           <div className="pt-2 text-center">
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors">
+            <Link href="/login" className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors">
               <GIcon icon={ArrowLeft} size="sm" color="inherit" className="rtl:-scale-x-100" />
               {t.backToLogin}
             </Link>

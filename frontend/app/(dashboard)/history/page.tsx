@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import { History } from "lucide-react";
 import { useLocale, useTranslation } from "@/hooks/useSetting";
 import { useMatchHistory } from "@/hooks/useMatchHistory";
+import { GList } from "@/component/common/GList";
+import { AlertTriangle } from "lucide-react";
 import { GTabs } from "@/component/common/GTabs";
 import { GSpinner } from "@/component/common/GSpinner";
 import { GEmpty } from "@/component/common/GEmpty";
@@ -23,7 +25,7 @@ export default function MatchHistoryPage() {
   const [locale] = useLocale();
   const t = useTranslation({ en, ar }) as THistoryTranslation;
   const [filter, setFilter] = useState(MatchStatusEnum.All);
-  const { matches, loading } = useMatchHistory(filter);
+  const { matches, loading, error } = useMatchHistory(filter);
   const tabs = useMemo<GTabItem<MatchStatusEnum>[]>(
     () => [
       { id: MatchStatusEnum.All, label: t.filters.all },
@@ -56,7 +58,11 @@ export default function MatchHistoryPage() {
           </div>
         )}
 
-        {!loading && matches.length === 0 && (
+        {!loading && error && (
+          <GEmpty icon={<GIcon icon={AlertTriangle} size="xl" color="danger" />} title="Unable to load history" description={error} />
+        )}
+
+        {!loading && !error && matches.length === 0 && (
           <GEmpty
             icon={<GIcon icon={History} size="xl" color="muted" />}
             title={t.empty.title}
@@ -64,7 +70,7 @@ export default function MatchHistoryPage() {
           />
         )}
 
-        {!loading && matches.length > 0 && (
+        {!loading && !error && matches.length > 0 && (
           <>
             <div className="hidden sm:block overflow-x-auto">
               <MatchHistoryTable
@@ -74,22 +80,22 @@ export default function MatchHistoryPage() {
                 lossLabel={t.results.loss}
                 drawLabel={t.results.draw}
                 gameLabels={t.games}
-                columns={t.columns}
               />
             </div>
-            <div className="flex flex-col gap-3 sm:hidden">
-              {matches.map((match) => (
-                <MatchHistoryItem
-                  key={match.id}
-                  match={match}
-                  locale={locale}
-                  winLabel={t.results.win}
-                  lossLabel={t.results.loss}
-                  drawLabel={t.results.draw}
-                  versusLabel={t.versus}
-                  gameLabel={t.games[match.kind]}
-                />
-              ))}
+            <div className="sm:hidden">
+              <GList items={matches} keyExtractor={(match) => match.id} >
+                {(match) => (
+                  <MatchHistoryItem
+                    match={match}
+                    locale={locale}
+                    winLabel={t.results.win}
+                    lossLabel={t.results.loss}
+                    drawLabel={t.results.draw}
+                    versusLabel={t.versus}
+                    gameLabel={t.games[match.kind]}
+                  />
+                )}
+              </GList>
             </div>
           </>
         )}

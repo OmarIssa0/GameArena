@@ -5,6 +5,7 @@ interface IUserPreferences {
   showOnlineStatus: boolean;
   showGameActivity: boolean;
   showNotifications: boolean;
+  pageSize: number;
 }
 
 const DEFAULT_USER_PREFERENCES: IUserPreferences = {
@@ -14,6 +15,7 @@ const DEFAULT_USER_PREFERENCES: IUserPreferences = {
   showOnlineStatus: true,
   showGameActivity: true,
   showNotifications: true,
+  pageSize: 10,
 };
 
 export type { IUserPreferences };

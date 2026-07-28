@@ -37,6 +37,8 @@ export function useMessages(initialFriendId?: TNullable<string>) {
 
   const [draft, setDraft] = useState("");
   const [localMessages, setLocalMessages] = useState<IMessage[]>([]);
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState<TNullable<string>>(null);
 
   const { data: apiMessages, loading: loadingMessages, error } = useFetch(() => {
     if (!selectedFriendId) return Promise.resolve([] as IMessage[]);
@@ -46,7 +48,10 @@ export function useMessages(initialFriendId?: TNullable<string>) {
   }, [selectedFriendId]);
 
   const baseMessages = useMemo(() => apiMessages ?? [], [apiMessages]);
-  const messages = useMemo(() => [...baseMessages, ...localMessages], [baseMessages, localMessages]);
+  const messages = useMemo(() => {
+    const combined = [...baseMessages, ...localMessages];
+    return combined.sort((a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime());
+  }, [baseMessages, localMessages]);
 
   const selectedFriend = useMemo<TNullable<IUserSummary>>(() => {
     if (!selectedFriendId) return null;
@@ -70,18 +75,21 @@ export function useMessages(initialFriendId?: TNullable<string>) {
       );
     });
 
-    return off;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+      return off;
   }, [selectedFriendId]);
 
   const selectFriend = useCallback((friendId: TNullable<string>) => {
     setSelectedFriendId(friendId);
     setLocalMessages([]);
+    setSendError(null);
   }, []);
 
   const sendMessage = useCallback(async () => {
     const content = draft.trim();
     if (!selectedFriendId || !content || !user) return;
+
+    setSending(true);
+    setSendError(null);
 
     const outgoing: IMessage = {
       senderId: user.id,
@@ -97,7 +105,10 @@ export function useMessages(initialFriendId?: TNullable<string>) {
     try {
       await chatService.sendMessage(selectedFriendId, content);
     } catch {
+      setSendError("Unable to send message. Please try again.");
       setLocalMessages((prev) => prev.filter((m) => m !== outgoing));
+    } finally {
+      setSending(false);
     }
   }, [draft, selectedFriendId, user]);
 
@@ -112,6 +123,8 @@ export function useMessages(initialFriendId?: TNullable<string>) {
     setDraft,
     loadingMessages,
     error,
+    sending,
+    sendError,
     selectFriend,
     sendMessage,
   };

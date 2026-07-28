@@ -3,7 +3,10 @@ import type { IGameInvite } from "@/domain/meta/INotification";
 import type { IGameState } from "@/app/providers/def/IGameState";
 
 interface IGameService {
-  requestCurrentState(): Promise<IGameState | null>;
+  // REST API (via repository)
+  getCurrentState(): Promise<IGameState | null>;
+
+  // SignalR invocations
   findMatch(gameKind: GamesKindEnum): Promise<void>;
   startGame(friendId: string | null, gameKind: GamesKindEnum): Promise<void>;
   inviteFriend(friendId: string, gameKind: GamesKindEnum): Promise<void>;
@@ -16,11 +19,17 @@ interface IGameService {
   acceptInvite(roomId: string): Promise<void>;
   createLobby(gameKind: GamesKindEnum): Promise<void>;
 
+  // SignalR event subscriptions
   onGameState(handler: (state: IGameState) => void): () => void;
   onOpponentDisconnect(handler: () => void): () => void;
   onGameInvite(handler: (invite: IGameInvite) => void): () => void;
   onPlayAgainRequest(handler: (data: { requesterId: string; requesterUsername: string }) => void): () => void;
   onPlayAgainResponse(handler: (data: { accepted: boolean }) => void): () => void;
+
+  // Connection management
+  handleReconnect(): void;
+  onReconnect(handler: () => void): () => void;
+  setConnection(connection: unknown): void;
 }
 
 export type { IGameService };

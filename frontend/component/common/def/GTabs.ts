@@ -17,7 +17,7 @@ interface GTabsProps<T extends string | number> {
   className?: string;
   tabClassName?: string;
   fullWidth?: boolean;
-  /** Active border — start/end are RTL-aware */
+  responsive?: boolean;
   indicator?: "start" | "end" | "top" | "bottom" | "none";
   renderLabel?: (tab: GTabItem<T>, active: boolean) => ReactNode;
   renderIcon?: (tab: GTabItem<T>, active: boolean) => ReactNode;

@@ -6,6 +6,7 @@ import { useTranslation } from "@/hooks/useSetting";
 import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
 import { ArrowRight, Gamepad2, MessageSquare, Users, Trophy, Zap, Sparkles } from "lucide-react";
 import { GIcon } from "@/component/common/GIcon";
+import { GList } from "@/component/common/GList";
 import { ar } from "./i18n/ar.i18n";
 import { en, type THomeTranslation } from "./i18n/en.i18n";
 import { GamesList } from "@/domain/constant/games";
@@ -16,7 +17,6 @@ import { GButton } from "@/component/common/GButton";
 import { GBadge } from "@/component/common/GBadge";
 import { GameCard } from "@/component/games/common/GameCard";
 import { useRouter } from "next/navigation";
-import clsx from "clsx";
 
 function Home() {
   const { user } = useAuth();
@@ -49,19 +49,23 @@ function Home() {
           <div className="flex items-center gap-3">
             <GIcon icon={Gamepad2} size="lg" tile tileSize="lg" tileGradient="bg-primary" className="text-on-primary animate-float" />
             <div className="min-w-0">
-              <GBadge variant="primary" className="mb-2 text-xs">{t.features.badge}</GBadge>
+              <GBadge variant="primary" className="mb-2 text-xs">
+                {t.features.badge}
+              </GBadge>
               <p className="text-sm font-medium text-primary truncate">{t.welcome(user?.firstName || "")}</p>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight bg-gradient-to-br from-primary to-secondary bg-clip-text text-transparent">{t.brand}</h1>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight bg-linear-to-br from-primary to-secondary bg-clip-text text-transparent">
+                {t.brand}
+              </h1>
             </div>
           </div>
           <div className="flex items-center gap-3 sm:ms-auto">
             <Link href="/games">
-              <GButton size="lg" leftIcon={<GIcon icon={Gamepad2} size="md" color="inherit" />}>
+              <GButton size="lg" startIcon={<GIcon icon={Gamepad2} size="md" color="inherit" />}>
                 {t.playNow}
               </GButton>
             </Link>
             <Link href="/history">
-              <GButton variant="outline" size="lg" leftIcon={<GIcon icon={Trophy} size="md" color="inherit" />}>
+              <GButton variant="outline" size="lg" startIcon={<GIcon icon={Trophy} size="md" color="inherit" />}>
                 {t.viewStats}
               </GButton>
             </Link>
@@ -69,41 +73,58 @@ function Home() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
-          {stats.map(({ label, value, icon: Icon, gradient, href }) => (
-<Link key={label} href={href} className="group">
-            <GCard variant="interactive" className="flex items-center gap-4 p-4 group-hover:-translate-y-1 transition-all duration-300">
-              <GIcon icon={Icon} size="md" tile tileSize="md" tileGradient={gradient} className="group-hover:scale-110 transition-transform duration-300" />
-              <div className="min-w-0 flex-1">
-                <p className="text-2xl sm:text-3xl font-black text-primary">{value}</p>
-                <p className="mt-1 truncate text-xs font-medium uppercase tracking-wide text-text-secondary">{label}</p>
-              </div>
-                <GIcon icon={ArrowRight} size="sm" color="muted" className="group-hover:text-primary group-hover:translate-x-1 rtl:-translate-x-1 transition-all duration-200" />
+        <GList items={stats} keyExtractor={(stat) => stat.label} noPagination listClassName="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          {({ label, value, icon: Icon, gradient, href }) => (
+            <Link href={href} className="group">
+              <GCard variant="interactive" className="flex items-center gap-4 p-4 transition-all duration-300 group-hover:-translate-y-1 h-full">
+                <GIcon
+                  icon={Icon}
+                  size="md"
+                  tile
+                  tileSize="md"
+                  tileGradient={gradient}
+                  className="group-hover:scale-110 transition-transform duration-300"
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-2xl sm:text-3xl font-black text-primary">{value}</p>
+                  <p className="mt-1 truncate text-xs font-medium uppercase tracking-wide text-text-secondary">{label}</p>
+                </div>
+                <GIcon
+                  icon={ArrowRight}
+                  size="sm"
+                  color="muted"
+                  className="group-hover:text-primary group-hover:translate-x-1 rtl:-translate-x-1 transition-all duration-200"
+                />
               </GCard>
             </Link>
-          ))}
-        </div>
+          )}
+        </GList>
       </section>
 
       {/* Features Section */}
-      <section className="mb-10 lg:mb-14 animate-in" style={{ animationDelay: '100ms' }}>
+      <section className="mb-10 lg:mb-14 animate-in" style={{ animationDelay: "100ms" }}>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <GBadge variant="secondary" className="mb-2 text-xs">{t.features.badge}</GBadge>
+            <GBadge variant="secondary" className="mb-2 text-xs">
+              {t.features.badge}
+            </GBadge>
             <h2 className="text-2xl sm:text-3xl font-bold text-text">{t.features.title}</h2>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {features.map((feature) => (
-            <GCard key={feature.title} variant="glass" padding="lg" className="group text-center transition-all duration-300 group-hover:border-primary/50 group-hover:shadow-glow">
+        <GList items={features} keyExtractor={(feature) => feature.title} listClassName="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" noPagination>
+          {({ icon, title, desc }) => (
+            <GCard
+              variant="glass"
+              padding="lg"
+              className="group text-center transition-all duration-300 group-hover:border-primary/50 h-full">
               <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
-                <GIcon icon={feature.icon} size="lg" color="primary" />
+                <GIcon icon={icon} size="lg" color="primary" />
               </div>
-              <h3 className="text-lg font-bold text-text mb-1">{feature.title}</h3>
-              <p className="text-sm text-text-secondary">{feature.desc}</p>
+              <h3 className="text-lg font-bold text-text mb-1">{title}</h3>
+              <p className="text-sm text-text-secondary">{desc}</p>
             </GCard>
-          ))}
-        </div>
+          )}
+        </GList>
       </section>
 
       {/* Recent History */}
@@ -115,17 +136,18 @@ function Home() {
       />
 
       {/* Games Grid */}
-      <section className="mt-8 lg:mt-12 animate-in" style={{ animationDelay: '200ms' }}>
+      <section className="mt-8 lg:mt-12 animate-in" style={{ animationDelay: "200ms" }}>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <GBadge variant="primary" className="mb-2 text-xs">{t.enterArena}</GBadge>
+            <GBadge variant="primary" className="mb-2 text-xs">
+              {t.enterArena}
+            </GBadge>
             <h2 className="text-2xl sm:text-3xl font-bold text-text">Available Games</h2>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-5">
-          {GamesList.map((game) => (
+        <GList items={[...GamesList]} keyExtractor={(game) => `${game.type}`} listClassName="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" noPagination>
+          {(game) => (
             <GameCard
-              key={game.type}
               name={t.games[game.name as keyof typeof t.games]}
               desc={t.games[game.description as keyof typeof t.games]}
               icon={game.icon}
@@ -135,8 +157,8 @@ function Home() {
               playLabel={t.playNow}
               page
             />
-          ))}
-        </div>
+          )}
+        </GList>
       </section>
     </GPage>
   );

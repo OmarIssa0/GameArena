@@ -14,7 +14,7 @@ import { en, type TResetPasswordTranslation } from "./i18n/en.i18n";
 import { ar } from "./i18n/ar.i18n";
 import { en as EnTextField } from "@/component/i18n/GTextField/en.i18n";
 import { ar as ArTextField } from "@/component/i18n/GTextField/ar.i18n";
-import { passwordValidator } from "@/utils";
+import { passwordValidator } from "@/lib/utils";
 import { authService } from "@/services/def/AuthService";
 import type { GTextFieldTranslation } from "@/component/i18n/GTextField/en.i18n";
 
@@ -103,9 +103,7 @@ function ResetPasswordPage() {
             {t.resetPassword}
           </GButton>
           <div className="pt-2 text-center">
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors">
+            <Link href="/login" className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors">
               <GIcon icon={ArrowLeft} size="sm" color="inherit" className="rtl:-scale-x-100" />
               {t.backToLogin}
             </Link>

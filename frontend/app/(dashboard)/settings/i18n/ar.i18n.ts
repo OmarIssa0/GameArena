@@ -44,6 +44,7 @@ const ar = {
       secondaryColor: "اللون الثانوي",
       backgroundColor: "الخلفية",
       bgPlaceholder: "افتراضي",
+      pageSize: "حجم الصفحة",
     },
   },
 };

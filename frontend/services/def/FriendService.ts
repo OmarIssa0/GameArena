@@ -9,10 +9,10 @@ import type { IFriendService } from "../meta/IFriendService";
 import type { IFriendRepository } from "@/repositories/meta/IFriendRepository";
 import type { Handler } from "../lib/signalRUtils";
 import { requireConnection } from "../lib/signalRUtils";
+import { ReconnectManager } from "../lib/ReconnectManager";
 import { SubscriptionManager } from "../lib/SubscriptionManager";
 
-const buildFullName = (first: string | null | undefined, last: string | null | undefined): string =>
-  `${first ?? ""} ${last ?? ""}`.trim();
+const buildFullName = (first: string | null | undefined, last: string | null | undefined): string => `${first ?? ""} ${last ?? ""}`.trim();
 
 const toFullNameUser = (u: IUserSummary): IUserSummary => ({
   ...u,
@@ -22,23 +22,23 @@ const toFullNameUser = (u: IUserSummary): IUserSummary => ({
 class FriendService implements IFriendService {
   private connection: HubConnection | null = null;
   private subs = new SubscriptionManager();
-  private reconnectHandlers = new Set<() => void>();
+  private reconnectHandlers = new ReconnectManager();
 
   constructor(private repo: IFriendRepository) {}
 
   handleReconnect(): void {
-    this.reconnectHandlers.forEach((h) => { try { h(); } catch { /* isolated */ } });
+    this.reconnectHandlers.handleReconnect();
   }
 
   onReconnect(handler: () => void): () => void {
-    this.reconnectHandlers.add(handler);
-    return () => { this.reconnectHandlers.delete(handler); };
+    return this.reconnectHandlers.onReconnect(handler);
   }
 
   // ── Connection setup (called once by ConnectionProvider) ──────────────
 
   setConnection(connection: HubConnection): void {
     if (this.connection) {
+      this.connection.off("social:all");
       this.connection.off("social:friends");
       this.connection.off("social:requests");
       this.connection.off("social:blocked");
@@ -48,6 +48,28 @@ class FriendService implements IFriendService {
     }
     this.connection = connection;
 
+    // Batched social data event — replaces individual social:friends, social:requests, social:blocked
+    // on initial connect/reconnect to prevent UI flicker
+    this.connection.on("social:all", (data: unknown) => {
+      const batch = data as {
+        friends?: IUserSummary[];
+        receivedRequests?: IFriendRequestReceived[];
+        sentRequests?: IFriendRequestSent[];
+        blockedUsers?: IUserSummary[];
+        counters?: { receivedFriendRequests: number; sentFriendRequests: number; friends: number; unreadMessages: number };
+      };
+
+      const sortedFriends = (batch.friends ?? []).map(toFullNameUser).sort((a, b) => (a.fullName ?? "").localeCompare(b.fullName ?? ""));
+      this.subs.dispatch("social:friends", sortedFriends);
+      this.subs.dispatch("social:requests", { received: batch.receivedRequests ?? [], sent: batch.sentRequests ?? [] });
+      this.subs.dispatch("social:blocked", (batch.blockedUsers ?? []).map(toFullNameUser));
+      this.subs.dispatch(
+        "notification:update",
+        batch.counters ?? { receivedFriendRequests: 0, sentFriendRequests: 0, friends: 0, unreadMessages: 0 },
+      );
+    });
+
+    // Legacy individual events — still handled for incremental updates
     this.connection.on("social:friends", (data: unknown) => {
       const list = (data as IUserSummary[]).map(toFullNameUser).sort((a, b) => (a.fullName ?? "").localeCompare(b.fullName ?? ""));
       this.subs.dispatch("social:friends", list);

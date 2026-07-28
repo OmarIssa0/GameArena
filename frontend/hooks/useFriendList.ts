@@ -1,0 +1,55 @@
+"use client";
+
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
+import { friendService } from "@/services/def/FriendService";
+import { useConnections } from "@/app/providers/ConnectionProvider";
+import type { IUserSummary } from "@/domain/meta/IUserSummary";
+
+const STATUS_MAP: Record<string, UserStatusEnum> = {
+  online: UserStatusEnum.Online,
+  offline: UserStatusEnum.Offline,
+  ingame: UserStatusEnum.InGame,
+};
+
+export function useFriendList() {
+  const { isSocialConnected, isSocialConnecting, socialReconnectKey } = useConnections();
+  const [friends, setFriends] = useState<IUserSummary[]>([]);
+  const [hasReceivedData, setHasReceivedData] = useState(false);
+
+  const loading = isSocialConnecting || (isSocialConnected && !hasReceivedData);
+  const isOffline = !isSocialConnected && !isSocialConnecting;
+
+  useEffect(() => {
+    const offList = friendService.onFriendListUpdate((data) => {
+      setFriends(data);
+      setHasReceivedData(true);
+    });
+
+    const offStatus = friendService.onFriendStatusChange((userId, status) => {
+      setFriends((prev) =>
+        prev.map((f) => (f.id === userId ? { ...f, status: STATUS_MAP[status] ?? f.status } : f))
+      );
+    });
+
+    if (isSocialConnected) {
+      friendService.invokeFriends().catch(() => {});
+    }
+
+    return () => {
+      offList();
+      offStatus();
+    };
+  }, [isSocialConnected, socialReconnectKey]);
+
+  const reload = useCallback(() => {
+    friendService.invokeFriends().catch(() => {});
+  }, []);
+
+  const onlineCount = useMemo(
+    () => friends.filter((f) => f.status !== UserStatusEnum.Offline).length,
+    [friends]
+  );
+
+  return { friends, loading, hasReceivedData, onlineCount, reload, isOffline };
+}

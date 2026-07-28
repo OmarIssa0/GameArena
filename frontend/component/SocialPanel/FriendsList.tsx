@@ -1,22 +1,20 @@
 "use client";
 
+import clsx from "clsx";
 import { useMemo } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Gamepad2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Gamepad2, UsersRound } from "lucide-react";
 import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
 import { GIcon } from "../common/GIcon";
 import { GAvatar } from "../common/GAvatar";
 import { GBadge } from "../common/GBadge";
-import { GButton } from "../common/GButton";
 import { GCard } from "../common/GCard";
+import { GList } from "../common/GList";
 import type { IFriendsListProps } from "./def/FriendsList";
 import type { IUserSummary } from "@/domain/meta/IUserSummary";
 
-export function FriendsList({ friends, messageLabel, query, activeLabel, unreadCounts, actions }: IFriendsListProps) {
+export function FriendsList({ friends, query, unreadCounts, actions, noPagination = false }: IFriendsListProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const currentActiveFriendId = searchParams.get("friend");
-  const isCurrentChat = (friendId: string) => currentActiveFriendId === friendId;
   const searchRegex = useMemo(() => {
     if (!query?.trim()) return null;
     try {
@@ -35,9 +33,9 @@ export function FriendsList({ friends, messageLabel, query, activeLabel, unreadC
       const isMatch = part.toLowerCase() === query.toLowerCase();
 
       return isMatch ? (
-        <span key={`${friend.id}-match-${index}`} className="bg-warning text-bg px-1 rounded">
+        <mark key={`${friend.id}-match-${index}`} className="bg-primary-muted text-primary px-0.5 rounded">
           {part}
-        </span>
+        </mark>
       ) : (
         <span key={`${friend.id}-part-${index}`}>{part}</span>
       );
@@ -45,9 +43,32 @@ export function FriendsList({ friends, messageLabel, query, activeLabel, unreadC
   };
 
   return (
-    <div className="flex flex-col gap-1">
-      {friends.map((friend) => (
-        <GCard key={friend.id} padding="sm" variant="outlined" rounded="xl" className="flex items-center gap-3">
+    <GList
+      items={friends}
+      keyExtractor={(friend) => friend.id}
+      noPagination={noPagination}
+      emptyIcon={<GIcon icon={UsersRound} size="xl" color="muted" />}>
+      {(friend) => (
+        <GCard
+          key={friend.id}
+          padding="sm"
+          variant="outlined"
+          rounded="xl"
+          onClick={() => {
+            if (!actions) router.push(`/messages?friend=${friend.id}`);
+          }}
+          onKeyDown={(e) => {
+            if ((e.key === "Enter" || e.key === " ") && !actions) {
+              e.preventDefault();
+              router.push(`/messages?friend=${friend.id}`);
+            }
+          }}
+          role={!actions ? "button" : undefined}
+          tabIndex={!actions ? 0 : undefined}
+          className={clsx(
+            "flex items-center gap-3",
+            !actions && "cursor-pointer transition hover:bg-bg-card-hover focus-visible:ring-2 focus-visible:ring-primary",
+          )}>
           <div className="relative shrink-0">
             <GAvatar firstName={friend.firstName} lastName={friend.lastName} status={friend.status} size="sm" shape="circle" />
           </div>
@@ -72,19 +93,9 @@ export function FriendsList({ friends, messageLabel, query, activeLabel, unreadC
             </GBadge>
           )}
 
-          {!actions && (
-            <GButton
-              variant={isCurrentChat(friend.id) ? "ghost" : "secondary"}
-              size="sm"
-              disabled={isCurrentChat(friend.id)}
-              onClick={() => router.push(`/messages?friend=${friend.id}`)}
-              className="shrink-0">
-              {isCurrentChat(friend.id) ? activeLabel : messageLabel}
-            </GButton>
-          )}
-          {actions && <div className="flex gap-2">{actions(friend)}</div>}
+          {actions && <div className="flex gap-2 shrink-0">{actions(friend)}</div>}
         </GCard>
-      ))}
-    </div>
+      )}
+    </GList>
   );
 }

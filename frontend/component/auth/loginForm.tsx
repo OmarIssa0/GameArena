@@ -12,7 +12,7 @@ import { ar as ArTextField } from "@/component/i18n/GTextField/ar.i18n";
 import { useTranslation } from "@/hooks/useSetting";
 import { en, type TLoginTranslation } from "@/app/(auth)/login/i18n/en.i18n";
 import { ar } from "@/app/(auth)/login/i18n/ar.i18n";
-import { emailValidator, passwordValidator } from "@/utils";
+import { emailValidator, passwordValidator } from "@/lib/utils";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { authService } from "@/services/def/AuthService";
 import { AxiosError } from "axios";

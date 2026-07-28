@@ -3,7 +3,6 @@ import { MatchStatusEnum } from "@/domain/enum/MatchStatusEnum";
 import { GBadge } from "@/component/common/GBadge";
 import { GCard } from "@/component/common/GCard";
 import { GIcon } from "@/component/common/GIcon";
-import type { IMatchHistory } from "@/domain/meta/IMatchHistory";
 import { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
 import type { MatchHistoryItemProps } from "./def/MatchHistoryItem";
 import { Gamepad2 } from "lucide-react";

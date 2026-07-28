@@ -7,6 +7,7 @@ interface UseFetchResult<T> {
   data: TNullable<T>;
   loading: boolean;
   error: TNullable<string>;
+  /** Re-fetches data. Note: if the component is unmounted, the result will be discarded. */
   reload: () => void;
 }
 
@@ -43,7 +44,7 @@ export function useFetch<T>(
       })
       .catch((err) => {
         if (gen === genRef.current && mountedRef.current && !(err instanceof DOMException && err.name === "AbortError")) {
-          setError(err instanceof Error ? err.message : "An error occurred");
+          setError("Something went wrong. Please try again.");
           setLoading(false);
         }
       });

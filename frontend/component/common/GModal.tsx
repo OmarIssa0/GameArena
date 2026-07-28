@@ -2,7 +2,7 @@
 
 import type React from "react";
 import clsx from "clsx";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { GBackdrop } from "./GBackdrop";
 import { GCard } from "./GCard";
 import type { GModalProps } from "./def/GModal";
@@ -13,6 +13,8 @@ const sizeStyles: Record<string, string> = {
   lg: "max-w-md",
   xl: "max-w-lg",
 };
+
+const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),textarea:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])';
 
 function GModal({
   open,
@@ -28,9 +30,38 @@ function GModal({
   className,
   ...props
 }: GModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (closeOnEscape && e.key === "Escape") onClose();
+      if (closeOnEscape && e.key === "Escape") {
+        onClose();
+        return;
+      }
+
+      if (e.key === "Tab" && modalRef.current) {
+        const focusable = modalRef.current.querySelectorAll<HTMLElement>(FOCUSABLE);
+        if (focusable.length === 0) {
+          e.preventDefault();
+          return;
+        }
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
     },
     [closeOnEscape, onClose],
   );
@@ -42,18 +73,35 @@ function GModal({
 
   useEffect(() => {
     if (!open) return;
+
+    previousFocusRef.current = document.activeElement as HTMLElement;
+
     document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
+
+    const timer = requestAnimationFrame(() => {
+      if (modalRef.current) {
+        const focusable = modalRef.current.querySelector<HTMLElement>(FOCUSABLE);
+        focusable?.focus();
+      }
+    });
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      cancelAnimationFrame(timer);
+      previousFocusRef.current?.focus();
+      previousFocusRef.current = null;
+    };
   }, [open, handleKeyDown]);
 
   if (!open) return null;
 
   return (
     <div
+      ref={modalRef}
       className={clsx("fixed inset-0 z-50 flex items-center justify-center", className)}
       role={role}
       aria-modal="true"
-      aria-label={ariaLabel ?? "modal"}
+      aria-label={ariaLabel}
       aria-describedby={ariaDescription ? "modal-description" : undefined}
       {...props}>
       <GBackdrop onClick={handleBackdropClick} />

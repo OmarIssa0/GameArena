@@ -41,7 +41,7 @@ function SnakePage() {
                   <div
                     key={`${rowIndex}-${colIndex}`}
                     className={clsx(
-                      "w-6 h-6 rounded transition-colors duration-150",
+                      "w-[min(5vw,1.5rem)] h-[min(5vw,1.5rem)] rounded transition-colors duration-150",
                       hasSnake
                         ? "bg-primary border border-primary-muted"
                         : hasFood

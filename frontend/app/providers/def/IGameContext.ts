@@ -8,7 +8,6 @@ interface IGameContext {
   isSearching: boolean;
   searchError: TNullable<string>;
   opponentDisconnected: boolean;
-  isInitialSyncDone: boolean;
   lastGameType: GamesKindEnum | null;
   pendingPlayAgainRequest: { requesterId: string; requesterUsername: string } | null;
   requestedPlayAgain: boolean;

@@ -8,25 +8,14 @@ import { GButton } from "@/component/common/GButton";
 import { GIcon } from "@/component/common/GIcon";
 import { useTranslation } from "@/hooks/useSetting";
 import { GCard } from "../common/GCard";
-
-function slideInRightKeyframes() {
-  return `@keyframes ga-slideInRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}.ga-slide-in-right{animation:ga-slideInRight .3s ease-out}`;
-}
+import { en, type TGamesTranslation } from "@/app/(dashboard)/games/i18n/en.i18n";
+import { ar } from "@/app/(dashboard)/games/i18n/ar.i18n";
 
 function ActiveGameBanner() {
   const { state, lastGameType } = useGame();
   const pathname = usePathname();
   const router = useRouter();
-  const t = useTranslation({
-    en: { returnToGame: "Return to Game", gameRunning: "Game Running", ticTacToe: "Tic Tac Toe", snake: "Snake", pong: "Ping Pong" },
-    ar: { returnToGame: "العودة إلى اللعبة", gameRunning: "اللعبة جارية", ticTacToe: "إكس أو", snake: "الثعبان", pong: "بينغ بونغ" },
-  }) as {
-    returnToGame: string;
-    gameRunning: string;
-    ticTacToe: string;
-    snake: string;
-    pong: string;
-  };
+  const t = useTranslation({ en, ar }) as TGamesTranslation & { returnToGame: string; gameRunning: string };
   const isActive = state?.hasStarted === true && state?.isFinished === false;
   const isOnGamePage = pathname.startsWith("/games/") && pathname !== "/games";
 
@@ -36,10 +25,8 @@ function ActiveGameBanner() {
   const game = GamesList.find((g) => g.type === (lastGameType as typeof g.type)) ?? GamesList[0];
 
   return (
-    <>
-      <style>{slideInRightKeyframes()}</style>
-      <div className="fixed bottom-6 inset-inline-4 sm:inset-inline-end-4 sm:w-96 sm:max-w-none z-50 ga-slide-in-right">
-      <GCard variant="glass" padding="md" className="flex items-center gap-4 shadow-2xl">
+    <div className="fixed bottom-6 inset-inline-4 sm:inset-inline-end-4 sm:w-96 sm:max-w-none z-50 ga-slide-in-right">
+      <GCard variant="glass" padding="md" className="flex items-center gap-4">
         <div className="p-2 bg-primary/10 rounded-xl">
           <GIcon icon={game.icon} size="lg" color="primary" />
         </div>
@@ -53,7 +40,7 @@ function ActiveGameBanner() {
           <GIcon icon={ArrowRight} size="sm" className="rtl:-scale-x-100" />
         </GButton>
       </GCard>
-    </div></>  
+    </div>  
   );
 }
 

@@ -6,7 +6,7 @@ import { UserPlus } from "lucide-react";
 import { GTextField } from "@/component/common/GTextField";
 import { GButton } from "@/component/common/GButton";
 import { GIcon } from "@/component/common/GIcon";
-import { emailValidator, passwordValidator } from "@/utils";
+import { emailValidator, passwordValidator } from "@/lib/utils";
 import { en, type TRegisterTranslation } from "@/app/(auth)/register/i18n/en.i18n";
 import { ar } from "@/app/(auth)/register/i18n/ar.i18n";
 import { en as EnTextField, GTextFieldTranslation } from "@/component/i18n/GTextField/en.i18n";

@@ -7,7 +7,8 @@ import { en, type TSettingsTranslation } from "./i18n/en.i18n";
 import { en as EnTextField, type GTextFieldTranslation } from "@/component/i18n/GTextField/en.i18n";
 import { ar as ArTextField } from "@/component/i18n/GTextField/ar.i18n";
 import { GTabs } from "@/component/common/GTabs";
-import { Save, User, Lock, Settings, Moon, Volume2, Activity, Gamepad2, Sliders, Languages, Bell } from "lucide-react";
+import { Save, User, Lock, Settings, Moon, Volume2, Activity, Gamepad2, Sliders, Languages, Bell, List } from "lucide-react";
+import { GList } from "@/component/common/GList";
 import { GButton } from "@/component/common/GButton";
 import type { GTabItem } from "@/component/common/def/GTabs";
 import { GCard } from "@/component/common/GCard";
@@ -17,8 +18,9 @@ import { GIcon } from "@/component/common/GIcon";
 import { GSpinner } from "@/component/common/GSpinner";
 import { userRepository } from "@/repositories/def/UserRepository";
 import type { IUser } from "@/domain/meta/IUser";
-import { DEFAULT_USER_PREFERENCES, type IUserPreferences} from "@/domain/meta/IUserPreferences";
-import { passwordValidator } from "@/utils";
+import { DEFAULT_USER_PREFERENCES, type IUserPreferences } from "@/domain/meta/IUserPreferences";
+import { passwordValidator } from "@/lib/utils";
+import { useAuth } from "@/app/providers/AuthProvider";
 
 type SettingsTab = "profile" | "password" | "preferences";
 
@@ -28,7 +30,7 @@ function SettingsPage() {
     ar: { ...ar, ...ArTextField },
   }) as TSettingsTranslation & GTextFieldTranslation;
   const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
-
+  const { updatePreferences } = useAuth();
   const [profile, setProfile] = useState<IUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -87,15 +89,19 @@ function SettingsPage() {
   const handleSaveProfile = async () => {
     if (!profile) return;
     setSaving(true);
-    await userRepository.updateProfile({
-      firstName,
-      lastName,
-      userName,
-      email: profile.email,
-      password: null,
-    });
+    try {
+      await userRepository.updateProfile({
+        firstName,
+        lastName,
+        userName,
+        email: profile.email,
+        password: null,
+      });
+      showMessage(t.settings.profile.saved);
+    } catch {
+      showMessage("Failed to save profile");
+    }
     setSaving(false);
-    showMessage(t.settings.profile.saved);
   };
 
   const validatePassword = (): boolean => {
@@ -122,27 +128,38 @@ function SettingsPage() {
       setConfirmPassword("");
       setPasswordErrors({});
       showMessage(t.settings.password.saved);
-    } catch {
-      setPasswordErrors({ oldPassword: t.settings.password.invalidCurrentPassword });
+    } catch (err) {
+      const message = err instanceof Error ? err.message.toLowerCase() : "";
+      if (message.includes("invalid") || message.includes("wrong") || message.includes("incorrect")) {
+        setPasswordErrors({ oldPassword: t.settings.password.invalidCurrentPassword });
+      } else {
+        showMessage("Failed to change password");
+      }
     }
     setSaving(false);
   };
 
   const handleSavePreferences = async () => {
     setPrefSaving(true);
-    // theme/locale are applied live via useSetting; persist the canonical values.
-    const toPersist: IUserPreferences = {
-      ...preferences,
-      theme: theme as IUserPreferences["theme"],
-      locale: locale as IUserPreferences["locale"],
-    };
-    await userRepository.updatePreferences({ preferences: JSON.stringify(toPersist) });
+    try {
+      const toPersist: IUserPreferences = {
+        ...preferences,
+        theme: theme as IUserPreferences["theme"],
+        locale: locale as IUserPreferences["locale"],
+      };
+      await userRepository.updatePreferences({ preferences: JSON.stringify(toPersist) });
+      updatePreferences(toPersist);
+      showMessage(t.settings.preferences.saved);
+    } catch {
+      showMessage("Failed to save preferences");
+    }
     setPrefSaving(false);
-    showMessage(t.settings.preferences.saved);
   };
 
   const togglePref = (key: keyof IUserPreferences) => {
-    setPreferences((prev) => ({ ...prev, [key]: !prev[key] }));
+    const next = !preferences[key];
+    setPreferences((prev) => ({ ...prev, [key]: next }));
+    updatePreferences({ [key]: next });
   };
 
   const tabs = useMemo<GTabItem<SettingsTab>[]>(
@@ -166,6 +183,8 @@ function SettingsPage() {
     [t],
   );
 
+  const pageSizeOptions = [5, 10, 15, 20, 25];
+
   const prefItems: { key: keyof IUserPreferences; label: string; icon: React.ReactNode }[] = [
     { key: "soundEnabled", label: t.settings.preferences.sound, icon: <GIcon icon={Volume2} size="sm" color="inherit" /> },
     { key: "showOnlineStatus", label: t.settings.preferences.showOnline, icon: <GIcon icon={Activity} size="sm" color="inherit" /> },
@@ -175,25 +194,23 @@ function SettingsPage() {
 
   return (
     <div className="h-full flex flex-col lg:flex-row overflow-hidden">
-        <aside className="w-full lg:w-64 shrink-0 border-b lg:border-b-0 lg:border-e border-border bg-bg-sidebar">
-          <div className="p-4 lg:p-6">
-            <div className="mb-8">
-              <header className="flex items-center gap-3">
-                <GIcon icon={Settings} size="xl" tile tileSize="xl" tileGradient="bg-primary" tileColor="on-primary" />
-                <div className="flex-1">
-                  <h1 className="text-2xl font-extrabold text-text tracking-tight leading-tight">{t.title}</h1>
-                </div>
-              </header>
-            </div>
-            <GTabs tabs={tabs} value={activeTab} onChange={setActiveTab} direction="V" variant="sidebar" indicator="start" fullWidth />
+      <aside className="w-full md:w-64 shrink-0 border-b md:border-b-0 md:border-e border-border bg-bg-sidebar">
+        <div className="p-4 lg:p-6">
+          <div className="mb-8">
+            <header className="flex items-center gap-3">
+              <GIcon icon={Settings} size="xl" tile tileSize="xl" tileGradient="bg-primary" tileColor="on-primary" />
+              <div className="flex-1">
+                <h1 className="text-2xl font-extrabold text-text tracking-tight leading-tight">{t.title}</h1>
+              </div>
+            </header>
           </div>
-        </aside>
+          <GTabs tabs={tabs} value={activeTab} onChange={setActiveTab} direction="V" variant="sidebar" indicator="start" fullWidth />
+        </div>
+      </aside>
 
       <main className="flex-1 overflow-y-auto custom-scrollbar p-4 lg:p-8 bg-bg">
         <div className="max-w-2xl mx-auto w-full">
-          {saveMsg && (
-            <div className="mb-6 p-4 rounded-xl bg-success-bg border border-success text-success text-sm text-center">{saveMsg}</div>
-          )}
+          {saveMsg && <div className="mb-6 p-4 rounded-xl bg-success-bg border border-success text-success text-sm text-center">{saveMsg}</div>}
 
           {activeTab === "profile" && (
             <GCard variant="elevated" padding="xl" className="animate-in">
@@ -225,7 +242,7 @@ function SettingsPage() {
                   </div>
                   <div className="mt-8 flex justify-end">
                     <GButton
-                      leftIcon={saving ? <GSpinner size="sm" /> : <GIcon icon={Save} size="sm" color="inherit" className="text-on-primary" />}
+                      startIcon={saving ? <GSpinner size="sm" /> : <GIcon icon={Save} size="sm" color="inherit" className="text-on-primary" />}
                       onClick={handleSaveProfile}
                       disabled={saving}>
                       {t.settings.profile.save}
@@ -274,7 +291,7 @@ function SettingsPage() {
 
               <div className="mt-8 flex justify-end">
                 <GButton
-                  leftIcon={saving ? <GSpinner size="sm" /> : <GIcon icon={Save} size="sm" color="inherit" className="text-on-primary" />}
+                  startIcon={saving ? <GSpinner size="sm" /> : <GIcon icon={Save} size="sm" color="inherit" className="text-on-primary" />}
                   onClick={handleSavePassword}
                   disabled={saving}>
                   {t.settings.password.save}
@@ -305,7 +322,8 @@ function SettingsPage() {
                   </div>
                   <GTextField
                     type="checkbox"
-                    className="w-5 h-5 p-0 m-0"
+                    className="flex items-center justify-center"
+                    size="md"
                     checked={theme === "dark"}
                     onChange={(e) => setTheme(e.target.checked ? "dark" : "light")}
                   />
@@ -329,25 +347,43 @@ function SettingsPage() {
                   />
                 </div>
 
-                {prefItems.map((item) => (
-                  <label key={item.key} className="flex items-center justify-between py-3 border-b border-border/50 last:border-0 group">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-surface rounded-lg group-hover:bg-primary/10 transition-colors">{item.icon}</div>
-                      <span className="text-sm text-text">{item.label}</span>
+                <GList items={prefItems} keyExtractor={(item) => item.key} noPagination>
+                  {(item) => (
+                    <label className="flex items-center justify-between py-3 border-b border-border/50 group">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-surface rounded-lg group-hover:bg-primary/10 transition-colors">{item.icon}</div>
+                        <span className="text-sm text-text">{item.label}</span>
+                      </div>
+                      <GTextField
+                        type="checkbox"
+                        className="flex items-center justify-center"
+                        checked={preferences[item.key] as boolean}
+                        onChange={() => togglePref(item.key)}
+                        size="sm"
+                      />
+                    </label>
+                  )}
+                </GList>
+
+                <div className="flex items-center justify-between py-3 border-b border-border/50">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2 bg-surface rounded-lg">
+                      <GIcon icon={List} size="sm" color="inherit" />
                     </div>
-                    <GTextField
-                      type="checkbox"
-                      className="w-5 h-5 p-0 m-0"
-                      checked={preferences[item.key] as boolean}
-                      onChange={() => togglePref(item.key)}
-                    />
-                  </label>
-                ))}
+                    <span className="text-sm text-text">{t.settings.preferences.pageSize}</span>
+                  </div>
+                  <GSelect
+                    className="w-20"
+                    value={preferences.pageSize}
+                    onChange={(e) => setPreferences((prev) => ({ ...prev, pageSize: Number(e.target.value) }))}
+                    options={pageSizeOptions.map((n) => ({ value: n, label: `${n}` }))}
+                  />
+                </div>
               </div>
 
               <div className="flex justify-end pt-4 border-t border-border">
                 <GButton
-                  leftIcon={prefSaving ? <GSpinner size="sm" /> : <GIcon icon={Save} size="sm" color="inherit" className="text-on-primary" />}
+                  startIcon={prefSaving ? <GSpinner size="sm" /> : <GIcon icon={Save} size="sm" color="inherit" className="text-on-primary" />}
                   onClick={handleSavePreferences}
                   disabled={prefSaving}>
                   {t.settings.preferences.save}

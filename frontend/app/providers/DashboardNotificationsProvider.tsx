@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useConnections } from "./ConnectionProvider";
 import { useAuth } from "./AuthProvider";
@@ -65,7 +65,15 @@ export function DashboardNotificationsProvider({ children }: { children: React.R
       setNotifications((prev) => [n, ...prev]);
       playNotificationSound();
     });
-    const off4 = notificationService.onNotificationList(setNotifications);
+    const off4 = notificationService.onNotificationList((list) => {
+      setNotifications((prev) => {
+        const incomingIds = new Set(list.map((n) => n.id));
+        const localOnly = prev.filter((n) => !incomingIds.has(n.id));
+        return [...list, ...localOnly].sort((a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      });
+    });
     return () => { off1(); off2(); off3(); off4(); };
   }, []);
 
@@ -73,11 +81,7 @@ export function DashboardNotificationsProvider({ children }: { children: React.R
     if (!isSocialConnected) return;
     notificationService.requestCounters().catch(() => {});
     notificationService.requestNotificationList().catch(() => {});
-    const t = setTimeout(() => {
-      notificationService.requestCounters().catch(() => {});
-      notificationService.requestNotificationList().catch(() => {});
-    }, 500);
-    return () => clearTimeout(t);
+    return () => {};
   }, [isSocialConnected, socialReconnectKey]);
 
   useEffect(() => {
@@ -90,15 +94,24 @@ export function DashboardNotificationsProvider({ children }: { children: React.R
 
   const unreadNotificationCount = useMemo(() => notifications.filter((n) => !n.isRead).length, [notifications]);
 
+  const dismissGameInvite = useCallback((roomId: string) => {
+    setGameInvites((prev) => prev.filter((i) => i.roomId !== roomId));
+  }, []);
+
+  const acceptGameInvite = useCallback(async (roomId: string) => {
+    await gameService.acceptInvite(roomId);
+    setGameInvites((prev) => prev.filter((i) => i.roomId !== roomId));
+  }, []);
+
   const value = useMemo<INotificationState>(() => ({
     friendRequestCount,
     unreadMessageCount,
     unreadNotificationCount,
     gameInvites,
     notifications,
-    dismissGameInvite: (roomId) => setGameInvites((prev) => prev.filter((i) => i.roomId !== roomId)),
-    acceptGameInvite: async (roomId) => { await gameService.acceptInvite(roomId); setGameInvites((prev) => prev.filter((i) => i.roomId !== roomId)); },
-  }), [friendRequestCount, unreadMessageCount, unreadNotificationCount, gameInvites, notifications]);
+    dismissGameInvite,
+    acceptGameInvite,
+  }), [friendRequestCount, unreadMessageCount, unreadNotificationCount, gameInvites, notifications, dismissGameInvite, acceptGameInvite]);
 
   return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;
 }

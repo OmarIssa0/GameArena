@@ -38,7 +38,7 @@ function TicTacToePage() {
             onClick={() => sendAction({ type: ACTION_MAKE_MOVE, cell: index })}
             disabled={!isCellPlayable(cell)}
             className={clsx(
-              "aspect-square flex items-center justify-center text-4xl font-bold border-2 rounded-md transition-colors duration-150",
+              "aspect-square min-w-[44px] min-h-[44px] flex items-center justify-center text-4xl font-bold border-2 rounded-md transition-colors duration-150",
               cell === PLAYER_X && "text-accent bg-accent-muted border-accent/40",
               cell === PLAYER_O && "text-warning bg-warning-bg border-warning/40",
               cell === EMPTY && "bg-surface border-border-light hover:border-primary/40 hover:bg-primary-muted cursor-pointer",

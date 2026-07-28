@@ -1,5 +1,4 @@
 import { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
-import { MatchStatusEnum } from "@/domain/enum/MatchStatusEnum";
 
 const en = {
   title: "Match History",

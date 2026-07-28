@@ -32,7 +32,7 @@ function GameReady({ gameType }: GameReadyProps) {
 
         <div className="flex items-center justify-center gap-6 mb-10">
           <div className="flex flex-col items-center">
-            <div className="w-20 h-20 rounded-2xl flex items-center justify-center border-2 border-accent bg-accent-muted shadow-glow">
+            <div className="w-20 h-20 rounded-2xl flex items-center justify-center border-2 border-accent bg-accent-muted">
               <span className="text-3xl font-bold text-accent">{gameInfo.symbol1}</span>
             </div>
             <span className="text-sm font-bold mt-3 text-text truncate max-w-28">
@@ -57,7 +57,7 @@ function GameReady({ gameType }: GameReadyProps) {
           onClick={() => startGame(state.player2Id!, gameType)}
           fullWidth
           size="lg"
-          leftIcon={<GIcon icon={Play} size="lg" color="inherit" />}>
+          startIcon={<GIcon icon={Play} size="lg" color="inherit" />}>
           {isHost ? t.ready.startGame : t.ready.waitingForStart}
         </GButton>
       </GCard>

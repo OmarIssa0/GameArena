@@ -6,6 +6,7 @@ import { useDashboardNotifications } from "@/app/providers/DashboardNotification
 import { useGame } from "@/app/providers/GameProvider";
 import { GButton } from "@/component/common/GButton";
 import { GCard } from "@/component/common/GCard";
+import { GList } from "@/component/common/GList";
 import { GModal } from "@/component/common/GModal";
 import { useTranslation } from "@/hooks/useSetting";
 import { GamesList } from "@/domain/constant/games";
@@ -16,18 +17,19 @@ import { GEmpty } from "../common/GEmpty";
 import { Bell } from "lucide-react";
 import { GIcon } from "../common/GIcon";
 
-const gamePath = (gameType: number) => GamesList.find((g) => g.type === gameType)?.path ?? "tic-tac-toe";
+const gamePath = (gameType: number) => GamesList.find((g) => g.type === gameType)?.path;
 
 export function GameInvitesList({ onAfterAccept }: IGameInvitesListProps) {
   const router = useRouter();
   const t = useTranslation({ en, ar }) as TSocialPanelTranslation;
   const { gameInvites, acceptGameInvite, dismissGameInvite } = useDashboardNotifications();
   const { state, leaveGame } = useGame();
-  const [pendingAccept, setPendingAccept] = useState<{ roomId: string; path: string } | null>(null);
+  const [pendingAccept, setPendingAccept] = useState<{ roomId: string; path: string | undefined } | null>(null);
 
   const isInGame = state !== null;
 
-  const handleAccept = async (roomId: string, path: string) => {
+  const handleAccept = async (roomId: string, path: string | undefined) => {
+    if (!path) return;
     if (isInGame) {
       setPendingAccept({ roomId, path });
       return;
@@ -38,7 +40,7 @@ export function GameInvitesList({ onAfterAccept }: IGameInvitesListProps) {
   };
 
   const handleConfirmAccept = async () => {
-    if (!pendingAccept) return;
+    if (!pendingAccept?.path) return;
     await leaveGame();
     await acceptGameInvite(pendingAccept.roomId);
     router.push(`/games/${pendingAccept.path}`);
@@ -53,19 +55,21 @@ export function GameInvitesList({ onAfterAccept }: IGameInvitesListProps) {
 
   return (
     <div className="space-y-2">
-      {gameInvites.map((invite) => (
-        <GCard key={invite.roomId} padding="sm" className="bg-primary-muted border-primary/20">
-          <p className="text-sm font-medium text-text">{t.invites.wantsToPlay.replace("{{name}}", invite.inviterName ?? "")}</p>
-          <div className="flex gap-2 mt-2">
-            <GButton size="sm" onClick={() => handleAccept(invite.roomId, gamePath(invite.gameType))}>
-              {t.invites.accept}
-            </GButton>
-            <GButton size="sm" variant="secondary" onClick={() => dismissGameInvite(invite.roomId)}>
-              {t.invites.decline}
-            </GButton>
-          </div>
-        </GCard>
-      ))}
+      <GList items={gameInvites} keyExtractor={(invite) => invite.roomId}>
+        {(invite) => (
+          <GCard key={invite.roomId} padding="sm" className="bg-primary-muted border-primary/20">
+            <p className="text-sm font-medium text-text">{t.invites.wantsToPlay.replace("{{name}}", invite.inviterName ?? "")}</p>
+            <div className="flex gap-2 mt-2">
+              <GButton size="md" onClick={() => handleAccept(invite.roomId, gamePath(invite.gameType))}>
+                {t.invites.accept}
+              </GButton>
+              <GButton size="md" variant="secondary" onClick={() => dismissGameInvite(invite.roomId)}>
+                {t.invites.decline}
+              </GButton>
+            </div>
+          </GCard>
+        )}
+      </GList>
 
       <GModal open={pendingAccept !== null} onClose={handleCancelAccept} role="alertdialog" ariaLabel="Accept invite confirmation">
         <div className="text-center">

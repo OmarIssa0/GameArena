@@ -21,13 +21,20 @@ function buildSummary(matches: IMatchHistory[]) {
 function useMatchHistory(statusFilter: MatchStatusEnum = MatchStatusEnum.All, limit?: number) {
   const [allMatches, setAllMatches] = useState<IMatchHistory[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let alive = true;
     matchHistoryService
       .getMatchHistory()
       .then((res) => {
-        if (alive && res.data) setAllMatches(res.data);
+        if (!alive) return;
+        if (res.data) setAllMatches(res.data);
+      })
+      .catch((err: unknown) => {
+        if (!alive) return;
+        const message = err instanceof Error ? err.message : "Failed to load match history";
+        setError(message);
       })
       .finally(() => {
         if (alive) setLoading(false);
@@ -44,7 +51,7 @@ function useMatchHistory(statusFilter: MatchStatusEnum = MatchStatusEnum.All, li
 
   const summary = useMemo(() => buildSummary(allMatches), [allMatches]);
 
-  return { matches, summary, loading };
+  return { matches, summary, loading, error };
 }
 
 export { useMatchHistory };

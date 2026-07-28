@@ -15,7 +15,9 @@ function FriendsListTab({ friends, messageLabel, activeLabel, onMessage, onBlock
   if (friends.length === 0) {
     return (
       <GEmpty icon={<GIcon icon={Users} size="xl" color="muted" />} title={t.noFriendsTitle} description={t.noFriendsDescription}>
-        <GButton onClick={onAddFriend} className="mt-4">{t.addFriend}</GButton>
+        <GButton onClick={onAddFriend} className="mt-4">
+          {t.addFriend}
+        </GButton>
       </GEmpty>
     );
   }
@@ -29,17 +31,55 @@ function FriendsListTab({ friends, messageLabel, activeLabel, onMessage, onBlock
         const isBusy = actionId === friend.id;
         return (
           <div className="flex gap-1">
-            <GIcon icon={MessageSquare} size="sm" tile tileSize="sm" tileGradient="bg-primary/10" tileColor="primary" onClick={() => onMessage(friend.id)} className="hover:bg-primary hover:text-text" />
-            <GIcon icon={isBusy ? Loader2 : ShieldBan} size="sm" tile tileSize="sm" tileGradient="bg-warning/10" tileColor="warning" className={isBusy ? "animate-spin opacity-50 pointer-events-none" : "hover:bg-warning hover:text-text"}
+            <GIcon
+              icon={MessageSquare}
+              size="md"
+              tile
+              hover
+              tileSize="lg"
+              tileGradient="bg-primary/10"
+              tileColor="primary"
+              onClick={() => onMessage(friend.id)}
+              ariaLabel={t.message}
+            />
+            <GIcon
+              icon={isBusy ? Loader2 : ShieldBan}
+              size="md"
+              tile
+              hover
+              tileSize="lg"
+              tileGradient="bg-warning/10"
+              tileColor="warning"
+              className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}
               onClick={async () => {
                 setActionId(friend.id);
-                try { await onBlock(friend.id); } finally { setActionId(null); }
-              }} />
-            <GIcon icon={isBusy ? Loader2 : UserMinus} size="sm" tile tileSize="sm" tileGradient="bg-danger/10" tileColor="danger" className={isBusy ? "animate-spin opacity-50 pointer-events-none" : "hover:bg-danger hover:text-text"}
+                try {
+                  await onBlock(friend.id);
+                } finally {
+                  setActionId(null);
+                }
+              }}
+              ariaLabel="Block"
+            />
+            <GIcon
+              icon={isBusy ? Loader2 : UserMinus}
+              size="md"
+              tile
+              hover
+              tileSize="lg"
+              tileGradient="bg-danger/10"
+              tileColor="danger"
+              className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}
               onClick={async () => {
                 setActionId(friend.id);
-                try { await onRemove(friend.id); } finally { setActionId(null); }
-              }} />
+                try {
+                  await onRemove(friend.id);
+                } finally {
+                  setActionId(null);
+                }
+              }}
+              ariaLabel="Remove friend"
+            />
           </div>
         );
       }}

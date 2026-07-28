@@ -67,14 +67,6 @@
   --color-danger-bg: rgb(229 115 115 / 0.1);
   --color-danger-strong: rgb(229 115 115 / 0.2);
 
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-  --shadow-glow: 0 0 20px rgb(124 108 240 / 0.25);
-  --shadow-glow-lg: 0 0 40px rgb(124 108 240 / 0.15);
-
   --transition-fast: 150ms ease;
   --transition-normal: 200ms ease;
   --transition-slow: 300ms ease;
@@ -99,9 +91,9 @@
   --theme-bg-sidebar: #0d0f17;
   --theme-surface: #181b26;
   --theme-surface-hover: #1e2230;
-  --theme-border: #2a2e3e;
-  --theme-border-light: #363a4d;
-  --theme-border-strong: #44495e;
+  --theme-border: #663399;
+  --theme-border-light: #7a4dab;
+  --theme-border-strong: #9966cc;
   --theme-text: #eef0f5;
   --theme-text-secondary: #9aa0b4;
   --theme-text-muted: #6b7186;
@@ -139,9 +131,9 @@
   --theme-bg-sidebar: #ebe8f2;
   --theme-surface: #f0edf7;
   --theme-surface-hover: #e6e2f0;
-  --theme-border: #d3cedf;
-  --theme-border-light: #c2bcd2;
-  --theme-border-strong: #a8a0b8;
+  --theme-border: #663399;
+  --theme-border-light: #7a4dab;
+  --theme-border-strong: #9966cc;
   --theme-text: #1a1625;
   --theme-text-secondary: #494561;
   --theme-text-muted: #7b7690;
@@ -189,14 +181,6 @@
   --color-danger: #c45555;
   --color-danger-bg: rgb(196 85 85 / 0.15);
   --color-danger-strong: rgb(196 85 85 / 0.25);
-
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.05);
-  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.15);
-  --shadow-glow: 0 0 20px rgb(107 90 216 / 0.25);
-  --shadow-glow-lg: 0 0 40px rgb(107 90 216 / 0.15);
 
   --color-bg: var(--theme-bg);
   --color-bg-elevated: var(--theme-bg-elevated);
@@ -281,6 +265,16 @@ a:hover {
 
 button {
   font-family: inherit;
+}
+
+select,
+select option {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+*, *::before, *::after, ::backdrop {
+  border-color: var(--color-border-light);
 }
 
 img, svg, video, canvas {
@@ -378,9 +372,19 @@ p {
   50% { transform: translateY(-8px); }
 }
 
+.ga-slide-in-right {
+  animation: gaSlideInRight 0.3s ease-out;
+}
+
+@keyframes gaSlideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-in,
-  .animate-float {
+  .animate-float,
+  .ga-slide-in-right {
     animation: none !important;
   }
 }

@@ -212,14 +212,14 @@ function PingPongPage() {
             ref={boardRef}
             className="relative bg-surface border-2 border-border-light rounded-lg mx-auto w-full max-w-full overflow-hidden"
             style={{ aspectRatio: boardRect && boardRect.width > boardRect.height ? "3/2" : "2/3" }}>
-            <div className="absolute inset-y-0 left-1/2 w-px border-l-2 border-dashed border-border opacity-50" />
+            <div className="absolute inset-y-0 start-1/2 w-px border-s-2 border-dashed border-border opacity-50" />
 
-            <div className="absolute left-[2px] bg-accent rounded" style={{ width: paddleW, height: paddleH, top: p1Top }} />
-            <div className="absolute right-[2px] bg-warning rounded" style={{ width: paddleW, height: paddleH, top: p2Top }} />
+            <div className="absolute start-[2px] bg-accent rounded" style={{ width: paddleW, height: paddleH, top: p1Top }} />
+            <div className="absolute end-[2px] bg-warning rounded" style={{ width: paddleW, height: paddleH, top: p2Top }} />
 
             <div
               className={clsx("absolute bg-primary rounded-full", !isFinished && "animate-pulse")}
-              style={{ width: ballSize, height: ballSize, left: ballLeft, top: ballTop }}
+              style={{ width: ballSize, height: ballSize, insetInlineStart: ballLeft, top: ballTop }}
             />
           </div>
         </div>

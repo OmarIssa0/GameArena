@@ -1,15 +1,17 @@
+import { ReconnectManager } from "../lib/ReconnectManager";
+import { SubscriptionManager } from "../lib/SubscriptionManager";
+import { gameRepository } from "@/repositories/def/GameRepository";
 import type { HubConnection } from "@microsoft/signalr";
 import type { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
 import type { IGameInvite } from "@/domain/meta/INotification";
 import type { IGameState } from "@/app/providers/def/IGameState";
 import type { IGameService } from "../meta/IGameService";
 import type { Handler } from "../lib/signalRUtils";
-import { SubscriptionManager } from "../lib/SubscriptionManager";
 
 class GameService implements IGameService {
   private connection: HubConnection | null = null;
   private subs = new SubscriptionManager();
-  private reconnectHandlers = new Set<() => void>();
+  private reconnectHandlers = new ReconnectManager();
   private _connectionReady: Promise<void>;
   private _resolveConnectionReady!: () => void;
 
@@ -29,14 +31,20 @@ class GameService implements IGameService {
     return this.connection;
   }
 
+  // ── REST API (via repository) ───────────────────────────────────────────
+
+  getCurrentState(): Promise<IGameState | null> {
+    return gameRepository.getCurrentState().then((res) => res.data ?? null);
+  }
+
+  // ── Connection management ───────────────────────────────────────────────
+
   handleReconnect(): void {
-    this.requestCurrentState().catch(() => {});
-    this.reconnectHandlers.forEach((h) => { try { h(); } catch { /* isolated */ } });
+    this.reconnectHandlers.handleReconnect();
   }
 
   onReconnect(handler: () => void): () => void {
-    this.reconnectHandlers.add(handler);
-    return () => { this.reconnectHandlers.delete(handler); };
+    return this.reconnectHandlers.onReconnect(handler);
   }
 
   setConnection(connection: HubConnection): void {
@@ -72,16 +80,12 @@ class GameService implements IGameService {
     this._resolveConnectionReady();
   }
 
-  // ── Invoke methods ──────────────────────────────────────────────────────
-
   private async invoke<T = void>(method: string, ...args: unknown[]): Promise<T> {
     const conn = await this.ensureConnection();
     return conn.invoke(method, ...args);
   }
 
-  async requestCurrentState(): Promise<IGameState | null> {
-    return this.invoke<IGameState | null>("GetCurrentState");
-  }
+  // ── SignalR invocations ─────────────────────────────────────────────────
 
   async findMatch(gameKind: GamesKindEnum): Promise<void> {
     await this.invoke("FindMatch", gameKind);
@@ -127,11 +131,11 @@ class GameService implements IGameService {
     await this.invoke("CreateLobby", gameKind);
   }
 
+  // ── SignalR subscriptions ───────────────────────────────────────────────
+
   private on<T>(key: string, handler: (data: T) => void): () => void {
     return this.subs.subscribe(key, handler as Handler);
   }
-
-  // ── Subscriptions ────────────────────────────────────────────────────────
 
   onGameState(handler: (state: IGameState) => void): () => void {
     return this.on("game:state", handler);

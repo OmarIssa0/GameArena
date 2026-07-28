@@ -2,6 +2,7 @@
 
 import { Frown, Search, UserPlus } from "lucide-react";
 import { GButton } from "@/component/common/GButton";
+import { GList } from "@/component/common/GList";
 import { GSpinner } from "@/component/common/GSpinner";
 import { GCard } from "@/component/common/GCard";
 import { GIcon } from "@/component/common/GIcon";
@@ -41,19 +42,19 @@ function InviteModal({
         {loading ? (
           <GSpinner size="sm" />
         ) : friends.length > 0 ? (
-          <div className="space-y-1">
-            {friends.map((friend) => (
+          <GList items={friends} keyExtractor={(friend) => friend.id}>
+            {(friend) => (
               <GButton
                 key={friend.id}
                 variant="ghost"
                 fullWidth
                 className="justify-start text-sm"
-                leftIcon={<GIcon icon={UserPlus} size="sm" color="inherit" />}
+                startIcon={<GIcon icon={UserPlus} size="sm" color="inherit" />}
                 onClick={() => onSelect(friend.id)}>
                 {friend.fullName ?? friend.userName}
               </GButton>
-            ))}
-          </div>
+            )}
+          </GList>
         ) : (
           <div className="flex flex-col items-center justify-center h-20 text-text-muted text-sm">
             <GIcon icon={Frown} size="lg" color="muted" className="mb-1" />

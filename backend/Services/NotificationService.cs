@@ -13,7 +13,8 @@ namespace backend.Services
     public class NotificationService(
         IHubContext<SocialHub> hub,
         ISocialReadService socialReadService,
-        IDbContextFactory<AppDbContext> contextFactory) : INotificationService
+        IDbContextFactory<AppDbContext> contextFactory,
+        ILogger<NotificationService> logger) : INotificationService
     {
         public async Task<NotificationCountersResponse> GetCountersAsync(Guid userId)
         {
@@ -106,8 +107,7 @@ namespace backend.Services
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine(
-                    $"Failed to send social data to user {userId}: {ex.Message}");
+                logger.LogWarning("Failed to send social data to user {UserId}: {Message}", userId, ex.Message);
             }
         }
 
@@ -162,8 +162,7 @@ namespace backend.Services
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine(
-                    $"Failed to push notification:new to user {userId}: {ex.Message}");
+                logger.LogWarning("Failed to push notification:new to user {UserId}: {Message}", userId, ex.Message);
             }
 
             return response;

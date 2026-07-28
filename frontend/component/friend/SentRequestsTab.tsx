@@ -39,11 +39,16 @@ function SentRequestsTab({ sentRequests, onCancel, t }: SentRequestsTabProps) {
         const isBusy = actionId === friend.id;
         return (
           <div className="flex gap-1">
-            <GIcon icon={isBusy ? Loader2 : X} size="sm" tile tileSize="sm" tileGradient="bg-danger/10" tileColor="danger" className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}
+            <GIcon
+              icon={isBusy ? Loader2 : X} size="sm" tile tileSize="sm"
+              tileGradient="bg-danger/10" tileColor="danger"
+              className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}
               onClick={async () => {
                 setActionId(friend.id);
                 try { await onCancel(friend.id); } finally { setActionId(null); }
-              }} />
+              }}
+              ariaLabel={t.sentTab.cancel}
+            />
           </div>
         );
       }}

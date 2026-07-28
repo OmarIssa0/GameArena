@@ -2,6 +2,7 @@
 
 import { Gamepad2, ArrowRightFromLine } from "lucide-react";
 import { GIcon } from "@/component/common/GIcon";
+import { GList } from "@/component/common/GList";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -51,12 +52,15 @@ function GamesPage() {
           </GBadge>
         }
       />
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-        {GamesList.map((game) => {
+      <GList
+        items={[...GamesList]}
+        keyExtractor={(game) => game.id}
+        emptyMessage=""
+        emptyDescription="">
+        {(game) => {
           const gameConfig = GamesMap[game.id];
           return (
             <GameCard
-              key={game.id}
               name={t[gameConfig.name]}
               desc={t[gameConfig.description]}
               onClick={() => handleGameSelect(gameConfig.path)}
@@ -66,8 +70,8 @@ function GamesPage() {
               page
             />
           );
-        })}
-      </div>
+        }}
+      </GList>
       <GModal
         open={Boolean(state) && pendingPath !== null}
         onClose={() => setPendingPath(null)}

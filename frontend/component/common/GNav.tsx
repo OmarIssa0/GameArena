@@ -33,7 +33,7 @@ const navBase = {
 const navIndicator: Record<GNavIndicator, { active: string; idle: string }> = {
   start: {
     active: "border-s-[3px] border-s-primary",
-    idle: "border-s-[3px] border-s-transparent",
+    idle: "border-s-transparent",
   },
   end: {
     active: "border-e-[3px] border-e-primary",
@@ -58,12 +58,7 @@ function getIndicatorClass(active: boolean, indicator: GNavIndicator) {
 const GNav = forwardRef<HTMLButtonElement, GNavProps>(
   ({ items, orientation = "vertical", indicator = "start", collapsed = false, className, ...props }, ref) => {
     return (
-      <nav
-        className={clsx(
-          "flex",
-          orientation === "vertical" ? "flex-col gap-1" : "flex-row flex-wrap gap-2",
-          className,
-        )}>
+      <nav className={clsx("flex", orientation === "vertical" ? "flex-col gap-1" : "flex-row flex-wrap gap-2", className)}>
         {items.map((item) => {
           const active = Boolean(item.active);
           return (
@@ -86,13 +81,11 @@ const GNav = forwardRef<HTMLButtonElement, GNavProps>(
               {item.icon && (
                 <span className={clsx("relative shrink-0", collapsed && "mx-auto")} title={collapsed && item.label ? String(item.label) : undefined}>
                   {item.icon}
+                  {collapsed && item.badge}
                 </span>
               )}
-              {!collapsed && item.label && (
-                <span className="min-w-0 flex-1 text-start leading-snug whitespace-normal">{item.label}</span>
-              )}
+              {!collapsed && item.label && <span className="min-w-0 flex-1 text-start leading-snug whitespace-normal">{item.label}</span>}
               {!collapsed && item.badge}
-              {collapsed && item.badge}
             </button>
           );
         })}

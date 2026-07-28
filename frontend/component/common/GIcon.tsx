@@ -48,6 +48,16 @@ const colors: Record<string, string> = {
   "on-primary": "text-on-primary",
   accent: "text-accent",
 };
+const hoverColors: Record<string, string> = {
+  primary: "hover:bg-primary",
+  secondary: "hover:bg-text-secondary",
+  muted: "hover:bg-text-muted",
+  success: "hover:bg-success",
+  warning: "hover:bg-warning",
+  danger: "hover:bg-danger",
+  accent: "hover:bg-accent",
+  inherit: "",
+};
 
 function getTileGradient(gradient?: string): string {
   if (!gradient) return "bg-primary";
@@ -69,10 +79,12 @@ function GIcon({
   flip = true,
   className,
   onClick,
+  ariaLabel,
   tile = false,
   tileSize = "md",
   tileRounded: tileRoundedProp = "md",
   tileGradient = "bg-primary",
+  hover = false,
   tileColor,
   tileClassName,
 }: GIconProps) {
@@ -81,12 +93,16 @@ function GIcon({
       "shrink-0",
       iconSize[size],
       colors[color] ?? color,
-      flip && "[dir=\"rtl\"]:scale-x-[-1]",
+      flip && '[dir="rtl"]:scale-x-[-1]',
       onClick && "cursor-pointer",
       className,
     );
     return onClick ? (
-      <button type="button" onClick={onClick} className="inline-flex bg-transparent border-0 p-0 cursor-pointer">
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label={ariaLabel}
+        className="inline-flex bg-transparent border-0 p-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-[var(--radius-sm)]">
         <Icon className={iconClassName} aria-hidden="true" />
       </button>
     ) : (
@@ -98,6 +114,7 @@ function GIcon({
     "inline-flex items-center justify-center shrink-0",
     tileSizeMap[tileSize],
     tileRoundedMap[tileRoundedProp],
+    hover && [hoverColors[tileColor ?? "primary"], ],
     getTileGradient(tileGradient),
     onClick && "cursor-pointer transition-colors",
     tileClassName,
@@ -105,25 +122,25 @@ function GIcon({
 
   const iconEl = (
     <Icon
-      className={clsx(
-        tileIconSizeMap[tileSize],
-        getTileIconColor(tileColor),
-        flip && "[dir=\"rtl\"]:scale-x-[-1]",
-      )}
+      className={clsx(tileIconSizeMap[tileSize], getTileIconColor(tileColor), flip && '[dir="rtl"]:scale-x-[-1]', "hover:text-[var(--color-text)]")}
       aria-hidden="true"
     />
   );
 
   if (onClick) {
     return (
-      <button type="button" onClick={onClick} className={tileClassNameMerged} aria-label="">
+      <button
+        type="button"
+        onClick={onClick}
+        className={clsx(tileClassNameMerged, "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40")}
+        aria-label={ariaLabel}>
         {iconEl}
       </button>
     );
   }
 
   return (
-    <div className={tileClassNameMerged} role="img" aria-label="">
+    <div className={tileClassNameMerged} role={ariaLabel ? "img" : undefined} aria-label={ariaLabel}>
       {iconEl}
     </div>
   );

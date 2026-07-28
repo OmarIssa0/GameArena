@@ -48,7 +48,7 @@ function GameActive({ children }: GameActiveProps) {
 
         {!(state.winnerPlayerId || state.isFinished) && (
           <div className="flex justify-center">
-            <GButton onClick={() => leaveGame()} variant="dangerOutline" size="sm">
+            <GButton onClick={() => leaveGame()} variant="outline-danger" size="sm">
               {t.game.leaveGame}
             </GButton>
           </div>

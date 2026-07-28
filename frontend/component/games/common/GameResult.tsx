@@ -8,84 +8,108 @@ import { useAuth } from "@/app/providers/AuthProvider";
 import { useGame } from "@/app/providers/GameProvider";
 import { useGameTranslation } from "@/hooks/useGameTranslation";
 
+const RESULT_ICONS = { win: Trophy, draw: Handshake, loss: Frown, forfeit: Trophy } as const;
+
+const RESULT_META = {
+  win: { tile: "bg-warning", tileColor: "on-primary" as const, textColor: "text-warning" as const },
+  draw: { tile: "bg-primary", tileColor: "on-primary" as const, textColor: "text-neon-cyan" as const },
+  loss: { tile: "bg-error", tileColor: "on-primary" as const, textColor: "text-error" as const },
+  forfeit: { tile: "bg-success", tileColor: "on-primary" as const, textColor: "text-success" as const },
+} as const;
+
+type ResultKind = keyof typeof RESULT_ICONS;
+
+function getResultKind(
+  winnerPlayerId: string | undefined,
+  userId: string | undefined,
+  opponentDisconnected: boolean,
+): ResultKind | null {
+  if (winnerPlayerId === "") return "draw";
+  if (winnerPlayerId === userId) return "win";
+  if (winnerPlayerId != null) return "loss";
+  if (opponentDisconnected) return "forfeit";
+  return null;
+}
+
+function PendingPlayAgainOverlay() {
+  const { pendingPlayAgainRequest, respondPlayAgain } = useGame();
+  const t = useGameTranslation();
+
+  if (!pendingPlayAgainRequest) return null;
+
+  return (
+    <GCard padding="lg" className="absolute inset-0 bg-bg/95 flex flex-col items-center justify-center text-center z-20">
+      <h2 className="text-xl font-black text-text">{t.result.playAgainRequest}</h2>
+      <p className="text-text-secondary text-sm mt-2">{pendingPlayAgainRequest.requesterUsername}</p>
+      <div className="flex gap-4 mt-8 w-full max-w-xs">
+        <GButton onClick={() => respondPlayAgain(true)} className="flex-1">{t.result.accept}</GButton>
+        <GButton onClick={() => respondPlayAgain(false)} variant="outline-danger" className="flex-1">{t.result.reject}</GButton>
+      </div>
+    </GCard>
+  );
+}
+
+interface GameOverActionsProps {
+  kind: ResultKind;
+  opponentDisconnected: boolean;
+}
+
+function GameOverActions({ kind, opponentDisconnected }: GameOverActionsProps) {
+  const { requestedPlayAgain, requestPlayAgain, leaveGame } = useGame();
+  const t = useGameTranslation();
+
+  const gameHasResult = kind !== "forfeit";
+  const sessionEnded = opponentDisconnected && gameHasResult;
+
+  return (
+    <div className="flex gap-4 mt-8 w-full max-w-xs">
+      {sessionEnded ? (
+        <GButton onClick={() => leaveGame()} variant="secondary" className="flex-1" startIcon={<GIcon icon={Home} size="sm" color="inherit" />}>
+          {t.result.backToLobby}
+        </GButton>
+      ) : requestedPlayAgain ? (
+        <GButton disabled className="flex-1">
+          <Loader className="animate-spin me-2 h-4 w-4 inline" />
+          {t.result.waiting}
+        </GButton>
+      ) : (
+        <GButton onClick={() => requestPlayAgain()} className="flex-1">{t.result.playAgain}</GButton>
+      )}
+      {!sessionEnded && (
+        <GButton onClick={() => leaveGame()} variant="secondary" className="flex-1" startIcon={<GIcon icon={Home} size="sm" color="inherit" />}>
+          {t.result.backToLobby}
+        </GButton>
+      )}
+    </div>
+  );
+}
+
 function GameResult() {
   const { user } = useAuth();
-  const { state, opponentDisconnected, requestedPlayAgain, pendingPlayAgainRequest, requestPlayAgain, respondPlayAgain, leaveGame } = useGame();
+  const { state, opponentDisconnected, pendingPlayAgainRequest } = useGame();
   const t = useGameTranslation();
 
   if (!state) return null;
 
-  const winnerPlayerId = state.winnerPlayerId;
-  const userId = user?.id;
-  const score = state.score;
+  const kind = getResultKind(state.winnerPlayerId, user?.id, opponentDisconnected);
 
-  const isDraw = winnerPlayerId === "";
-  const isWin = !isDraw && winnerPlayerId === userId;
-  const isLoss = !isDraw && winnerPlayerId != null && !isWin;
-  const gameOver = isDraw || isWin || isLoss;
-
-  if (pendingPlayAgainRequest) {
-    return (
-      <GCard padding="lg" className="absolute inset-0 bg-bg/95 flex flex-col items-center justify-center text-center z-20">
-         <h2 className="text-xl font-black text-text">{t.result.playAgainRequest}</h2>
-        <p className="text-text-secondary text-sm mt-2">{pendingPlayAgainRequest.requesterUsername}</p>
-        <div className="flex gap-4 mt-8 w-full max-w-xs">
-          <GButton onClick={() => respondPlayAgain(true)} className="flex-1">{t.result.accept}</GButton>
-          <GButton onClick={() => respondPlayAgain(false)} variant="dangerOutline" className="flex-1">{t.result.reject}</GButton>
-        </div>
-      </GCard>
-    );
+  if (pendingPlayAgainRequest || kind === null) {
+    if (pendingPlayAgainRequest) return <PendingPlayAgainOverlay />;
+    return null;
   }
 
-  const k = (() => {
-    if (isWin) return "win" as const;
-    if (isDraw) return "draw" as const;
-    if (isLoss) return "loss" as const;
-    if (opponentDisconnected) return "forfeit" as const;
-    return null;
-  })();
-
-  if (!k) return null;
-
-  const IMG = { win: Trophy, draw: Handshake, loss: Frown, forfeit: Trophy };
-  const META = {
-    win: { iconColor: "warning" as const, textColor: "text-warning" as const, iconClass: undefined, tile: "bg-warning", tileColor: "on-primary" as const },
-    draw: { iconColor: "primary" as const, textColor: "text-neon-cyan" as const, iconClass: "text-neon-cyan" as const, tile: "bg-primary", tileColor: "on-primary" as const },
-    loss: { iconColor: "danger" as const, textColor: "text-error" as const, iconClass: undefined, tile: "bg-error", tileColor: "on-primary" as const },
-    forfeit: { iconColor: "success" as const, textColor: "text-success" as const, iconClass: undefined, tile: "bg-success", tileColor: "on-primary" as const },
-  };
-  const TITLE = { win: t.result.victory, draw: t.result.draw, loss: t.result.defeat, forfeit: t.result.opponentForfeited };
-  const DESC = { win: t.result.victoryDesc, draw: t.result.drawDesc, loss: t.result.defeatDesc, forfeit: t.result.opponentForfeitedDesc };
-
-  const meta = META[k];
-  const Icon = IMG[k];
-  const sessionEnded = opponentDisconnected && gameOver;
+  const Icon = RESULT_ICONS[kind];
+  const meta = RESULT_META[kind];
+  const RESULT_TITLES = { win: t.result.victory, draw: t.result.draw, loss: t.result.defeat, forfeit: t.result.opponentForfeited };
+  const RESULT_DESCS = { win: t.result.victoryDesc, draw: t.result.drawDesc, loss: t.result.defeatDesc, forfeit: t.result.opponentForfeitedDesc };
 
   return (
-    <GCard padding="lg" className="absolute inset-0 bg-bg/95 backdrop-blur-sm flex flex-col items-center justify-center text-center z-10">
-      <GIcon icon={Icon} size="3xl" tile tileSize="xl" tileGradient={meta.tile} tileColor={meta.tileColor} className="shadow-glow" />
-      <h2 className={`text-2xl font-black mt-4 ${meta.textColor}`}>{TITLE[k]}</h2>
-      <p className="text-text-secondary text-sm mt-2 max-w-xs leading-relaxed">{DESC[k]}</p>
-      {score && <p className="text-text-secondary text-xs mt-1">Score: {score[0]} - {score[1]}</p>}
-      <div className="flex gap-4 mt-8 w-full max-w-xs">
-        {sessionEnded ? (
-          <GButton onClick={() => leaveGame()} variant="secondary" className="flex-1" leftIcon={<GIcon icon={Home} size="sm" color="inherit" />}>
-            {t.result.backToLobby}
-          </GButton>
-        ) : requestedPlayAgain ? (
-          <GButton disabled className="flex-1">
-             <Loader className="animate-spin me-2 h-4 w-4 inline" />
-            {t.result.waiting}
-          </GButton>
-        ) : (
-          <GButton onClick={() => requestPlayAgain()} className="flex-1">{t.result.playAgain}</GButton>
-        )}
-        {!sessionEnded && (
-          <GButton onClick={() => leaveGame()} variant="secondary" className="flex-1" leftIcon={<GIcon icon={Home} size="sm" color="inherit" />}>
-            {t.result.backToLobby}
-          </GButton>
-        )}
-      </div>
+    <GCard padding="lg" className="absolute inset-0 bg-bg/95 flex flex-col items-center justify-center text-center z-10">
+      <GIcon icon={Icon} size="3xl" tile tileSize="xl" tileGradient={meta.tile} tileColor={meta.tileColor}/>
+      <h2 className={`text-2xl font-black mt-4 ${meta.textColor}`}>{RESULT_TITLES[kind]}</h2>
+      <p className="text-text-secondary text-sm mt-2 max-w-xs leading-relaxed">{RESULT_DESCS[kind]}</p>
+      {state.score && <p className="text-text-secondary text-xs mt-1">Score: {state.score[0]} - {state.score[1]}</p>}
+      <GameOverActions kind={kind} opponentDisconnected={opponentDisconnected} />
     </GCard>
   );
 }

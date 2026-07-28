@@ -10,6 +10,7 @@ import { ConnectionProvider } from "@/app/providers/ConnectionProvider";
 import { GameProvider } from "@/app/providers/GameProvider";
 import { DashboardNotificationsProvider } from "@/app/providers/DashboardNotificationsProvider";
 import { ActiveGameBanner } from "@/component/games/ActiveGameBanner";
+import { NotificationPopup } from "@/component/notification/NotificationPopup";
 import { GSpinner } from "@/component/common/GSpinner";
 
 function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -51,6 +52,7 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
             </main>
             <SocialPanel />
           </div>
+          <NotificationPopup />
           <ActiveGameBanner />
           <BottomNav />
         </DashboardNotificationsProvider>

@@ -9,10 +9,10 @@ import { GameActive } from "./GameActive";
 import type { GameLayoutWrapperProps } from "./def/GameLayoutWrapper";
 
 function GameLayoutWrapper({ children, gameType }: GameLayoutWrapperProps) {
-  const { state, isConnected, isInitialSyncDone, isSearching } = useGame();
+  const { state, isConnected, isSearching } = useGame();
 
   if (!state) {
-    if (!isInitialSyncDone || !isConnected) {
+    if (!isConnected) {
       return (
         <div className="flex items-center justify-center min-h-[150px] p-4">
           <GSpinner size="lg" />

@@ -12,6 +12,8 @@ const en = {
   leaveDesc: "You have an active game. Leave it to start a new one?",
   cancel: "Cancel",
   leaveConfirm: "Leave & Start New",
+  returnToGame: "Return to Game",
+  gameRunning: "Game Running",
 };
 type TGamesTranslation = typeof en;
 export { en, type TGamesTranslation };

@@ -26,11 +26,15 @@ function BlockedUsersTab({ blockedUsers, onUnblock, t }: BlockedUsersTabProps) {
         const isBusy = actionId === friend.id;
         return (
           <div className="flex gap-1">
-            <GIcon icon={isBusy ? Loader2 : ShieldBan} size="sm" tile tileSize="sm" tileGradient="bg-success/10" tileColor="success" className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}
+            <GIcon
+              icon={isBusy ? Loader2 : ShieldBan} size="md" tile tileSize="lg"
+              tileGradient="bg-success/10" tileColor="success"
+              className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}
               onClick={async () => {
                 setActionId(friend.id);
                 try { await onUnblock(friend.id); } finally { setActionId(null); }
               }}
+              ariaLabel={t.blockedTab.unblock}
             />
           </div>
         );

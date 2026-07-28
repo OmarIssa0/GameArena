@@ -39,16 +39,26 @@ function RequestsTab({ requests, onAccept, onDecline, t }: RequestsTabProps) {
         const isBusy = actionId === friend.id;
         return (
           <div className="flex gap-1">
-            <GIcon icon={isBusy ? Loader2 : Check} size="sm" tile tileSize="sm" tileGradient="bg-success/10" tileColor="success" className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}
+            <GIcon
+              icon={isBusy ? Loader2 : Check} size="md" tile tileSize="lg"
+              tileGradient="bg-success/10" tileColor="success"
+              className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}
               onClick={async () => {
                 setActionId(friend.id);
                 try { await onAccept(friend.id); } finally { setActionId(null); }
-              }} />
-            <GIcon icon={isBusy ? Loader2 : X} size="sm" tile tileSize="sm" tileGradient="bg-danger/10" tileColor="danger" className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}
+              }}
+              ariaLabel={t.requestsTab.accept}
+            />
+            <GIcon
+              icon={isBusy ? Loader2 : X} size="md" tile tileSize="lg"
+              tileGradient="bg-danger/10" tileColor="danger"
+              className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}
               onClick={async () => {
                 setActionId(friend.id);
                 try { await onDecline(friend.id); } finally { setActionId(null); }
-              }} />
+              }}
+              ariaLabel={t.requestsTab.decline}
+            />
           </div>
         );
       }}
