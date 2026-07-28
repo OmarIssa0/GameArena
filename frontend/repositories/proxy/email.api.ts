@@ -1,13 +1,15 @@
 import { baseURL, clientFactory } from "@/app/network";
+import { HttpVerbEnum } from "@/domain/enum/HttpVerbEnum";
+
 const emailApi = clientFactory(
   `${baseURL}email-verification`,
   {
     send: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/send",
     },
     verify: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/verify",
     },
   },

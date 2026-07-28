@@ -8,6 +8,7 @@ import { AsideWrapper } from "@/component/aside/AsideWrapper";
 import { AsideHeader } from "@/component/aside/AsideHeader";
 import { SidebarCollapsed } from "@/component/Sidebar/SidebarCollapsed";
 import { SidebarExpanded } from "@/component/Sidebar/SidebarExpanded";
+import { AsidePlacementEnum } from "@/domain/enum/AsidePlacementEnum";
 import type { AsideConfig } from "@/component/aside/AsideTypes";
 
 function SidebarBrand() {
@@ -28,7 +29,7 @@ function Sidebar() {
   const collapsedIcon = <GIcon icon={Menu} size="md" tile tileSize="md" />;
 
   const asideConfig: AsideConfig = {
-    placement: "start",
+    placement: AsidePlacementEnum.Start,
     expandedWidth: "w-60",
     collapsedWidth: "w-20",
     label: t.mainNavigation,

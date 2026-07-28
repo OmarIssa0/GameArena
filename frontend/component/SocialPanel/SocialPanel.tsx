@@ -15,6 +15,7 @@ import { SocialDesktopCollapsed } from "./SocialDesktopCollapsed";
 import { SocialDesktopExpanded } from "./SocialDesktopExpanded";
 import type { AsideConfig } from "@/component/aside/AsideTypes";
 import type { IUserSummary } from "@/domain/meta/IUserSummary";
+import { AsidePlacementEnum } from "@/domain/enum/AsidePlacementEnum";
 
 function SocialBrand({ onlineCount }: { onlineCount: number }) {
   const t = useTranslation({ en, ar }) as TSocialPanelTranslation;
@@ -98,7 +99,7 @@ function SocialPanel() {
   );
 
   const asideConfig: AsideConfig = {
-    placement: "end",
+    placement: AsidePlacementEnum.End,
     expandedWidth: "w-80",
     collapsedWidth: "w-20",
     label: t.friendsAndInvites,

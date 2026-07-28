@@ -1,30 +1,31 @@
 import { baseURL, clientFactory } from "@/app/network";
+import { HttpVerbEnum } from "@/domain/enum/HttpVerbEnum";
 
 const authProxy = clientFactory(
   `${baseURL}auth`,
   {
     login: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/login",
     },
     register: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/register",
     },
     logout: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/logout",
     },
     refresh: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/refresh",
     },
     forgotPassword: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/forgot-password",
     },
     resetPassword: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/reset-password",
     },
   },

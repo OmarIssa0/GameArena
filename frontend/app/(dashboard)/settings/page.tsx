@@ -19,18 +19,20 @@ import { userRepository } from "@/repositories/def/UserRepository";
 import { DEFAULT_USER_PREFERENCES, type IUserPreferences } from "@/domain/meta/IUserPreferences";
 import { passwordValidator } from "@/lib/utils";
 import { useAuth } from "@/app/providers/AuthProvider";
+import { ThemeEnum } from "@/domain/enum/ThemeEnum";
 import type { IUser } from "@/domain/meta/IUser";
 import type { GTabItem } from "@/component/common/def/GTabs";
 import type { TNullable } from "@/domain/type/TCommon";
+import type { LocaleEnum } from "@/domain/enum/LocaleEnum";
+import { SettingsTabEnum } from "@/domain/enum/SettingsTabEnum";
 
-type SettingsTab = "profile" | "password" | "preferences";
 
 function SettingsPage() {
   const t = useTranslation({
     en: { ...en, ...EnTextField },
     ar: { ...ar, ...ArTextField },
   }) as TSettingsTranslation & GTextFieldTranslation;
-  const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
+  const [activeTab, setActiveTab] = useState<SettingsTabEnum>(SettingsTabEnum.Profile);
   const { updatePreferences } = useAuth();
   const [profile, setProfile] = useState<TNullable<IUser>>(null);
   const [loading, setLoading] = useState(true);
@@ -163,20 +165,20 @@ function SettingsPage() {
     updatePreferences({ [key]: next });
   };
 
-  const tabs = useMemo<GTabItem<SettingsTab>[]>(
+  const tabs = useMemo<GTabItem<SettingsTabEnum>[]>(
     () => [
       {
-        id: "profile",
+        id: SettingsTabEnum.Profile,
         label: t.settings.profile.title,
         icon: <GIcon icon={User} size="md" color="inherit" />,
       },
       {
-        id: "password",
+        id: SettingsTabEnum.Password,
         label: t.settings.password.title,
         icon: <GIcon icon={Lock} size="md" color="inherit" />,
       },
       {
-        id: "preferences",
+        id: SettingsTabEnum.Preferences,
         label: t.settings.preferences.title,
         icon: <GIcon icon={Settings} size="md" color="inherit" />,
       },
@@ -326,7 +328,7 @@ function SettingsPage() {
                     className="flex items-center justify-center"
                     size="md"
                     checked={theme === "dark"}
-                    onChange={(e) => setTheme(e.target.checked ? "dark" : "light")}
+                    onChange={(e) => setTheme(e.target.checked ? ThemeEnum.Dark : ThemeEnum.Light)}
                   />
                 </label>
 
@@ -340,7 +342,7 @@ function SettingsPage() {
                   <GSelect
                     className="w-36"
                     value={locale}
-                    onChange={(e) => setLocale(e.target.value as "en" | "ar")}
+                    onChange={(e) => setLocale(e.target.value as LocaleEnum)}
                     options={[
                       { value: "en", label: "English" },
                       { value: "ar", label: "العربية" },

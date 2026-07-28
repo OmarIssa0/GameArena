@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { BreakpointEnum } from "@/domain/enum/BreakpointEnum";
 
 export interface UseAsideReturn {
   collapsed: boolean;
@@ -24,7 +25,7 @@ const MOBILE_MAX = 639; // < 640px
 const DESKTOP_MIN = 1024; // >= 1024px
 
 export function useAside(defaultDesktopCollapsed = false): UseAsideReturn {
-  const [breakpoint, setBreakpoint] = useState<"mobile" | "tablet" | "desktop">("desktop");
+  const [breakpoint, setBreakpoint] = useState<BreakpointEnum>(BreakpointEnum.Desktop);
   const [collapsed, setCollapsed] = useState(defaultDesktopCollapsed);
   const [open, setOpen] = useState(false);
 
@@ -33,11 +34,11 @@ export function useAside(defaultDesktopCollapsed = false): UseAsideReturn {
     const mqDesktop = window.matchMedia(`(min-width: ${DESKTOP_MIN}px)`);
 
     const update = () => {
-      const next = mqDesktop.matches ? "desktop" : mqMobile.matches ? "mobile" : "tablet";
+      const next = mqDesktop.matches ? BreakpointEnum.Desktop : mqMobile.matches ? BreakpointEnum.Mobile : BreakpointEnum.Tablet;
 
       setBreakpoint(next);
 
-      if (next === "desktop") setOpen(false);
+      if (next === BreakpointEnum.Desktop) setOpen(false);
     };
 
     update();
@@ -49,9 +50,9 @@ export function useAside(defaultDesktopCollapsed = false): UseAsideReturn {
     };
   }, []);
 
-  const isDesktop = breakpoint === "desktop";
-  const isTablet = breakpoint === "tablet";
-  const isMobile = breakpoint === "mobile";
+  const isDesktop = breakpoint === BreakpointEnum.Desktop;
+  const isTablet = breakpoint === BreakpointEnum.Tablet;
+  const isMobile = breakpoint === BreakpointEnum.Mobile;
   const isCompact = !isDesktop;
 
   const expand = useCallback(() => setCollapsed(false), []);

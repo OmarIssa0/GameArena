@@ -18,7 +18,7 @@ import { authService } from "@/services/def/AuthService";
 import { AxiosError } from "axios";
 import { ErrorCodeEnum } from "@/domain/enum/ErrorCodeEnum";
 import type { IApiResponse } from "@/domain/meta/IApiResponse";
-import type { TFieldLogin } from "@/domain/type/TCommon";
+import { LoginFieldEnum } from "@/domain/enum/LoginFieldEnum";
 
 function LoginForm() {
   const router = useRouter();
@@ -48,9 +48,9 @@ function LoginForm() {
     };
   };
 
-  const handleChange = (field: TFieldLogin, value: string) => {
-    if (field === "email") setEmail(value);
-    if (field === "password") setPassword(value);
+  const handleChange = (field: LoginFieldEnum, value: string) => {
+    if (field === LoginFieldEnum.Email) setEmail(value);
+    if (field === LoginFieldEnum.Password) setPassword(value);
     setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
@@ -121,7 +121,7 @@ function LoginForm() {
             type="email"
             autoComplete="email"
             required
-            onChange={(e) => handleChange("email", e.target.value)}
+            onChange={(e) => handleChange(LoginFieldEnum.Email, e.target.value)}
           />
 
           <GTextField
@@ -132,7 +132,7 @@ function LoginForm() {
             type="password"
             autoComplete="current-password"
             required
-            onChange={(e) => handleChange("password", e.target.value)}
+            onChange={(e) => handleChange(LoginFieldEnum.Password, e.target.value)}
           />
 
           <GButton type="submit" loading={loading} fullWidth>

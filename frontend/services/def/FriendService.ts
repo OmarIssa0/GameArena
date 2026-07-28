@@ -11,6 +11,7 @@ import type { Handler } from "../lib/signalRUtils";
 import { requireConnection } from "../lib/signalRUtils";
 import { ReconnectManager } from "../lib/ReconnectManager";
 import { SubscriptionManager } from "../lib/SubscriptionManager";
+import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
 
 const buildFullName = (first: TNullable<string>, last: TNullable<string>): string => `${first ?? ""} ${last ?? ""}`.trim();
 
@@ -84,15 +85,15 @@ class FriendService implements IFriendService {
     });
 
     this.connection.on("friend:online", (data: unknown) => {
-      this.subs.dispatch("friend:status", (data as { userId: string }).userId, "online");
+      this.subs.dispatch("friend:status", (data as { userId: string }).userId, UserStatusEnum.Online);
     });
 
     this.connection.on("friend:offline", (data: unknown) => {
-      this.subs.dispatch("friend:status", (data as { userId: string }).userId, "offline");
+      this.subs.dispatch("friend:status", (data as { userId: string }).userId, UserStatusEnum.Offline);
     });
 
     this.connection.on("friend:ingame", (data: unknown) => {
-      this.subs.dispatch("friend:status", (data as { userId: string }).userId, "ingame");
+      this.subs.dispatch("friend:status", (data as { userId: string }).userId, UserStatusEnum.InGame);
     });
   }
 
@@ -158,7 +159,7 @@ class FriendService implements IFriendService {
     return this.subs.subscribe("social:blocked", handler as Handler);
   }
 
-  onFriendStatusChange(handler: (userId: string, status: "online" | "offline" | "ingame") => void): () => void {
+  onFriendStatusChange(handler: (userId: string, status: UserStatusEnum) => void): () => void {
     return this.subs.subscribe("friend:status", handler as Handler);
   }
 

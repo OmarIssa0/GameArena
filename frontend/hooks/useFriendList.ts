@@ -6,12 +6,6 @@ import { friendService } from "@/services/def/FriendService";
 import { useConnections } from "@/app/providers/ConnectionProvider";
 import type { IUserSummary } from "@/domain/meta/IUserSummary";
 
-const STATUS_MAP: Record<string, UserStatusEnum> = {
-  online: UserStatusEnum.Online,
-  offline: UserStatusEnum.Offline,
-  ingame: UserStatusEnum.InGame,
-};
-
 export function useFriendList() {
   const { isSocialConnected, isSocialConnecting, socialReconnectKey } = useConnections();
   const [friends, setFriends] = useState<IUserSummary[]>([]);
@@ -28,7 +22,7 @@ export function useFriendList() {
 
     const offStatus = friendService.onFriendStatusChange((userId, status) => {
       setFriends((prev) =>
-        prev.map((f) => (f.id === userId ? { ...f, status: STATUS_MAP[status] ?? f.status } : f))
+        prev.map((f) => (f.id === userId ? { ...f, status } : f))
       );
     });
 

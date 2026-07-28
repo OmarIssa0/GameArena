@@ -3,6 +3,7 @@ import type { IFriendRequestReceived } from "@/domain/meta/IFriendRequestReceive
 import type { IFriendRequestSent } from "@/domain/meta/IFriendRequestSent";
 import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import type { TPromise } from "@/domain/type/TCommon";
+import type { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
 
 interface IFriendService {
   sendFriendRequest(friendId: string): TPromise<void>;
@@ -20,7 +21,7 @@ interface IFriendService {
   onFriendListUpdate(handler: (friends: IUserSummary[]) => void): () => void;
   onFriendRequestUpdate(handler: (data: { received: IFriendRequestReceived[]; sent: IFriendRequestSent[] }) => void): () => void;
   onBlockedUsersUpdate(handler: (blocked: IUserSummary[]) => void): () => void;
-  onFriendStatusChange(handler: (userId: string, status: "online" | "offline" | "ingame") => void): () => void;
+  onFriendStatusChange(handler: (userId: string, status: UserStatusEnum) => void): () => void;
 }
 
 export type { IFriendService };

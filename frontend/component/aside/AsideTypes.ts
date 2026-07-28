@@ -1,23 +1,14 @@
-/**
- * Shared types for aside (sidebar / social panel) components.
- */
+import type { AsidePlacementEnum } from "@/domain/enum/AsidePlacementEnum";
 
-export type AsidePlacement = "start" | "end";
-
-export interface AsideConfig {
-  /** Placement: start (sidebar/left) or end (social panel/right) */
-  placement: AsidePlacement;
-  /** Width when expanded (e.g. "w-60" or "w-80") */
+interface AsideConfig {
+  placement: AsidePlacementEnum;
   expandedWidth: string;
-  /** Width when collapsed (e.g. "w-20") */
   collapsedWidth: string;
-  /** Accessible label for the aside element */
   label: string;
-  /** Icon for the mobile FAB button */
   mobileIcon: React.ReactNode;
 }
 
-export interface AsideState {
+interface AsideState {
   collapsed: boolean;
   open: boolean;
   isDesktop: boolean;
@@ -28,3 +19,5 @@ export interface AsideState {
   closeMobile: () => void;
   toggleCollapsed: () => void;
 }
+
+export type { AsideConfig, AsideState };

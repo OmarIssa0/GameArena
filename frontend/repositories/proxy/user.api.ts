@@ -1,30 +1,31 @@
 import { baseURL, clientFactory } from "@/app/network";
+import { HttpVerbEnum } from "@/domain/enum/HttpVerbEnum";
 
 const userApi = clientFactory(
   `${baseURL}user`,
   {
     profile: {
-      verb: "get",
+      verb: HttpVerbEnum.Get,
       template: "/profile",
     },
     search: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/search",
     },
     updateProfile: {
-      verb: "put",
+      verb: HttpVerbEnum.Put,
       template: "/update-profile",
     },
     changePassword: {
-      verb: "put",
+      verb: HttpVerbEnum.Put,
       template: "/change-password",
     },
     getPreferences: {
-      verb: "get",
+      verb: HttpVerbEnum.Get,
       template: "/preferences",
     },
     updatePreferences: {
-      verb: "put",
+      verb: HttpVerbEnum.Put,
       template: "/preferences",
     },
   },

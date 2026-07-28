@@ -1,15 +1,12 @@
 "use client";
 
 import { useMemo, useSyncExternalStore } from "react";
-import type {
-  THashMap,
-  TLocale,
-  TTheme,
-  TTranslate,
-} from "@/domain/type/TCommon";
+import type { THashMap, TTranslate } from "@/domain/type/TCommon";
+import { LocaleEnum } from "@/domain/enum/LocaleEnum";
+import { ThemeEnum } from "@/domain/enum/ThemeEnum";
 
-let currentLocale: TLocale = "ar";
-let currentTheme: TTheme = "dark";
+let currentLocale: LocaleEnum = LocaleEnum.Ar;
+let currentTheme: ThemeEnum = ThemeEnum.Dark;
 
 const listeners = new Set<() => void>();
 
@@ -22,27 +19,27 @@ function subscribe(listener: () => void) {
   return () => listeners.delete(listener);
 }
 
-function updateLocaleDOM(locale: TLocale) {
+function updateLocaleDOM(locale: LocaleEnum) {
   if (typeof document === "undefined") return;
   document.documentElement.lang = locale;
   document.documentElement.dir = locale === "ar" ? "rtl" : "ltr";
 }
 
-function updateThemeDOM(theme: TTheme) {
+function updateThemeDOM(theme: ThemeEnum) {
   if (typeof document === "undefined") return;
   document.documentElement.dataset.theme = theme;
 }
 
 if (typeof window !== "undefined") {
-  currentLocale = (localStorage.getItem("locale") as TLocale) ?? "ar";
-  currentTheme = (localStorage.getItem("theme") as TTheme) ?? "dark";
+  currentLocale = (localStorage.getItem("locale") as LocaleEnum) ?? "ar";
+  currentTheme = (localStorage.getItem("theme") as ThemeEnum) ?? "dark";
 }
 
-function getLocale(): TLocale {
+function getLocale(): LocaleEnum {
   return currentLocale;
 }
 
-function setLocale(locale: TLocale) {
+function setLocale(locale: LocaleEnum) {
   if (locale === currentLocale) return;
   currentLocale = locale;
   localStorage.setItem("locale", locale);
@@ -51,11 +48,11 @@ function setLocale(locale: TLocale) {
   emit();
 }
 
-function getTheme(): TTheme {
+function getTheme(): ThemeEnum {
   return currentTheme;
 }
 
-function setTheme(theme: TTheme) {
+function setTheme(theme: ThemeEnum) {
   if (theme === currentTheme) return;
   currentTheme = theme;
   localStorage.setItem("theme", theme);
@@ -88,16 +85,7 @@ function createProxy(langs: TTranslate, path: string[] = []): unknown {
       get(_, key) {
         if (typeof key !== "string") return undefined;
 
-        if (
-          [
-            "$$typeof",
-            "prototype",
-            "constructor",
-            "toJSON",
-            "toString",
-            "valueOf",
-          ].includes(key)
-        ) {
+        if (["$$typeof", "prototype", "constructor", "toJSON", "toString", "valueOf"].includes(key)) {
           return undefined;
         }
 
@@ -122,7 +110,6 @@ function createProxy(langs: TTranslate, path: string[] = []): unknown {
 }
 
 export function useTranslation<T>(langs: TTranslate): T {
-  const [locale] = useLocale();
-
-  return useMemo(() => createProxy(langs) as T, [locale]);
+  useLocale();
+  return useMemo(() => createProxy(langs) as T, [langs]);
 }

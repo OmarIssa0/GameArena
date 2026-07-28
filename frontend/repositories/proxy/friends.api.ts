@@ -1,50 +1,51 @@
 import { baseURL, clientFactory } from "@/app/network";
+import { HttpVerbEnum } from "@/domain/enum/HttpVerbEnum";
 
 const friendsApi = clientFactory(
   `${baseURL}friend`,
   {
     sendFriendRequest: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/request/{friendId}",
     },
     getReceivedFriendRequests: {
-      verb: "get",
+      verb: HttpVerbEnum.Get,
       template: "/requests",
     },
     getSentFriendRequests: {
-      verb: "get",
+      verb: HttpVerbEnum.Get,
       template: "/sent",
     },
     getFriends: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/friends",
     },
     acceptFriendRequest: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/accept/{senderId}",
     },
     rejectFriendRequest: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/decline/{senderId}",
     },
     removeFriend: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/remove/{friendId}",
     },
     cancelFriendRequest: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/cancel-request/{receiverId}",
     },
     blockUser: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/block/{blockedId}",
     },
     unblockUser: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/unblock/{blockedId}",
     },
     getBlockedUsers: {
-      verb: "get",
+      verb: HttpVerbEnum.Get,
       template: "/blocked",
     },
   },

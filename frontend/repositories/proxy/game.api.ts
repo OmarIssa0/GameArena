@@ -1,54 +1,55 @@
 import { baseURL, clientFactory } from "@/app/network";
+import { HttpVerbEnum } from "@/domain/enum/HttpVerbEnum";
 
 const gameApi = clientFactory(
   `${baseURL}game`,
   {
     getCurrentState: {
-      verb: "get",
+      verb: HttpVerbEnum.Get,
       template: "/current-state",
     },
     findMatch: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/find-match",
     },
     startGame: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/start",
     },
     inviteFriend: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/invite",
     },
     inviteToRoom: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/invite-to-room",
     },
     leaveGame: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/leave",
     },
     requestPlayAgain: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/play-again",
     },
     respondPlayAgain: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/respond-play-again",
     },
     cancelSearch: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/cancel-search",
     },
     sendAction: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/action",
     },
     acceptInvite: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/accept-invite",
     },
     createLobby: {
-      verb: "post",
+      verb: HttpVerbEnum.Post,
       template: "/create-lobby",
     },
   },

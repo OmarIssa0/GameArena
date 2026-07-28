@@ -140,7 +140,7 @@ function SearchTab() {
           onChange={(e) =>
             setUserFilter((prev) => ({
               ...prev,
-              userStatus: Number(e.target.value) as UserStatusEnum,
+              userStatus: e.target.value as UserStatusEnum,
             }))
           }
           options={[

@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { GBackdrop } from "../common/GBackdrop";
 import { GButton } from "../common/GButton";
 import type { AsideConfig, AsideState } from "./AsideTypes";
+import { AsidePlacementEnum } from "@/domain/enum/AsidePlacementEnum";
 
 interface AsideWrapperProps {
   config: AsideConfig;
@@ -15,16 +16,6 @@ interface AsideWrapperProps {
   className?: string;
 }
 
-/**
- * Shared aside wrapper used by both Sidebar (start) and SocialPanel (end).
- *
- * Handles:
- * - Desktop inline layout (collapsible)
- * - Mobile/tablet overlay with backdrop
- * - Accessibility (role, aria-modal, aria-hidden)
- * - Overflow body lock
- * - FAB button for opening mobile
- */
 function AsideWrapper({ config, aside, header, children, footer, mobileFab, className }: AsideWrapperProps) {
   const { collapsed, open, isDesktop, closeMobile } = aside;
   const { placement, expandedWidth, collapsedWidth, label } = config;
@@ -39,26 +30,26 @@ function AsideWrapper({ config, aside, header, children, footer, mobileFab, clas
       size="icon"
       rounded="full"
       onClick={aside.openMobile}
-      className={clsx("fixed bottom-4", placement === "start" ? "inset-s-4" : "end-4")}
+      className={clsx("fixed bottom-4", placement === AsidePlacementEnum.Start ? "inset-s-4" : "end-4")}
       aria-label={`Open ${label}`}>
       {config.mobileIcon}
     </GButton>
   );
 
-  // Compute transform direction for overlay
-  const openTransform = placement === "start" ? "ltr:translate-x-0 rtl:-translate-x-0" : "translate-x-0";
-  const closedTransform = placement === "start" ? "ltr:-translate-x-full rtl:translate-x-full" : "ltr:translate-x-full rtl:-translate-x-full";
+  const openTransform = placement === AsidePlacementEnum.Start ? "ltr:translate-x-0 rtl:-translate-x-0" : "translate-x-0";
+  const closedTransform =
+    placement === AsidePlacementEnum.Start ? "ltr:-translate-x-full rtl:translate-x-full" : "ltr:translate-x-full rtl:-translate-x-full";
 
   const asideClass = clsx(
     "flex flex-col shrink-0 h-dvh-safe bg-bg-sidebar transition-transform duration-200",
-    placement === "start" ? "border-e border-border" : "border-s border-border",
+    placement === AsidePlacementEnum.Start ? "border-e border-border" : "border-s border-border",
     isInlineDesktop
       ? collapsed
         ? collapsedWidth
         : expandedWidth
       : [
           "fixed inset-y-0 z-50",
-          placement === "start" ? "start-0" : "end-0",
+          placement === AsidePlacementEnum.Start ? "start-0" : "end-0",
           open ? [openTransform, expandedWidth] : [closedTransform, "w-0 overflow-hidden border-0 pointer-events-none"],
         ],
     className,

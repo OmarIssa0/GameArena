@@ -1,9 +1,10 @@
+import { LocaleEnum } from "@/domain/enum/LocaleEnum";
+import { ThemeEnum } from "@/domain/enum/ThemeEnum";
 import { cookies } from "next/headers";
-import type { TLocale, TTheme } from "@/domain/type/TCommon";
 
 export async function getSettingFromCookie(): Promise<{
-  locale: TLocale;
-  theme: TTheme;
+  locale: LocaleEnum;
+  theme: ThemeEnum;
 }> {
   const cookieStore = await cookies();
 
@@ -11,7 +12,7 @@ export async function getSettingFromCookie(): Promise<{
   const theme = cookieStore.get("theme")?.value;
 
   return {
-    locale: locale === "ar" ? "ar" : "en",
-    theme: theme === "light" ? "light" : "dark",
+    locale: locale === LocaleEnum.Ar ? LocaleEnum.Ar : LocaleEnum.En,
+    theme: theme === ThemeEnum.Dark ? ThemeEnum.Dark : ThemeEnum.Light,
   };
 }

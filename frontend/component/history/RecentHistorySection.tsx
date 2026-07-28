@@ -10,13 +10,13 @@ import { GList } from "@/component/common/GList";
 import Link from "next/link";
 import { ar } from "@/app/(dashboard)/history/i18n/ar.i18n";
 import { en, type THistoryTranslation } from "@/app/(dashboard)/history/i18n/en.i18n";
-import type { TLocale } from "@/domain/type/TCommon";
 import type { RecentHistorySectionProps } from "./def/RecentHistorySection";
 import { MatchStatusEnum } from "@/domain/enum/MatchStatusEnum";
 import { MatchHistoryItem } from "./MatchHistoryItem";
+import type { LocaleEnum } from "@/domain/enum/LocaleEnum";
 
 function RecentHistorySection({ title, viewAll, emptyTitle, emptyDescription, limit = 3 }: RecentHistorySectionProps) {
-  const [locale] = useLocale() as [TLocale, (l: TLocale) => void];
+  const [locale] = useLocale() as [LocaleEnum, (l: LocaleEnum) => void];
   const historyT = useTranslation({ en, ar }) as THistoryTranslation;
   const { matches, summary, loading } = useMatchHistory(MatchStatusEnum.All, limit);
   const items = [

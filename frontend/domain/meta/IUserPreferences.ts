@@ -1,6 +1,9 @@
+import { LocaleEnum } from "@/domain/enum/LocaleEnum";
+import { ThemeEnum } from "@/domain/enum/ThemeEnum";
+
 interface IUserPreferences {
-  locale: "en" | "ar";
-  theme: "light" | "dark";
+  locale: LocaleEnum;
+  theme: ThemeEnum;
   soundEnabled: boolean;
   showOnlineStatus: boolean;
   showGameActivity: boolean;
@@ -9,8 +12,8 @@ interface IUserPreferences {
 }
 
 const DEFAULT_USER_PREFERENCES: IUserPreferences = {
-  locale: "en",
-  theme: "dark",
+  locale: LocaleEnum.En,
+  theme: ThemeEnum.Dark,
   soundEnabled: true,
   showOnlineStatus: true,
   showGameActivity: true,
