@@ -5,7 +5,7 @@ interface INotificationItem {
   type: string;
   title: string;
   body: string;
-  referenceId: string | null;
+  referenceId: TNullable<string>;
   isRead: boolean;
   createdAt: string;
 }

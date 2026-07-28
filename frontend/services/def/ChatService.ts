@@ -1,7 +1,7 @@
 import type { HubConnection } from "@microsoft/signalr";
 import type { IMessage } from "@/domain/meta/IMessage";
 import type { IPrivateMessagePayload } from "@/domain/meta/IPrivateMessagePayload";
-import type { TPromise } from "@/domain/type/TCommon";
+import type { TNullable, TPromise } from "@/domain/type/TCommon";
 import type { IChatService } from "../meta/IChatService";
 import type { IChatRepository, IPerFriendUnreadCount } from "@/repositories/meta/IChatRepository";
 import { chatRepository } from "@/repositories/def/ChatRepository";
@@ -19,7 +19,7 @@ const normalizeMessage = (payload: IPrivateMessagePayload): IMessage => ({
 });
 
 class ChatService implements IChatService {
-  private connection: HubConnection | null = null;
+  private connection: TNullable<HubConnection> = null;
   private subs = new SubscriptionManager();
   private reconnectHandlers = new ReconnectManager();
 

@@ -1,14 +1,14 @@
 import { gameApi } from "../proxy/game.api";
 import type { IGameRepository } from "../meta/IGameRepository";
 import type { IGameState } from "@/app/providers/def/IGameState";
-import type { TPromise } from "@/domain/type/TCommon";
+import type { TNullable, TPromise } from "@/domain/type/TCommon";
 import type { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
 import type { IGameAction } from "@/domain/meta/IGameAction";
 
 class GameRepository implements IGameRepository {
   private static instance: GameRepository;
   private api = gameApi.api;
-  getCurrentState(): TPromise<IGameState | null> {
+  getCurrentState(): TPromise<TNullable<IGameState>> {
     return this.api.getCurrentState();
   }
 
@@ -16,7 +16,7 @@ class GameRepository implements IGameRepository {
     return this.api.findMatch({ gameKind });
   }
 
-  startGame(friendId: string | null, gameKind: GamesKindEnum): TPromise<void> {
+  startGame(friendId: TNullable<string>, gameKind: GamesKindEnum): TPromise<void> {
     return this.api.startGame({ friendId, gameKind });
   }
 

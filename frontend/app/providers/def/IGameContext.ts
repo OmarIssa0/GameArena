@@ -1,6 +1,6 @@
-import { TNullable } from "@/domain/type/TCommon";
-import { IGameState } from "./IGameState";
 import { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
+import type { IGameState } from "./IGameState";
+import type { TNullable } from "@/domain/type/TCommon";
 
 interface IGameContext {
   state: TNullable<IGameState>;
@@ -8,8 +8,8 @@ interface IGameContext {
   isSearching: boolean;
   searchError: TNullable<string>;
   opponentDisconnected: boolean;
-  lastGameType: GamesKindEnum | null;
-  pendingPlayAgainRequest: { requesterId: string; requesterUsername: string } | null;
+  lastGameType: TNullable<GamesKindEnum>;
+  pendingPlayAgainRequest: TNullable<{ requesterId: string; requesterUsername: string }>;
   requestedPlayAgain: boolean;
   findMatch(gameKind: GamesKindEnum): Promise<void>;
   startGame(friendId: TNullable<string>, gameKind: GamesKindEnum): Promise<void>;

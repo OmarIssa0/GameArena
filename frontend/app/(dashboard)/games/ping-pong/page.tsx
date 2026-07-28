@@ -8,6 +8,7 @@ import { GameLayoutWrapper } from "@/component/games/GameLayoutWrapper";
 import { GCard } from "@/component/common/GCard";
 import { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
 import type { IPingPongGameState } from "@/app/providers/def/IGameState";
+import type { TNullable } from "@/domain/type/TCommon";
 
 const ACTION_MOVE_PADDLE = "MOVE_PADDLE";
 const DIRECTION_UP = "UP";
@@ -26,18 +27,18 @@ function PingPongPage() {
   const { user } = useAuth();
 
   const keysDown = useRef<Set<string>>(new Set());
-  const rafId = useRef<number | null>(null);
+  const rafId = useRef<TNullable<number>>(null);
 
   const stateRef = useRef(state);
   const userRef = useRef(user);
   const sendActionRef = useRef(sendAction);
 
-  const lastMouseDirectionRef = useRef<"UP" | "DOWN" | null>(null);
-  const rafMouseSendRef = useRef<number | null>(null);
+  const lastMouseDirectionRef = useRef<TNullable<"UP" | "DOWN">>(null);
+  const rafMouseSendRef = useRef<TNullable<number>>(null);
   const lastMouseSendAtRef = useRef<number>(0);
 
-  const boardRef = useRef<HTMLDivElement | null>(null);
-  const [boardRect, setBoardRect] = useState<DOMRectReadOnly | null>(null);
+  const boardRef = useRef<TNullable<HTMLDivElement>>(null);
+  const [boardRect, setBoardRect] = useState<TNullable<DOMRectReadOnly>>(null);
 
   useEffect(() => {
     stateRef.current = state;

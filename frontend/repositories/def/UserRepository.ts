@@ -2,7 +2,7 @@ import { userApi } from "../proxy/user.api";
 import type { IUser } from "@/domain/meta/IUser";
 import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import type { IUserRepository } from "../meta/IUserRepository";
-import type { TPromise } from "@/domain/type/TCommon";
+import type { TNullable, TPromise } from "@/domain/type/TCommon";
 import type { IUserFilterRequest } from "@/domain/meta/IUserFilterRequest";
 import type { IRegisterRequest } from "@/domain/meta/IRegisterRequest";
 
@@ -26,7 +26,7 @@ class UserRepository implements IUserRepository {
     return this.api.changePassword(data);
   }
 
-  getPreferences(): TPromise<string | null> {
+  getPreferences(): TPromise<TNullable<string>> {
     return this.api.getPreferences();
   }
 

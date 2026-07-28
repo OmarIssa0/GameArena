@@ -1,13 +1,14 @@
+import { requireConnection } from "../lib/signalRUtils";
+import { ReconnectManager } from "../lib/ReconnectManager";
+import { SubscriptionManager } from "../lib/SubscriptionManager";
 import type { HubConnection } from "@microsoft/signalr";
 import type { INotificationCounters, INotificationService } from "../meta/INotificationService";
 import type { INotificationItem } from "@/domain/meta/INotification";
 import type { Handler } from "../lib/signalRUtils";
-import { requireConnection } from "../lib/signalRUtils";
-import { ReconnectManager } from "../lib/ReconnectManager";
-import { SubscriptionManager } from "../lib/SubscriptionManager";
+import type { TNullable } from "@/domain/type/TCommon";
 
 class NotificationService implements INotificationService {
-  private connection: HubConnection | null = null;
+  private connection: TNullable<HubConnection> = null;
   private subs = new SubscriptionManager();
   private reconnectHandlers = new ReconnectManager();
 

@@ -20,6 +20,7 @@ import type { GTabItem } from "@/component/common/def/GTabs";
 import { friendService } from "@/services/def/FriendService";
 import type { IFriendRequestReceived } from "@/domain/meta/IFriendRequestReceived";
 import { AlertTriangle } from "lucide-react";
+import { TNullable } from "@/domain/type/TCommon";
 
 type Tab = "all" | "gameInvites" | "friendRequests";
 
@@ -40,7 +41,7 @@ export default function NotificationsPage() {
   const [tab, setTab] = useState<Tab>("all");
   const [requests, setRequests] = useState<IFriendRequestReceived[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<TNullable<string>>(null);
 
   useEffect(() => {
     friendService

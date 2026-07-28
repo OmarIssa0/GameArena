@@ -1,15 +1,20 @@
+import type { TNullable, TOptional } from "@/domain/type/TCommon";
 import type { HubConnection } from "@microsoft/signalr";
 
 type Handler = (...args: unknown[]) => void;
 
-function dispatch(handlers: Set<Handler> | undefined, ...args: unknown[]): void {
+function dispatch(handlers: TOptional<Set<Handler>>, ...args: unknown[]): void {
   if (!handlers) return;
   for (const h of handlers) {
-    try { h(...args); } catch { /* isolated */ }
+    try {
+      h(...args);
+    } catch {
+      /* isolated */
+    }
   }
 }
 
-function requireConnection(connection: HubConnection | null, name: string): HubConnection {
+function requireConnection(connection: TNullable<HubConnection>, name: string): HubConnection {
   if (!connection) throw new Error(`${name} connection not established`);
   return connection;
 }

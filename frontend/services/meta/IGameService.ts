@@ -1,14 +1,15 @@
 import type { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
 import type { IGameInvite } from "@/domain/meta/INotification";
 import type { IGameState } from "@/app/providers/def/IGameState";
+import type { TNullable, TPromise } from "@/domain/type/TCommon";
 
 interface IGameService {
   // REST API (via repository)
-  getCurrentState(): Promise<IGameState | null>;
+  getCurrentState(): TPromise<TNullable<IGameState>>;
 
   // SignalR invocations
   findMatch(gameKind: GamesKindEnum): Promise<void>;
-  startGame(friendId: string | null, gameKind: GamesKindEnum): Promise<void>;
+  startGame(friendId: TNullable<string>, gameKind: GamesKindEnum): Promise<void>;
   inviteFriend(friendId: string, gameKind: GamesKindEnum): Promise<void>;
   inviteToRoom(friendId: string): Promise<void>;
   leaveGame(): Promise<void>;

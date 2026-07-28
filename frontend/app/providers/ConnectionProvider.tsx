@@ -2,17 +2,18 @@
 
 import { createContext, useContext, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { HubConnectionBuilder, LogLevel } from "@microsoft/signalr";
-import type { HubConnection } from "@microsoft/signalr";
-import type { IConnectionContext } from "@/domain/meta/IConnectionContext";
 import { ConnectionState, type HubConnectionStates } from "@/domain/enum/ConnectionState";
 import { friendService } from "@/services/def/FriendService";
 import { notificationService } from "@/services/def/NotificationService";
 import { chatService } from "@/services/def/ChatService";
 import { gameService } from "@/services/def/GameService";
+import type { HubConnection } from "@microsoft/signalr";
+import type { IConnectionContext } from "@/domain/meta/IConnectionContext";
+import type { TNullable, TOptional } from "@/domain/type/TCommon";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://gamearena-ppnc.onrender.com";
 
-const ConnectionContext = createContext<IConnectionContext | undefined>(undefined);
+const ConnectionContext = createContext<TOptional<IConnectionContext>>(undefined);
 
 function createConnection(name: string): HubConnection {
   return new HubConnectionBuilder()
@@ -25,9 +26,9 @@ function createConnection(name: string): HubConnection {
 }
 
 export function ConnectionProvider({ children }: { children: React.ReactNode }) {
-  const [chatConnection, setChatConnection] = useState<HubConnection | null>(null);
-  const [gameConnection, setGameConnection] = useState<HubConnection | null>(null);
-  const [socialConnection, setSocialConnection] = useState<HubConnection | null>(null);
+  const [chatConnection, setChatConnection] = useState<TNullable<HubConnection>>(null);
+  const [gameConnection, setGameConnection] = useState<TNullable<HubConnection>>(null);
+  const [socialConnection, setSocialConnection] = useState<TNullable<HubConnection>>(null);
   const [socialReconnectKey, setSocialReconnectKey] = useState(0);
 
   // Track connection states per hub
@@ -37,9 +38,9 @@ export function ConnectionProvider({ children }: { children: React.ReactNode }) 
     social: ConnectionState.Disconnected,
   });
 
-  const chatRef = useRef<HubConnection | null>(null);
-  const gameRef = useRef<HubConnection | null>(null);
-  const socialRef = useRef<HubConnection | null>(null);
+  const chatRef = useRef<TNullable<HubConnection>>(null);
+  const gameRef = useRef<TNullable<HubConnection>>(null);
+  const socialRef = useRef<TNullable<HubConnection>>(null);
   const socialKeyRef = useRef(0);
   const cancelledRef = useRef(false);
 
@@ -57,8 +58,8 @@ export function ConnectionProvider({ children }: { children: React.ReactNode }) 
     const startHub = async (
       name: string,
       hubKey: keyof HubConnectionStates,
-      stateSetter: (conn: HubConnection | null) => void,
-      ref: React.MutableRefObject<HubConnection | null>,
+      stateSetter: (conn: TNullable<HubConnection>) => void,
+      ref: React.MutableRefObject<TNullable<HubConnection>>,
     ) => {
       const conn = createConnection(name);
 

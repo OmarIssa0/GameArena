@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { MatchStatusEnum } from "@/domain/enum/MatchStatusEnum";
 import { matchHistoryService } from "@/services/def/MatchHistoryService";
 import type { IMatchHistory } from "@/domain/meta/IMatchHistory";
+import type { TNullable } from "@/domain/type/TCommon";
 
 function buildSummary(matches: IMatchHistory[]) {
   return matches.reduce(
@@ -21,7 +22,7 @@ function buildSummary(matches: IMatchHistory[]) {
 function useMatchHistory(statusFilter: MatchStatusEnum = MatchStatusEnum.All, limit?: number) {
   const [allMatches, setAllMatches] = useState<IMatchHistory[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<TNullable<string>>(null);
 
   useEffect(() => {
     let alive = true;

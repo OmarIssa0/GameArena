@@ -10,17 +10,18 @@ import { GTabs } from "@/component/common/GTabs";
 import { Save, User, Lock, Settings, Moon, Volume2, Activity, Gamepad2, Sliders, Languages, Bell, List } from "lucide-react";
 import { GList } from "@/component/common/GList";
 import { GButton } from "@/component/common/GButton";
-import type { GTabItem } from "@/component/common/def/GTabs";
 import { GCard } from "@/component/common/GCard";
 import { GTextField } from "@/component/common/GTextField";
 import { GSelect } from "@/component/common/GSelect";
 import { GIcon } from "@/component/common/GIcon";
 import { GSpinner } from "@/component/common/GSpinner";
 import { userRepository } from "@/repositories/def/UserRepository";
-import type { IUser } from "@/domain/meta/IUser";
 import { DEFAULT_USER_PREFERENCES, type IUserPreferences } from "@/domain/meta/IUserPreferences";
 import { passwordValidator } from "@/lib/utils";
 import { useAuth } from "@/app/providers/AuthProvider";
+import type { IUser } from "@/domain/meta/IUser";
+import type { GTabItem } from "@/component/common/def/GTabs";
+import type { TNullable } from "@/domain/type/TCommon";
 
 type SettingsTab = "profile" | "password" | "preferences";
 
@@ -31,10 +32,10 @@ function SettingsPage() {
   }) as TSettingsTranslation & GTextFieldTranslation;
   const [activeTab, setActiveTab] = useState<SettingsTab>("profile");
   const { updatePreferences } = useAuth();
-  const [profile, setProfile] = useState<IUser | null>(null);
+  const [profile, setProfile] = useState<TNullable<IUser>>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [saveMsg, setSaveMsg] = useState<string | null>(null);
+  const [saveMsg, setSaveMsg] = useState<TNullable<string>>(null);
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");

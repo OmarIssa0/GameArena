@@ -6,14 +6,15 @@ import { useDashboardNotifications } from "@/app/providers/DashboardNotification
 import { GIcon } from "@/component/common/GIcon";
 import { X, Bell } from "lucide-react";
 import { GButton } from "../common/GButton";
+import type { TNullable } from "@/domain/type/TCommon";
 
 function NotificationPopup() {
   const router = useRouter();
   const { notifications } = useDashboardNotifications();
   const [visible, setVisible] = useState(false);
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const lastIdRef = useRef<string | null>(null);
+  const timerRef = useRef<TNullable<ReturnType<typeof setTimeout>>>(null);
+  const lastIdRef = useRef<TNullable<string>>(null);
 
   // Get the latest non-dismissed notification
   const latest = notifications.length > 0 ? (notifications.find((n) => !dismissedIds.has(n.id)) ?? notifications[0]) : null;

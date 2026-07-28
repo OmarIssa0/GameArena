@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { GBackdrop } from "./GBackdrop";
 import { GCard } from "./GCard";
 import type { GModalProps } from "./def/GModal";
+import type { TNullable } from "@/domain/type/TCommon";
 
 const sizeStyles: Record<string, string> = {
   sm: "max-w-xs",
@@ -14,7 +15,8 @@ const sizeStyles: Record<string, string> = {
   xl: "max-w-lg",
 };
 
-const FOCUSABLE = 'a[href],button:not([disabled]),input:not([disabled]),textarea:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])';
+const FOCUSABLE =
+  'a[href],button:not([disabled]),input:not([disabled]),textarea:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])';
 
 function GModal({
   open,
@@ -30,8 +32,8 @@ function GModal({
   className,
   ...props
 }: GModalProps) {
-  const modalRef = useRef<HTMLDivElement>(null);
-  const previousFocusRef = useRef<HTMLElement | null>(null);
+  const modalRef = useRef<TNullable<HTMLDivElement>>(null);
+  const previousFocusRef = useRef<TNullable<HTMLElement>>(null);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {

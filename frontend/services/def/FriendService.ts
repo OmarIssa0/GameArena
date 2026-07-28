@@ -1,6 +1,6 @@
 import { friendRepository } from "@/repositories/def/FriendRepository";
 import type { HubConnection } from "@microsoft/signalr";
-import type { TPromise } from "@/domain/type/TCommon";
+import type { TNullable, TPromise } from "@/domain/type/TCommon";
 import type { IFriendRequestReceived } from "@/domain/meta/IFriendRequestReceived";
 import type { IFriendRequestSent } from "@/domain/meta/IFriendRequestSent";
 import type { IUserSummary } from "@/domain/meta/IUserSummary";
@@ -12,7 +12,7 @@ import { requireConnection } from "../lib/signalRUtils";
 import { ReconnectManager } from "../lib/ReconnectManager";
 import { SubscriptionManager } from "../lib/SubscriptionManager";
 
-const buildFullName = (first: string | null | undefined, last: string | null | undefined): string => `${first ?? ""} ${last ?? ""}`.trim();
+const buildFullName = (first: TNullable<string>, last: TNullable<string>): string => `${first ?? ""} ${last ?? ""}`.trim();
 
 const toFullNameUser = (u: IUserSummary): IUserSummary => ({
   ...u,
@@ -20,7 +20,7 @@ const toFullNameUser = (u: IUserSummary): IUserSummary => ({
 });
 
 class FriendService implements IFriendService {
-  private connection: HubConnection | null = null;
+  private connection: TNullable<HubConnection> = null;
   private subs = new SubscriptionManager();
   private reconnectHandlers = new ReconnectManager();
 

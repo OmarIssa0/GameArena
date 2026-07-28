@@ -8,8 +8,9 @@ import { notificationService } from "@/services/def/NotificationService";
 import { gameService } from "@/services/def/GameService";
 import type { IGameInvite, INotificationItem, INotificationState } from "@/domain/meta/INotification";
 import type { IUserPreferences } from "@/domain/meta/IUserPreferences";
+import type { TNullable, TOptional } from "@/domain/type/TCommon";
 
-const NotificationContext = createContext<INotificationState | undefined>(undefined);
+const NotificationContext = createContext<TOptional<INotificationState>>(undefined);
 
 export function DashboardNotificationsProvider({ children }: { children: React.ReactNode }) {
   const { isSocialConnected, socialReconnectKey } = useConnections();
@@ -24,11 +25,15 @@ export function DashboardNotificationsProvider({ children }: { children: React.R
 
   const pathnameRef = useRef(pathname);
   const searchParamsRef = useRef(searchParams);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef = useRef<TNullable<HTMLAudioElement>>(null);
   const soundEnabledRef = useRef(true);
 
-  useEffect(() => { pathnameRef.current = pathname; }, [pathname]);
-  useEffect(() => { searchParamsRef.current = searchParams; }, [searchParams]);
+  useEffect(() => {
+    pathnameRef.current = pathname;
+  }, [pathname]);
+  useEffect(() => {
+    searchParamsRef.current = searchParams;
+  }, [searchParams]);
 
   useEffect(() => {
     if (user?.preferences) {
@@ -57,8 +62,7 @@ export function DashboardNotificationsProvider({ children }: { children: React.R
     });
     const off2 = notificationService.onChatNotification((p) => {
       const selected = searchParamsRef.current.get("friend");
-      if (pathnameRef.current !== "/messages" || selected !== p.senderId)
-        setUnreadMessageCount((n) => n + 1);
+      if (pathnameRef.current !== "/messages" || selected !== p.senderId) setUnreadMessageCount((n) => n + 1);
       playNotificationSound();
     });
     const off3 = notificationService.onNewNotification((n) => {
@@ -69,12 +73,15 @@ export function DashboardNotificationsProvider({ children }: { children: React.R
       setNotifications((prev) => {
         const incomingIds = new Set(list.map((n) => n.id));
         const localOnly = prev.filter((n) => !incomingIds.has(n.id));
-        return [...list, ...localOnly].sort((a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
+        return [...list, ...localOnly].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
       });
     });
-    return () => { off1(); off2(); off3(); off4(); };
+    return () => {
+      off1();
+      off2();
+      off3();
+      off4();
+    };
   }, []);
 
   useEffect(() => {
@@ -86,7 +93,7 @@ export function DashboardNotificationsProvider({ children }: { children: React.R
 
   useEffect(() => {
     const off = gameService.onGameInvite((p) => {
-      setGameInvites((prev) => prev.some((i) => i.roomId === p.roomId) ? prev : [...prev, p]);
+      setGameInvites((prev) => (prev.some((i) => i.roomId === p.roomId) ? prev : [...prev, p]));
       playNotificationSound();
     });
     return () => off();
@@ -103,15 +110,18 @@ export function DashboardNotificationsProvider({ children }: { children: React.R
     setGameInvites((prev) => prev.filter((i) => i.roomId !== roomId));
   }, []);
 
-  const value = useMemo<INotificationState>(() => ({
-    friendRequestCount,
-    unreadMessageCount,
-    unreadNotificationCount,
-    gameInvites,
-    notifications,
-    dismissGameInvite,
-    acceptGameInvite,
-  }), [friendRequestCount, unreadMessageCount, unreadNotificationCount, gameInvites, notifications, dismissGameInvite, acceptGameInvite]);
+  const value = useMemo<INotificationState>(
+    () => ({
+      friendRequestCount,
+      unreadMessageCount,
+      unreadNotificationCount,
+      gameInvites,
+      notifications,
+      dismissGameInvite,
+      acceptGameInvite,
+    }),
+    [friendRequestCount, unreadMessageCount, unreadNotificationCount, gameInvites, notifications, dismissGameInvite, acceptGameInvite],
+  );
 
   return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;
 }

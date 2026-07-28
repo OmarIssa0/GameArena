@@ -18,12 +18,13 @@ import { useGame } from "@/app/providers/GameProvider";
 import { GBadge } from "@/component/common/GBadge";
 import { PageHeader } from "@/component/common/PageHeader";
 import { GPage } from "@/component/common/GPage";
+import { THashMap, TNullable } from "@/domain/type/TCommon";
 
 function GamesPage() {
   const router = useRouter();
-  const t = useTranslation({ en, ar }) as TGamesTranslation & Record<string, string>;
+  const t = useTranslation({ en, ar }) as TGamesTranslation & THashMap<string>;
   const { state, leaveGame } = useGame();
-  const [pendingPath, setPendingPath] = useState<string | null>(null);
+  const [pendingPath, setPendingPath] = useState<TNullable<string>>(null);
 
   const handleGameSelect = (path: string) => {
     if (state) {
@@ -52,11 +53,7 @@ function GamesPage() {
           </GBadge>
         }
       />
-      <GList
-        items={[...GamesList]}
-        keyExtractor={(game) => game.id}
-        emptyMessage=""
-        emptyDescription="">
+      <GList items={[...GamesList]} keyExtractor={(game) => game.id} emptyMessage="" emptyDescription="">
         {(game) => {
           const gameConfig = GamesMap[game.id];
           return (

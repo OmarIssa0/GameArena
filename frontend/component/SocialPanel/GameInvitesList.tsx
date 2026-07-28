@@ -12,10 +12,11 @@ import { useTranslation } from "@/hooks/useSetting";
 import { GamesList } from "@/domain/constant/games";
 import { en, type TSocialPanelTranslation } from "@/component/i18n/SocialPanel/en.i18n";
 import { ar } from "@/component/i18n/SocialPanel/ar.i18n";
-import type { IGameInvitesListProps } from "./def/GameInvitesList";
 import { GEmpty } from "../common/GEmpty";
 import { Bell } from "lucide-react";
 import { GIcon } from "../common/GIcon";
+import type { IGameInvitesListProps } from "./def/GameInvitesList";
+import type { TNullable, TOptional } from "@/domain/type/TCommon";
 
 const gamePath = (gameType: number) => GamesList.find((g) => g.type === gameType)?.path;
 
@@ -24,11 +25,11 @@ export function GameInvitesList({ onAfterAccept }: IGameInvitesListProps) {
   const t = useTranslation({ en, ar }) as TSocialPanelTranslation;
   const { gameInvites, acceptGameInvite, dismissGameInvite } = useDashboardNotifications();
   const { state, leaveGame } = useGame();
-  const [pendingAccept, setPendingAccept] = useState<{ roomId: string; path: string | undefined } | null>(null);
+  const [pendingAccept, setPendingAccept] = useState<TNullable<{ roomId: string; path: TOptional<string> }>>(null);
 
   const isInGame = state !== null;
 
-  const handleAccept = async (roomId: string, path: string | undefined) => {
+  const handleAccept = async (roomId: string, path: TOptional<string>) => {
     if (!path) return;
     if (isInGame) {
       setPendingAccept({ roomId, path });

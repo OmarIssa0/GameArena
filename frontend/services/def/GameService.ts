@@ -7,9 +7,10 @@ import type { IGameInvite } from "@/domain/meta/INotification";
 import type { IGameState } from "@/app/providers/def/IGameState";
 import type { IGameService } from "../meta/IGameService";
 import type { Handler } from "../lib/signalRUtils";
+import type { TNullable, TPromise } from "@/domain/type/TCommon";
 
 class GameService implements IGameService {
-  private connection: HubConnection | null = null;
+  private connection: TNullable<HubConnection> = null;
   private subs = new SubscriptionManager();
   private reconnectHandlers = new ReconnectManager();
   private _connectionReady: Promise<void>;
@@ -33,8 +34,8 @@ class GameService implements IGameService {
 
   // ── REST API (via repository) ───────────────────────────────────────────
 
-  getCurrentState(): Promise<IGameState | null> {
-    return gameRepository.getCurrentState().then((res) => res.data ?? null);
+  getCurrentState(): TPromise<TNullable<IGameState>> {
+    return gameRepository.getCurrentState();
   }
 
   // ── Connection management ───────────────────────────────────────────────
@@ -91,7 +92,7 @@ class GameService implements IGameService {
     await this.invoke("FindMatch", gameKind);
   }
 
-  async startGame(friendId: string | null, gameKind: GamesKindEnum): Promise<void> {
+  async startGame(friendId: TNullable<string>, gameKind: GamesKindEnum): Promise<void> {
     await this.invoke("StartGame", friendId, gameKind);
   }
 

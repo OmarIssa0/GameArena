@@ -18,8 +18,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const isSearchingRef = useRef(false);
   const [searchError, setSearchError] = useState<TNullable<string>>(null);
   const [opponentDisconnected, setOpponentDisconnected] = useState(false);
-  const [lastGameType, setLastGameType] = useState<GamesKindEnum | null>(null);
-  const [pendingPlayAgainRequest, setPendingPlayAgainRequest] = useState<{ requesterId: string; requesterUsername: string } | null>(null);
+  const [lastGameType, setLastGameType] = useState<TNullable<GamesKindEnum>>(null);
+  const [pendingPlayAgainRequest, setPendingPlayAgainRequest] = useState<TNullable<{ requesterId: string; requesterUsername: string }>>(null);
   const [requestedPlayAgain, setRequestedPlayAgain] = useState(false);
   const router = useRouter();
 
