@@ -108,7 +108,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
     try {
       await gameService.leaveGame();
     } catch {
-      /* navigate regardless */
     }
     goToLobby();
   }, [goToLobby]);
@@ -122,7 +121,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // ── Timeout: reset requestedPlayAgain after 30s ─────────────────────
   useEffect(() => {
     if (!requestedPlayAgain) return;
     const timer = setTimeout(() => {
@@ -137,9 +135,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         await gameService.respondPlayAgain(accept);
         setPendingPlayAgainRequest(null);
         if (!accept) goToLobby();
-      } catch {
-        // keep dialog open so user can retry or use Go to Lobby
-      }
+      } catch {}
     },
     [goToLobby],
   );

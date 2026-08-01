@@ -19,7 +19,7 @@ export function BottomNav() {
   };
 
   return (
-    <nav className="fixed inset-inline-0 bottom-0 flex items-center justify-around h-18 pb-[env(safe-area-inset-bottom)] bg-bg-sidebar border-t border-border z-fixed md:hidden overflow-x-auto custom-scrollbar" role="navigation" aria-label="Bottom navigation">
+    <nav className="fixed inset-inline-0 bottom-0 flex items-center justify-around h-18 pb-[env(safe-area-inset-bottom)] bg-bg-sidebar border-t border-border z-fixed md:hidden overflow-x-auto w-full custom-scrollbar" role="navigation" aria-label="Bottom navigation">
       <div className="flex items-center justify-center min-w-full">
         {sidebarNav.map((item) => (
           <a

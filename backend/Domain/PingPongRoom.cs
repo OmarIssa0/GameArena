@@ -14,18 +14,18 @@ namespace backend.Domain
         public float BallVX { get; set; } = InitialBallSpeed;
         public float BallVY { get; set; } = 0.006f;
 
-        public float PadYP1 { get; set; } = 0.4f;
-        public float PadHP1 { get; set; } = 0.2f;
-        public float PadVP1 { get; set; } = 0.02f;
+        public float PadYP1 { get; set; } = 0.4f;// paddle Y position for player 1
+        public float PadHP1 { get; set; } = 0.2f; 
+        public float PadVP1 { get; set; } = 0.035f;
         public float PadYP2 { get; set; } = 0.4f;
         public float PadHP2 { get; set; } = 0.2f;
-        public float PadVP2 { get; set; } = 0.02f;
+        public float PadVP2 { get; set; } = 0.035f;
 
         public int ScoreP1 { get; set; } = 0;
         public int ScoreP2 { get; set; } = 0;
 
         private const int WinScore = 5;
-        private const float PaddleMargin = 0.03f;
+        private const float PaddleMargin = 0.01f;
         private const float InitialBallSpeed = 0.012f;
         private const float BallHitSpeedRamp = 1.05f;
         private const float MaxBallSpeed = 0.03f;
@@ -155,7 +155,7 @@ namespace backend.Domain
                 targetY = 0.5f - paddleHeight / 2f;
             }
 
-            const float speed = 0.015f;
+            const float speed = 0.02f;
 
             float diff = targetY - botPaddleY;
             if (Math.Abs(diff) < speed)
@@ -210,10 +210,10 @@ namespace backend.Domain
             ScoreP2 = 0;
             PadYP1 = 0.4f;
             PadHP1 = 0.2f;
-            PadVP1 = 0.02f;
+            PadVP1 = 0.035f;
             PadYP2 = 0.4f;
             PadHP2 = 0.2f;
-            PadVP2 = 0.02f;
+            PadVP2 = 0.035f;
             ResetBall();
         }
 

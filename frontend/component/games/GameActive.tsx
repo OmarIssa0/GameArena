@@ -28,7 +28,7 @@ function GameActive({ children }: IGameActiveProps) {
 
   return (
     <div className="flex items-center justify-center min-h-[150px] p-4">
-      <div className="w-full max-w-lg space-y-6">
+      <div className="w-full max-w-xl space-y-6">
         <GamePlayersHeader />
 
         {!(state.winnerPlayerId || state.isFinished) && (
