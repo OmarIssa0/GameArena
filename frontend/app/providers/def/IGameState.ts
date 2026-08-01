@@ -27,9 +27,17 @@ export interface ISnakeGameState extends IGameStateBase {
 
 // PingPong specific state
 export interface IPingPongGameState extends IGameStateBase {
+  boardWidth: number;
+  boardHeight: number;
   ballPosition: { x: number; y: number };
+  ballSize: number;
+  player1PaddleX: number;
   player1PaddleY: number;
+  player1PaddleHeight: number;
+  player2PaddleX: number;
   player2PaddleY: number;
+  player2PaddleHeight: number;
+  paddleWidth: number;
   player1Score: number;
   player2Score: number;
 }

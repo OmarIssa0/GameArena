@@ -28,13 +28,18 @@ namespace backend.Domain
         private const float PaddleLeftEdge = 0.03f;
         private const float PaddleRightEdge = 0.97f;
         private const float InitialBallSpeed = 0.012f;
-        private const float BallSpeedRamp = 1.002f;
+        private const float BallHitSpeedRamp = 1.05f;
+        private const float MaxBallSpeed = 0.03f;
+        private const int PaddleWidthPx = 12;
+        private const int BallSizePx = 12;
 
         private const string ActionMovePaddle = "MOVE_PADDLE";
         private const string DirectionUp = "UP";
         private const string DirectionDown = "DOWN";
 
-        // Must match BOARD_WIDTH / BOARD_HEIGHT in the PingPongPage frontend component.
+        // Board size in pixels. Sent to clients in GetStatePayload so the
+        // frontend scales from a single source of truth instead of duplicating
+        // board constants.
         private const int BoardWidthPx = 600;
         private const int BoardHeightPx = 400;
 
@@ -80,7 +85,7 @@ namespace backend.Domain
             float paddleBottom1 = PadYP1 + PadHP1;
             if (BallVX < 0 && BallPX <= PaddleLeftEdge && BallPY >= paddleTop1 && BallPY <= paddleBottom1)
             {
-                BallVX = -BallVX;
+                BallVX = -Math.Min(Math.Abs(BallVX) * BallHitSpeedRamp, MaxBallSpeed);
                 BallPX = PaddleLeftEdge;
                 float hitPos = (BallPY - PadYP1) / PadHP1;
                 BallVY = (hitPos - 0.5f) * 0.02f;
@@ -90,7 +95,7 @@ namespace backend.Domain
             float paddleBottom2 = PadYP2 + PadHP2;
             if (BallVX > 0 && BallPX >= PaddleRightEdge && BallPY >= paddleTop2 && BallPY <= paddleBottom2)
             {
-                BallVX = -BallVX;
+                BallVX = Math.Min(BallVX * BallHitSpeedRamp, MaxBallSpeed);
                 BallPX = PaddleRightEdge;
                 float hitPos = (BallPY - PadYP2) / PadHP2;
                 BallVY = (hitPos - 0.5f) * 0.02f;
@@ -119,10 +124,6 @@ namespace backend.Domain
                 }
                 ResetBall();
             }
-
-            // Ramp difficulty slightly every tick.
-            BallVX *= BallSpeedRamp;
-            BallVY *= BallSpeedRamp;
         }
 
         private void AdvanceBot()
@@ -167,9 +168,17 @@ namespace backend.Domain
             isFinished = IsFinished,
             winnerPlayerId = WinnerPlayerId,
             currentTurnPlayerId = CurrentTurnPlayerId,
+            boardWidth = BoardWidthPx,
+            boardHeight = BoardHeightPx,
             ballPosition = new { x = BallPX * BoardWidthPx, y = BallPY * BoardHeightPx },
+            ballSize = BallSizePx,
+            player1PaddleX = PaddleLeftEdge * BoardWidthPx,
             player1PaddleY = PadYP1 * BoardHeightPx,
+            player1PaddleHeight = PadHP1 * BoardHeightPx,
+            player2PaddleX = PaddleRightEdge * BoardWidthPx,
             player2PaddleY = PadYP2 * BoardHeightPx,
+            player2PaddleHeight = PadHP2 * BoardHeightPx,
+            paddleWidth = PaddleWidthPx,
             player1Score = ScoreP1,
             player2Score = ScoreP2,
             score = Score

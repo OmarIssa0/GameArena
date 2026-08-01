@@ -15,37 +15,21 @@ type TPasswordValidationText = {
 
 const emailValidator =
   (t: TEmailValidationText) =>
-  (value: string): TNullable<string> => {
-    if (!value.trim()) return t.dynamicFieldRequired(t.email);
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
-      ? null
-      : t.invalidEmail;
-  };
+  (value: string): TNullable<string> =>
+    !value.trim() ? t.dynamicFieldRequired(t.email) : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim()) ? null : t.invalidEmail;
 
 const passwordValidator =
   (t: TPasswordValidationText) =>
   (value: string): TNullable<string> => {
     if (!value.trim()) return t.dynamicFieldRequired(t.password);
     const rules: string[] = [];
-    if (value.length < 8)
-      rules.push(t.invalidPassword[PasswordValidationEnum.MinLength]);
-    if (value.length > 20)
-      rules.push(t.invalidPassword[PasswordValidationEnum.MaxLength]);
-
-    if (!/[A-Z]/.test(value))
-      rules.push(t.invalidPassword[PasswordValidationEnum.Uppercase]);
-
-    if (!/[a-z]/.test(value))
-      rules.push(t.invalidPassword[PasswordValidationEnum.Lowercase]);
-
-    if (!/[0-9]/.test(value))
-      rules.push(t.invalidPassword[PasswordValidationEnum.Number]);
-
-    if (!/[!@#$%^&*]/.test(value))
-      rules.push(t.invalidPassword[PasswordValidationEnum.SpecialChar]);
-
-    if (/\s/.test(value))
-      rules.push(t.invalidPassword[PasswordValidationEnum.NoSpaces]);
+    if (value.length < 8) rules.push(t.invalidPassword[PasswordValidationEnum.MinLength]);
+    if (value.length > 64) rules.push(t.invalidPassword[PasswordValidationEnum.MaxLength]);
+    if (!/[A-Z]/.test(value)) rules.push(t.invalidPassword[PasswordValidationEnum.Uppercase]);
+    if (!/[a-z]/.test(value)) rules.push(t.invalidPassword[PasswordValidationEnum.Lowercase]);
+    if (!/[0-9]/.test(value)) rules.push(t.invalidPassword[PasswordValidationEnum.Number]);
+    if (!/[^A-Za-z0-9]/.test(value)) rules.push(t.invalidPassword[PasswordValidationEnum.SpecialChar]);
+    if (/\s/.test(value)) rules.push(t.invalidPassword[PasswordValidationEnum.NoSpaces]);
     return rules.length ? rules.join("\n") : null;
   };
 
