@@ -1,57 +1,29 @@
+import { SignalRServiceBase } from "../lib/SignalRServiceBase";
 import { friendRepository } from "@/repositories/def/FriendRepository";
 import type { HubConnection } from "@microsoft/signalr";
-import type { TNullable, TPromise } from "@/domain/type/TCommon";
+import type { TPromise } from "@/domain/type/TCommon";
 import type { IFriendRequestReceived } from "@/domain/meta/IFriendRequestReceived";
 import type { IFriendRequestSent } from "@/domain/meta/IFriendRequestSent";
 import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import type { IUserFilterRequest } from "@/domain/meta/IUserFilterRequest";
 import type { IFriendService } from "../meta/IFriendService";
-import type { IFriendRepository } from "@/repositories/meta/IFriendRepository";
-import type { Handler } from "../lib/signalRUtils";
-import { requireConnection } from "../lib/signalRUtils";
-import { ReconnectManager } from "../lib/ReconnectManager";
-import { SubscriptionManager } from "../lib/SubscriptionManager";
 import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
+import { withFullName } from "@/domain/lib/userUtils";
+import type { Handler } from "../lib/signalRUtils";
 
-const buildFullName = (first: TNullable<string>, last: TNullable<string>): string => `${first ?? ""} ${last ?? ""}`.trim();
-
-const toFullNameUser = (u: IUserSummary): IUserSummary => ({
-  ...u,
-  fullName: buildFullName(u.firstName, u.lastName) || u.userName || u.id,
-});
-
-class FriendService implements IFriendService {
-  private connection: TNullable<HubConnection> = null;
-  private subs = new SubscriptionManager();
-  private reconnectHandlers = new ReconnectManager();
-
-  constructor(private repo: IFriendRepository) {}
-
-  handleReconnect(): void {
-    this.reconnectHandlers.handleReconnect();
-  }
-
-  onReconnect(handler: () => void): () => void {
-    return this.reconnectHandlers.onReconnect(handler);
-  }
+class FriendService extends SignalRServiceBase implements IFriendService {
+  private repo = friendRepository;
 
   // ── Connection setup (called once by ConnectionProvider) ──────────────
 
   setConnection(connection: HubConnection): void {
-    if (this.connection) {
-      this.connection.off("social:all");
-      this.connection.off("social:friends");
-      this.connection.off("social:requests");
-      this.connection.off("social:blocked");
-      this.connection.off("friend:online");
-      this.connection.off("friend:offline");
-      this.connection.off("friend:ingame");
-    }
-    this.connection = connection;
+    super.setConnection(connection);
+  }
 
+  protected registerHandlers(): void {
     // Batched social data event — replaces individual social:friends, social:requests, social:blocked
     // on initial connect/reconnect to prevent UI flicker
-    this.connection.on("social:all", (data: unknown) => {
+    this.addHandler("social:all", (data: unknown) => {
       const batch = data as {
         friends?: IUserSummary[];
         receivedRequests?: IFriendRequestReceived[];
@@ -60,10 +32,10 @@ class FriendService implements IFriendService {
         counters?: { receivedFriendRequests: number; sentFriendRequests: number; friends: number; unreadMessages: number };
       };
 
-      const sortedFriends = (batch.friends ?? []).map(toFullNameUser).sort((a, b) => (a.fullName ?? "").localeCompare(b.fullName ?? ""));
+      const sortedFriends = (batch.friends ?? []).map(withFullName).sort((a, b) => (a.fullName ?? "").localeCompare(b.fullName ?? ""));
       this.subs.dispatch("social:friends", sortedFriends);
       this.subs.dispatch("social:requests", { received: batch.receivedRequests ?? [], sent: batch.sentRequests ?? [] });
-      this.subs.dispatch("social:blocked", (batch.blockedUsers ?? []).map(toFullNameUser));
+      this.subs.dispatch("social:blocked", (batch.blockedUsers ?? []).map(withFullName));
       this.subs.dispatch(
         "notification:update",
         batch.counters ?? { receivedFriendRequests: 0, sentFriendRequests: 0, friends: 0, unreadMessages: 0 },
@@ -71,30 +43,40 @@ class FriendService implements IFriendService {
     });
 
     // Legacy individual events — still handled for incremental updates
-    this.connection.on("social:friends", (data: unknown) => {
-      const list = (data as IUserSummary[]).map(toFullNameUser).sort((a, b) => (a.fullName ?? "").localeCompare(b.fullName ?? ""));
+    this.addHandler("social:friends", (data: unknown) => {
+      const list = (data as IUserSummary[]).map(withFullName).sort((a, b) => (a.fullName ?? "").localeCompare(b.fullName ?? ""));
       this.subs.dispatch("social:friends", list);
     });
 
-    this.connection.on("social:requests", (data: unknown) => {
+    this.addHandler("social:requests", (data: unknown) => {
       this.subs.dispatch("social:requests", data);
     });
 
-    this.connection.on("social:blocked", (data: unknown) => {
-      this.subs.dispatch("social:blocked", (data as IUserSummary[]).map(toFullNameUser));
+    this.addHandler("social:blocked", (data: unknown) => {
+      this.subs.dispatch("social:blocked", (data as IUserSummary[]).map(withFullName));
     });
 
-    this.connection.on("friend:online", (data: unknown) => {
+    this.addHandler("friend:online", (data: unknown) => {
       this.subs.dispatch("friend:status", (data as { userId: string }).userId, UserStatusEnum.Online);
     });
 
-    this.connection.on("friend:offline", (data: unknown) => {
+    this.addHandler("friend:offline", (data: unknown) => {
       this.subs.dispatch("friend:status", (data as { userId: string }).userId, UserStatusEnum.Offline);
     });
 
-    this.connection.on("friend:ingame", (data: unknown) => {
+    this.addHandler("friend:ingame", (data: unknown) => {
       this.subs.dispatch("friend:status", (data as { userId: string }).userId, UserStatusEnum.InGame);
     });
+
+    // Informational pushes — the corresponding data refreshes (social:* /
+    // notification:*) are pushed by the server alongside these. Registered so
+    // SignalR does not log "No client method found" warnings.
+    this.addHandler("friend:request", (data: unknown) => this.subs.dispatch("friend:request", data));
+    this.addHandler("friend:accepted", (data: unknown) => this.subs.dispatch("friend:accepted", data));
+    this.addHandler("friend:declined", (data: unknown) => this.subs.dispatch("friend:declined", data));
+    this.addHandler("friend:removed", (data: unknown) => this.subs.dispatch("friend:removed", data));
+    this.addHandler("friend:blocked", (data: unknown) => this.subs.dispatch("friend:blocked", data));
+    this.addHandler("friend:requestCancelled", (data: unknown) => this.subs.dispatch("friend:requestCancelled", data));
   }
 
   // ── REST API ─────────────────────────────────────────────────────────
@@ -113,7 +95,7 @@ class FriendService implements IFriendService {
 
   async getFriends(data: IUserFilterRequest): TPromise<IUserSummary[]> {
     const result = await this.repo.getFriends(data);
-    if (result.data) result.data = result.data.map(toFullNameUser);
+    if (result.data) result.data = result.data.map(withFullName);
     return result;
   }
 
@@ -148,40 +130,38 @@ class FriendService implements IFriendService {
   // ── SignalR subscriptions ────────────────────────────────────────────
 
   onFriendListUpdate(handler: (friends: IUserSummary[]) => void): () => void {
-    return this.subs.subscribe("social:friends", handler as Handler);
+    return this.subscribe("social:friends", handler as Handler);
   }
 
   onFriendRequestUpdate(handler: (data: { received: IFriendRequestReceived[]; sent: IFriendRequestSent[] }) => void): () => void {
-    return this.subs.subscribe("social:requests", handler as Handler);
+    return this.subscribe("social:requests", handler as Handler);
   }
 
   onBlockedUsersUpdate(handler: (blocked: IUserSummary[]) => void): () => void {
-    return this.subs.subscribe("social:blocked", handler as Handler);
+    return this.subscribe("social:blocked", handler as Handler);
   }
 
   onFriendStatusChange(handler: (userId: string, status: UserStatusEnum) => void): () => void {
-    return this.subs.subscribe("friend:status", handler as Handler);
+    return this.subscribe("friend:status", handler as Handler);
   }
 
   // ── SignalR invocations ────────────────────────────────────────────────
 
   async invokeSocialData(): Promise<void> {
-    await requireConnection(this.connection, "Social").invoke("RequestSocialData");
+    await this.requireConnection("Social").invoke("RequestSocialData");
   }
 
   async invokeFriends(): Promise<void> {
-    await requireConnection(this.connection, "Social").invoke("RequestFriends");
+    await this.requireConnection("Social").invoke("RequestFriends");
   }
 
   async invokeFriendRequests(): Promise<void> {
-    await requireConnection(this.connection, "Social").invoke("RequestFriendRequests");
+    await this.requireConnection("Social").invoke("RequestFriendRequests");
   }
 
   async invokeBlocked(): Promise<void> {
-    await requireConnection(this.connection, "Social").invoke("RequestBlocked");
+    await this.requireConnection("Social").invoke("RequestBlocked");
   }
 }
 
-const friendService = new FriendService(friendRepository);
-
-export { friendService };
+export const friendService = new FriendService();

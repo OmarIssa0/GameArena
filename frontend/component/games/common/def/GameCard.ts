@@ -1,6 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 
-interface GameCardProps {
+export interface IGameCardProps {
   name: string;
   desc: string;
   icon?: LucideIcon;
@@ -11,5 +11,3 @@ interface GameCardProps {
   playLabel: string;
   page?: boolean;
 }
-
-export type { GameCardProps };

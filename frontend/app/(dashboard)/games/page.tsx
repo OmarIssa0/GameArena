@@ -19,6 +19,8 @@ import { GBadge } from "@/component/common/GBadge";
 import { PageHeader } from "@/component/common/PageHeader";
 import { GPage } from "@/component/common/GPage";
 import { THashMap, TNullable } from "@/domain/type/TCommon";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 
 function GamesPage() {
   const router = useRouter();
@@ -41,14 +43,14 @@ function GamesPage() {
   };
 
   return (
-    <GPage width="lg">
+    <GPage size={SizeEnum.lg}>
       <PageHeader
         icon={Gamepad2}
         title={t.games}
         subtitle={t.chooseGame}
         badge={
           <GBadge>
-            <GIcon icon={Gamepad2} size="xs" color="primary" />
+            <GIcon icon={Gamepad2} size={SizeEnum.xs} color={AccentColorEnum.Primary} />
             {t.play}
           </GBadge>
         }
@@ -75,14 +77,14 @@ function GamesPage() {
         role="alertdialog"
         ariaLabel="Leave game confirmation">
         <div className="text-center">
-          <GIcon icon={ArrowRightFromLine} size="3xl" color="warning" className="mx-auto mb-4" />
+          <GIcon icon={ArrowRightFromLine} size={SizeEnum.lg} color={AccentColorEnum.Warning} className="mx-auto mb-4" />
           <h2 className="text-xl font-bold text-text mb-2">{t.leaveTitle}</h2>
           <p className="text-sm text-text-secondary mb-6">{t.leaveDesc}</p>
           <div className="flex gap-3">
-            <GButton onClick={() => setPendingPath(null)} variant="secondary" fullWidth>
+            <GButton onClick={() => setPendingPath(null)} variant={AccentColorEnum.Secondary} fullWidth>
               {t.cancel}
             </GButton>
-            <GButton onClick={handleConfirmLeave} variant="danger" fullWidth>
+            <GButton onClick={handleConfirmLeave} variant={AccentColorEnum.Danger} fullWidth>
               {t.leaveConfirm}
             </GButton>
           </div>

@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { UserPlus } from "lucide-react";
@@ -18,6 +16,8 @@ import { authService } from "@/services/def/AuthService";
 import { FieldRegisterEnum } from "@/domain/enum/FieldRegisterEnum";
 import { AxiosError } from "axios";
 import type { IApiResponse } from "@/domain/meta/IApiResponse";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 
 function RegisterForm() {
   const router = useRouter();
@@ -107,7 +107,7 @@ function RegisterForm() {
   return (
     <div className="w-full max-w-xl mx-auto">
       <div className="flex items-center gap-3 mb-8">
-        <GIcon icon={UserPlus} size="xl" tile tileSize="xl" tileGradient="bg-primary" tileColor="on-primary" />
+        <GIcon icon={UserPlus} size={SizeEnum.xl} tile tileColor={AccentColorEnum.OnPrimary} />
         <div className="min-w-0">
           <h1 className="text-2xl font-bold text-text tracking-tight">{t.register}</h1>
           <p className="text-sm text-text-muted mt-0.5">{t.createAccount}</p>

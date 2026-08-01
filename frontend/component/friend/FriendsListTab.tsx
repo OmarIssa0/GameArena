@@ -8,13 +8,18 @@ import { GEmpty } from "../common/GEmpty";
 import { GIcon } from "../common/GIcon";
 import type { FriendsListTabProps } from "./def/FriendsTab";
 import type { TNullable } from "@/domain/type/TCommon";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 
 function FriendsListTab({ friends, messageLabel, activeLabel, onMessage, onBlock, onRemove, onAddFriend, t }: FriendsListTabProps) {
   const [actionId, setActionId] = useState<TNullable<string>>(null);
 
   if (friends.length === 0) {
     return (
-      <GEmpty icon={<GIcon icon={Users} size="xl" color="muted" />} title={t.noFriendsTitle} description={t.noFriendsDescription}>
+      <GEmpty
+        icon={<GIcon icon={Users} size={SizeEnum.xl} color={AccentColorEnum.Muted} />}
+        title={t.noFriendsTitle}
+        description={t.noFriendsDescription}>
         <GButton onClick={onAddFriend} className="mt-4">
           {t.addFriend}
         </GButton>
@@ -33,23 +38,21 @@ function FriendsListTab({ friends, messageLabel, activeLabel, onMessage, onBlock
           <div className="flex gap-1">
             <GIcon
               icon={MessageSquare}
-              size="md"
+              size={SizeEnum.md}
               tile
               hover
-              tileSize="lg"
               tileGradient="bg-primary/10"
-              tileColor="primary"
+              tileColor={AccentColorEnum.Primary}
               onClick={() => onMessage(friend.id)}
               ariaLabel={t.message}
             />
             <GIcon
               icon={isBusy ? Loader2 : ShieldBan}
-              size="md"
+              size={SizeEnum.md}
               tile
               hover
-              tileSize="lg"
               tileGradient="bg-warning/10"
-              tileColor="warning"
+              tileColor={AccentColorEnum.Warning}
               className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}
               onClick={async () => {
                 setActionId(friend.id);
@@ -63,12 +66,11 @@ function FriendsListTab({ friends, messageLabel, activeLabel, onMessage, onBlock
             />
             <GIcon
               icon={isBusy ? Loader2 : UserMinus}
-              size="md"
+              size={SizeEnum.md}
               tile
               hover
-              tileSize="lg"
               tileGradient="bg-danger/10"
-              tileColor="danger"
+              tileColor={AccentColorEnum.Danger}
               className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}
               onClick={async () => {
                 setActionId(friend.id);

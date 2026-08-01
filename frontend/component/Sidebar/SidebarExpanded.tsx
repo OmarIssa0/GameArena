@@ -19,6 +19,12 @@ import { GCard } from "@/component/common/GCard";
 import { GIcon } from "@/component/common/GIcon";
 import { GAvatar } from "@/component/common/GAvatar";
 import { LangTheme } from "@/component/LangTheme";
+import { NavOrientationEnum } from "@/domain/enum/NavOrientationEnum";
+import { IndicatorPositionEnum } from "@/domain/enum/IndicatorPositionEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
+import { AvatarShapeEnum } from "@/domain/enum/AvatarShapeEnum";
 
 export function SidebarExpanded({ closeMobile }: { closeMobile?: () => void }) {
   const router = useRouter();
@@ -47,7 +53,7 @@ export function SidebarExpanded({ closeMobile }: { closeMobile?: () => void }) {
       sidebarNav
         .map(({ id, labelKey, icon: Icon, badge }) => ({
           id,
-          icon: <GIcon icon={Icon} size="md" color="inherit" />,
+          icon: <GIcon icon={Icon} size={SizeEnum.md} />,
           label: t[labelKey as keyof TSidebarTranslation],
           active: activeId === id,
           badgeCount:
@@ -67,7 +73,7 @@ export function SidebarExpanded({ closeMobile }: { closeMobile?: () => void }) {
           },
           badge:
             item.badgeCount > 0 ? (
-              <GBadge size="sm" className="ms-auto min-w-5 justify-center">
+              <GBadge size={SizeEnum.sm} className="ms-auto min-w-5 justify-center">
                 {item.badgeCount}
               </GBadge>
             ) : undefined,
@@ -79,7 +85,7 @@ export function SidebarExpanded({ closeMobile }: { closeMobile?: () => void }) {
     <div className="flex flex-col h-full">
       {/* Navigation */}
       <nav className="flex-1 px-3 py-2" aria-label={t.mainNavigation}>
-        <GNav items={navItems} orientation="vertical" indicator="start" collapsed={false} />
+        <GNav items={navItems} orientation={NavOrientationEnum.Vertical} indicator={IndicatorPositionEnum.Start} collapsed={false} />
       </nav>
 
       {/* Footer */}
@@ -87,9 +93,11 @@ export function SidebarExpanded({ closeMobile }: { closeMobile?: () => void }) {
         <div className="flex flex-col gap-2 p-3 pb-safe">
           <LangTheme collapsed={false} />
 
-          <GCard padding="sm" variant="outlined" className="flex items-center gap-3">
+          <GCard padding={SizeEnum.sm} variant={CardVariantEnum.Outlined} className="flex items-center gap-3">
             <div className="relative shrink-0">
-              {user && <GAvatar firstName={user.firstName} lastName={user.lastName} status={user.status} size="sm" shape="circle" />}
+              {user && (
+                <GAvatar firstName={user.firstName} lastName={user.lastName} status={user.status} size={SizeEnum.sm} shape={AvatarShapeEnum.Circle} />
+              )}
             </div>
 
             <div className="flex-1 min-w-0">
@@ -99,8 +107,14 @@ export function SidebarExpanded({ closeMobile }: { closeMobile?: () => void }) {
               <p className="text-xs text-text-secondary truncate">@{user?.userName}</p>
             </div>
 
-            <GButton onClick={handleLogout} variant="ghost" size="lg" className="!p-3 rounded-xl" title={t.logout} aria-label={t.logout}>
-              <GIcon icon={LogOut} size="md" color="inherit" />
+            <GButton
+              onClick={handleLogout}
+              variant={AccentColorEnum.Muted}
+              size={SizeEnum.lg}
+              className="!p-3 rounded-xl"
+              title={t.logout}
+              aria-label={t.logout}>
+              <GIcon icon={LogOut} size={SizeEnum.md} />
             </GButton>
           </GCard>
         </div>

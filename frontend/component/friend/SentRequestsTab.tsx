@@ -8,6 +8,8 @@ import { GIcon } from "../common/GIcon";
 import type { SentRequestsTabProps } from "./def/FriendsTab";
 import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import type { TNullable } from "@/domain/type/TCommon";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 
 function SentRequestsTab({ sentRequests, onCancel, t }: SentRequestsTabProps) {
   const [actionId, setActionId] = useState<TNullable<string>>(null);
@@ -15,7 +17,7 @@ function SentRequestsTab({ sentRequests, onCancel, t }: SentRequestsTabProps) {
   if (sentRequests.length === 0) {
     return (
       <GEmpty
-        icon={<GIcon icon={Send} size="xl" color="muted" />}
+        icon={<GIcon icon={Send} size={SizeEnum.xl} color={AccentColorEnum.Muted} />}
         title={t.sentTab.emptyTitle}
         description={t.sentTab.emptyDescription}
       />
@@ -40,12 +42,19 @@ function SentRequestsTab({ sentRequests, onCancel, t }: SentRequestsTabProps) {
         return (
           <div className="flex gap-1">
             <GIcon
-              icon={isBusy ? Loader2 : X} size="sm" tile tileSize="sm"
-              tileGradient="bg-danger/10" tileColor="danger"
+              icon={isBusy ? Loader2 : X}
+              size={SizeEnum.sm}
+              tile
+              tileGradient="bg-danger/10"
+              tileColor={AccentColorEnum.Danger}
               className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}
               onClick={async () => {
                 setActionId(friend.id);
-                try { await onCancel(friend.id); } finally { setActionId(null); }
+                try {
+                  await onCancel(friend.id);
+                } finally {
+                  setActionId(null);
+                }
               }}
               ariaLabel={t.sentTab.cancel}
             />

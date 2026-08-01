@@ -2,145 +2,67 @@
 
 import clsx from "clsx";
 import type { GIconProps } from "./def/GIcon";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { IConSIZE } from "@/domain/constant/icon-size";
 
-const iconSize: Record<string, string> = {
-  xs: "h-3 w-3",
-  sm: "h-4 w-4",
-  md: "h-5 w-5",
-  lg: "h-6 w-6",
-  xl: "h-8 w-8",
-  "2xl": "h-10 w-10",
-  "3xl": "h-12 w-12",
-  "4xl": "h-16 w-16",
-};
+const toRounded = (r: SizeEnum) => (r === SizeEnum.None ? "rounded-none" : `rounded-${r}`);
 
-const tileSizeMap: Record<string, string> = {
-  xs: "h-6 w-6",
-  sm: "h-8 w-8",
-  md: "h-10 w-10",
-  lg: "h-12 w-12",
-  xl: "h-16 w-16",
-};
+const toHoverBg = (accent: AccentColorEnum) => (accent ? `hover:${accent.replace("text-", "bg-")}` : "");
 
-const tileIconSizeMap: Record<string, string> = {
-  xs: "h-3 w-3",
-  sm: "h-4 w-4",
-  md: "h-5 w-5",
-  lg: "h-6 w-6",
-  xl: "h-8 w-8",
-};
-
-const tileRoundedMap: Record<string, string> = {
-  sm: "rounded-[var(--radius-sm)]",
-  md: "rounded-[var(--radius-md)]",
-  lg: "rounded-[var(--radius-lg)]",
-  full: "rounded-full",
-};
-
-const colors: Record<string, string> = {
-  primary: "text-primary",
-  secondary: "text-text-secondary",
-  muted: "text-text-muted",
-  success: "text-success",
-  warning: "text-warning",
-  danger: "text-danger",
-  inherit: "",
-  "on-primary": "text-on-primary",
-  accent: "text-accent",
-};
-const hoverColors: Record<string, string> = {
-  primary: "hover:bg-primary",
-  secondary: "hover:bg-text-secondary",
-  muted: "hover:bg-text-muted",
-  success: "hover:bg-success",
-  warning: "hover:bg-warning",
-  danger: "hover:bg-danger",
-  accent: "hover:bg-accent",
-  inherit: "",
-};
-
-function getTileGradient(gradient?: string): string {
-  if (!gradient) return "bg-primary";
-  if (gradient.startsWith("bg-") || gradient.startsWith("from-")) return gradient;
-  if (gradient.startsWith("text-")) return `bg-${gradient.slice(5)}`;
-  return `bg-${gradient}`;
-}
-
-function getTileIconColor(color?: string): string {
-  if (!color) return "text-on-primary";
-  if (color === "inherit") return "text-on-primary";
-  return colors[color] ?? "text-on-primary";
-}
-
+const resolveTileBg = (gradient: string) =>
+  gradient.startsWith("bg-") || gradient.startsWith("from-") ? gradient : `bg-${gradient.replace(/^text-/, "")}`;
 function GIcon({
   icon: Icon,
-  size = "md",
-  color = "inherit",
+  size = SizeEnum.md,
+  color = AccentColorEnum.Inherit,
   flip = true,
   className,
   onClick,
   ariaLabel,
   tile = false,
-  tileSize = "md",
-  tileRounded: tileRoundedProp = "md",
+  tileRounded = SizeEnum.md,
   tileGradient = "bg-primary",
-  hover = false,
   tileColor,
   tileClassName,
+  hover = false,
 }: GIconProps) {
+  const iconSize = IConSIZE[size] as string;
+  const isRtl = flip && "[dir=rtl]:scale-x-[-1]";
   if (!tile) {
-    const iconClassName = clsx(
-      "shrink-0",
-      iconSize[size],
-      colors[color] ?? color,
-      flip && '[dir="rtl"]:scale-x-[-1]',
-      onClick && "cursor-pointer",
-      className,
-    );
+    const iconEl = <Icon className={clsx("shrink-0", iconSize, color, isRtl, onClick && "cursor-pointer", className)} aria-hidden="true" />;
     return onClick ? (
       <button
         type="button"
         onClick={onClick}
         aria-label={ariaLabel}
-        className="inline-flex bg-transparent border-0 p-0 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-[var(--radius-sm)]">
-        <Icon className={iconClassName} aria-hidden="true" />
+        className={clsx(
+          "inline-flex items-center justify-center bg-transparent border-0 p-0 cursor-pointer rounded-sm",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
+        )}>
+        {iconEl}
       </button>
     ) : (
-      <Icon className={iconClassName} aria-hidden="true" />
+      iconEl
     );
   }
-
-  const tileClassNameMerged = clsx(
-    "inline-flex items-center justify-center shrink-0",
-    tileSizeMap[tileSize],
-    tileRoundedMap[tileRoundedProp],
-    hover && [hoverColors[tileColor ?? "primary"], ],
-    getTileGradient(tileGradient),
-    onClick && "cursor-pointer transition-colors",
+  const activeColor = tileColor || AccentColorEnum.OnPrimary;
+  const iconEl = <Icon className={clsx(iconSize, activeColor, isRtl, "hover:text-text")} aria-hidden="true" />;
+  const wrapperClasses = clsx(
+    "inline-flex items-center justify-center shrink-0 p-2",
+    toRounded(tileRounded),
+    resolveTileBg(tileGradient),
+    hover && toHoverBg(activeColor),
+    onClick && `cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40`,
     tileClassName,
   );
 
-  const iconEl = (
-    <Icon
-      className={clsx(tileIconSizeMap[tileSize], getTileIconColor(tileColor), flip && '[dir="rtl"]:scale-x-[-1]', "hover:text-[var(--color-text)]")}
-      aria-hidden="true"
-    />
-  );
-
-  if (onClick) {
-    return (
-      <button
-        type="button"
-        onClick={onClick}
-        className={clsx(tileClassNameMerged, "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40")}
-        aria-label={ariaLabel}>
-        {iconEl}
-      </button>
-    );
-  }
-
-  return (
-    <div className={tileClassNameMerged} role={ariaLabel ? "img" : undefined} aria-label={ariaLabel}>
+  return onClick ? (
+    <button type="button" onClick={onClick} aria-label={ariaLabel} className={wrapperClasses}>
+      {iconEl}
+    </button>
+  ) : (
+    <div className={wrapperClasses} role={ariaLabel ? "img" : undefined} aria-label={ariaLabel}>
       {iconEl}
     </div>
   );

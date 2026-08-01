@@ -19,6 +19,8 @@ import { AxiosError } from "axios";
 import { ErrorCodeEnum } from "@/domain/enum/ErrorCodeEnum";
 import type { IApiResponse } from "@/domain/meta/IApiResponse";
 import { LoginFieldEnum } from "@/domain/enum/LoginFieldEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 
 function LoginForm() {
   const router = useRouter();
@@ -95,7 +97,7 @@ function LoginForm() {
   return (
     <div className="w-full max-w-md mx-auto">
       <div className="flex items-center gap-3 mb-8">
-        <GIcon icon={LogIn} size="xl" tile tileSize="xl" tileGradient="bg-primary" tileColor="on-primary" />
+        <GIcon icon={LogIn} size={SizeEnum.xl} tile tileColor={AccentColorEnum.OnPrimary} />
         <div className="min-w-0">
           <h1 className="text-2xl font-bold text-text tracking-tight">{t.login}</h1>
           <p className="text-sm text-text-muted mt-0.5">{t.loginDescription}</p>

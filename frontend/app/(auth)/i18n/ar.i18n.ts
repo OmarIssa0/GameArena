@@ -1,4 +1,5 @@
 const ar = {
+  brand: "أرينا 404",
   welcomeBack: "أهلاً بعودتك",
   signInDesc: "سجل الدخول لمتابعة رحلة اللعب",
   bySigningIn: "بالتسجيل، أنت توافق على",

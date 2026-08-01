@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, Trophy, Frown, Handshake, Loader } from "lucide-react";
+import { Home, Trophy, Frown, Handshake, Loader2 } from "lucide-react";
 import { GButton } from "@/component/common/GButton";
 import { GIcon } from "@/component/common/GIcon";
 import { GCard } from "@/component/common/GCard";
@@ -8,14 +8,16 @@ import { useAuth } from "@/app/providers/AuthProvider";
 import { useGame } from "@/app/providers/GameProvider";
 import { useGameTranslation } from "@/hooks/useGameTranslation";
 import type { TNullable, TOptional } from "@/domain/type/TCommon";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 
 const RESULT_ICONS = { win: Trophy, draw: Handshake, loss: Frown, forfeit: Trophy } as const;
 
 const RESULT_META = {
-  win: { tile: "bg-warning", tileColor: "on-primary" as const, textColor: "text-warning" as const },
-  draw: { tile: "bg-primary", tileColor: "on-primary" as const, textColor: "text-neon-cyan" as const },
-  loss: { tile: "bg-error", tileColor: "on-primary" as const, textColor: "text-error" as const },
-  forfeit: { tile: "bg-success", tileColor: "on-primary" as const, textColor: "text-success" as const },
+  win: { tile: "bg-warning", tileColor: AccentColorEnum.OnPrimary, textColor: "text-warning" },
+  draw: { tile: "bg-primary", tileColor: AccentColorEnum.OnPrimary, textColor: "text-neon-cyan" },
+  loss: { tile: "bg-error", tileColor: AccentColorEnum.OnPrimary, textColor: "text-error" },
+  forfeit: { tile: "bg-success", tileColor: AccentColorEnum.OnPrimary, textColor: "text-success" },
 } as const;
 
 type ResultKind = keyof typeof RESULT_ICONS;
@@ -35,14 +37,14 @@ function PendingPlayAgainOverlay() {
   if (!pendingPlayAgainRequest) return null;
 
   return (
-    <GCard padding="lg" className="absolute inset-0 bg-bg/95 flex flex-col items-center justify-center text-center z-20">
+    <GCard padding={SizeEnum.lg} className="absolute inset-0 bg-bg/95 flex flex-col items-center justify-center text-center z-20">
       <h2 className="text-xl font-black text-text">{t.result.playAgainRequest}</h2>
       <p className="text-text-secondary text-sm mt-2">{pendingPlayAgainRequest.requesterUsername}</p>
       <div className="flex gap-4 mt-8 w-full max-w-xs">
         <GButton onClick={() => respondPlayAgain(true)} className="flex-1">
           {t.result.accept}
         </GButton>
-        <GButton onClick={() => respondPlayAgain(false)} variant="outline-danger" className="flex-1">
+        <GButton onClick={() => respondPlayAgain(false)} variant={AccentColorEnum.Danger} className="flex-1">
           {t.result.reject}
         </GButton>
       </div>
@@ -50,12 +52,7 @@ function PendingPlayAgainOverlay() {
   );
 }
 
-interface GameOverActionsProps {
-  kind: ResultKind;
-  opponentDisconnected: boolean;
-}
-
-function GameOverActions({ kind, opponentDisconnected }: GameOverActionsProps) {
+function GameOverActions({ kind, opponentDisconnected }: { kind: ResultKind; opponentDisconnected: boolean }) {
   const { requestedPlayAgain, requestPlayAgain, leaveGame } = useGame();
   const t = useGameTranslation();
 
@@ -65,12 +62,12 @@ function GameOverActions({ kind, opponentDisconnected }: GameOverActionsProps) {
   return (
     <div className="flex gap-4 mt-8 w-full max-w-xs">
       {sessionEnded ? (
-        <GButton onClick={() => leaveGame()} variant="secondary" className="flex-1" startIcon={<GIcon icon={Home} size="sm" color="inherit" />}>
+        <GButton onClick={() => leaveGame()} variant={AccentColorEnum.Secondary} className="flex-1" startIcon={<GIcon icon={Home} size={SizeEnum.sm} />}>
           {t.result.backToLobby}
         </GButton>
       ) : requestedPlayAgain ? (
         <GButton disabled className="flex-1">
-          <Loader className="animate-spin me-2 h-4 w-4 inline" />
+          <Loader2 className="animate-spin me-2 h-4 w-4 inline" />
           {t.result.waiting}
         </GButton>
       ) : (
@@ -79,7 +76,7 @@ function GameOverActions({ kind, opponentDisconnected }: GameOverActionsProps) {
         </GButton>
       )}
       {!sessionEnded && (
-        <GButton onClick={() => leaveGame()} variant="secondary" className="flex-1" startIcon={<GIcon icon={Home} size="sm" color="inherit" />}>
+        <GButton onClick={() => leaveGame()} variant={AccentColorEnum.Secondary} className="flex-1" startIcon={<GIcon icon={Home} size={SizeEnum.sm} />}>
           {t.result.backToLobby}
         </GButton>
       )}
@@ -107,8 +104,8 @@ function GameResult() {
   const RESULT_DESCS = { win: t.result.victoryDesc, draw: t.result.drawDesc, loss: t.result.defeatDesc, forfeit: t.result.opponentForfeitedDesc };
 
   return (
-    <GCard padding="lg" className="absolute inset-0 bg-bg/95 flex flex-col items-center justify-center text-center z-10">
-      <GIcon icon={Icon} size="3xl" tile tileSize="xl" tileGradient={meta.tile} tileColor={meta.tileColor} />
+    <GCard padding={SizeEnum.lg} className="absolute inset-0 bg-bg/95 flex flex-col items-center justify-center text-center z-10">
+      <GIcon icon={Icon} size={SizeEnum.lg} tile tileGradient={meta.tile} tileColor={meta.tileColor} />
       <h2 className={`text-2xl font-black mt-4 ${meta.textColor}`}>{RESULT_TITLES[kind]}</h2>
       <p className="text-text-secondary text-sm mt-2 max-w-xs leading-relaxed">{RESULT_DESCS[kind]}</p>
       {state.score && (

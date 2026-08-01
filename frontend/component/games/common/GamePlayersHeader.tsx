@@ -4,15 +4,16 @@ import { useAuth } from "@/app/providers/AuthProvider";
 import { useGame } from "@/app/providers/GameProvider";
 import { useGameTranslation } from "@/hooks/useGameTranslation";
 import { getGameConfig } from "@/component/games/gameConfig";
-import { PlayerCard } from "./PlayerCard";
+import { PlayerCard } from "@/component/games/common/PlayerCard";
 import { GCard } from "@/component/common/GCard";
 import type { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
 
-interface GamePlayersHeaderProps {
+interface IGamePlayersHeaderProps {
   gameType?: GamesKindEnum;
 }
 
-function GamePlayersHeader({ gameType }: GamePlayersHeaderProps) {
+function GamePlayersHeader({ gameType }: IGamePlayersHeaderProps) {
   const { user } = useAuth();
   const { state, lastGameType } = useGame();
   const t = useGameTranslation();
@@ -30,10 +31,10 @@ function GamePlayersHeader({ gameType }: GamePlayersHeaderProps) {
   const p2IsTurn = currentTurnPlayerId === player2Id && hasStarted && !state.isFinished;
 
   return (
-    <GCard padding="sm" className="grid grid-cols-7 items-center">
+    <GCard padding={SizeEnum.sm} className="grid grid-cols-7 items-center">
       <PlayerCard
         playerId={player1Id}
-        playerUsername={player1Username}
+        playerUsername={player1Username ?? null}
         symbol={gameInfo.symbol1}
         isBot={isBotGame && player1Id !== user?.id}
         fallbackName={t.game.player1}
@@ -47,8 +48,8 @@ function GamePlayersHeader({ gameType }: GamePlayersHeaderProps) {
       </div>
 
       <PlayerCard
-        playerId={player2Id}
-        playerUsername={player2Username}
+        playerId={player2Id ?? null}
+        playerUsername={player2Username ?? null}
         symbol={isLobby ? "?" : gameInfo.symbol2}
         isBot={isBotGame && player2Id !== user?.id}
         fallbackName={isLobby ? t.game.waiting : t.game.player2}

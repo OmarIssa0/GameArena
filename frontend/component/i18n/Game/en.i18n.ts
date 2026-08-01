@@ -17,7 +17,7 @@ const en = {
     findMatch: "Find Match",
     connecting: "Connecting to Game Server...",
     searchingTitle: "Searching for opponent...",
-    searchingSubtitle: "Checking GameArena servers",
+    searchingSubtitle: "Checking Arena 404 servers",
     cancelSearch: "Cancel Search",
     quick: "Quick",
     invite: "Invite",

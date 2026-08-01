@@ -17,6 +17,8 @@ import { Bell } from "lucide-react";
 import { GIcon } from "../common/GIcon";
 import type { IGameInvitesListProps } from "./def/GameInvitesList";
 import type { TNullable, TOptional } from "@/domain/type/TCommon";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 
 const gamePath = (gameType: number) => GamesList.find((g) => g.type === gameType)?.path;
 
@@ -52,19 +54,19 @@ export function GameInvitesList({ onAfterAccept }: IGameInvitesListProps) {
   const handleCancelAccept = () => setPendingAccept(null);
 
   if (!gameInvites.length)
-    return <GEmpty icon={<GIcon icon={Bell} size="xl" color="muted" />} title={t.noInvitesTitle} description={t.noInvitesDescription} />;
+    return <GEmpty icon={<GIcon icon={Bell} size={SizeEnum.xl} color={AccentColorEnum.Muted} />} title={t.noInvitesTitle} description={t.noInvitesDescription} />;
 
   return (
     <div className="space-y-2">
       <GList items={gameInvites} keyExtractor={(invite) => invite.roomId}>
         {(invite) => (
-          <GCard key={invite.roomId} padding="sm" className="bg-primary-muted border-primary/20">
+           <GCard key={invite.roomId} padding={SizeEnum.sm} className="bg-primary-muted border-primary/20">
             <p className="text-sm font-medium text-text">{t.invites.wantsToPlay.replace("{{name}}", invite.inviterName ?? "")}</p>
             <div className="flex gap-2 mt-2">
-              <GButton size="md" onClick={() => handleAccept(invite.roomId, gamePath(invite.gameType))}>
+              <GButton size={SizeEnum.md} onClick={() => handleAccept(invite.roomId, gamePath(invite.gameType))}>
                 {t.invites.accept}
               </GButton>
-              <GButton size="md" variant="secondary" onClick={() => dismissGameInvite(invite.roomId)}>
+              <GButton size={SizeEnum.md} variant={AccentColorEnum.Secondary} onClick={() => dismissGameInvite(invite.roomId)}>
                 {t.invites.decline}
               </GButton>
             </div>
@@ -77,10 +79,10 @@ export function GameInvitesList({ onAfterAccept }: IGameInvitesListProps) {
           <h2 className="text-xl font-bold text-text mb-2">{t.leaveTitle}</h2>
           <p className="text-sm text-text-secondary mb-6">{t.leaveDesc}</p>
           <div className="flex gap-3">
-            <GButton onClick={handleCancelAccept} variant="secondary" fullWidth>
+            <GButton onClick={handleCancelAccept} variant={AccentColorEnum.Secondary} fullWidth>
               {t.cancel}
             </GButton>
-            <GButton onClick={handleConfirmAccept} variant="danger" fullWidth>
+            <GButton onClick={handleConfirmAccept} variant={AccentColorEnum.Danger} fullWidth>
               {t.leaveAccept}
             </GButton>
           </div>

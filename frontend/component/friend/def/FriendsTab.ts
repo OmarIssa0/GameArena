@@ -2,9 +2,6 @@ import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import type { IFriendRequestReceived } from "@/domain/meta/IFriendRequestReceived";
 import type { IFriendRequestSent } from "@/domain/meta/IFriendRequestSent";
 import type { TFriendsTranslation } from "@/app/(dashboard)/friends/i18n/en.i18n";
-import type { FriendsTabEnum } from "@/domain/enum/FriendsTabEnum";
-
-type TFriendsTab = FriendsTabEnum;
 
 interface FriendsListTabProps {
   friends: IUserSummary[];
@@ -36,4 +33,4 @@ interface BlockedUsersTabProps {
   t: TFriendsTranslation;
 }
 
-export type { TFriendsTab, FriendsListTabProps, RequestsTabProps, SentRequestsTabProps, BlockedUsersTabProps };
+export type { FriendsListTabProps, RequestsTabProps, SentRequestsTabProps, BlockedUsersTabProps };

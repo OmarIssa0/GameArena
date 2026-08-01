@@ -8,20 +8,20 @@ import { useGameTranslation } from "@/hooks/useGameTranslation";
 import { useFriendList } from "@/hooks/useFriendList";
 import { GamePlayersHeader } from "@/component/games/common/GamePlayersHeader";
 import { InviteModal } from "@/component/games/common/InviteModal";
+import { translateGameInfo } from "./gameConfig";
 import { GButton } from "@/component/common/GButton";
 import { GIcon } from "@/component/common/GIcon";
 import { GCard } from "@/component/common/GCard";
-import type { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import type { IGameLobbyProps } from "./def/GameLobby";
 
-interface GameLobbyProps {
-  gameType: GamesKindEnum;
-}
-
-function GameLobby({ gameType }: GameLobbyProps) {
+function GameLobby({ gameType }: IGameLobbyProps) {
   const { user } = useAuth();
   const { state, startGame, inviteToRoom, resetGame } = useGame();
   const t = useGameTranslation();
   const { friends, loading: loadingFriends } = useFriendList();
+  const { name: gameName, description: gameDescription } = translateGameInfo(t, gameType);
 
   const [showInvitePicker, setShowInvitePicker] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -29,9 +29,7 @@ function GameLobby({ gameType }: GameLobbyProps) {
   const filteredFriends = useMemo(() => {
     const term = searchQuery.trim().toLowerCase();
     if (!term) return friends;
-    return friends.filter((f) =>
-      `${f.firstName ?? ""} ${f.lastName ?? ""} ${f.userName ?? ""}`.toLowerCase().includes(term)
-    );
+    return friends.filter((f) => `${f.firstName ?? ""} ${f.lastName ?? ""} ${f.userName ?? ""}`.toLowerCase().includes(term));
   }, [friends, searchQuery]);
 
   if (!state) return null;
@@ -44,9 +42,14 @@ function GameLobby({ gameType }: GameLobbyProps) {
   return (
     <div className="flex items-center justify-center min-h-[150px] p-4">
       <div className="w-full max-w-lg space-y-6">
+        <div className="text-center space-y-1">
+          <h1 className="text-2xl font-black text-text">{gameName}</h1>
+          <p className="text-text-secondary text-sm">{gameDescription}</p>
+        </div>
+
         <GamePlayersHeader gameType={gameType} />
 
-        <GCard padding="md" className="text-center">
+        <GCard padding={SizeEnum.md} className="text-center">
           <div className="flex items-center justify-center gap-3 mb-2">
             <span className="relative flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
@@ -58,24 +61,19 @@ function GameLobby({ gameType }: GameLobbyProps) {
           <div className="flex flex-col gap-3 mt-4">
             {state.player1Id === user?.id && (
               <>
-                <GButton
-                  onClick={() => startGame(null, gameType)}
-                  fullWidth
-                  startIcon={<GIcon icon={Play} size="md" color="inherit" />}
-                >
+                <GButton onClick={() => startGame(null, gameType)} fullWidth startIcon={<GIcon icon={Play} size={SizeEnum.md} />}>
                   {t.waiting.startVsAI}
                 </GButton>
                 <GButton
                   onClick={() => setShowInvitePicker(true)}
                   fullWidth
-                  variant="secondary"
-                  startIcon={<GIcon icon={UserPlus} size="md" color="inherit" />}
-                >
+                  variant={AccentColorEnum.Secondary}
+                  startIcon={<GIcon icon={UserPlus} size={SizeEnum.md} />}>
                   {t.waiting.inviteFriend}
                 </GButton>
               </>
             )}
-            <GButton onClick={() => resetGame()} variant="secondary">
+            <GButton onClick={() => resetGame()} variant={AccentColorEnum.Secondary} size={SizeEnum.sm}>
               {t.waiting.cancelMatch}
             </GButton>
           </div>

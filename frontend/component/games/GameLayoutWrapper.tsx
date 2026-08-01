@@ -7,6 +7,7 @@ import { GameLobby } from "./GameLobby";
 import { GameReady } from "./GameReady";
 import { GameActive } from "./GameActive";
 import type { GameLayoutWrapperProps } from "./def/GameLayoutWrapper";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
 
 function GameLayoutWrapper({ children, gameType }: GameLayoutWrapperProps) {
   const { state, isConnected, isSearching } = useGame();
@@ -15,14 +16,14 @@ function GameLayoutWrapper({ children, gameType }: GameLayoutWrapperProps) {
     if (!isConnected) {
       return (
         <div className="flex items-center justify-center min-h-[150px] p-4">
-          <GSpinner size="lg" />
+          <GSpinner size={SizeEnum.lg} />
         </div>
       );
     }
     if (isSearching) {
       return (
         <div className="flex flex-col items-center justify-center min-h-[150px] p-4 gap-4 text-center">
-          <GSpinner size="lg" />
+          <GSpinner size={SizeEnum.lg} />
           <p className="text-text-secondary text-sm">Searching for opponent...</p>
         </div>
       );

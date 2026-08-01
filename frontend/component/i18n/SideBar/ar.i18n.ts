@@ -1,4 +1,5 @@
 const ar = {
+  brand: "أرينا 404",
   home: "الرئيسية",
   friends: "الأصدقاء",
   messages: "الرسائل",

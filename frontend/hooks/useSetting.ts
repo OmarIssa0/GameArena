@@ -89,8 +89,10 @@ function createProxy(langs: TTranslate, path: string[] = []): unknown {
           return undefined;
         }
 
+        // Support dotted keys ("tictactoe.name") alongside nested proxy access
+        const segments = key.split(".");
         const locale = langs[getLocale()] ?? langs.en;
-        const nextPath = [...path, key];
+        const nextPath = [...path, ...segments];
         const value = resolve(locale as THashMap, nextPath);
 
         if (value && typeof value === "object" && !Array.isArray(value)) {

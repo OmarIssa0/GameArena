@@ -1,14 +1,11 @@
-import type { HubConnection } from "@microsoft/signalr";
+import { SignalRServiceBase } from "../lib/SignalRServiceBase";
+import { chatRepository } from "@/repositories/def/ChatRepository";
 import type { IMessage } from "@/domain/meta/IMessage";
 import type { IPrivateMessagePayload } from "@/domain/meta/IPrivateMessagePayload";
-import type { TNullable, TPromise } from "@/domain/type/TCommon";
+import type { TPromise } from "@/domain/type/TCommon";
 import type { IChatService } from "../meta/IChatService";
-import type { IChatRepository, IPerFriendUnreadCount } from "@/repositories/meta/IChatRepository";
-import { chatRepository } from "@/repositories/def/ChatRepository";
+import type { IPerFriendUnreadCount } from "@/repositories/meta/IChatRepository";
 import type { Handler } from "../lib/signalRUtils";
-import { requireConnection } from "../lib/signalRUtils";
-import { ReconnectManager } from "../lib/ReconnectManager";
-import { SubscriptionManager } from "../lib/SubscriptionManager";
 
 const normalizeMessage = (payload: IPrivateMessagePayload): IMessage => ({
   senderId: payload.senderId,
@@ -18,28 +15,11 @@ const normalizeMessage = (payload: IPrivateMessagePayload): IMessage => ({
   isRead: payload.isRead ?? false,
 });
 
-class ChatService implements IChatService {
-  private connection: TNullable<HubConnection> = null;
-  private subs = new SubscriptionManager();
-  private reconnectHandlers = new ReconnectManager();
+class ChatService extends SignalRServiceBase implements IChatService {
+  private repo = chatRepository;
 
-  constructor(private repo: IChatRepository) {}
-
-  handleReconnect(): void {
-    this.reconnectHandlers.handleReconnect();
-  }
-
-  onReconnect(handler: () => void): () => void {
-    return this.reconnectHandlers.onReconnect(handler);
-  }
-
-  setConnection(connection: HubConnection): void {
-    if (this.connection) {
-      this.connection.off("chat:private");
-    }
-    this.connection = connection;
-
-    this.connection.on("chat:private", (data: unknown) => {
+  protected registerHandlers(): void {
+    this.addHandler("chat:private", (data: unknown) => {
       this.subs.dispatch("chat:private", normalizeMessage(data as IPrivateMessagePayload));
     });
   }
@@ -53,15 +33,12 @@ class ChatService implements IChatService {
   }
 
   async sendMessage(receiverId: string, content: string): Promise<void> {
-    const conn = requireConnection(this.connection, "Chat");
-    await conn.invoke("SendPrivateMessage", receiverId, content);
+    await this.requireConnection("Chat").invoke("SendPrivateMessage", receiverId, content);
   }
 
   onPrivateMessage(handler: (message: IMessage) => void): () => void {
-    return this.subs.subscribe("chat:private", handler as Handler);
+    return this.subscribe("chat:private", handler as Handler);
   }
 }
 
-const chatService = new ChatService(chatRepository);
-
-export { chatService };
+export const chatService = new ChatService();

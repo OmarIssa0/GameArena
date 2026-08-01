@@ -1,4 +1,5 @@
 import type { HTMLAttributes, ReactNode } from "react";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
 
 interface GModalProps extends HTMLAttributes<HTMLDivElement> {
   open: boolean;
@@ -6,12 +7,11 @@ interface GModalProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
   closeOnBackdrop?: boolean;
   closeOnEscape?: boolean;
-  size?: "sm" | "md" | "lg" | "xl";
-  cardPadding?: "sm" | "md" | "lg";
+  size?: SizeEnum;
+  cardPadding?: SizeEnum;
   role?: "dialog" | "alertdialog";
   ariaLabel?: string;
   ariaDescription?: string;
 }
 
 export type { GModalProps };
-

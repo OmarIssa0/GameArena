@@ -1,11 +1,10 @@
 import type { ReactNode } from "react";
-
-type GPageWidth = "sm" | "md" | "lg" | "xl";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
 
 interface GPageProps {
   children: ReactNode;
-  width?: GPageWidth;
+  size?: SizeEnum;
   className?: string;
 }
 
-export type { GPageProps, GPageWidth };
+export type { GPageProps };

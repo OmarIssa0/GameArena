@@ -12,6 +12,7 @@ import { DashboardNotificationsProvider } from "@/app/providers/DashboardNotific
 import { ActiveGameBanner } from "@/component/games/ActiveGameBanner";
 import { NotificationPopup } from "@/component/notification/NotificationPopup";
 import { GSpinner } from "@/component/common/GSpinner";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
 
 function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -28,7 +29,7 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
   if (loading) {
     return (
       <div className="flex min-h-screen w-full bg-bg items-center justify-center">
-        <GSpinner size="lg" />
+        <GSpinner size={SizeEnum.lg} />
       </div>
     );
   }
@@ -36,7 +37,7 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
   if (!user) {
     return (
       <div className="flex min-h-screen w-full bg-bg items-center justify-center">
-        <GSpinner size="lg" />
+        <GSpinner size={SizeEnum.lg} />
       </div>
     );
   }

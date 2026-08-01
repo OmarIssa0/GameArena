@@ -1,6 +1,6 @@
 const en = {
   welcome: (name: string) => "Welcome back" + (name ? `, ${name}` : ""),
-  brand: "GameArena",
+  brand: "Arena 404",
   heroSubtitle: "Your ultimate gaming destination. Instant matches, ranked battles, and endless fun.",
   playNow: "PLAY NOW",
   viewStats: "VIEW STATS",
@@ -10,7 +10,7 @@ const en = {
     friendRequests: "Friend Requests",
   },
   features: {
-    title: "Why GameArena?",
+    title: "Why Arena 404?",
     badge: "FEATURES",
     instantPlay: "Instant Play",
     instantPlayDesc: "Jump into matches in seconds",

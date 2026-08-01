@@ -1,6 +1,11 @@
 import type { ReactNode } from "react";
 
-interface GListProps<T> {
+export interface IGListPaginationProps {
+  pageSize?: number;
+  defaultPage?: number;
+}
+
+export interface IGListProps<T> {
   items: T[];
   children: (item: T, index: number) => ReactNode;
   keyExtractor: (item: T, index: number) => string;
@@ -9,6 +14,5 @@ interface GListProps<T> {
   emptyDescription?: string;
   emptyIcon?: ReactNode;
   className?: string;
+  listClassName?: string;
 }
-
-export type { GListProps };

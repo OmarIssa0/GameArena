@@ -2,27 +2,9 @@
 
 import clsx from "clsx";
 import { forwardRef } from "react";
-import type { ButtonHTMLAttributes, ReactNode } from "react";
-
-type GNavIndicator = "start" | "end" | "top" | "bottom" | "none";
-
-interface GNavItem {
-  id: string;
-  label?: ReactNode;
-  icon?: ReactNode;
-  badge?: ReactNode;
-  active?: boolean;
-  disabled?: boolean;
-  onClick?: () => void;
-}
-
-interface GNavProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onClick"> {
-  items: GNavItem[];
-  orientation?: "vertical" | "horizontal";
-  indicator?: GNavIndicator;
-  collapsed?: boolean;
-  className?: string;
-}
+import { IndicatorPositionEnum } from "@/domain/enum/IndicatorPositionEnum";
+import { NavOrientationEnum } from "@/domain/enum/NavOrientationEnum";
+import type { GNavProps, GNavItem } from "./def/GNav";
 
 const navBase = {
   item: "relative flex w-full items-center gap-3 px-3 py-2.5 text-sm font-medium min-w-0",
@@ -30,35 +12,35 @@ const navBase = {
   itemActive: "bg-primary-muted text-primary font-semibold",
 };
 
-const navIndicator: Record<GNavIndicator, { active: string; idle: string }> = {
-  start: {
+const navIndicator: Record<IndicatorPositionEnum, { active: string; idle: string }> = {
+  [IndicatorPositionEnum.Start]: {
     active: "border-s-[3px] border-s-primary",
     idle: "border-s-transparent",
   },
-  end: {
+  [IndicatorPositionEnum.End]: {
     active: "border-e-[3px] border-e-primary",
     idle: "border-e-[3px] border-e-transparent",
   },
-  top: {
+  [IndicatorPositionEnum.Top]: {
     active: "border-t-[3px] border-t-primary",
     idle: "border-t-[3px] border-t-transparent",
   },
-  bottom: {
+  [IndicatorPositionEnum.Bottom]: {
     active: "border-b-[3px] border-b-primary",
     idle: "border-b-[3px] border-b-transparent",
   },
-  none: { active: "", idle: "" },
+  [IndicatorPositionEnum.None]: { active: "", idle: "" },
 };
 
-function getIndicatorClass(active: boolean, indicator: GNavIndicator) {
-  if (indicator === "none") return "";
+function getIndicatorClass(active: boolean, indicator: IndicatorPositionEnum) {
+  if (indicator === IndicatorPositionEnum.None) return "";
   return active ? navIndicator[indicator].active : navIndicator[indicator].idle;
 }
 
 const GNav = forwardRef<HTMLButtonElement, GNavProps>(
-  ({ items, orientation = "vertical", indicator = "start", collapsed = false, className, ...props }, ref) => {
+  ({ items, orientation = NavOrientationEnum.Vertical, indicator = IndicatorPositionEnum.Start, collapsed = false, className, ...props }, ref) => {
     return (
-      <nav className={clsx("flex", orientation === "vertical" ? "flex-col gap-1" : "flex-row flex-wrap gap-2", className)}>
+      <nav className={clsx("flex", orientation === NavOrientationEnum.Vertical ? "flex-col gap-1" : "flex-row flex-wrap gap-2", className)}>
         {items.map((item) => {
           const active = Boolean(item.active);
           return (
@@ -96,4 +78,4 @@ const GNav = forwardRef<HTMLButtonElement, GNavProps>(
 
 GNav.displayName = "GNav";
 
-export { GNav, type GNavProps, type GNavIndicator, type GNavItem };
+export { GNav, type GNavProps, type GNavItem };

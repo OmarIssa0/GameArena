@@ -5,16 +5,19 @@ import { GCard } from "@/component/common/GCard";
 import { GButton } from "@/component/common/GButton";
 import { GIcon } from "@/component/common/GIcon";
 import { Gamepad2, Users, Zap } from "lucide-react";
-import type { GameCardProps } from "./def/GameCard";
+import type { IGameCardProps } from "./def/GameCard";
 import clsx from "clsx";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
 
 const LottiePlayer = dynamic(() => import("@lottiefiles/react-lottie-player").then((mod) => mod.Player), { ssr: false });
 
-function GameCard({ name, desc, icon, onClick, gradientClass, playLabel, animation, page }: GameCardProps) {
+function GameCard({ name, desc, icon, onClick, gradientClass, playLabel, animation, page }: IGameCardProps) {
   return (
     <GCard
-      variant="glass"
-      padding="lg"
+      variant={CardVariantEnum.Glass}
+       padding={SizeEnum.lg}
       className={clsx(
         "group",
         "flex flex-col",
@@ -43,9 +46,8 @@ function GameCard({ name, desc, icon, onClick, gradientClass, playLabel, animati
           icon && (
             <GIcon
               icon={icon}
-              size="xl"
+              size={SizeEnum.xl}
               tile
-              tileSize="xl"
               tileGradient={gradientClass}
               tileClassName="transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3"
             />
@@ -53,9 +55,24 @@ function GameCard({ name, desc, icon, onClick, gradientClass, playLabel, animati
         )}
         {!page && (
           <div className="absolute bottom-3 inset-e-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <GIcon icon={Gamepad2} size="sm" color="text" className="w-8 h-8 rounded-full bg-bg/80 flex items-center justify-center" />
-            <GIcon icon={Users} size="sm" color="text" className="w-8 h-8 rounded-full bg-bg/80 flex items-center justify-center" />
-            <GIcon icon={Zap} size="sm" color="text" className="w-8 h-8 rounded-full bg-bg/80 flex items-center justify-center" />
+            <GIcon
+              icon={Gamepad2}
+              size={SizeEnum.sm}
+              color={AccentColorEnum.Text}
+              className="w-8 h-8 rounded-full bg-bg/80 flex items-center justify-center"
+            />
+            <GIcon
+              icon={Users}
+              size={SizeEnum.sm}
+              color={AccentColorEnum.Text}
+              className="w-8 h-8 rounded-full bg-bg/80 flex items-center justify-center"
+            />
+            <GIcon
+              icon={Zap}
+              size={SizeEnum.sm}
+              color={AccentColorEnum.Text}
+              className="w-8 h-8 rounded-full bg-bg/80 flex items-center justify-center"
+            />
           </div>
         )}
       </div>
@@ -66,7 +83,7 @@ function GameCard({ name, desc, icon, onClick, gradientClass, playLabel, animati
 
         <p className="mt-2 text-sm text-text-secondary text-center flex-1">{desc}</p>
 
-        <GButton variant="primary" onClick={onClick} className="mt-6 w-full group-hover:scale-[1.02] transition-transform duration-200">
+        <GButton variant={AccentColorEnum.Primary} onClick={onClick} className="mt-6 w-full group-hover:scale-[1.02] transition-transform duration-200">
           {playLabel}
         </GButton>
       </div>

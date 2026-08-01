@@ -8,13 +8,10 @@ import { GButton } from "@/component/common/GButton";
 import { GIcon } from "@/component/common/GIcon";
 import { GCard } from "@/component/common/GCard";
 import { getGameConfig } from "./gameConfig";
-import type { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import type { IGameReadyProps } from "./def/GameReady";
 
-interface GameReadyProps {
-  gameType: GamesKindEnum;
-}
-
-function GameReady({ gameType }: GameReadyProps) {
+function GameReady({ gameType }: IGameReadyProps) {
   const { user } = useAuth();
   const { state, startGame } = useGame();
   const t = useGameTranslation();
@@ -26,7 +23,7 @@ function GameReady({ gameType }: GameReadyProps) {
 
   return (
     <div className="flex items-center justify-center min-h-[150px] p-4">
-      <GCard padding="lg" className="w-full max-w-lg text-center relative overflow-hidden">
+      <GCard padding={SizeEnum.lg} className="w-full max-w-lg text-center relative overflow-hidden">
         <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary via-accent to-secondary" />
         <h2 className="text-2xl font-black text-text mb-6">{t.ready.title}</h2>
 
@@ -56,8 +53,8 @@ function GameReady({ gameType }: GameReadyProps) {
           disabled={!isHost}
           onClick={() => startGame(state.player2Id!, gameType)}
           fullWidth
-          size="lg"
-          startIcon={<GIcon icon={Play} size="lg" color="inherit" />}>
+          size={SizeEnum.lg}
+          startIcon={<GIcon icon={Play} size={SizeEnum.lg} />}>
           {isHost ? t.ready.startGame : t.ready.waitingForStart}
         </GButton>
       </GCard>

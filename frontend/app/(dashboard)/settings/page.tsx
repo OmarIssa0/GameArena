@@ -23,9 +23,14 @@ import { ThemeEnum } from "@/domain/enum/ThemeEnum";
 import type { IUser } from "@/domain/meta/IUser";
 import type { GTabItem } from "@/component/common/def/GTabs";
 import type { TNullable } from "@/domain/type/TCommon";
-import type { LocaleEnum } from "@/domain/enum/LocaleEnum";
+import { LocaleEnum } from "@/domain/enum/LocaleEnum";
 import { SettingsTabEnum } from "@/domain/enum/SettingsTabEnum";
-
+import { TabsVariantEnum } from "@/domain/enum/TabsVariantEnum";
+import { TabsDirectionEnum } from "@/domain/enum/TabsDirectionEnum";
+import { IndicatorPositionEnum } from "@/domain/enum/IndicatorPositionEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 
 function SettingsPage() {
   const t = useTranslation({
@@ -74,8 +79,8 @@ function SettingsPage() {
             const parsed = JSON.parse(res.data.preferences) as IUserPreferences;
             const merged = { ...DEFAULT_USER_PREFERENCES, ...parsed } as IUserPreferences;
             setPreferences(merged);
-            if (merged.theme === "light" || merged.theme === "dark") setTheme(merged.theme);
-            if (merged.locale === "en" || merged.locale === "ar") setLocale(merged.locale);
+            if (merged.theme === ThemeEnum.Light || merged.theme === ThemeEnum.Dark) setTheme(merged.theme);
+            if (merged.locale === LocaleEnum.En || merged.locale === LocaleEnum.Ar) setLocale(merged.locale);
           } catch {
             // fall back to defaults
           }
@@ -170,17 +175,17 @@ function SettingsPage() {
       {
         id: SettingsTabEnum.Profile,
         label: t.settings.profile.title,
-        icon: <GIcon icon={User} size="md" color="inherit" />,
+        icon: <GIcon icon={User} size={SizeEnum.md} />,
       },
       {
         id: SettingsTabEnum.Password,
         label: t.settings.password.title,
-        icon: <GIcon icon={Lock} size="md" color="inherit" />,
+        icon: <GIcon icon={Lock} size={SizeEnum.md} />,
       },
       {
         id: SettingsTabEnum.Preferences,
         label: t.settings.preferences.title,
-        icon: <GIcon icon={Settings} size="md" color="inherit" />,
+        icon: <GIcon icon={Settings} size={SizeEnum.md} />,
       },
     ],
     [t],
@@ -189,10 +194,22 @@ function SettingsPage() {
   const pageSizeOptions = [5, 10, 15, 20, 25];
 
   const prefItems: { key: keyof IUserPreferences; label: string; icon: React.ReactNode }[] = [
-    { key: "soundEnabled", label: t.settings.preferences.sound, icon: <GIcon icon={Volume2} size="sm" color="inherit" /> },
-    { key: "showOnlineStatus", label: t.settings.preferences.showOnline, icon: <GIcon icon={Activity} size="sm" color="inherit" /> },
-    { key: "showGameActivity", label: t.settings.preferences.showGameActivity, icon: <GIcon icon={Gamepad2} size="sm" color="inherit" /> },
-    { key: "showNotifications", label: t.settings.preferences.showNotifications, icon: <GIcon icon={Bell} size="sm" color="inherit" /> },
+    { key: "soundEnabled", label: t.settings.preferences.sound, icon: <GIcon icon={Volume2} size={SizeEnum.sm} /> },
+    {
+      key: "showOnlineStatus",
+      label: t.settings.preferences.showOnline,
+      icon: <GIcon icon={Activity} size={SizeEnum.sm} />,
+    },
+    {
+      key: "showGameActivity",
+      label: t.settings.preferences.showGameActivity,
+      icon: <GIcon icon={Gamepad2} size={SizeEnum.sm} />,
+    },
+    {
+      key: "showNotifications",
+      label: t.settings.preferences.showNotifications,
+      icon: <GIcon icon={Bell} size={SizeEnum.sm} />,
+    },
   ];
 
   return (
@@ -201,13 +218,21 @@ function SettingsPage() {
         <div className="p-4 lg:p-6">
           <div className="mb-8">
             <header className="flex items-center gap-3">
-              <GIcon icon={Settings} size="xl" tile tileSize="xl" tileGradient="bg-primary" tileColor="on-primary" />
+              <GIcon icon={Settings} size={SizeEnum.xl} tile tileGradient="bg-primary" tileColor={AccentColorEnum.OnPrimary} />
               <div className="flex-1">
                 <h1 className="text-2xl font-extrabold text-text tracking-tight leading-tight">{t.title}</h1>
               </div>
             </header>
           </div>
-          <GTabs tabs={tabs} value={activeTab} onChange={setActiveTab} direction="V" variant="sidebar" indicator="start" fullWidth />
+          <GTabs
+            tabs={tabs}
+            value={activeTab}
+            onChange={setActiveTab}
+            direction={TabsDirectionEnum.V}
+            variant={TabsVariantEnum.Sidebar}
+            indicator={IndicatorPositionEnum.Start}
+            fullWidth
+          />
         </div>
       </aside>
 
@@ -215,11 +240,11 @@ function SettingsPage() {
         <div className="max-w-2xl mx-auto w-full">
           {saveMsg && <div className="mb-6 p-4 rounded-xl bg-success-bg border border-success text-success text-sm text-center">{saveMsg}</div>}
 
-          {activeTab === "profile" && (
-            <GCard variant="elevated" padding="xl" className="animate-in">
+          {activeTab === SettingsTabEnum.Profile && (
+            <GCard variant={CardVariantEnum.Elevated} padding={SizeEnum.xl} className="animate-in">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-3 bg-primary/10 rounded-xl">
-                  <GIcon icon={User} size="lg" color="primary" />
+                  <GIcon icon={User} size={SizeEnum.lg} color={AccentColorEnum.Primary} />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-text">{t.settings.profile.title}</h2>
@@ -229,7 +254,7 @@ function SettingsPage() {
 
               {loading ? (
                 <div className="flex justify-center py-10">
-                  <GSpinner />
+                  <GSpinner size={SizeEnum.md} />
                 </div>
               ) : (
                 <>
@@ -245,7 +270,7 @@ function SettingsPage() {
                   </div>
                   <div className="mt-8 flex justify-end">
                     <GButton
-                      startIcon={saving ? <GSpinner size="sm" /> : <GIcon icon={Save} size="sm" color="inherit" className="text-on-primary" />}
+                      startIcon={saving ? <GSpinner size={SizeEnum.sm} /> : <GIcon icon={Save} size={SizeEnum.sm} className="text-on-primary" />}
                       onClick={handleSaveProfile}
                       disabled={saving}>
                       {t.settings.profile.save}
@@ -256,11 +281,11 @@ function SettingsPage() {
             </GCard>
           )}
 
-          {activeTab === "password" && (
-            <GCard variant="elevated" padding="xl" className="animate-in">
+          {activeTab === SettingsTabEnum.Password && (
+            <GCard variant={CardVariantEnum.Elevated} padding={SizeEnum.xl} className="animate-in">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-3 bg-warning/10 rounded-xl">
-                  <GIcon icon={Lock} size="lg" color="warning" />
+                  <GIcon icon={Lock} size={SizeEnum.lg} color={AccentColorEnum.Warning} />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-text">{t.settings.password.title}</h2>
@@ -294,7 +319,7 @@ function SettingsPage() {
 
               <div className="mt-8 flex justify-end">
                 <GButton
-                  startIcon={saving ? <GSpinner size="sm" /> : <GIcon icon={Save} size="sm" color="inherit" className="text-on-primary" />}
+                  startIcon={saving ? <GSpinner size={SizeEnum.sm} /> : <GIcon icon={Save} size={SizeEnum.sm} className="text-on-primary" />}
                   onClick={handleSavePassword}
                   disabled={saving}>
                   {t.settings.password.save}
@@ -303,11 +328,11 @@ function SettingsPage() {
             </GCard>
           )}
 
-          {activeTab === "preferences" && (
-            <GCard variant="elevated" padding="xl" className="space-y-6 animate-in">
+          {activeTab === SettingsTabEnum.Preferences && (
+            <GCard variant={CardVariantEnum.Elevated} padding={SizeEnum.xl} className="space-y-6 animate-in">
               <div className="flex items-center gap-3">
                 <div className="p-3 bg-accent/10 rounded-xl">
-                  <GIcon icon={Sliders} size="lg" color="accent" />
+                  <GIcon icon={Sliders} size={SizeEnum.lg} color={AccentColorEnum.Accent} />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-text">{t.settings.preferences.title}</h2>
@@ -319,15 +344,15 @@ function SettingsPage() {
                 <label className="flex items-center justify-between py-3 border-b border-border/50 group">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-surface rounded-lg group-hover:bg-primary/10 transition-colors">
-                      <GIcon icon={Moon} size="sm" color="inherit" />
+                      <GIcon icon={Moon} size={SizeEnum.sm} />
                     </div>
                     <span className="text-sm text-text">{t.settings.preferences.darkMode}</span>
                   </div>
                   <GTextField
                     type="checkbox"
                     className="flex items-center justify-center"
-                    size="md"
-                    checked={theme === "dark"}
+                    size={SizeEnum.md}
+                    checked={theme === ThemeEnum.Dark}
                     onChange={(e) => setTheme(e.target.checked ? ThemeEnum.Dark : ThemeEnum.Light)}
                   />
                 </label>
@@ -335,7 +360,7 @@ function SettingsPage() {
                 <div className="flex items-center justify-between py-3 border-b border-border/50">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-surface rounded-lg">
-                      <GIcon icon={Languages} size="sm" color="inherit" />
+                      <GIcon icon={Languages} size={SizeEnum.sm} />
                     </div>
                     <span className="text-sm text-text">{t.settings.preferences.language}</span>
                   </div>
@@ -344,8 +369,8 @@ function SettingsPage() {
                     value={locale}
                     onChange={(e) => setLocale(e.target.value as LocaleEnum)}
                     options={[
-                      { value: "en", label: "English" },
-                      { value: "ar", label: "العربية" },
+                      { value: LocaleEnum.En, label: "English" },
+                      { value: LocaleEnum.Ar, label: "العربية" },
                     ]}
                   />
                 </div>
@@ -362,7 +387,7 @@ function SettingsPage() {
                         className="flex items-center justify-center"
                         checked={preferences[item.key] as boolean}
                         onChange={() => togglePref(item.key)}
-                        size="sm"
+                        size={SizeEnum.sm}
                       />
                     </label>
                   )}
@@ -371,7 +396,7 @@ function SettingsPage() {
                 <div className="flex items-center justify-between py-3 border-b border-border/50">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-surface rounded-lg">
-                      <GIcon icon={List} size="sm" color="inherit" />
+                      <GIcon icon={List} size={SizeEnum.sm} />
                     </div>
                     <span className="text-sm text-text">{t.settings.preferences.pageSize}</span>
                   </div>
@@ -386,7 +411,7 @@ function SettingsPage() {
 
               <div className="flex justify-end pt-4 border-t border-border">
                 <GButton
-                  startIcon={prefSaving ? <GSpinner size="sm" /> : <GIcon icon={Save} size="sm" color="inherit" className="text-on-primary" />}
+                  startIcon={prefSaving ? <GSpinner size={SizeEnum.sm} /> : <GIcon icon={Save} size={SizeEnum.sm} className="text-on-primary" />}
                   onClick={handleSavePreferences}
                   disabled={prefSaving}>
                   {t.settings.preferences.save}

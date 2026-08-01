@@ -1,22 +1,19 @@
-import { ReconnectManager } from "../lib/ReconnectManager";
-import { SubscriptionManager } from "../lib/SubscriptionManager";
+import { SignalRServiceBase } from "../lib/SignalRServiceBase";
 import { gameRepository } from "@/repositories/def/GameRepository";
 import type { HubConnection } from "@microsoft/signalr";
 import type { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
 import type { IGameInvite } from "@/domain/meta/INotification";
 import type { IGameState } from "@/app/providers/def/IGameState";
 import type { IGameService } from "../meta/IGameService";
-import type { Handler } from "../lib/signalRUtils";
 import type { TNullable, TPromise } from "@/domain/type/TCommon";
+import type { Handler } from "../lib/signalRUtils";
 
-class GameService implements IGameService {
-  private connection: TNullable<HubConnection> = null;
-  private subs = new SubscriptionManager();
-  private reconnectHandlers = new ReconnectManager();
+class GameService extends SignalRServiceBase implements IGameService {
   private _connectionReady: Promise<void>;
   private _resolveConnectionReady!: () => void;
 
   constructor() {
+    super();
     this._connectionReady = new Promise((r) => { this._resolveConnectionReady = r; });
   }
 
@@ -40,50 +37,36 @@ class GameService implements IGameService {
 
   // ── Connection management ───────────────────────────────────────────────
 
-  handleReconnect(): void {
-    this.reconnectHandlers.handleReconnect();
-  }
-
-  onReconnect(handler: () => void): () => void {
-    return this.reconnectHandlers.onReconnect(handler);
-  }
-
   setConnection(connection: HubConnection): void {
-    if (this.connection) {
-      this.connection.off("gameState");
-      this.connection.off("OpponentDisconnected");
-      this.connection.off("game:invite");
-      this.connection.off("playAgainRequest");
-      this.connection.off("playAgainResponse");
-    }
-    this.connection = connection;
+    super.setConnection(connection);
+    this._resolveConnectionReady();
+  }
 
-    this.connection.on("gameState", (data: unknown) => {
+  protected registerHandlers(): void {
+    this.addHandler("gameState", (data: unknown) => {
       this.subs.dispatch("game:state", data);
     });
 
-    this.connection.on("OpponentDisconnected", () => {
+    this.addHandler("OpponentDisconnected", () => {
       this.subs.dispatch("game:disconnect");
     });
 
-    this.connection.on("game:invite", (data: unknown) => {
+    this.addHandler("game:invite", (data: unknown) => {
       this.subs.dispatch("game:invite", data);
     });
 
-    this.connection.on("playAgainRequest", (data: unknown) => {
+    this.addHandler("playAgainRequest", (data: unknown) => {
       this.subs.dispatch("game:playAgainRequest", data);
     });
 
-    this.connection.on("playAgainResponse", (data: unknown) => {
+    this.addHandler("playAgainResponse", (data: unknown) => {
       this.subs.dispatch("game:playAgainResponse", data);
     });
-
-    this._resolveConnectionReady();
   }
 
   private async invoke<T = void>(method: string, ...args: unknown[]): Promise<T> {
     const conn = await this.ensureConnection();
-    return conn.invoke(method, ...args);
+    return conn.invoke(method, ...args) as T;
   }
 
   // ── SignalR invocations ─────────────────────────────────────────────────
@@ -134,28 +117,24 @@ class GameService implements IGameService {
 
   // ── SignalR subscriptions ───────────────────────────────────────────────
 
-  private on<T>(key: string, handler: (data: T) => void): () => void {
-    return this.subs.subscribe(key, handler as Handler);
-  }
-
   onGameState(handler: (state: IGameState) => void): () => void {
-    return this.on("game:state", handler);
+    return this.subscribe("game:state", handler as Handler);
   }
 
   onOpponentDisconnect(handler: () => void): () => void {
-    return this.on<void>("game:disconnect", handler);
+    return this.subscribe("game:disconnect", handler as Handler);
   }
 
   onGameInvite(handler: (invite: IGameInvite) => void): () => void {
-    return this.on("game:invite", handler);
+    return this.subscribe("game:invite", handler as Handler);
   }
 
   onPlayAgainRequest(handler: (data: { requesterId: string; requesterUsername: string }) => void): () => void {
-    return this.on("game:playAgainRequest", handler);
+    return this.subscribe("game:playAgainRequest", handler as Handler);
   }
 
   onPlayAgainResponse(handler: (data: { accepted: boolean }) => void): () => void {
-    return this.on("game:playAgainResponse", handler);
+    return this.subscribe("game:playAgainResponse", handler as Handler);
   }
 }
 

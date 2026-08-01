@@ -1,9 +1,11 @@
 import type { HTMLAttributes, ReactNode } from "react";
+import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
 
 interface GCardProps extends HTMLAttributes<HTMLDivElement> {
-  variant?: "default" | "outlined" | "elevated" | "interactive" | "glass" | "gradient";
-  padding?: "none" | "sm" | "md" | "lg" | "xl";
-  rounded?: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "full";
+  variant?: CardVariantEnum;
+  padding?: SizeEnum;
+  rounded?: SizeEnum;
   children: ReactNode;
 }
 

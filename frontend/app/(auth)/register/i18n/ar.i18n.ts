@@ -15,6 +15,7 @@ const ar = {
   haveAccount: "هل لديك حساب بالفعل؟",
   signIn: "تسجيل الدخول",
   joinUs: "انضم إلينا اليوم",
+  unknownError: "حدث خطأ غير معروف",
   RegisterErrorCodeEnum: {
     [ErrorCodeEnum.EmailAlreadyExists]: "البريد الإلكتروني موجود بالفعل",
   },

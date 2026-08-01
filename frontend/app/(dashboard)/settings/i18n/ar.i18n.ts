@@ -29,7 +29,7 @@ const ar = {
     },
     preferences: {
       title: "التفضيلات",
-      subtitle: "خصّص تجربة GameArena الخاصة بك",
+      subtitle: "خصّص تجربة أرينا 404 الخاصة بك",
       save: "حفظ التفضيلات",
       saved: "تم حفظ التفضيلات",
       theme: "الوضع الداكن",

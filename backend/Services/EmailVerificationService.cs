@@ -40,7 +40,7 @@ namespace backend.Services
             });
 
             await _context.SaveChangesAsync();
-            await _emailService.SendAsync(user.Email, "GameArena OTP Code", body);
+            await _emailService.SendAsync(user.Email, "Arena 404 OTP Code", body);
         }
 
         public async Task VerifyOtpAsync(string email, string otp, OtpPurpose purpose)

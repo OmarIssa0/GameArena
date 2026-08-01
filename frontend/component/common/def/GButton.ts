@@ -1,12 +1,14 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
 
 interface GButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
   startIcon?: ReactNode;
   endIcon?: ReactNode;
-  variant?: "primary" | "secondary" | "outline" | "ghost" | "danger" | "success" | "link" | "outline-danger";
-  size?: "xs" | "sm" | "md" | "lg" | "xl" | "icon";
-  rounded?: "sm" | "md" | "lg" | "full";
+  variant?: AccentColorEnum;
+  size?: SizeEnum;
+  rounded?: SizeEnum;
   loadingText?: string;
   fullWidth?: boolean;
 }

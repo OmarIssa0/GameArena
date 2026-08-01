@@ -3,7 +3,6 @@ import type { IGameRepository } from "../meta/IGameRepository";
 import type { IGameState } from "@/app/providers/def/IGameState";
 import type { TNullable, TPromise } from "@/domain/type/TCommon";
 import type { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
-import type { IGameAction } from "@/domain/meta/IGameAction";
 
 class GameRepository implements IGameRepository {
   private static instance: GameRepository;
@@ -44,7 +43,7 @@ class GameRepository implements IGameRepository {
     return this.api.cancelSearch();
   }
 
-  sendAction(action: IGameAction): TPromise<void> {
+  sendAction(action: object): TPromise<void> {
     return this.api.sendAction({ action });
   }
 

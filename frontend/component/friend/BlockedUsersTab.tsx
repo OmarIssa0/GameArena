@@ -7,13 +7,19 @@ import { GEmpty } from "../common/GEmpty";
 import { GIcon } from "../common/GIcon";
 import type { BlockedUsersTabProps } from "./def/FriendsTab";
 import type { TNullable } from "@/domain/type/TCommon";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 
 function BlockedUsersTab({ blockedUsers, onUnblock, t }: BlockedUsersTabProps) {
   const [actionId, setActionId] = useState<TNullable<string>>(null);
 
   if (blockedUsers.length === 0) {
     return (
-      <GEmpty icon={<GIcon icon={ShieldBan} size="xl" color="muted" />} title={t.blockedTab.emptyTitle} description={t.blockedTab.emptyDescription} />
+      <GEmpty
+        icon={<GIcon icon={ShieldBan} size={SizeEnum.xl} color={AccentColorEnum.Muted} />}
+        title={t.blockedTab.emptyTitle}
+        description={t.blockedTab.emptyDescription}
+      />
     );
   }
 
@@ -27,12 +33,19 @@ function BlockedUsersTab({ blockedUsers, onUnblock, t }: BlockedUsersTabProps) {
         return (
           <div className="flex gap-1">
             <GIcon
-              icon={isBusy ? Loader2 : ShieldBan} size="md" tile tileSize="lg"
-              tileGradient="bg-success/10" tileColor="success"
+              icon={isBusy ? Loader2 : ShieldBan}
+              size={SizeEnum.md}
+              tile
+              tileGradient="bg-success/10"
+              tileColor={AccentColorEnum.Success}
               className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}
               onClick={async () => {
                 setActionId(friend.id);
-                try { await onUnblock(friend.id); } finally { setActionId(null); }
+                try {
+                  await onUnblock(friend.id);
+                } finally {
+                  setActionId(null);
+                }
               }}
               ariaLabel={t.blockedTab.unblock}
             />

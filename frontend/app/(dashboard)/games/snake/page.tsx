@@ -5,6 +5,7 @@ import { useGame } from "@/app/providers/GameProvider";
 import { useGameTranslation } from "@/hooks/useGameTranslation";
 import { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
 import { GCard } from "@/component/common/GCard";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
 import type { ISnakeGameState } from "@/app/providers/def/IGameState";
 import { GameLayoutWrapper } from "@/component/games/GameLayoutWrapper";
 
@@ -29,7 +30,7 @@ function SnakePage() {
 
   return (
     <GameLayoutWrapper gameType={GamesKindEnum.Snake}>
-      <GCard padding="md" rounded="3xl">
+      <GCard padding={SizeEnum.md} rounded={SizeEnum.lg}>
         <div className="grid gap-1">
           {grid.map((row, rowIndex) => (
             <div key={rowIndex} className="flex gap-1">

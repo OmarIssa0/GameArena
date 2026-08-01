@@ -6,13 +6,14 @@ import { useCallback, useEffect, useRef } from "react";
 import { GBackdrop } from "./GBackdrop";
 import { GCard } from "./GCard";
 import type { GModalProps } from "./def/GModal";
-import type { TNullable } from "@/domain/type/TCommon";
+import type { THashMap, TNullable } from "@/domain/type/TCommon";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
 
-const sizeStyles: Record<string, string> = {
-  sm: "max-w-xs",
-  md: "max-w-sm",
-  lg: "max-w-md",
-  xl: "max-w-lg",
+const sizeStyles: THashMap<string> = {
+  [SizeEnum.sm]: "max-w-xs",
+  [SizeEnum.md]: "max-w-sm",
+  [SizeEnum.lg]: "max-w-md",
+  [SizeEnum.xl]: "max-w-lg",
 };
 
 const FOCUSABLE =
@@ -24,8 +25,8 @@ function GModal({
   children,
   closeOnBackdrop = true,
   closeOnEscape = true,
-  size = "md",
-  cardPadding = "lg",
+  size = SizeEnum.md,
+  cardPadding = SizeEnum.lg,
   role = "dialog",
   ariaLabel,
   ariaDescription,

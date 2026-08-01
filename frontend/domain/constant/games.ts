@@ -18,7 +18,7 @@ export const GAMES_CONFIG: readonly GameConfig[] = [
   {
     id: 'ticTacToe',
     name: 'ticTacToe',
-    description: 'tictactoeDesc',
+    description: 'ticTacToeDesc',
     type: GamesKindEnum.TicTacToe,
     icon: Grid3X3,
     path: 'tic-tac-toe',

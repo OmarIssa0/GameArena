@@ -1,8 +1,10 @@
 import type { HTMLAttributes, ReactNode } from "react";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
 
 interface GBadgeProps extends HTMLAttributes<HTMLSpanElement> {
-  variant?: "primary" | "secondary" | "success" | "warning" | "danger" | "muted";
-  size?: "sm" | "md";
+  variant?: AccentColorEnum;
+  size?: SizeEnum;
   children: ReactNode;
 }
 

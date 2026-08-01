@@ -4,20 +4,22 @@ import { ar } from "./i18n/SideBar/ar.i18n";
 import { en, type TSidebarTranslation } from "./i18n/SideBar/en.i18n";
 import { useAside } from "@/hooks/useAside";
 import { GIcon } from "./common/GIcon";
+import { BrandText } from "./common/BrandText";
 import { AsideWrapper } from "@/component/aside/AsideWrapper";
 import { AsideHeader } from "@/component/aside/AsideHeader";
 import { SidebarCollapsed } from "@/component/Sidebar/SidebarCollapsed";
 import { SidebarExpanded } from "@/component/Sidebar/SidebarExpanded";
 import { AsidePlacementEnum } from "@/domain/enum/AsidePlacementEnum";
 import type { AsideConfig } from "@/component/aside/AsideTypes";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 
 function SidebarBrand() {
+  const t = useTranslation({ en, ar }) as TSidebarTranslation;
   return (
     <>
-      <GIcon icon={Hexagon} size="sm" tile tileSize="sm" tileGradient="bg-primary" />
-      <span className="font-bold text-text text-lg whitespace-nowrap">
-        Game<span className="text-primary">Arena</span>
-      </span>
+      <GIcon icon={Hexagon} size={SizeEnum.sm} tile tileColor={AccentColorEnum.OnPrimary} />
+      <BrandText name={t.brand} className="font-bold text-text text-lg whitespace-nowrap" />
     </>
   );
 }
@@ -26,7 +28,7 @@ function Sidebar() {
   const t = useTranslation({ en, ar }) as TSidebarTranslation;
   const aside = useAside(false);
 
-  const collapsedIcon = <GIcon icon={Menu} size="md" tile tileSize="md" />;
+  const collapsedIcon = <GIcon icon={Menu} size={SizeEnum.md} tile/>;
 
   const asideConfig: AsideConfig = {
     placement: AsidePlacementEnum.Start,

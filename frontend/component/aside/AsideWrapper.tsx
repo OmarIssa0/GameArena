@@ -3,18 +3,10 @@
 import clsx from "clsx";
 import { GBackdrop } from "../common/GBackdrop";
 import { GButton } from "../common/GButton";
-import type { AsideConfig, AsideState } from "./AsideTypes";
 import { AsidePlacementEnum } from "@/domain/enum/AsidePlacementEnum";
-
-interface AsideWrapperProps {
-  config: AsideConfig;
-  aside: AsideState;
-  header: React.ReactNode;
-  children: React.ReactNode;
-  footer?: React.ReactNode;
-  mobileFab?: React.ReactNode;
-  className?: string;
-}
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import type { AsideWrapperProps } from "./def/AsideWrapper";
 
 function AsideWrapper({ config, aside, header, children, footer, mobileFab, className }: AsideWrapperProps) {
   const { collapsed, open, isDesktop, closeMobile } = aside;
@@ -26,11 +18,11 @@ function AsideWrapper({ config, aside, header, children, footer, mobileFab, clas
 
   const openFab = mobileFab ?? (
     <GButton
-      variant="secondary"
-      size="icon"
-      rounded="full"
+      variant={AccentColorEnum.Secondary}
+      size={SizeEnum.icon}
+      rounded={SizeEnum.full}
       onClick={aside.openMobile}
-      className={clsx("fixed bottom-4", placement === AsidePlacementEnum.Start ? "inset-s-4" : "end-4")}
+      className={clsx("fixed inset-0 top-4 z-50", placement === AsidePlacementEnum.Start ? "inset-s-4" : "inset-e-4")}
       aria-label={`Open ${label}`}>
       {config.mobileIcon}
     </GButton>
@@ -78,4 +70,3 @@ function AsideWrapper({ config, aside, header, children, footer, mobileFab, clas
 }
 
 export { AsideWrapper };
-export type { AsideWrapperProps };

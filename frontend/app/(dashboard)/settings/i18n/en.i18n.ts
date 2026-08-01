@@ -29,7 +29,7 @@ const en = {
     },
     preferences: {
       title: "Preferences",
-      subtitle: "Customize your GameArena experience",
+      subtitle: "Customize your Arena 404 experience",
       save: "Save Preferences",
       saved: "Preferences saved",
       theme: "Dark Theme",

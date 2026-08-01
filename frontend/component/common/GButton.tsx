@@ -4,33 +4,40 @@ import clsx from "clsx";
 import { forwardRef } from "react";
 import { GSpinner } from "./GSpinner";
 import type { GButtonProps } from "./def/GButton";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { AccentBackGroundEnum } from "@/domain/enum/AccentBackGroundEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { THashMap } from "@/domain/type/TCommon";
 
-const sizeStyles: Record<string, string> = {
-  xs: "h-9 px-2.5 text-xs gap-1",
-  sm: "h-10 px-3 text-sm gap-1.5",
-  md: "h-11 px-4 text-sm gap-2",
-  lg: "h-12 px-5 text-base gap-2.5",
-  xl: "h-12 px-6 text-lg gap-2.5",
-  icon: "h-11 w-11 p-0",
+const sizeStyles: THashMap<string> = {
+  [SizeEnum.xs]: "h-9 px-2.5 text-xs gap-1",
+  [SizeEnum.sm]: "h-10 px-3 text-sm gap-1.5",
+  [SizeEnum.md]: "h-11 px-4 text-sm gap-2",
+  [SizeEnum.lg]: "h-12 px-5 text-base gap-2.5",
+  [SizeEnum.xl]: "h-12 px-6 text-lg gap-2.5",
+  [SizeEnum.icon]: "h-11 w-11 p-0",
 };
 
-const roundedStyles: Record<string, string> = {
-  sm: "rounded-[var(--radius-sm)]",
-  md: "rounded-[var(--radius-md)]",
-  lg: "rounded-[var(--radius-lg)]",
-  xl: "rounded-[var(--radius-xl)]",
-  full: "rounded-full",
+const roundedStyles: THashMap<string> = {
+  [SizeEnum.sm]: "rounded-[var(--radius-sm)]",
+  [SizeEnum.md]: "rounded-[var(--radius-md)]",
+  [SizeEnum.lg]: "rounded-[var(--radius-lg)]",
+  [SizeEnum.xl]: "rounded-[var(--radius-xl)]",
+  [SizeEnum.full]: "rounded-full",
+  [SizeEnum.None]: "rounded-none",
 };
 
-const variantStyles: Record<string, string> = {
-  primary: "bg-primary text-on-primary hover:bg-primary-hover",
-  secondary: "bg-surface text-text border border-border hover:bg-surface-hover",
-  outline: "bg-transparent text-text border border-border hover:bg-primary-muted hover:border-primary hover:text-primary",
-  ghost: "bg-transparent text-text-secondary hover:bg-primary-muted hover:text-primary",
-  danger: "bg-error text-on-primary hover:bg-error-hover",
-  success: "bg-success text-on-primary hover:bg-success-hover",
-  link: "bg-transparent text-primary hover:text-primary-hover underline-offset-4 hover:underline h-auto p-0",
-  "outline-danger": "bg-transparent text-error border border-error/30 hover:bg-error-muted hover:border-error",
+const variantStyles: Record<AccentColorEnum, string> = {
+  [AccentColorEnum.Primary]: `${AccentBackGroundEnum.Primary} ${AccentColorEnum.OnPrimary} ${AccentBackGroundEnum.PrimaryHover}`,
+  [AccentColorEnum.Secondary]: `${AccentBackGroundEnum.Surface} ${AccentColorEnum.Text} border border-border ${AccentBackGroundEnum.SurfaceHover}`,
+  [AccentColorEnum.Muted]: `${AccentBackGroundEnum.Transparent} ${AccentColorEnum.Secondary} ${AccentBackGroundEnum.PrimaryHover.replace("hover:", "")} hover:${AccentColorEnum.Primary}`,
+  [AccentColorEnum.Success]: `${AccentBackGroundEnum.Success} ${AccentColorEnum.OnPrimary} ${AccentBackGroundEnum.SuccessHover}`,
+  [AccentColorEnum.Warning]: `${AccentBackGroundEnum.Warning} ${AccentColorEnum.OnPrimary} ${AccentBackGroundEnum.WarningHover}`,
+  [AccentColorEnum.Danger]: `${AccentBackGroundEnum.Error} ${AccentColorEnum.OnPrimary} ${AccentBackGroundEnum.ErrorHover}`,
+  [AccentColorEnum.Inherit]: `${AccentBackGroundEnum.Transparent} ${AccentColorEnum.Secondary} ${AccentBackGroundEnum.PrimaryHover.replace("hover:", "")} hover:${AccentColorEnum.Primary}`,
+  [AccentColorEnum.OnPrimary]: `${AccentBackGroundEnum.Transparent} ${AccentColorEnum.OnPrimary} ${AccentBackGroundEnum.PrimaryHover.replace("hover:", "")} hover:${AccentColorEnum.Primary}`,
+  [AccentColorEnum.Accent]: `${AccentBackGroundEnum.Accent} ${AccentColorEnum.OnPrimary} ${AccentBackGroundEnum.AccentHover}`,
+  [AccentColorEnum.Text]: `${AccentBackGroundEnum.Transparent} ${AccentColorEnum.Primary} hover:text-primary-hover underline-offset-4 hover:underline h-auto p-0`,
 };
 
 const GButton = forwardRef<HTMLButtonElement, GButtonProps>(
@@ -39,9 +46,9 @@ const GButton = forwardRef<HTMLButtonElement, GButtonProps>(
       children,
       loading,
       disabled,
-      variant = "primary",
-      size = "md",
-      rounded = "md",
+      variant = AccentColorEnum.Primary,
+      size = SizeEnum.md,
+      rounded = SizeEnum.md,
       className,
       startIcon,
       endIcon,
@@ -69,20 +76,20 @@ const GButton = forwardRef<HTMLButtonElement, GButtonProps>(
           roundedStyles[rounded],
           fullWidth && "w-full",
           isDisabled && "opacity-50 cursor-not-allowed pointer-events-none",
-          isIconOnly && size !== "icon" && "p-0",
+          isIconOnly && size !== SizeEnum.icon && "p-0",
           className,
         )}
         {...props}>
         {loading ? (
           <span className="opacity-70 flex items-center gap-1.5">
-            <GSpinner size="sm" />
+            <GSpinner size={SizeEnum.sm} />
             {resolvedLoadingText}
           </span>
         ) : (
           <>
-            {startIcon && <span className="flex-shrink-0">{startIcon}</span>}
+            {startIcon && <span className="shrink-0">{startIcon}</span>}
             {children}
-            {endIcon && <span className="flex-shrink-0">{endIcon}</span>}
+            {endIcon && <span className="shrink-0">{endIcon}</span>}
           </>
         )}
       </button>

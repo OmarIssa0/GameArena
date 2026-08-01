@@ -7,13 +7,11 @@ import { GamePlayersHeader } from "@/component/games/common/GamePlayersHeader";
 import { GameTurnIndicator } from "@/component/games/common/GameTurnIndicator";
 import { GameResult } from "@/component/games/common/GameResult";
 import { GButton } from "@/component/common/GButton";
-import type { ReactNode } from "react";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import type { IGameActiveProps } from "./def/GameActive";
 
-interface GameActiveProps {
-  children: ReactNode;
-}
-
-function GameActive({ children }: GameActiveProps) {
+function GameActive({ children }: IGameActiveProps) {
   const { user } = useAuth();
   const { state, leaveGame } = useGame();
   const t = useGameTranslation();
@@ -34,11 +32,7 @@ function GameActive({ children }: GameActiveProps) {
         <GamePlayersHeader />
 
         {!(state.winnerPlayerId || state.isFinished) && (
-          <GameTurnIndicator
-            isMyTurn={isMyTurn}
-            currentTurnText={t.game.yourTurn}
-            waitingText={t.game.waitingFor.replace("{name}", opponentName)}
-          />
+          <GameTurnIndicator isMyTurn={isMyTurn} currentTurnText={t.game.yourTurn} waitingText={t.game.waitingFor.replace("{name}", opponentName)} />
         )}
 
         <div className="relative">
@@ -48,7 +42,7 @@ function GameActive({ children }: GameActiveProps) {
 
         {!(state.winnerPlayerId || state.isFinished) && (
           <div className="flex justify-center">
-            <GButton onClick={() => leaveGame()} variant="outline-danger" size="sm">
+            <GButton onClick={() => leaveGame()} variant={AccentColorEnum.Danger} size={SizeEnum.sm}>
               {t.game.leaveGame}
             </GButton>
           </div>

@@ -19,6 +19,10 @@ import { GIcon } from "@/component/common/GIcon";
 import { GTextField } from "@/component/common/GTextField";
 import clsx from "clsx";
 import { chatService } from "@/services/def/ChatService";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { AvatarShapeEnum } from "@/domain/enum/AvatarShapeEnum";
 
 const formatStatus = (status: UserStatusEnum, t: TMessagesTranslation) => {
   switch (status) {
@@ -92,13 +96,13 @@ function MessagesPage() {
       <aside className={clsx("w-full sm:w-80 shrink-0 border-e border-border bg-bg-sidebar flex-col z-20", showList ? "flex" : "hidden sm:flex")}>
         <div className="p-4 border-b border-border space-y-4">
           <header className="flex items-center gap-3">
-            <GIcon icon={MessagesSquare} size="xl" tile tileSize="xl" tileGradient="bg-primary" tileColor="on-primary" />
+            <GIcon icon={MessagesSquare} size={SizeEnum.xl} tile tileColor={AccentColorEnum.OnPrimary} />
             <div className="flex-1">
               <div className="flex items-center justify-between">
                 <h1 className="text-xl sm:text-2xl font-extrabold text-text tracking-tight leading-tight">{t.title}</h1>
                 <div className="mb-1">
-                  <GBadge variant={isConnected ? "success" : "danger"} className="shrink-0">
-                    {!isConnected && <GIcon icon={WifiOff} size="xs" color="inherit" />}
+                  <GBadge variant={isConnected ? AccentColorEnum.Success : AccentColorEnum.Danger} className="shrink-0">
+                    {!isConnected && <GIcon icon={WifiOff} size={SizeEnum.xs} />}
                     {isConnected ? t.connected : t.disconnected}
                   </GBadge>
                 </div>
@@ -111,30 +115,34 @@ function MessagesPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t.search}
-            startIcon={<GIcon icon={Search} size="sm" color="muted" />}
+            startIcon={<GIcon icon={Search} size={SizeEnum.sm} color={AccentColorEnum.Muted} />}
           />
         </div>
 
         <div className="flex-1 overflow-y-auto p-3 custom-scrollbar">
           {friendsLoading ? (
             <div className="flex justify-center py-10">
-              <GSpinner />
+              <GSpinner size={SizeEnum.lg} />
             </div>
           ) : filteredFriends.length === 0 ? (
-            <GEmpty icon={<GIcon icon={MessagesSquare} size="xl" color="muted" />} title={t.noFriendsTitle} description={t.noFriendsDescription} />
+            <GEmpty
+              icon={<GIcon icon={MessagesSquare} size={SizeEnum.xl} color={AccentColorEnum.Muted} />}
+              title={t.noFriendsTitle}
+              description={t.noFriendsDescription}
+            />
           ) : (
             <GList
               items={filteredFriends}
               keyExtractor={(friend) => friend.id}
               emptyMessage={t.noFriendsTitle}
               emptyDescription={t.noFriendsDescription}
-              emptyIcon={<GIcon icon={MessagesSquare} size="xl" color="muted" />}>
+              emptyIcon={<GIcon icon={MessagesSquare} size={SizeEnum.xl} color={AccentColorEnum.Muted} />}>
               {(friend) => (
                 <GCard
                   key={friend.id}
-                  padding="sm"
-                  variant="outlined"
-                  rounded="xl"
+                  padding={SizeEnum.sm}
+                  variant={CardVariantEnum.Outlined}
+                  rounded={SizeEnum.xl}
                   onClick={() => router.push(`/messages?friend=${friend.id}`)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
@@ -146,7 +154,7 @@ function MessagesPage() {
                   tabIndex={0}
                   className="flex items-center gap-3 cursor-pointer transition hover:bg-bg-card-hover focus-visible:ring-2 focus-visible:ring-primary">
                   <div className="relative shrink-0">
-                    <GAvatar firstName={friend.firstName} lastName={friend.lastName} status={friend.status} size="sm" shape="circle" />
+                    <GAvatar firstName={friend.firstName} lastName={friend.lastName} status={friend.status} size={SizeEnum.sm} shape={AvatarShapeEnum.Circle} />
                   </div>
                   <div className="min-w-0 flex-1">
                     <h3 className="truncate text-sm font-semibold text-inherit">{friend.fullName}</h3>
@@ -155,7 +163,7 @@ function MessagesPage() {
                     </div>
                   </div>
                   {unreadCounts[friend.id] != null && unreadCounts[friend.id] > 0 && (
-                    <GBadge variant="danger" size="sm" className="shrink-0 min-w-5 justify-center">
+                    <GBadge variant={AccentColorEnum.Danger} size={SizeEnum.sm} className="shrink-0 min-w-5 justify-center">
                       {unreadCounts[friend.id]}
                     </GBadge>
                   )}
@@ -170,16 +178,16 @@ function MessagesPage() {
         {selectedFriendId ? (
           <>
             <header className="flex items-center gap-3 border-b border-border bg-surface px-4 sm:px-6 py-4 shrink-0">
-              <GButton variant="ghost" size="icon" onClick={handleBack} className="sm:hidden" aria-label={t.back}>
-                <GIcon icon={ArrowLeft} size="md" color="secondary" />
+              <GButton variant={AccentColorEnum.Muted} size={SizeEnum.icon} onClick={handleBack} className="sm:hidden" aria-label={t.back}>
+                <GIcon icon={ArrowLeft} size={SizeEnum.md} color={AccentColorEnum.Secondary} />
               </GButton>
               <div className="relative shrink-0">
                 <GAvatar
                   firstName={selectedFriend?.firstName ?? ""}
                   lastName={selectedFriend?.lastName ?? ""}
                   status={selectedFriend?.status ?? UserStatusEnum.Offline}
-                  size="sm"
-                  shape="circle"
+                   size={SizeEnum.sm}
+                   shape={AvatarShapeEnum.Circle}
                 />
               </div>
               <div className="min-w-0 flex-1">
@@ -192,22 +200,26 @@ function MessagesPage() {
                   {selectedFriend ? formatStatus(selectedFriend.status ?? UserStatusEnum.Offline, t) : ""}
                 </p>
               </div>
-              {!isConnected && <GBadge variant="danger">{t.disconnected}</GBadge>}
+              {!isConnected && <GBadge variant={AccentColorEnum.Danger}>{t.disconnected}</GBadge>}
             </header>
 
             <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 custom-scrollbar">
               {loadingMessages ? (
                 <div className="flex h-full items-center justify-center">
-                  <GSpinner size="lg" />
+                  <GSpinner size={SizeEnum.lg} />
                 </div>
               ) : error ? (
                 <div className="flex h-full items-center justify-center">
-                  <GEmpty icon={<GIcon icon={MessagesSquare} size="xl" color="danger" />} title="Unable to load messages" description={error} />
+                  <GEmpty
+                    icon={<GIcon icon={MessagesSquare} size={SizeEnum.xl} color={AccentColorEnum.Danger} />}
+                    title="Unable to load messages"
+                    description={error}
+                  />
                 </div>
               ) : messages.length === 0 ? (
                 <div className="flex h-full items-center justify-center">
                   <GEmpty
-                    icon={<GIcon icon={MessagesSquare} size="xl" color="muted" />}
+                    icon={<GIcon icon={MessagesSquare} size={SizeEnum.xl} color={AccentColorEnum.Muted} />}
                     title={t.noMessagesTitle}
                     description={t.noMessagesDescription}
                   />
@@ -224,7 +236,7 @@ function MessagesPage() {
                         className={clsx("flex", outgoing ? "justify-end" : "justify-start")}>
                         <div
                           className={clsx(
-                            "max-w-[85%] sm:max-w-[70%] min-w-0 px-4 py-2.5 text-sm leading-relaxed wrap-anywhere break-words rounded-[var(--radius-lg)]",
+                            "max-w-[85%] sm:max-w-[70%] min-w-0 px-4 py-2.5 text-sm leading-relaxed wrap-anywhere rounded-[var(--radius-lg)]",
                             outgoing ? "ms-auto rounded-ee-sm bg-primary text-on-primary" : "rounded-es-sm border border-border bg-surface text-text",
                           )}>
                           <p className="whitespace-pre-wrap">{message.content}</p>
@@ -234,9 +246,7 @@ function MessagesPage() {
                               outgoing ? "justify-end text-on-primary/80" : "text-text-muted",
                             )}>
                             <span>{time}</span>
-                            {outgoing && (
-                              <GIcon icon={CheckCheck} size="sm" color="inherit" className={message.isRead ? "opacity-100" : "opacity-50"} />
-                            )}
+                            {outgoing && <GIcon icon={CheckCheck} size={SizeEnum.sm} className={message.isRead ? "opacity-100" : "opacity-50"} />}
                           </div>
                         </div>
                       </div>
@@ -248,12 +258,12 @@ function MessagesPage() {
 
             <footer className="border-t border-border bg-surface px-4 sm:px-6 py-4 shrink-0 pb-safe mb-16 lg:mb-0">
               {error && (
-                <GBadge variant="danger" className="mb-3">
+                <GBadge variant={AccentColorEnum.Danger} className="mb-3">
                   {error}
                 </GBadge>
               )}
               {sendError && (
-                <GBadge variant="danger" className="mb-3">
+                <GBadge variant={AccentColorEnum.Danger} className="mb-3">
                   {sendError}
                 </GBadge>
               )}
@@ -276,8 +286,8 @@ function MessagesPage() {
                   onClick={() => void sendMessage()}
                   disabled={!draft.trim() || !isConnected || sending}
                   loading={sending}
-                  size="md"
-                  startIcon={<GIcon icon={Send} size="sm" color="inherit" className="text-on-primary" />}>
+                  size={SizeEnum.md}
+                  startIcon={<GIcon icon={Send} size={SizeEnum.sm} color={AccentColorEnum.OnPrimary} />}>
                   <span className="hidden sm:inline">{t.send}</span>
                 </GButton>
               </div>
@@ -286,7 +296,15 @@ function MessagesPage() {
         ) : (
           <div className="flex flex-1 items-center justify-center p-6">
             <GEmpty
-              icon={<GIcon icon={MessagesSquare} size="lg" tile tileSize="lg" tileGradient="bg-primary/10" tileColor="primary" />}
+              icon={
+                <GIcon
+                  icon={MessagesSquare}
+                  size={SizeEnum.lg}
+                  tile
+                  tileGradient="bg-primary/10"
+                  tileColor={AccentColorEnum.Primary}
+                />
+              }
               title={t.selectConversationTitle}
               description={t.selectConversationDescription}
             />

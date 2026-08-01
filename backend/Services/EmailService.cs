@@ -13,7 +13,7 @@ namespace backend.Services
             var fromEmail = _config["EmailSettings:Email"] ?? "noreply@gamearena.com";
             var payload = new
             {
-                sender = new { email = fromEmail, name = "GameArena" },
+                sender = new { email = fromEmail, name = "Arena 404" },
                 to = new[] { new { email = to } },
                 subject,
                 htmlContent = body

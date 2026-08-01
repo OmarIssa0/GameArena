@@ -43,6 +43,7 @@ export function ConnectionProvider({ children }: { children: React.ReactNode }) 
   const socialRef = useRef<TNullable<HubConnection>>(null);
   const socialKeyRef = useRef(0);
   const cancelledRef = useRef(false);
+  const hubGenRef = useRef<Record<keyof HubConnectionStates, number>>({ chat: 0, game: 0, social: 0 });
 
   useEffect(() => {
     socialKeyRef.current = socialReconnectKey;
@@ -62,10 +63,17 @@ export function ConnectionProvider({ children }: { children: React.ReactNode }) 
       ref: React.MutableRefObject<TNullable<HubConnection>>,
     ) => {
       const conn = createConnection(name);
+      // Generation token: a newer startHub call (e.g. StrictMode's second
+      // mount) supersedes this one, so a stale connection is stopped as soon
+      // as it finishes connecting and never registers handlers.
+      const gen = ++hubGenRef.current[hubKey];
 
-      // Track state changes via SignalR events
-      conn.onreconnecting(() => updateState(hubKey, ConnectionState.Reconnecting));
+      // Only the current connection may update state or run reconnect logic
+      conn.onreconnecting(() => {
+        if (ref.current === conn) updateState(hubKey, ConnectionState.Reconnecting);
+      });
       conn.onreconnected(() => {
+        if (ref.current !== conn) return;
         updateState(hubKey, ConnectionState.Connected);
 
         if (name === "chatHub") {
@@ -78,26 +86,44 @@ export function ConnectionProvider({ children }: { children: React.ReactNode }) 
           setSocialReconnectKey((k) => k + 1);
         }
       });
-      conn.onclose(() => updateState(hubKey, ConnectionState.Disconnected));
+      conn.onclose(() => {
+        if (ref.current === conn) updateState(hubKey, ConnectionState.Disconnected);
+      });
 
       updateState(hubKey, ConnectionState.Connecting);
 
       try {
         await conn.start();
-        updateState(hubKey, ConnectionState.Connected);
 
-        if (cancelledRef.current) {
+        if (cancelledRef.current || gen !== hubGenRef.current[hubKey]) {
           conn.stop().catch(() => {});
           return;
         }
 
+        updateState(hubKey, ConnectionState.Connected);
         ref.current = conn;
+
+        // Register handlers immediately after the handshake completes.
+        // The social hub pushes `social:all` from OnConnectedAsync, so waiting
+        // for a React state effect would let that push arrive with no handler
+        // registered (SignalR logs "No client method ... found" warnings).
+        if (name === "chatHub") {
+          chatService.setConnection(conn);
+        } else if (name === "gameHub") {
+          gameService.setConnection(conn);
+        } else if (name === "socialHub") {
+          notificationService.setConnection(conn);
+          friendService.setConnection(conn);
+        }
+
         stateSetter(conn);
       } catch (err) {
-        updateState(hubKey, ConnectionState.Disconnected);
+        if (gen === hubGenRef.current[hubKey]) {
+          updateState(hubKey, ConnectionState.Disconnected);
 
-        if (!cancelledRef.current && err instanceof Error && err.message.toLowerCase().includes("unauthorized")) {
-          window.location.replace("/login");
+          if (!cancelledRef.current && err instanceof Error && err.message.toLowerCase().includes("unauthorized")) {
+            window.location.replace("/login");
+          }
         }
       }
     };
@@ -108,6 +134,11 @@ export function ConnectionProvider({ children }: { children: React.ReactNode }) 
 
     return () => {
       cancelledRef.current = true;
+
+      chatService.disconnect();
+      gameService.disconnect();
+      friendService.disconnect();
+      notificationService.disconnect();
 
       // Deregister callbacks before stopping
       if (chatRef.current) {
@@ -151,6 +182,12 @@ export function ConnectionProvider({ children }: { children: React.ReactNode }) 
   const stopConnections = useCallback(async () => {
     cancelledRef.current = true;
     const conns = [chatRef.current, gameRef.current, socialRef.current];
+
+    chatService.disconnect();
+    gameService.disconnect();
+    friendService.disconnect();
+    notificationService.disconnect();
+
     chatRef.current = null;
     gameRef.current = null;
     socialRef.current = null;
@@ -166,23 +203,6 @@ export function ConnectionProvider({ children }: { children: React.ReactNode }) 
       social: ConnectionState.Disconnected,
     });
   }, []);
-
-  // ── Initialize services with connections ─────────────────────────────
-  useEffect(() => {
-    if (socialConnection) friendService.setConnection(socialConnection);
-  }, [socialConnection]);
-
-  useEffect(() => {
-    if (socialConnection) notificationService.setConnection(socialConnection);
-  }, [socialConnection]);
-
-  useEffect(() => {
-    if (chatConnection) chatService.setConnection(chatConnection);
-  }, [chatConnection]);
-
-  useEffect(() => {
-    if (gameConnection) gameService.setConnection(gameConnection);
-  }, [gameConnection]);
 
   // ── Derived booleans ──────────────────────────────────────────────────
   const value = useMemo<IConnectionContext>(() => {

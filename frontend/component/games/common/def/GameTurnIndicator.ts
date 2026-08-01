@@ -1,7 +1,7 @@
-interface GameTurnIndicatorProps {
+interface IGameTurnIndicatorProps {
   isMyTurn: boolean;
   currentTurnText: string;
   waitingText: string;
 }
 
-export type { GameTurnIndicatorProps };
+export type { IGameTurnIndicatorProps };

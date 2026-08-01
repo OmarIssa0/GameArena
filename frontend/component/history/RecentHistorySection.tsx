@@ -14,15 +14,17 @@ import type { RecentHistorySectionProps } from "./def/RecentHistorySection";
 import { MatchStatusEnum } from "@/domain/enum/MatchStatusEnum";
 import { MatchHistoryItem } from "./MatchHistoryItem";
 import type { LocaleEnum } from "@/domain/enum/LocaleEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 
 function RecentHistorySection({ title, viewAll, emptyTitle, emptyDescription, limit = 3 }: RecentHistorySectionProps) {
   const [locale] = useLocale() as [LocaleEnum, (l: LocaleEnum) => void];
   const historyT = useTranslation({ en, ar }) as THistoryTranslation;
   const { matches, summary, loading } = useMatchHistory(MatchStatusEnum.All, limit);
   const items = [
-    { label: historyT.summary.wins, value: summary.wins, icon: Trophy, iconColor: "success" as const },
-    { label: historyT.summary.losses, value: summary.losses, icon: Frown, iconColor: "danger" as const },
-    { label: historyT.summary.draws, value: summary.draws, icon: Handshake, iconColor: "primary" as const },
+    { label: historyT.summary.wins, value: summary.wins, icon: Trophy, iconColor: AccentColorEnum.Success },
+    { label: historyT.summary.losses, value: summary.losses, icon: Frown, iconColor: AccentColorEnum.Danger },
+    { label: historyT.summary.draws, value: summary.draws, icon: Handshake, iconColor: AccentColorEnum.Primary },
   ];
   return (
     <section>
@@ -32,7 +34,7 @@ function RecentHistorySection({ title, viewAll, emptyTitle, emptyDescription, li
           href="/history"
           className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary-hover transition-colors">
           {viewAll}
-          <GIcon icon={ArrowRight} size="xs" color="primary" className="rtl:-scale-x-100" />
+          <GIcon icon={ArrowRight} size={SizeEnum.xs} color={AccentColorEnum.Primary} className="rtl:-scale-x-100" />
         </Link>
       </div>
 
@@ -41,13 +43,17 @@ function RecentHistorySection({ title, viewAll, emptyTitle, emptyDescription, li
           <GSpinner />
         </div>
       ) : matches.length === 0 ? (
-        <GEmpty icon={<GIcon icon={History} size="xl" color="muted" className="opacity-50" />} title={emptyTitle} description={emptyDescription} />
+        <GEmpty
+          icon={<GIcon icon={History} size={SizeEnum.xl} color={AccentColorEnum.Muted} className="opacity-50" />}
+          title={emptyTitle}
+          description={emptyDescription}
+        />
       ) : (
         <div className="flex flex-col gap-4">
           <GList items={items} keyExtractor={(item) => item.label} listClassName="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" noPagination>
             {(item) => (
               <div className="flex items-center gap-3 p-3.5 bg-bg-card border border-border rounded-lg hover:border-border-light hover:bg-bg-card-hover transition-all duration-200">
-                <GIcon icon={item.icon} size="md" tile tileSize="md" tileGradient={`bg-${item.iconColor}`} tileColor="text" />
+                <GIcon icon={item.icon} size={SizeEnum.md} tile tileGradient={`bg-${item.iconColor}`} tileColor={AccentColorEnum.Text} />
                 <div>
                   <p className="text-xl font-extrabold leading-tight text-text">{item.value}</p>
                   <p className="text-xs font-medium text-text-secondary mt-0.5">{item.label}</p>

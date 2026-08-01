@@ -6,10 +6,8 @@ import type { TPromise } from "@/domain/type/TCommon";
 
 import type { IAuthService } from "../meta/IAuthService";
 import { authRepository } from "@/repositories/def/AuthRepository";
-import type { IAuthRepository } from "@/repositories/meta/IAuthRepository";
-
 class AuthService implements IAuthService {
-  constructor(private repo: IAuthRepository) {}
+  private repo = authRepository;
   login(data: ILoginRequest): TPromise<void> {
     return this.repo.login(data);
   }
@@ -31,6 +29,4 @@ class AuthService implements IAuthService {
   }
 }
 
-const authService = new AuthService(authRepository);
-
-export { authService };
+export const authService = new AuthService();

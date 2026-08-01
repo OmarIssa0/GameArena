@@ -11,7 +11,7 @@ const en = {
     searchFriends: "Search friends...",
     noFriendsFound: "No friends found",
     searchingTitle: "Searching for opponent...",
-    searchingSubtitle: "Checking GameArena servers",
+    searchingSubtitle: "Checking Arena 404 servers",
     cancelSearch: "Cancel Search",
     waitingForOpponent: "Waiting for opponent to accept invite or join...",
     cancelMatch: "Cancel Match",

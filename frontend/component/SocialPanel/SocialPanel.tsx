@@ -16,6 +16,7 @@ import { SocialDesktopExpanded } from "./SocialDesktopExpanded";
 import type { AsideConfig } from "@/component/aside/AsideTypes";
 import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import { AsidePlacementEnum } from "@/domain/enum/AsidePlacementEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
 
 function SocialBrand({ onlineCount }: { onlineCount: number }) {
   const t = useTranslation({ en, ar }) as TSocialPanelTranslation;
@@ -23,7 +24,7 @@ function SocialBrand({ onlineCount }: { onlineCount: number }) {
   return (
     <div className="min-w-0">
       <p className="font-bold text-text flex items-center gap-2">
-        <GIcon icon={Users} size="sm" color="inherit" className="shrink-0" />
+        <GIcon icon={Users} size={SizeEnum.sm} className="shrink-0" />
         <span className="truncate">{t.title}</span>
       </p>
       <p className="text-xs text-text-muted">
@@ -68,15 +69,7 @@ function SocialBody({
   }
 
   // ── Expanded full view (desktop expanded or mobile overlay) ────────────
-  return (
-    <SocialDesktopExpanded
-      friends={friends}
-      loading={loading}
-      gameInvites={gameInvites}
-      isCompact={isCompact}
-      closeMobile={closeMobile}
-    />
-  );
+  return <SocialDesktopExpanded friends={friends} loading={loading} gameInvites={gameInvites} isCompact={isCompact} closeMobile={closeMobile} />;
 }
 
 /**
@@ -93,7 +86,7 @@ function SocialPanel() {
 
   const collapsedIcon = (
     <span className="relative inline-flex">
-      <GIcon icon={Users} size="md" tile tileSize="md" />
+      <GIcon icon={Users} size={SizeEnum.md} tile />
       {gameInvites.length > 0 && <span className="absolute -top-1 -inset-e-1 w-2 h-2 rounded-full bg-primary ring-2 ring-bg-sidebar" />}
     </span>
   );

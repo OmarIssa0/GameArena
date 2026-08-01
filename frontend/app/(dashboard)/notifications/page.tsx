@@ -21,6 +21,10 @@ import { friendService } from "@/services/def/FriendService";
 import type { IFriendRequestReceived } from "@/domain/meta/IFriendRequestReceived";
 import { AlertTriangle } from "lucide-react";
 import { TNullable } from "@/domain/type/TCommon";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { TabsVariantEnum } from "@/domain/enum/TabsVariantEnum";
+import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
 
 type Tab = "all" | "gameInvites" | "friendRequests";
 
@@ -33,7 +37,7 @@ function timeAgo(d: Date, t: TNotificationsTranslation) {
   return t.time.daysAgo.replace("{n}", String(Math.floor(h / 24)));
 }
 
-const icons: Record<string, typeof Bell> = { FriendRequest: Users, FriendRequestAccepted: Users, GameInvite: Gamepad2, NewMessage: MessageSquare };
+const icons: Record<string, typeof Users> = { FriendRequest: Users, FriendRequestAccepted: Users, GameInvite: Gamepad2, NewMessage: MessageSquare };
 
 export default function NotificationsPage() {
   const t = useTranslation({ en, ar }) as TNotificationsTranslation;
@@ -57,17 +61,17 @@ export default function NotificationsPage() {
 
   const tabs = useMemo<GTabItem<Tab>[]>(
     () => [
-      { id: "all", label: t.tabs.all, icon: <GIcon icon={Bell} size="sm" color="inherit" />, badge: unreadCount || undefined },
+      { id: "all", label: t.tabs.all, icon: <GIcon icon={Bell} size={SizeEnum.sm} />, badge: unreadCount || undefined },
       {
         id: "gameInvites",
         label: t.tabs.gameInvites,
-        icon: <GIcon icon={Gamepad2} size="sm" color="inherit" />,
+        icon: <GIcon icon={Gamepad2} size={SizeEnum.sm} />,
         badge: gameInvites.length || undefined,
       },
       {
         id: "friendRequests",
         label: t.tabs.friendRequests,
-        icon: <GIcon icon={Users} size="sm" color="inherit" />,
+        icon: <GIcon icon={Users} size={SizeEnum.sm} />,
         badge: requests.length || undefined,
       },
     ],
@@ -124,37 +128,48 @@ export default function NotificationsPage() {
   }, [all, tab]);
 
   return (
-    <GPage width="lg">
+    <GPage size={SizeEnum.lg}>
       <PageHeader icon={Bell} title={t.title} subtitle={t.subtitle} />
       {tab === "all" && unreadCount > 0 && (
         <div className="flex justify-end flex-wrap -mt-3 mb-3">
-          <GButton size="md" variant="ghost" onClick={() => notificationService.markAllNotificationsRead()}>
+          <GButton size={SizeEnum.md} variant={AccentColorEnum.Muted} onClick={() => notificationService.markAllNotificationsRead()}>
             <CheckCheck size={16} />
             <span className="ms-1">{t.markAllRead}</span>
           </GButton>
         </div>
       )}
-      <GCard padding="sm">
-        <GTabs tabs={tabs} value={tab} onChange={setTab} variant="pills" fullWidth className="mb-2" />
+      <GCard padding={SizeEnum.sm}>
+        <GTabs tabs={tabs} value={tab} onChange={setTab} variant={TabsVariantEnum.Pills} fullWidth className="mb-2" />
         {error && tab === "friendRequests" ? (
-          <GEmpty icon={<GIcon icon={AlertTriangle} size="xl" color="danger" />} title="Unable to load requests" description={error} />
+          <GEmpty
+            icon={<GIcon icon={AlertTriangle} size={SizeEnum.xl} color={AccentColorEnum.Danger} />}
+            title="Unable to load requests"
+            description={error}
+          />
         ) : loading && tab === "friendRequests" ? (
-          <GSpinner className="mx-auto py-16" />
+          <GSpinner size={SizeEnum.md} className="mx-auto py-16" />
         ) : filtered.length === 0 ? (
-          <GEmpty icon={<GIcon icon={Bell} size="xl" color="muted" />} title={t.empty.title} description={t.empty.description} />
+          <GEmpty
+            icon={<GIcon icon={Bell} size={SizeEnum.xl} color={AccentColorEnum.Muted} />}
+            title={t.empty.title}
+            description={t.empty.description}
+          />
         ) : (
           <GList
             items={filtered}
             keyExtractor={(n) => n.id}
             emptyMessage={t.empty.title}
             emptyDescription={t.empty.description}
-            emptyIcon={<GIcon icon={Bell} size="xl" color="muted" />}>
+            emptyIcon={<GIcon icon={Bell} size={SizeEnum.xl} color={AccentColorEnum.Muted} />}>
             {(n) => (
-              <GCard variant={n.read ? "default" : "interactive"} padding="md" className={n.read ? "opacity-60" : ""}>
+              <GCard
+                variant={n.read ? CardVariantEnum.Default : CardVariantEnum.Interactive}
+                padding={SizeEnum.md}
+                className={n.read ? "opacity-60" : ""}>
                 <div className="flex items-start gap-3">
                   <div
                     className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${n.read ? "bg-surface" : "bg-primary-muted"}`}>
-                    <GIcon icon={icons[n.type] ?? Bell} size="md" color={n.read ? "muted" : "primary"} />
+                    <GIcon icon={icons[n.type] ?? Bell} size={SizeEnum.md} color={n.read ? AccentColorEnum.Muted : AccentColorEnum.Primary} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
@@ -166,19 +181,22 @@ export default function NotificationsPage() {
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     {n.onAction && (
-                      <GButton size="md" variant={n.type === "GameInvite" || n.type === "FriendRequest" ? "primary" : "ghost"} onClick={n.onAction}>
+                      <GButton
+                        size={SizeEnum.md}
+                        variant={n.type === "GameInvite" || n.type === "FriendRequest" ? AccentColorEnum.Primary : AccentColorEnum.Muted}
+                        onClick={n.onAction}>
                         {n.type === "FriendRequest" || n.type === "GameInvite" ? <Check size={16} /> : <CheckCheck size={16} />}
                       </GButton>
                     )}
                     {n.onDismiss && (
-                      <GButton size="md" variant="ghost" onClick={n.onDismiss}>
+                      <GButton size={SizeEnum.md} variant={AccentColorEnum.Muted} onClick={n.onDismiss}>
                         <X size={16} />
                       </GButton>
                     )}
                     {!n.onAction && !n.onDismiss && n.read && (
                       <GButton
-                        size="md"
-                        variant="ghost"
+                        size={SizeEnum.md}
+                        variant={AccentColorEnum.Muted}
                         onClick={() => notificationService.deleteNotification(n.id)}
                         className="text-text-muted hover:text-danger">
                         <Trash2 size={16} />

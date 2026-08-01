@@ -1,7 +1,6 @@
 import type { TNullable, TPromise } from "@/domain/type/TCommon";
 import type { IGameState } from "@/app/providers/def/IGameState";
 import type { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
-import type { IGameAction } from "@/domain/meta/IGameAction";
 
 export interface IGameRepository {
   getCurrentState(): TPromise<TNullable<IGameState>>;
@@ -13,7 +12,7 @@ export interface IGameRepository {
   requestPlayAgain(): TPromise<void>;
   respondPlayAgain(accept: boolean): TPromise<void>;
   cancelSearch(): TPromise<void>;
-  sendAction(action: IGameAction): TPromise<void>;
+  sendAction(action: object): TPromise<void>;
   acceptInvite(roomId: string): TPromise<void>;
   createLobby(gameKind: GamesKindEnum): TPromise<void>;
 }

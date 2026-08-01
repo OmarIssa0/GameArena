@@ -1,4 +1,5 @@
 const en = {
+  brand: "Arena 404",
   welcomeBack: "Welcome Back",
   signInDesc: "Sign in to continue your gaming journey",
   bySigningIn: "By signing in, you agree to our",

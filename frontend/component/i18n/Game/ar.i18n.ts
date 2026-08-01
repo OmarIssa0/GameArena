@@ -17,7 +17,7 @@ const ar = {
     findMatch: "ابحث عن مباراة",
     connecting: "الاتصال بخادم اللعبة...",
     searchingTitle: "البحث عن خصم...",
-    searchingSubtitle: "التحقق من خوادم GameArena",
+    searchingSubtitle: "التحقق من خوادم أرينا 404",
     cancelSearch: "إلغاء البحث",
     quick: "سريع",
     invite: "دعوة",

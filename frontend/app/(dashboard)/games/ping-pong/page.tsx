@@ -7,55 +7,50 @@ import { useGame } from "@/app/providers/GameProvider";
 import { GameLayoutWrapper } from "@/component/games/GameLayoutWrapper";
 import { GCard } from "@/component/common/GCard";
 import { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
 import type { IPingPongGameState } from "@/app/providers/def/IGameState";
-import type { TNullable } from "@/domain/type/TCommon";
+import { PING_PONG_GAME_CONFIG, PING_PONG_KEYS, PING_PONG_MOVEMENT_ACTIONS } from "@/domain/constant/ping-pong";
 
-const ACTION_MOVE_PADDLE = "MOVE_PADDLE";
-const DIRECTION_UP = "UP";
-const DIRECTION_DOWN = "DOWN";
-const PADDLE_KEYS = new Set(["ArrowUp", "ArrowDown", "w", "W", "s", "S"]);
-
-// Logical board dimensions (backend coordinates)
-const LOGICAL_W = 600;
-const LOGICAL_H = 400;
-const PADDLE_W_LOGICAL = 10;
-const PADDLE_H_LOGICAL = 80;
-const BALL_SIZE_LOGICAL = 10;
+const {
+  boardWidthPx: LOGICAL_W,
+  boardHeightPx: LOGICAL_H,
+  paddleWidthPx: PADDLE_W_LOGICAL,
+  paddleHeightPx: PADDLE_H_LOGICAL,
+  ballSizePx: BALL_SIZE_LOGICAL,
+} = PING_PONG_GAME_CONFIG;
 
 function PingPongPage() {
   const { state, sendAction } = useGame();
   const { user } = useAuth();
 
   const keysDown = useRef<Set<string>>(new Set());
-  const rafId = useRef<TNullable<number>>(null);
+  const rafId = useRef<number | null>(null);
+  const lastMouseDirectionRef = useRef<"UP" | "DOWN" | null>(null);
+  const rafMouseSendRef = useRef<number | null>(null);
+
+  const boardRef = useRef<HTMLDivElement | null>(null);
+  const [boardRect, setBoardRect] = useState<DOMRectReadOnly | null>(null);
 
   const stateRef = useRef(state);
   const userRef = useRef(user);
   const sendActionRef = useRef(sendAction);
 
-  const lastMouseDirectionRef = useRef<TNullable<"UP" | "DOWN">>(null);
-  const rafMouseSendRef = useRef<TNullable<number>>(null);
-  const lastMouseSendAtRef = useRef<number>(0);
-
-  const boardRef = useRef<TNullable<HTMLDivElement>>(null);
-  const [boardRect, setBoardRect] = useState<TNullable<DOMRectReadOnly>>(null);
-
   useEffect(() => {
     stateRef.current = state;
-  });
+  }, [state]);
+
   useEffect(() => {
     userRef.current = user;
-  });
+  }, [user]);
+
   useEffect(() => {
     sendActionRef.current = sendAction;
-  });
+  }, [sendAction]);
 
   // Keyboard input
   useEffect(() => {
-    const isPaddleKey = (key: string): boolean => PADDLE_KEYS.has(key);
-
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isPaddleKey(e.key)) {
+      if (PING_PONG_KEYS.ALL.has(e.key)) {
         e.preventDefault();
         keysDown.current.add(e.key);
       }
@@ -75,22 +70,20 @@ function PingPongPage() {
       }
 
       if (!currentState.isFinished && keysDown.current.size > 0) {
-        const send = sendActionRef.current;
-        const hasUpKey = ["ArrowUp", "w", "W"].some((key) => keysDown.current.has(key));
-        const hasDownKey = ["ArrowDown", "s", "S"].some((key) => keysDown.current.has(key));
+        const hasUpKey = PING_PONG_KEYS.UP.intersection(keysDown.current).size > 0;
+        const hasDownKey = PING_PONG_KEYS.DOWN.intersection(keysDown.current).size > 0;
 
-        if (hasUpKey) {
-          send({ type: ACTION_MOVE_PADDLE, direction: DIRECTION_UP });
-        } else if (hasDownKey) {
-          send({ type: ACTION_MOVE_PADDLE, direction: DIRECTION_DOWN });
+        if (hasUpKey && !hasDownKey) {
+          sendActionRef.current({ type: PING_PONG_MOVEMENT_ACTIONS.MOVE_PADDLE, direction: PING_PONG_MOVEMENT_ACTIONS.DIRECTION_UP });
+        } else if (hasDownKey && !hasUpKey) {
+          sendActionRef.current({ type: PING_PONG_MOVEMENT_ACTIONS.MOVE_PADDLE, direction: PING_PONG_MOVEMENT_ACTIONS.DIRECTION_DOWN });
         }
       }
 
       rafId.current = requestAnimationFrame(tick);
     };
 
-    const currentKeysDown = keysDown.current;
-
+    const keysDownCopy = keysDown.current;
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
     rafId.current = requestAnimationFrame(tick);
@@ -98,7 +91,7 @@ function PingPongPage() {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
-      currentKeysDown.clear();
+      keysDownCopy.clear();
       if (rafId.current !== null) {
         cancelAnimationFrame(rafId.current);
       }
@@ -139,23 +132,15 @@ function PingPongPage() {
       const isPlayer1 = ppState.player1Id === currentUser.id;
       const paddleYBackend = isPlayer1 ? ppState.player1PaddleY : ppState.player2PaddleY;
 
-      // Convert rendered Y -> backend Y (0..LOGICAL_H)
       const pointerBackendY = (clampedY / rect.height) * LOGICAL_H;
+      const dir: "UP" | "DOWN" = pointerBackendY < paddleYBackend ? PING_PONG_MOVEMENT_ACTIONS.DIRECTION_UP : PING_PONG_MOVEMENT_ACTIONS.DIRECTION_DOWN;
 
-      const dir: "UP" | "DOWN" = pointerBackendY < paddleYBackend ? DIRECTION_UP : DIRECTION_DOWN;
-
-      const now = performance.now();
-      const shouldSend = now - lastMouseSendAtRef.current >= 16;
-
-      if (!shouldSend) return;
       lastMouseDirectionRef.current = dir;
-      lastMouseSendAtRef.current = now;
 
       if (rafMouseSendRef.current != null) return;
       rafMouseSendRef.current = requestAnimationFrame(() => {
         rafMouseSendRef.current = null;
-        const send = sendActionRef.current;
-        send({ type: ACTION_MOVE_PADDLE, direction: dir });
+        sendActionRef.current({ type: PING_PONG_MOVEMENT_ACTIONS.MOVE_PADDLE, direction: dir });
       });
     };
 
@@ -174,16 +159,13 @@ function PingPongPage() {
   const pongState = state as IPingPongGameState;
   const { ballPosition, player1PaddleY, player2PaddleY, player1Score, player2Score, isFinished } = pongState;
 
-  // Calculate scale factors based on actual board rect
   const scaleX = boardRect ? boardRect.width / LOGICAL_W : 1;
   const scaleY = boardRect ? boardRect.height / LOGICAL_H : 1;
 
-  // Paddle dimensions in rendered pixels
   const paddleW = PADDLE_W_LOGICAL * scaleX;
   const paddleH = PADDLE_H_LOGICAL * scaleY;
   const ballSize = BALL_SIZE_LOGICAL * Math.min(scaleX, scaleY);
 
-  // Backend coords are top-left aligned for paddles, center for ball
   const rawBallLeft = ballPosition.x * scaleX;
   const rawBallTop = ballPosition.y * scaleY;
 
@@ -195,7 +177,7 @@ function PingPongPage() {
 
   return (
     <GameLayoutWrapper gameType={GamesKindEnum.PingPong}>
-      <GCard padding="md" rounded="3xl">
+      <GCard padding={SizeEnum.md} rounded={SizeEnum.lg}>
         <div className="flex justify-center gap-8 mb-4">
           <div className="text-center">
             <div className="text-3xl font-bold text-accent">{player1Score}</div>

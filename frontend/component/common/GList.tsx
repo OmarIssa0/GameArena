@@ -1,27 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import type { ReactNode } from "react";
 import clsx from "clsx";
 import { ChevronLeft, ChevronRight, List } from "lucide-react";
-
-import { useAuth } from "@/app/providers/AuthProvider";
 
 import { GEmpty } from "./GEmpty";
 import { GIcon } from "./GIcon";
 import { GButton } from "./GButton";
-
-interface GListProps<T> {
-  items: T[];
-  children: (item: T, index: number) => ReactNode;
-  keyExtractor: (item: T, index: number) => string;
-  noPagination?: boolean;
-  emptyMessage?: string;
-  emptyDescription?: string;
-  emptyIcon?: ReactNode;
-  className?: string;
-  listClassName?: string;
-}
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import type { IGListProps, IGListPaginationProps } from "./def/GList";
 
 function GList<T>({
   items,
@@ -33,12 +21,10 @@ function GList<T>({
   emptyIcon,
   className,
   listClassName,
-}: GListProps<T>) {
-  // getgetPreferences api
-  const { user } = useAuth();
-  const [page, setPage] = useState(0);
-
-  const pageSize = JSON.parse(user?.preferences ?? "{}").pageSize;
+  pageSize = 10,
+  defaultPage = 0,
+}: IGListProps<T> & IGListPaginationProps) {
+  const [page, setPage] = useState(defaultPage);
 
   const totalPages = Math.ceil(items.length / pageSize);
 
@@ -51,7 +37,7 @@ function GList<T>({
   if (items.length === 0) {
     return (
       <GEmpty
-        icon={emptyIcon ?? <GIcon icon={List} size="xl" color="muted" />}
+        icon={emptyIcon ?? <GIcon icon={List} size={SizeEnum.xl} color={AccentColorEnum.Muted} />}
         title={emptyMessage ?? "No items"}
         description={emptyDescription ?? ""}
       />
@@ -70,20 +56,20 @@ function GList<T>({
       {!noPagination && (
         <div className="flex items-center justify-center gap-1 border-t border-border pt-3">
           <GButton
-            variant="ghost"
-            size="icon"
+            variant={AccentColorEnum.Muted}
+            size={SizeEnum.icon}
             onClick={() => setPage((page) => Math.max(0, page - 1))}
             disabled={currentPage === 0}
             aria-label="Previous page">
-            <GIcon icon={ChevronLeft} size="sm" color="secondary" />
+            <GIcon icon={ChevronLeft} size={SizeEnum.sm} color={AccentColorEnum.Secondary} />
           </GButton>
 
           {Array.from({ length: totalPages }, (_, index) => (
             <GButton
               key={index}
-              variant={currentPage === index ? "primary" : "ghost"}
+              variant={currentPage === index ? AccentColorEnum.Primary : AccentColorEnum.Muted}
               disabled={currentPage === index}
-              size="icon"
+              size={SizeEnum.icon}
               onClick={() => setPage(index)}
               aria-current={currentPage === index ? "page" : undefined}>
               {index + 1}
@@ -91,12 +77,12 @@ function GList<T>({
           ))}
 
           <GButton
-            variant="ghost"
-            size="icon"
+            variant={AccentColorEnum.Muted}
+            size={SizeEnum.icon}
             onClick={() => setPage((page) => Math.min(totalPages - 1, page + 1))}
             disabled={currentPage === totalPages - 1}
             aria-label="Next page">
-            <GIcon icon={ChevronRight} size="sm" color="secondary" />
+            <GIcon icon={ChevronRight} size={SizeEnum.sm} color={AccentColorEnum.Secondary} />
           </GButton>
         </div>
       )}

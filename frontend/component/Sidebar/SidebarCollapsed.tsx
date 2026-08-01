@@ -15,6 +15,9 @@ import { GIcon } from "@/component/common/GIcon";
 import { GButton } from "@/component/common/GButton";
 import { GAvatar } from "@/component/common/GAvatar";
 import { LangTheme } from "@/component/LangTheme";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { AvatarShapeEnum } from "@/domain/enum/AvatarShapeEnum";
 
 export function SidebarCollapsed({ closeMobile }: { closeMobile?: () => void }) {
   const router = useRouter();
@@ -67,7 +70,7 @@ export function SidebarCollapsed({ closeMobile }: { closeMobile?: () => void }) 
               aria-label={t[id as keyof TSidebarTranslation] ?? id}
               title={t[id as keyof TSidebarTranslation] ?? id}
               aria-current={isActive ? "page" : undefined}>
-              <GIcon icon={Icon} size="md" color="inherit" />
+              <GIcon icon={Icon} size={SizeEnum.md} />
               {badgeCount > 0 && <span className="absolute top-1.5 inset-x-0 mx-auto w-2 h-2 rounded-full bg-primary ring-2 ring-bg-sidebar" />}
             </button>
           );
@@ -84,12 +87,18 @@ export function SidebarCollapsed({ closeMobile }: { closeMobile?: () => void }) 
             className="relative flex items-center justify-center w-11 h-11 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
             aria-label={t.settings}
             title={t.settings}>
-            <GAvatar firstName={user.firstName} lastName={user.lastName} status={user.status} size="sm" shape="circle" />
+            <GAvatar firstName={user.firstName} lastName={user.lastName} status={user.status} size={SizeEnum.sm} shape={AvatarShapeEnum.Circle} />
           </button>
         )}
 
-        <GButton onClick={handleLogout} variant="ghost" size="icon" title={t.logout} aria-label={t.logout} className="w-11 h-11">
-          <GIcon icon={LogOut} size="md" color="inherit" />
+        <GButton
+          onClick={handleLogout}
+          variant={AccentColorEnum.Muted}
+          size={SizeEnum.icon}
+          title={t.logout}
+          aria-label={t.logout}
+          className="w-11 h-11">
+          <GIcon icon={LogOut} size={SizeEnum.md} />
         </GButton>
       </div>
     </div>

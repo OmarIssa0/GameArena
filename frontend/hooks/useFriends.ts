@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { friendService } from "@/services/def/FriendService";
 import { useFriendList } from "./useFriendList";
 import { useFriendRequests } from "./useFriendRequests";

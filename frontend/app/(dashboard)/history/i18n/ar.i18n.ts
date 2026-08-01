@@ -31,7 +31,6 @@ const ar = {
     [GamesKindEnum.Snake]: "الثعبان",
     [GamesKindEnum.TicTacToe]: "إكس أو",
     [GamesKindEnum.PingPong]: "بينغ بونغ",
-    [GamesKindEnum.None]: "غير معروف",
   },
   empty: {
     title: "لا توجد مباريات بعد",

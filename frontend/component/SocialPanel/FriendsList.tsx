@@ -12,6 +12,10 @@ import { GCard } from "../common/GCard";
 import { GList } from "../common/GList";
 import type { IFriendsListProps } from "./def/FriendsList";
 import type { IUserSummary } from "@/domain/meta/IUserSummary";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
+import { AvatarShapeEnum } from "@/domain/enum/AvatarShapeEnum";
 
 export function FriendsList({ friends, query, unreadCounts, actions, noPagination = false }: IFriendsListProps) {
   const router = useRouter();
@@ -47,13 +51,13 @@ export function FriendsList({ friends, query, unreadCounts, actions, noPaginatio
       items={friends}
       keyExtractor={(friend) => friend.id}
       noPagination={noPagination}
-      emptyIcon={<GIcon icon={UsersRound} size="xl" color="muted" />}>
+      emptyIcon={<GIcon icon={UsersRound} size={SizeEnum.xl} color={AccentColorEnum.Muted} />}>
       {(friend) => (
         <GCard
           key={friend.id}
-          padding="sm"
-          variant="outlined"
-          rounded="xl"
+           padding={SizeEnum.sm}
+           variant={CardVariantEnum.Outlined}
+           rounded={SizeEnum.xl}
           onClick={() => {
             if (!actions) router.push(`/messages?friend=${friend.id}`);
           }}
@@ -70,7 +74,7 @@ export function FriendsList({ friends, query, unreadCounts, actions, noPaginatio
             !actions && "cursor-pointer transition hover:bg-bg-card-hover focus-visible:ring-2 focus-visible:ring-primary",
           )}>
           <div className="relative shrink-0">
-            <GAvatar firstName={friend.firstName} lastName={friend.lastName} status={friend.status} size="sm" shape="circle" />
+            <GAvatar firstName={friend.firstName} lastName={friend.lastName} status={friend.status} size={SizeEnum.sm} shape={AvatarShapeEnum.Circle} />
           </div>
 
           <div className="min-w-0 flex-1">
@@ -81,14 +85,14 @@ export function FriendsList({ friends, query, unreadCounts, actions, noPaginatio
               {friend.status === UserStatusEnum.InGame && (
                 <>
                   <span>•</span>
-                  <GIcon icon={Gamepad2} size="xs" color="primary" />
+                  <GIcon icon={Gamepad2} size={SizeEnum.xs} color={AccentColorEnum.Primary} />
                 </>
               )}
             </div>
           </div>
 
           {unreadCounts?.[friend.id] != null && unreadCounts[friend.id] > 0 && (
-            <GBadge variant="danger" size="sm" className="shrink-0 min-w-5 justify-center">
+            <GBadge variant={AccentColorEnum.Danger} size={SizeEnum.sm} className="shrink-0 min-w-5 justify-center">
               {unreadCounts[friend.id]}
             </GBadge>
           )}

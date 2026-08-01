@@ -1,6 +1,10 @@
 import { PasswordValidationEnum } from "@/domain/enum/PasswordValidationEnum";
 
 const ar = {
+  required: "مطلوب",
+  password: "كلمة المرور",
+  confirmPassword: "تأكيد كلمة المرور",
+  email: "البريد الإلكتروني",
   dynamicFieldRequired: (field: string) => `حقل ${field} مطلوب`,
   invalidEmail: "عنوان البريد الإلكتروني غير صالح",
   invalidConfirmPassword: "كلمات المرور غير متطابقة",

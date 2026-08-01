@@ -3,25 +3,24 @@ import { MatchStatusEnum } from "@/domain/enum/MatchStatusEnum";
 import { GBadge } from "@/component/common/GBadge";
 import { GCard } from "@/component/common/GCard";
 import { GIcon } from "@/component/common/GIcon";
-import { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
 import type { MatchHistoryItemProps } from "./def/MatchHistoryItem";
-import { Gamepad2 } from "lucide-react";
 
 export function MatchHistoryItem({ match, locale, winLabel, lossLabel, drawLabel, versusLabel, gameLabel }: MatchHistoryItemProps) {
-  const game = match.kind != GamesKindEnum.None ? GamesList[match.kind] : undefined;
+  const game = GamesList[match.kind];
   const isWin = match.result === MatchStatusEnum.Win;
   const isLoss = match.result === MatchStatusEnum.Lost;
-  const badgeVariant = isWin ? "success" : isLoss ? "danger" : "warning";
+  const badgeVariant = isWin ? AccentColorEnum.Success : isLoss ? AccentColorEnum.Danger : AccentColorEnum.Warning;
   const resultLabel = isWin ? winLabel : isLoss ? lossLabel : drawLabel;
 
   return (
-    <GCard padding="sm" className="flex items-center gap-4">
-      <GIcon icon={game?.icon ?? Gamepad2} size="md" tile tileSize="md" tileGradient={game?.gradient} />
+    <GCard padding={SizeEnum.sm} className="flex items-center gap-4">
+      <GIcon icon={game.icon} size={SizeEnum.md} tile tileGradient={game.gradient} />
       <div className="min-w-0 flex-1">
         <div className="mb-2 flex items-center gap-2">
           <h3 className="truncate text-sm font-bold text-text sm:text-base">{gameLabel}</h3>
-          <GBadge variant={badgeVariant} size="sm" className="shrink-0">
-            {" "}
+          <GBadge variant={badgeVariant} size={SizeEnum.sm} className="shrink-0">
             {resultLabel}
           </GBadge>
         </div>

@@ -1,24 +1,21 @@
 import { matchHistoryRepository } from "@/repositories/def/MatchHistoryRepository";
+import { withFullName } from "@/domain/lib/userUtils";
 import type { IMatchHistoryService } from "../meta/IMatchHistoryService";
-import type { IMatchHistoryRepository } from "@/repositories/meta/IMatchHistoryRepository";
 import type { IMatchHistory } from "@/domain/meta/IMatchHistory";
 import type { TPromise } from "@/domain/type/TCommon";
 
 class MatchHistoryService implements IMatchHistoryService {
-  constructor(private repository: IMatchHistoryRepository) {}
+  private repository = matchHistoryRepository;
   async getMatchHistory(): TPromise<IMatchHistory[]> {
     const result = await this.repository.getMatchHistory();
-    result.data?.forEach((match) => {
-      match.completedAt = new Date(match.completedAt);
-      match.opponent = {
-        ...match.opponent,
-        fullName: (match.opponent.firstName || "") + " " + (match.opponent.lastName || ""),
-      };
-    });
+    if (result.data) {
+      result.data.forEach((match) => {
+        match.completedAt = new Date(match.completedAt);
+        match.opponent = withFullName(match.opponent);
+      });
+    }
     return result;
   }
 }
 
-const matchHistoryService = new MatchHistoryService(matchHistoryRepository);
-
-export { matchHistoryService };
+export const matchHistoryService = new MatchHistoryService();

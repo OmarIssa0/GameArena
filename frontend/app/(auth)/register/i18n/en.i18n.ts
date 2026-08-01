@@ -9,6 +9,7 @@ const en = {
   userName: "Username",
   email: "Email",
   password: "Password",
+  confirmPassword: "Confirm Password",
   createElipses: "Creating account...",
   create: "Create account",
   haveAccount: "Already have an account?",

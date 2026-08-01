@@ -1,3 +1,4 @@
+import type { HubConnection } from "@microsoft/signalr";
 import type { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
 import type { IGameInvite } from "@/domain/meta/INotification";
 import type { IGameState } from "@/app/providers/def/IGameState";
@@ -30,7 +31,7 @@ interface IGameService {
   // Connection management
   handleReconnect(): void;
   onReconnect(handler: () => void): () => void;
-  setConnection(connection: unknown): void;
+   setConnection(connection: HubConnection): void;
 }
 
 export type { IGameService };

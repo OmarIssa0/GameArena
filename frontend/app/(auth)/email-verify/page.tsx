@@ -14,6 +14,7 @@ import { emailValidator } from "@/lib/utils";
 import { en as EnTextField, type GTextFieldTranslation } from "@/component/i18n/GTextField/en.i18n";
 import { ar as ArTextField } from "@/component/i18n/GTextField/ar.i18n";
 import { useTranslation } from "@/hooks/useSetting";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
 
 const en = {
   title: "Verify Email",
@@ -74,7 +75,7 @@ function EmailVerifyPage() {
   const backToLogin = (
     <div className="pt-2 text-center">
       <Link href="/login" className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors">
-        <GIcon icon={ArrowLeft} size="sm" color="inherit" className="rtl:-scale-x-100" />
+        <GIcon icon={ArrowLeft} size={SizeEnum.sm} flip />
         {t.backToLogin}
       </Link>
     </div>

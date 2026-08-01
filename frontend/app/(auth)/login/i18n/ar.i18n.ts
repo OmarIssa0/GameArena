@@ -15,6 +15,7 @@ const ar = {
   loadingElipse: "جار التحميل...",
   createAccount: "إنشاء حساب",
   verifyEmail: "تأكيد البريد الإلكتروني",
+  unknownError: "حدث خطأ غير معروف",
   loginDescription: "مرحبًا بعودتك. يرجى تسجيل الدخول للمتابعة.",
   switchLanguage: (lang: string) =>
     `التبديل إلى ${lang === "en" ? "العربية" : "الإنجليزية"}`,

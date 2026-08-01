@@ -1,16 +1,8 @@
 import { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
-import type { PlayerColors } from "@/component/games/common/def/PlayerCard";
+import type { IGameInfo } from "./def/GameInfo";
+import type { GameTranslations } from "@/component/i18n/Game/en.i18n";
 
-interface GameInfo {
-  name: string;
-  description: string;
-  symbol1: string;
-  symbol2: string;
-  player1Colors: PlayerColors;
-  player2Colors: PlayerColors;
-}
-
-const gameConfigs: Partial<Record<GamesKindEnum, GameInfo>> = {
+const gameConfigs: Partial<Record<GamesKindEnum, IGameInfo>> = {
   [GamesKindEnum.TicTacToe]: {
     name: "tictactoe.name",
     description: "tictactoe.description",
@@ -61,10 +53,16 @@ const gameConfigs: Partial<Record<GamesKindEnum, GameInfo>> = {
   },
 };
 
-function getGameConfig(gameType: GamesKindEnum): GameInfo {
+function getGameConfig(gameType: GamesKindEnum): IGameInfo {
   const config = gameConfigs[gameType];
   if (!config) throw new Error(`No game config found for game type: ${gameType}`);
   return config;
 }
 
-export { getGameConfig, type GameInfo };
+function translateGameInfo(t: GameTranslations, gameType: GamesKindEnum): { name: string; description: string } {
+  const info = getGameConfig(gameType);
+  const lookup = (key: string): string => (t as unknown as Record<string, unknown>)[key] as string;
+  return { name: lookup(info.name), description: lookup(info.description) };
+}
+
+export { getGameConfig, translateGameInfo, type IGameInfo };

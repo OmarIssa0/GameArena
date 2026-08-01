@@ -16,10 +16,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "GameArena",
-  description: "Game platform",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { locale } = await getSettingFromCookie();
+  return {
+    title: locale === "ar" ? "أرينا 404" : "Arena 404",
+    description: "Game platform",
+  };
+}
 
 export default async function RootLayout({
   children,
@@ -32,6 +35,7 @@ export default async function RootLayout({
       lang={locale}
       dir={locale === "ar" ? "rtl" : "ltr"}
       data-theme={theme}
+      data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} antialiased h-full`}
     >
       <head>

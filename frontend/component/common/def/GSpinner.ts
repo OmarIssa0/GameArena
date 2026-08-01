@@ -1,4 +1,6 @@
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+
 export interface GSpinnerProps {
-  size?: "sm" | "md" | "lg";
+  size?: SizeEnum;
   className?: string;
 }

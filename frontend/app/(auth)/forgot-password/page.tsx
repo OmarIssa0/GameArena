@@ -16,6 +16,8 @@ import { useTranslation } from "@/hooks/useSetting";
 import { emailValidator } from "@/lib/utils";
 import { authService } from "@/services/def/AuthService";
 import type { GTextFieldTranslation } from "@/component/i18n/GTextField/en.i18n";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 
 function ForgotPasswordPage() {
   const router = useRouter();
@@ -59,7 +61,7 @@ function ForgotPasswordPage() {
     <AuthLayout>
       <div className="w-full max-w-md mx-auto">
         <div className="flex items-center gap-3 mb-8">
-          <GIcon icon={KeyRound} size="xl" tile tileSize="xl" tileGradient="bg-primary" tileColor="on-primary" />
+          <GIcon icon={KeyRound} size={SizeEnum.xl} tile tileColor={AccentColorEnum.OnPrimary} />
           <div className="min-w-0">
             <h1 className="text-xl sm:text-2xl font-bold text-text tracking-tight">{t.forgotPassword}</h1>
             <p className="text-sm text-text-muted mt-0.5">{t.description}</p>
@@ -86,7 +88,7 @@ function ForgotPasswordPage() {
           </GButton>
           <div className="pt-2 text-center">
             <Link href="/login" className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors">
-              <GIcon icon={ArrowLeft} size="sm" color="inherit" className="rtl:-scale-x-100" />
+              <GIcon icon={ArrowLeft} size={SizeEnum.sm} flip />
               {t.backToLogin}
             </Link>
           </div>

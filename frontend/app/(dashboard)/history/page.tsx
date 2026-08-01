@@ -20,6 +20,9 @@ import { MatchStatusEnum } from "@/domain/enum/MatchStatusEnum";
 import { ar } from "./i18n/ar.i18n";
 import { en, type THistoryTranslation } from "./i18n/en.i18n";
 import type { GTabItem } from "@/component/common/def/GTabs";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { TabsVariantEnum } from "@/domain/enum/TabsVariantEnum";
 
 export default function MatchHistoryPage() {
   const [locale] = useLocale();
@@ -37,34 +40,38 @@ export default function MatchHistoryPage() {
   );
 
   return (
-    <GPage width="lg">
+    <GPage size={SizeEnum.lg}>
       <PageHeader
         icon={History}
         title={t.title}
         subtitle={t.subtitle}
         badge={
           <GBadge>
-            <GIcon icon={History} size="xs" color="primary" />
+            <GIcon icon={History} size={SizeEnum.xs} color={AccentColorEnum.Primary} />
             {t.badge}
           </GBadge>
         }
       />
-      <GCard padding="sm">
-        <GTabs tabs={tabs} value={filter} onChange={setFilter} variant="pills" fullWidth className="mb-4" />
+      <GCard padding={SizeEnum.sm}>
+        <GTabs tabs={tabs} value={filter} onChange={setFilter} variant={TabsVariantEnum.Pills} fullWidth className="mb-4" />
 
         {loading && (
           <div className="flex justify-center py-16">
-            <GSpinner size="lg" />
+            <GSpinner size={SizeEnum.lg} />
           </div>
         )}
 
         {!loading && error && (
-          <GEmpty icon={<GIcon icon={AlertTriangle} size="xl" color="danger" />} title="Unable to load history" description={error} />
+          <GEmpty
+            icon={<GIcon icon={AlertTriangle} size={SizeEnum.xl} color={AccentColorEnum.Danger} />}
+            title="Unable to load history"
+            description={error}
+          />
         )}
 
         {!loading && !error && matches.length === 0 && (
           <GEmpty
-            icon={<GIcon icon={History} size="xl" color="muted" />}
+            icon={<GIcon icon={History} size={SizeEnum.xl} color={AccentColorEnum.Muted} />}
             title={t.empty.title}
             description={filter === MatchStatusEnum.All ? t.empty.description : t.empty.filtered}
           />
@@ -83,7 +90,7 @@ export default function MatchHistoryPage() {
               />
             </div>
             <div className="sm:hidden">
-              <GList items={matches} keyExtractor={(match) => match.id} >
+              <GList items={matches} keyExtractor={(match) => match.id}>
                 {(match) => (
                   <MatchHistoryItem
                     match={match}

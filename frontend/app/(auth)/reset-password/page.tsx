@@ -17,6 +17,8 @@ import { ar as ArTextField } from "@/component/i18n/GTextField/ar.i18n";
 import { passwordValidator } from "@/lib/utils";
 import { authService } from "@/services/def/AuthService";
 import type { GTextFieldTranslation } from "@/component/i18n/GTextField/en.i18n";
+import { ResetPasswordStepEnum } from "@/domain/enum/ResetPasswordStepEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
 
 function ResetPasswordPage() {
   const router = useRouter();
@@ -27,7 +29,7 @@ function ResetPasswordPage() {
 
   const email = useSearchParams().get("email");
 
-  const [step, setStep] = useState<"otp" | "reset">("otp");
+  const [step, setStep] = useState<ResetPasswordStepEnum>(ResetPasswordStepEnum.Otp);
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -72,17 +74,17 @@ function ResetPasswordPage() {
 
   return (
     <AuthLayout>
-      {step === "otp" && (
+      {step === ResetPasswordStepEnum.Otp && (
         <OtpForm
           email={email}
           onSuccess={(resolvedOtp) => {
             setOtp(resolvedOtp);
-            setStep("reset");
+            setStep(ResetPasswordStepEnum.Reset);
           }}
         />
       )}
 
-      {step === "reset" && (
+      {step === ResetPasswordStepEnum.Reset && (
         <div className="w-full space-y-5">
           {apiError && (
             <div role="alert" className="rounded-md border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">
@@ -104,7 +106,7 @@ function ResetPasswordPage() {
           </GButton>
           <div className="pt-2 text-center">
             <Link href="/login" className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors">
-              <GIcon icon={ArrowLeft} size="sm" color="inherit" className="rtl:-scale-x-100" />
+              <GIcon icon={ArrowLeft} size={SizeEnum.sm} flip />
               {t.backToLogin}
             </Link>
           </div>

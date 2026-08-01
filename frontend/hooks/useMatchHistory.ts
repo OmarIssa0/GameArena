@@ -45,12 +45,12 @@ function useMatchHistory(statusFilter: MatchStatusEnum = MatchStatusEnum.All, li
     };
   }, []);
 
+  const summary = useMemo(() => buildSummary(allMatches), [allMatches]);
+
   const matches = useMemo(() => {
     const list = statusFilter === MatchStatusEnum.All ? allMatches : allMatches.filter((m) => m.result === statusFilter);
     return limit ? list.slice(0, limit) : list;
   }, [statusFilter, limit, allMatches]);
-
-  const summary = useMemo(() => buildSummary(allMatches), [allMatches]);
 
   return { matches, summary, loading, error };
 }

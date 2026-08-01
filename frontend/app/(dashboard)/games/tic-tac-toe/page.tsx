@@ -6,6 +6,7 @@ import { useGame } from "@/app/providers/GameProvider";
 import { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
 import { GameLayoutWrapper } from "@/component/games/GameLayoutWrapper";
 import { GCard } from "@/component/common/GCard";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
 import type { ITicTacToeGameState } from "@/app/providers/def/IGameState";
 
 const EMPTY = ".";
@@ -31,7 +32,7 @@ function TicTacToePage() {
 
   return (
     <GameLayoutWrapper gameType={GamesKindEnum.TicTacToe}>
-      <GCard padding="md" rounded="3xl" className="grid grid-cols-3 gap-3">
+      <GCard padding={SizeEnum.md} rounded={SizeEnum.lg} className="grid grid-cols-3 gap-3">
         {board.map((cell, index) => (
           <button
             key={index}

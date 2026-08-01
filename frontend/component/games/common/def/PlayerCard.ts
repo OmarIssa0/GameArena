@@ -1,17 +1,15 @@
-interface PlayerColors {
+export interface IPlayerCardColors {
   box: string;
   badge: string;
   turn: string;
 }
 
-interface PlayerCardProps {
-  playerId?: string;
-  playerUsername?: string;
+export interface IPlayerCardProps {
+  playerId: string | null;
+  playerUsername: string | null;
   symbol?: string;
-  isBot?: boolean;
+  isBot: boolean;
   fallbackName: string;
   isTurn: boolean;
-  symbolColors?: PlayerColors;
+  symbolColors?: IPlayerCardColors;
 }
-
-export type { PlayerCardProps, PlayerColors };

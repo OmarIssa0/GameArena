@@ -1,4 +1,5 @@
 const en = {
+  brand: "Arena 404",
   home: "Home",
   friends: "Friends",
   messages: "Messages",

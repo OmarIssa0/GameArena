@@ -6,16 +6,21 @@ using backend.Services.Interface;
 using backend.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 
 namespace backend.Hubs
 {
     [Authorize]
     public class GameHub(
         IGameRoomService _roomService,
-        IEventBus _eventBus) : Hub
+        IEventBus _eventBus,
+        ILogger<GameHub> _logger) : Hub
     {
         private string GetPlayerId() =>
             Context.UserIdentifier ?? throw new HubException("Unauthorized");
+
+        private string GetUsername() =>
+            Context.User?.Identity?.Name ?? "Player";
 
         private bool TryGetPlayerRoom(string playerId, out BaseGameRoom? room, out string? roomId)
         {
@@ -29,49 +34,57 @@ namespace backend.Hubs
 
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
+            if (exception != null)
+                _logger.LogWarning(exception, "GameHub connection disconnected with error for user {UserId}", Context.UserIdentifier);
+
             var playerId = Context.UserIdentifier;
             if (playerId == null) return;
 
             if (TryGetPlayerRoom(playerId, out var room, out var roomId))
             {
-                room!.DisconnectedPlayerId = playerId;
-
-                if (room.WinnerPlayerId != null)
-                {
-                    room.IsFinished = true;
-                    await _roomService.FinishAndCleanupAsync(room, roomId!);
-                    await Clients.Group(roomId!).SendAsync("OpponentDisconnected");
-                    return;
-                }
-
-                if (!room.HasStarted)
-                {
-                    if (room.IsFull)
-                    {
-                        _roomService.TryRemovePlayer(playerId);
-                        await Clients.Group(roomId!).SendAsync("OpponentDisconnected");
-                    }
-                    else
-                    {
-                        _roomService.RemoveRoomAndPlayers(roomId!);
-                    }
-                    return;
-                }
-
-                if (room.IsBotGame)
-                {
-                    room.OnPlayerDisconnected(playerId);
-                    await _roomService.FinishAndCleanupAsync(room, roomId!);
-                    await Clients.Group(roomId!).SendAsync("OpponentDisconnected");
-                    return;
-                }
-
-                room.ReplacePlayerWithBot(playerId);
-                room.MakeBotMove();
-                await Clients.Group(roomId!).SendAsync("gameState", room.GetStatePayload());
+                await HandlePlayerDisconnectionAsync(room!, roomId!, playerId);
             }
 
             await base.OnDisconnectedAsync(exception);
+        }
+
+        private async Task HandlePlayerDisconnectionAsync(BaseGameRoom room, string roomId, string playerId)
+        {
+            room.DisconnectedPlayerId = playerId;
+
+            if (room.WinnerPlayerId != null)
+            {
+                room.IsFinished = true;
+                await _roomService.FinishAndCleanupAsync(room, roomId);
+                await Clients.Group(roomId).SendAsync("OpponentDisconnected");
+                return;
+            }
+
+            if (!room.HasStarted)
+            {
+                if (room.IsFull)
+                {
+                    _roomService.TryRemovePlayer(playerId);
+                    await Clients.Group(roomId).SendAsync("OpponentDisconnected");
+                }
+                else
+                {
+                    _roomService.RemoveRoomAndPlayers(roomId);
+                }
+                return;
+            }
+
+            if (room.IsBotGame)
+            {
+                room.OnPlayerDisconnected(playerId);
+                await _roomService.FinishAndCleanupAsync(room, roomId);
+                await Clients.Group(roomId).SendAsync("OpponentDisconnected");
+                return;
+            }
+
+            room.ReplacePlayerWithBot(playerId);
+            room.MakeBotMove();
+            await Clients.Group(roomId).SendAsync("gameState", room.GetStatePayload());
         }
 
         public async Task FindMatch(GamesKind gameType)
@@ -89,7 +102,7 @@ namespace backend.Hubs
                     return;
                 }
 
-                var username = Context.User?.Identity?.Name ?? "Player 1";
+                var username = GetUsername();
                 var (room, _) = _roomService.FindOrCreateRoom(gameType, playerId, username);
 
                 await Groups.AddToGroupAsync(Context.ConnectionId, room.RoomId);
@@ -214,7 +227,7 @@ namespace backend.Hubs
 
             room.InvitedPlayerId = friendId;
 
-            var username = Context.User?.Identity?.Name ?? "Player";
+            var username = GetUsername();
             await Clients.User(friendId).SendAsync("game:invite", new
             {
                 roomId = room.RoomId,
@@ -249,7 +262,7 @@ namespace backend.Hubs
         public async Task CreateLobby(GamesKind gameType)
         {
             var playerId = GetPlayerId();
-            string username = Context.User?.Identity?.Name ?? "Player";
+            var username = GetUsername();
             var room = _roomService.CreatePrivateRoom(gameType, playerId, username, null);
             await Groups.AddToGroupAsync(Context.ConnectionId, room.RoomId);
             await Clients.Caller.SendAsync("gameState", room.GetStatePayload());
@@ -258,7 +271,7 @@ namespace backend.Hubs
         public async Task InviteFriend(string friendId, GamesKind gameType)
         {
             var playerId = GetPlayerId();
-            string username = Context.User?.Identity?.Name ?? "Player";
+            var username = GetUsername();
 
             if (TryGetPlayerRoom(playerId, out var existingRoom, out var existingRoomId)
                 && !existingRoom!.IsFinished)

@@ -1,6 +1,6 @@
 const ar = {
   welcome: (name: string) => "مرحباً بعودتك" + (name ? `، ${name}` : ""),
-  brand: "GameArena",
+  brand: "أرينا 404",
   heroSubtitle: "وجهتك النهائية للألعاب. مباريات فورية، معارك مصنفة، ومتعة لا تنتهي.",
   playNow: "العب الآن",
   viewStats: "عرض الإحصائيات",
@@ -10,7 +10,7 @@ const ar = {
     friendRequests: "طلبات الصداقة",
   },
   features: {
-    title: "لماذا GameArena؟",
+    title: "لماذا أرينا 404؟",
     badge: "المميزات",
     instantPlay: "لعب فوري",
     instantPlayDesc: "انضم للمباريات في ثوانٍ",

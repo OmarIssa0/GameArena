@@ -13,7 +13,7 @@ const ar: TicTacToeTranslations = {
     searchFriends: "ابحث عن أصدقاء...",
     noFriendsFound: "لم يتم العثور على أصدقاء",
     searchingTitle: "جارٍ البحث عن خصم...",
-    searchingSubtitle: "جارٍ فحص خوادم GameArena",
+    searchingSubtitle: "جارٍ فحص خوادم أرينا 404",
     cancelSearch: "إلغاء البحث",
     waitingForOpponent: "في انتظار قبول الخصم للدعوة أو الانضمام...",
     cancelMatch: "إلغاء المباراة",

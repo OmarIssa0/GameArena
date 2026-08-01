@@ -51,6 +51,7 @@ export function useFetch<T>(fetcher: Fetcher<T>, deps: ReadonlyArray<unknown> = 
   }, []);
 
   useEffect(() => {
+    const gen = genRef.current;
     mountedRef.current = true;
     // Initial fetch - use timeout to avoid sync setState in effect
     const timer = setTimeout(() => {
@@ -58,10 +59,11 @@ export function useFetch<T>(fetcher: Fetcher<T>, deps: ReadonlyArray<unknown> = 
     }, 0);
     return () => {
       mountedRef.current = false;
-      genRef.current++;
+      genRef.current = gen + 1;
       controllerRef.current?.abort();
       clearTimeout(timer);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- deps are intentionally dynamic: refetch on any dependency change
   }, [execute, ...deps]);
 
   return { data, loading, error, reload: execute };

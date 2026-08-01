@@ -15,26 +15,23 @@ import { PageHeader } from "@/component/common/PageHeader";
 import { GBadge } from "@/component/common/GBadge";
 import { GIcon } from "@/component/common/GIcon";
 import { GSpinner } from "@/component/common/GSpinner";
-
 import { FriendsListTab } from "@/component/friend/FriendsListTab";
 import { RequestsTab } from "@/component/friend/RequestsTab";
 import { SentRequestsTab } from "@/component/friend/SentRequestsTab";
 import { BlockedUsersTab } from "@/component/friend/BlockedUsersTab";
 import { SearchTab } from "@/component/friend/SearchTab";
-
+import { FriendsTabEnum } from "@/domain/enum/FriendsTabEnum";
 import { useFriends } from "@/hooks/useFriends";
-
 import type { GTabItem } from "@/component/common/def/GTabs";
-
-type TFriendsTab = "friends" | "requests" | "sent" | "blocked" | "search";
-
-const DEFAULT_TAB: TFriendsTab = "friends";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { TabsVariantEnum } from "@/domain/enum/TabsVariantEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 
 function FriendsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslation({ en, ar }) as TFriendsTranslation;
-  const activeTab = (searchParams.get("tab") as TFriendsTab) ?? DEFAULT_TAB;
+  const activeTab = (searchParams.get("tab") as FriendsTabEnum) ?? FriendsTabEnum.Friends;
 
   const {
     friends,
@@ -57,31 +54,41 @@ function FriendsPage() {
 
   const tabLoading = useMemo(() => {
     switch (activeTab) {
-      case "friends":
+      case FriendsTabEnum.Friends:
         return friendsLoading;
-      case "requests":
-      case "sent":
+      case FriendsTabEnum.Requests:
+      case FriendsTabEnum.Sent:
         return requestsLoading;
-      case "blocked":
+      case FriendsTabEnum.Blocked:
         return blockedLoading;
       default:
         return false;
     }
   }, [activeTab, friendsLoading, requestsLoading, blockedLoading]);
 
-  const tabs = useMemo<GTabItem<TFriendsTab>[]>(
+  const tabs = useMemo<GTabItem<FriendsTabEnum>[]>(
     () => [
-      { id: "friends", label: t.friends, icon: <GIcon icon={Users} size="sm" color="inherit" /> },
-      { id: "requests", label: t.requests, icon: <GIcon icon={UserCheck} size="sm" color="inherit" />, badge: requestCount || undefined },
-      { id: "sent", label: t.sentRequests, icon: <GIcon icon={Send} size="sm" color="inherit" />, badge: sentRequestCount || undefined },
-      { id: "blocked", label: t.blockedUsers, icon: <GIcon icon={ShieldBan} size="sm" color="inherit" />, badge: blockedCount || undefined },
-      { id: "search", label: t.search, icon: <GIcon icon={Search} size="sm" color="inherit" /> },
+      { id: FriendsTabEnum.Friends, label: t.friends, icon: <GIcon icon={Users} size={SizeEnum.sm} /> },
+      {
+        id: FriendsTabEnum.Requests,
+        label: t.requests,
+        icon: <GIcon icon={UserCheck} size={SizeEnum.sm} />,
+        badge: requestCount || undefined,
+      },
+      { id: FriendsTabEnum.Sent, label: t.sentRequests, icon: <GIcon icon={Send} size={SizeEnum.sm} />, badge: sentRequestCount || undefined },
+      {
+        id: FriendsTabEnum.Blocked,
+        label: t.blockedUsers,
+        icon: <GIcon icon={ShieldBan} size={SizeEnum.sm} />,
+        badge: blockedCount || undefined,
+      },
+      { id: FriendsTabEnum.Search, label: t.search, icon: <GIcon icon={Search} size={SizeEnum.sm} /> },
     ],
     [t, requestCount, sentRequestCount, blockedCount],
   );
 
   const changeTab = useCallback(
-    (tab: TFriendsTab) => {
+    (tab: FriendsTabEnum) => {
       const params = new URLSearchParams(searchParams);
       params.set("tab", tab);
       router.push(`/friends?${params.toString()}`, { scroll: false });
@@ -91,7 +98,7 @@ function FriendsPage() {
 
   const renderTab = () => {
     switch (activeTab) {
-      case "friends":
+      case FriendsTabEnum.Friends:
         return (
           <FriendsListTab
             friends={friends}
@@ -100,21 +107,21 @@ function FriendsPage() {
             onMessage={(id) => router.push(`/messages?friend=${id}`)}
             onBlock={blockUser}
             onRemove={removeFriend}
-            onAddFriend={() => changeTab("search")}
+            onAddFriend={() => changeTab(FriendsTabEnum.Search)}
             t={t}
           />
         );
 
-      case "requests":
+      case FriendsTabEnum.Requests:
         return <RequestsTab requests={requests} onAccept={acceptRequest} onDecline={declineRequest} t={t} />;
 
-      case "sent":
+      case FriendsTabEnum.Sent:
         return <SentRequestsTab sentRequests={sentRequests} onCancel={cancelFriendRequest} t={t} />;
 
-      case "blocked":
+      case FriendsTabEnum.Blocked:
         return <BlockedUsersTab blockedUsers={blockedUsers} onUnblock={unblockUser} t={t} />;
 
-      case "search":
+      case FriendsTabEnum.Search:
         return <SearchTab />;
 
       default:
@@ -123,23 +130,31 @@ function FriendsPage() {
   };
 
   return (
-    <GPage width="lg">
+    <GPage size={SizeEnum.lg}>
       <PageHeader
         icon={Users}
         title={t.friends}
         subtitle={t.subtitle}
         badge={
           <GBadge>
-            <GIcon icon={Gamepad2} size="xs" color="primary" />
+            <GIcon icon={Gamepad2} size={SizeEnum.xs} color={AccentColorEnum.Primary} />
             {t.community}
           </GBadge>
         }
       />
 
-      <GCard padding="sm" className="space-y-4">
-        <GTabs tabs={tabs} value={activeTab} onChange={changeTab} variant="pills" fullWidth responsive/>
+        <GCard padding={SizeEnum.sm} className="space-y-4">
+        <GTabs tabs={tabs} value={activeTab} onChange={changeTab} variant={TabsVariantEnum.Pills} fullWidth responsive />
 
-        <div className="pt-1 text-start gap-3">{tabLoading ? <div className="flex justify-center py-10"><GSpinner size="lg" /></div> : renderTab()}</div>
+        <div className="pt-1 text-start gap-3">
+          {tabLoading ? (
+            <div className="flex justify-center py-10">
+              <GSpinner size={SizeEnum.lg} />
+            </div>
+          ) : (
+            renderTab()
+          )}
+        </div>
       </GCard>
     </GPage>
   );

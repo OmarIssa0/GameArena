@@ -8,6 +8,8 @@ import { GIcon } from "../common/GIcon";
 import type { RequestsTabProps } from "./def/FriendsTab";
 import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import type { TNullable } from "@/domain/type/TCommon";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 
 function RequestsTab({ requests, onAccept, onDecline, t }: RequestsTabProps) {
   const [actionId, setActionId] = useState<TNullable<string>>(null);
@@ -15,7 +17,7 @@ function RequestsTab({ requests, onAccept, onDecline, t }: RequestsTabProps) {
   if (requests.length === 0) {
     return (
       <GEmpty
-        icon={<GIcon icon={UserCheck} size="xl" color="muted" />}
+        icon={<GIcon icon={UserCheck} size={SizeEnum.xl} color={AccentColorEnum.Muted} />}
         title={t.requestsTab.emptyTitle}
         description={t.requestsTab.emptyDescription}
       />
@@ -40,22 +42,36 @@ function RequestsTab({ requests, onAccept, onDecline, t }: RequestsTabProps) {
         return (
           <div className="flex gap-1">
             <GIcon
-              icon={isBusy ? Loader2 : Check} size="md" tile tileSize="lg"
-              tileGradient="bg-success/10" tileColor="success"
+              icon={isBusy ? Loader2 : Check}
+              size={SizeEnum.md}
+              tile
+              tileGradient="bg-success/10"
+              tileColor={AccentColorEnum.Success}
               className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}
               onClick={async () => {
                 setActionId(friend.id);
-                try { await onAccept(friend.id); } finally { setActionId(null); }
+                try {
+                  await onAccept(friend.id);
+                } finally {
+                  setActionId(null);
+                }
               }}
               ariaLabel={t.requestsTab.accept}
             />
             <GIcon
-              icon={isBusy ? Loader2 : X} size="md" tile tileSize="lg"
-              tileGradient="bg-danger/10" tileColor="danger"
+              icon={isBusy ? Loader2 : X}
+              size={SizeEnum.md}
+              tile
+              tileGradient="bg-danger/10"
+              tileColor={AccentColorEnum.Danger}
               className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}
               onClick={async () => {
                 setActionId(friend.id);
-                try { await onDecline(friend.id); } finally { setActionId(null); }
+                try {
+                  await onDecline(friend.id);
+                } finally {
+                  setActionId(null);
+                }
               }}
               ariaLabel={t.requestsTab.decline}
             />

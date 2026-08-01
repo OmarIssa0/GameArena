@@ -68,7 +68,7 @@ namespace backend.Utils
                     <table width="100%" style="max-width:500px; background:#ffffff; border-radius:8px; border:1px solid #e5e7eb; overflow:hidden; box-shadow:0 4px 12px rgba(0,0,0,0.05);">
                       <tr>
                         <td align="center" style="padding:30px; background-color:#4f46e5;">
-                          <h1 style="margin:0; color:#ffffff; font-size:24px; font-weight:bold; letter-spacing:0.5px;">GameArena</h1>
+                          <h1 style="margin:0; color:#ffffff; font-size:24px; font-weight:bold; letter-spacing:0.5px;">Arena 404</h1>
                         </td>
                       </tr>
                       <tr>

@@ -5,18 +5,16 @@ import { useGame } from "@/app/providers/GameProvider";
 import { useGameTranslation } from "@/hooks/useGameTranslation";
 import { GButton } from "@/component/common/GButton";
 import { GIcon } from "@/component/common/GIcon";
-import { getGameConfig } from "./gameConfig";
+import { translateGameInfo } from "./gameConfig";
 import { GAMES_BY_TYPE } from "@/domain/constant/games";
-import type { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import type { IGameEntryProps } from "./def/GameEntry";
 
-interface GameEntryProps {
-  gameType: GamesKindEnum;
-}
-
-function GameEntry({ gameType }: GameEntryProps) {
+function GameEntry({ gameType }: IGameEntryProps) {
   const { findMatch, createLobby, searchError } = useGame();
   const t = useGameTranslation();
-  const gameInfo = getGameConfig(gameType);
+  const { name: gameName, description: gameDescription } = translateGameInfo(t, gameType);
   const gameConfig = GAMES_BY_TYPE[gameType];
 
   return (
@@ -25,16 +23,15 @@ function GameEntry({ gameType }: GameEntryProps) {
         <div className="space-y-4">
           <GIcon
             icon={gameConfig.icon}
-            size="4xl"
+            size={SizeEnum.xl}
             tile
-            tileSize="xl"
             tileGradient={gameConfig.gradientClass}
-            tileColor="on-primary"
+            tileColor={AccentColorEnum.OnPrimary}
             className="mx-auto"
           />
           <div className="space-y-2">
-            <h1 className="text-3xl font-black text-text">{gameInfo.name}</h1>
-            <p className="text-text-secondary text-sm">{gameInfo.description}</p>
+            <h1 className="text-3xl font-black text-text">{gameName}</h1>
+            <p className="text-text-secondary text-sm">{gameDescription}</p>
           </div>
         </div>
 
@@ -45,15 +42,15 @@ function GameEntry({ gameType }: GameEntryProps) {
         )}
 
         <div className="flex flex-col gap-4">
-          <GButton onClick={() => findMatch(gameType)} fullWidth size="lg" startIcon={<GIcon icon={Users} size="md" color="inherit" />}>
+          <GButton onClick={() => findMatch(gameType)} fullWidth size={SizeEnum.lg} startIcon={<GIcon icon={Users} size={SizeEnum.md} />}>
             {t.lobby.quick}
           </GButton>
           <GButton
             onClick={() => createLobby(gameType)}
             fullWidth
-            size="lg"
-            variant="secondary"
-            startIcon={<GIcon icon={Lock} size="md" color="inherit" />}>
+            size={SizeEnum.lg}
+            variant={AccentColorEnum.Secondary}
+            startIcon={<GIcon icon={Lock} size={SizeEnum.md} />}>
             {t.lobby.invite}
           </GButton>
         </div>

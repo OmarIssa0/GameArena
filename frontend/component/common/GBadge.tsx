@@ -1,25 +1,37 @@
 import clsx from "clsx";
 import type { GBadgeProps } from "./def/GBadge";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { AccentBackGroundEnum } from "@/domain/enum/AccentBackGroundEnum";
+import { THashMap } from "@/domain/type/TCommon";
 
-const variants = {
-  primary: "bg-primary-muted text-primary",
-  secondary: "bg-secondary-muted text-secondary",
-  success: "bg-success-bg text-success",
-  warning: "bg-warning-bg text-warning",
-  danger: "bg-error-muted text-error",
-  muted: "bg-surface text-text-secondary border border-border",
+const badgeBgColors: Record<AccentColorEnum, AccentBackGroundEnum> = {
+  [AccentColorEnum.Primary]: AccentBackGroundEnum.PrimaryMuted,
+  [AccentColorEnum.Secondary]: AccentBackGroundEnum.SecondaryMuted,
+  [AccentColorEnum.Muted]: AccentBackGroundEnum.Surface,
+  [AccentColorEnum.Success]: AccentBackGroundEnum.SuccessBg,
+  [AccentColorEnum.Warning]: AccentBackGroundEnum.WarningBg,
+  [AccentColorEnum.Danger]: AccentBackGroundEnum.ErrorMuted,
+  [AccentColorEnum.Inherit]: AccentBackGroundEnum.Surface,
+  [AccentColorEnum.OnPrimary]: AccentBackGroundEnum.Surface,
+  [AccentColorEnum.Accent]: AccentBackGroundEnum.AccentMuted,
+  [AccentColorEnum.Text]: AccentBackGroundEnum.Surface,
 };
 
-const sizes = {
-  sm: "text-2xs",
-  md: "",
+const sizes: THashMap<string> = {
+  [SizeEnum.xs]: "text-2xs",
+  [SizeEnum.sm]: "text-2xs",
+  [SizeEnum.md]: "",
+  [SizeEnum.lg]: "",
+  [SizeEnum.xl]: "",
+  [SizeEnum.icon]: "",
 };
 
 const badgeBase = "inline-flex items-center gap-1 text-xs font-semibold rounded-full px-2.5 py-0.5 whitespace-nowrap";
 
-function GBadge({ variant = "primary", size = "md", className, children, ...props }: GBadgeProps) {
+function GBadge({ variant = AccentColorEnum.Primary, size = SizeEnum.md, className, children, ...props }: GBadgeProps) {
   return (
-    <span className={clsx(badgeBase, variants[variant], sizes[size], className)} {...props}>
+    <span className={clsx(badgeBase, badgeBgColors[variant], variant, sizes[size], variant === AccentColorEnum.Secondary && "border border-border", className)} {...props}>
       {children}
     </span>
   );

@@ -3,9 +3,12 @@
 import clsx from "clsx";
 import { GBadge } from "./GBadge";
 import type { GTabsProps } from "./def/GTabs";
+import { TabsDirectionEnum } from "@/domain/enum/TabsDirectionEnum";
+import { TabsVariantEnum } from "@/domain/enum/TabsVariantEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
 
 const variantStyles: Record<
-  string,
+  TabsVariantEnum,
   {
     tab: string;
     active: string;
@@ -13,23 +16,23 @@ const variantStyles: Record<
     list?: string;
   }
 > = {
-  pills: {
+  [TabsVariantEnum.Pills]: {
     tab: "px-4 py-2 rounded-[var(--radius-md)] text-sm font-medium",
     active: "bg-primary text-on-primary",
     idle: "text-text-secondary hover:bg-primary-muted hover:text-text",
   },
-  underline: {
+  [TabsVariantEnum.Underline]: {
     tab: "px-3 py-2.5 text-sm font-medium border-b-2 -mb-px",
     active: "text-primary border-b-primary",
     idle: "text-text-secondary hover:text-text border-b-transparent",
     list: "border-b border-border",
   },
-  sidebar: {
+  [TabsVariantEnum.Sidebar]: {
     tab: "px-3 py-2.5 text-sm font-medium",
     active: "bg-primary-muted text-primary font-semibold border-s-[3px] border-s-primary",
     idle: "text-text-secondary hover:bg-primary-muted hover:text-text border-s-[3px] border-s-transparent",
   },
-  default: {
+  [TabsVariantEnum.Default]: {
     tab: "px-4 py-2 rounded-[var(--radius-md)] text-sm font-medium",
     active: "bg-primary text-on-primary",
     idle: "text-text-secondary hover:bg-primary-muted hover:text-text",
@@ -46,7 +49,7 @@ function renderTabBadge<T extends string | number>(tab: { id: T; badge?: number 
   }
 
   return (
-    <GBadge size="sm" className="ms-auto min-w-5 justify-center">
+    <GBadge size={SizeEnum.sm} className="ms-auto min-w-5 justify-center">
       {tab.badge}
     </GBadge>
   );
@@ -59,18 +62,18 @@ function GTabs<T extends string | number>({
   renderLabel,
   renderIcon,
   renderBadge,
-  direction = "H",
-  variant = direction === "V" ? "sidebar" : "default",
+  direction = TabsDirectionEnum.H,
+  variant = direction === TabsDirectionEnum.V ? TabsVariantEnum.Sidebar : TabsVariantEnum.Default,
   responsive = false,
   className,
   tabClassName,
   fullWidth,
   children,
 }: GTabsProps<T>) {
-  const styles = variantStyles[variant] ?? variantStyles.default;
+  const styles = variantStyles[variant] ?? variantStyles[TabsVariantEnum.Default];
 
-  const isVertical = direction === "V";
-  const isSidebar = variant === "sidebar" && isVertical;
+  const isVertical = direction === TabsDirectionEnum.V;
+  const isSidebar = variant === TabsVariantEnum.Sidebar && isVertical;
 
   // Responsive: H becomes V on sm/md screens (lg+ stays horizontal)
   // Responsive: V becomes H on md+ screens (stays vertical below md)
