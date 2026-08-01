@@ -20,6 +20,7 @@ function PingPongPage() {
   const keysDown = useRef<Set<string>>(new Set());
   const rafId = useRef<number | null>(null);
   const lastInputSentAtRef = useRef(0);
+  const lastDirRef = useRef<"UP" | "DOWN" | null>(null);
   const lastPointerBackendYRef = useRef<number | null>(null);
 
   const boardRef = useRef<HTMLDivElement | null>(null);
@@ -83,12 +84,16 @@ function PingPongPage() {
         }
       }
 
-      if (dir) {
-        const now = performance.now();
-        if (now - lastInputSentAtRef.current >= INPUT_SEND_INTERVAL_MS) {
+      const now = performance.now();
+      if (dir !== lastDirRef.current) {
+        lastDirRef.current = dir;
+        if (dir) {
           lastInputSentAtRef.current = now;
           sendActionRef.current({ type: PING_PONG_MOVEMENT_ACTIONS.MOVE_PADDLE, direction: dir });
         }
+      } else if (dir && now - lastInputSentAtRef.current >= INPUT_SEND_INTERVAL_MS) {
+        lastInputSentAtRef.current = now;
+        sendActionRef.current({ type: PING_PONG_MOVEMENT_ACTIONS.MOVE_PADDLE, direction: dir });
       }
       rafId.current = requestAnimationFrame(tick);
     };
@@ -109,10 +114,8 @@ function PingPongPage() {
   useEffect(() => {
     const el = boardRef.current;
     if (!el) return;
-    const ro = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        setBoardRect(entry.contentRect);
-      }
+    const ro = new ResizeObserver(() => {
+      setBoardRect(el.getBoundingClientRect());
     });
     ro.observe(el);
     return () => ro.disconnect();
@@ -198,21 +201,15 @@ function PingPongPage() {
             className="relative bg-surface border-2 border-border-light rounded-lg mx-auto w-full max-w-full overflow-hidden"
             style={{ aspectRatio: boardWidth / boardHeight }}>
             <div className="absolute inset-y-0 left-1/2 w-px -ml-px border-l-2 border-dashed border-border opacity-50" />
-            <div
-              className="absolute bg-accent rounded"
-              style={{ width: paddleW, height: paddleH1, left: p1Left, top: p1Top }}
-            />
-            <div
-              className="absolute bg-warning rounded"
-              style={{ width: paddleW, height: paddleH2, left: p2Left, top: p2Top }}
-            />
+            <div className="absolute bg-accent rounded" style={{ width: paddleW, height: paddleH1, left: p1Left, top: p1Top }} />
+            <div className="absolute bg-warning rounded" style={{ width: paddleW, height: paddleH2, left: p2Left, top: p2Top }} />
             <div
               className={`absolute bg-primary rounded-full ${!isFinished ? "animate-pulse" : ""}`}
               style={{ width: ballSizePx, height: ballSizePx, left: ballCenterX - ballSizePx / 2, top: ballCenterY - ballSizePx / 2 }}
             />
           </div>
         </div>
-        {!isFinished && <div className="mt-4 text-center text-xs text-text-muted">Use W/S or &uarr;/&darr; to move your paddle</div>}
+        {!isFinished && <div className="mt-4 text-center text-xs text-text-muted">Use W/S, &uarr;/&darr; or your mouse to move your paddle</div>}
       </GCard>
     </GameLayoutWrapper>
   );

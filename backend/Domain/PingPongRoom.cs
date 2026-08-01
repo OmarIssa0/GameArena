@@ -80,14 +80,14 @@ namespace backend.Domain
             if (BallPY <= 0 || BallPY >= 1)
             {
                 BallVY = -BallVY;
-                BallPY = Math.Clamp(BallPY, 0.01f, 0.99f);
+                BallPY = Math.Clamp(BallPY, BallRadius, 1f - BallRadius);
             }
 
             float paddleTop1 = PadYP1;
             float paddleBottom1 = PadYP1 + PadHP1;
             if (BallVX < 0 && previousX > BallContactPlane1 && BallPX <= BallContactPlane1 && BallPY >= paddleTop1 && BallPY <= paddleBottom1)
             {
-                BallVX = -Math.Min(Math.Abs(BallVX) * BallHitSpeedRamp, MaxBallSpeed);
+                BallVX = Math.Min(Math.Abs(BallVX) * BallHitSpeedRamp, MaxBallSpeed);
                 BallPX = BallContactPlane1;
                 float hitPos = (BallPY - PadYP1) / PadHP1;
                 BallVY = (hitPos - 0.5f) * 0.02f;
@@ -97,7 +97,7 @@ namespace backend.Domain
             float paddleBottom2 = PadYP2 + PadHP2;
             if (BallVX > 0 && previousX < BallContactPlane2 && BallPX >= BallContactPlane2 && BallPY >= paddleTop2 && BallPY <= paddleBottom2)
             {
-                BallVX = Math.Min(BallVX * BallHitSpeedRamp, MaxBallSpeed);
+                BallVX = -Math.Min(Math.Abs(BallVX) * BallHitSpeedRamp, MaxBallSpeed);
                 BallPX = BallContactPlane2;
                 float hitPos = (BallPY - PadYP2) / PadHP2;
                 BallVY = (hitPos - 0.5f) * 0.02f;
@@ -109,6 +109,7 @@ namespace backend.Domain
                 if (ScoreP1 >= WinScore)
                 {
                     WinnerPlayerId = Player1Id;
+                    IsFinished = true;
                     Score[0]++;
                     return;
                 }
@@ -121,6 +122,7 @@ namespace backend.Domain
                 if (ScoreP2 >= WinScore)
                 {
                     WinnerPlayerId = Player2Id;
+                    IsFinished = true;
                     Score[1]++;
                     return;
                 }
@@ -132,13 +134,28 @@ namespace backend.Domain
         {
             if (!IsBotGame || IsFinished || !HasStarted) return;
 
-            string? botId = Player1Id == "__BOT__" ? Player1Id : (Player2Id == "__BOT__" ? Player2Id : null);
-            if (botId == null) return;
+            bool botIsP1 = Player1Id == "__BOT__";
+            bool botIsP2 = Player2Id == "__BOT__";
+            if (!botIsP1 && !botIsP2) return;
 
-            float botPaddleY = botId == Player1Id ? PadYP1 : PadYP2;
-            float paddleHeight = botId == Player1Id ? PadHP1 : PadHP2;
-            float targetY = BallPY - paddleHeight / 2f;
-            float speed = 0.015f;
+            float botPaddleY = botIsP1 ? PadYP1 : PadYP2;
+            float paddleHeight = botIsP1 ? PadHP1 : PadHP2;
+
+            float targetY;
+            bool ballComing = botIsP1 ? BallVX < 0 : BallVX > 0;
+            if (ballComing)
+            {
+                float plane = botIsP1 ? BallContactPlane1 : BallContactPlane2;
+                float timeToPlane = (plane - BallPX) / BallVX;
+                float predictedBallY = BallPY + BallVY * timeToPlane;
+                targetY = predictedBallY - paddleHeight / 2f;
+            }
+            else
+            {
+                targetY = 0.5f - paddleHeight / 2f;
+            }
+
+            const float speed = 0.015f;
 
             float diff = targetY - botPaddleY;
             if (Math.Abs(diff) < speed)
@@ -150,7 +167,7 @@ namespace backend.Domain
 
             botPaddleY = Math.Clamp(botPaddleY, 0, 1 - paddleHeight);
 
-            if (botId == Player1Id)
+            if (botIsP1)
                 PadYP1 = botPaddleY;
             else
                 PadYP2 = botPaddleY;
