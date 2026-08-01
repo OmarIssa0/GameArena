@@ -25,13 +25,20 @@ namespace backend.Domain
         public int ScoreP2 { get; set; } = 0;
 
         private const int WinScore = 5;
-        private const float PaddleLeftEdge = 0.03f;
-        private const float PaddleRightEdge = 0.97f;
+        private const float PaddleMargin = 0.03f;
         private const float InitialBallSpeed = 0.012f;
         private const float BallHitSpeedRamp = 1.05f;
         private const float MaxBallSpeed = 0.03f;
         private const int PaddleWidthPx = 12;
         private const int BallSizePx = 12;
+        private const float PaddleWidth = (float)PaddleWidthPx / BoardWidthPx;
+        private const float BallRadius = BallSizePx / (2f * BoardWidthPx);
+        private const float Paddle1Left = PaddleMargin;
+        private const float Paddle1Right = PaddleMargin + PaddleWidth;
+        private const float Paddle2Right = 1f - PaddleMargin;
+        private const float Paddle2Left = Paddle2Right - PaddleWidth;
+        private const float BallContactPlane1 = Paddle1Right - BallRadius;
+        private const float BallContactPlane2 = Paddle2Left + BallRadius;
 
         private const string ActionMovePaddle = "MOVE_PADDLE";
         private const string DirectionUp = "UP";
@@ -47,12 +54,6 @@ namespace backend.Domain
         {
             BallPX = 0.5f;
             BallPY = 0.5f;
-
-            // Random.Shared is a single thread-safe instance reused across the
-            // process. The previous `new Random()` here was seeded from the
-            // system clock on every call, so resets happening close together
-            // (same tick, or concurrent rooms) could land on identical seeds
-            // and therefore identical "random" bounce directions.
             BallVX = (Random.Shared.Next(2) == 0 ? 1f : -1f) * InitialBallSpeed;
             BallVY = (float)(Random.Shared.NextDouble() * 0.01 - 0.005);
         }
@@ -72,6 +73,7 @@ namespace backend.Domain
         {
             if (WinnerPlayerId != null || !HasStarted) return;
 
+            float previousX = BallPX;
             BallPX += BallVX;
             BallPY += BallVY;
 
@@ -83,20 +85,20 @@ namespace backend.Domain
 
             float paddleTop1 = PadYP1;
             float paddleBottom1 = PadYP1 + PadHP1;
-            if (BallVX < 0 && BallPX <= PaddleLeftEdge && BallPY >= paddleTop1 && BallPY <= paddleBottom1)
+            if (BallVX < 0 && previousX > BallContactPlane1 && BallPX <= BallContactPlane1 && BallPY >= paddleTop1 && BallPY <= paddleBottom1)
             {
                 BallVX = -Math.Min(Math.Abs(BallVX) * BallHitSpeedRamp, MaxBallSpeed);
-                BallPX = PaddleLeftEdge;
+                BallPX = BallContactPlane1;
                 float hitPos = (BallPY - PadYP1) / PadHP1;
                 BallVY = (hitPos - 0.5f) * 0.02f;
             }
 
             float paddleTop2 = PadYP2;
             float paddleBottom2 = PadYP2 + PadHP2;
-            if (BallVX > 0 && BallPX >= PaddleRightEdge && BallPY >= paddleTop2 && BallPY <= paddleBottom2)
+            if (BallVX > 0 && previousX < BallContactPlane2 && BallPX >= BallContactPlane2 && BallPY >= paddleTop2 && BallPY <= paddleBottom2)
             {
                 BallVX = Math.Min(BallVX * BallHitSpeedRamp, MaxBallSpeed);
-                BallPX = PaddleRightEdge;
+                BallPX = BallContactPlane2;
                 float hitPos = (BallPY - PadYP2) / PadHP2;
                 BallVY = (hitPos - 0.5f) * 0.02f;
             }
@@ -172,10 +174,10 @@ namespace backend.Domain
             boardHeight = BoardHeightPx,
             ballPosition = new { x = BallPX * BoardWidthPx, y = BallPY * BoardHeightPx },
             ballSize = BallSizePx,
-            player1PaddleX = PaddleLeftEdge * BoardWidthPx,
+            player1PaddleX = Paddle1Left * BoardWidthPx,
             player1PaddleY = PadYP1 * BoardHeightPx,
             player1PaddleHeight = PadHP1 * BoardHeightPx,
-            player2PaddleX = PaddleRightEdge * BoardWidthPx,
+            player2PaddleX = Paddle2Left * BoardWidthPx,
             player2PaddleY = PadYP2 * BoardHeightPx,
             player2PaddleHeight = PadHP2 * BoardHeightPx,
             paddleWidth = PaddleWidthPx,

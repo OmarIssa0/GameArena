@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { useGame } from "@/app/providers/GameProvider";
 import { GameLayoutWrapper } from "@/component/games/GameLayoutWrapper";
@@ -10,14 +10,17 @@ import { SizeEnum } from "@/domain/enum/SizeEnum";
 import type { IPingPongGameState } from "@/app/providers/def/IGameState";
 import { PING_PONG_KEYS, PING_PONG_MOVEMENT_ACTIONS } from "@/domain/constant/ping-pong";
 
+const INPUT_SEND_INTERVAL_MS = 50;
+const POINTER_DEAD_ZONE_PX = 8;
+
 function PingPongPage() {
   const { state, sendAction } = useGame();
   const { user } = useAuth();
 
   const keysDown = useRef<Set<string>>(new Set());
   const rafId = useRef<number | null>(null);
-  const lastMouseDirectionRef = useRef<"UP" | "DOWN" | null>(null);
-  const rafMouseSendRef = useRef<number | null>(null);
+  const lastInputSentAtRef = useRef(0);
+  const lastPointerBackendYRef = useRef<number | null>(null);
 
   const boardRef = useRef<HTMLDivElement | null>(null);
   const [boardRect, setBoardRect] = useState<DOMRectReadOnly | null>(null);
@@ -35,6 +38,12 @@ function PingPongPage() {
   useEffect(() => {
     sendActionRef.current = sendAction;
   }, [sendAction]);
+
+  useLayoutEffect(() => {
+    const el = boardRef.current;
+    if (!el) return;
+    setBoardRect(el.getBoundingClientRect());
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -54,13 +63,31 @@ function PingPongPage() {
         rafId.current = requestAnimationFrame(tick);
         return;
       }
-      if (keysDown.current.size > 0) {
-        const hasUpKey = PING_PONG_KEYS.UP.intersection(keysDown.current).size > 0;
-        const hasDownKey = PING_PONG_KEYS.DOWN.intersection(keysDown.current).size > 0;
-        if (hasUpKey && !hasDownKey) {
-          sendActionRef.current({ type: PING_PONG_MOVEMENT_ACTIONS.MOVE_PADDLE, direction: PING_PONG_MOVEMENT_ACTIONS.DIRECTION_UP });
-        } else if (hasDownKey && !hasUpKey) {
-          sendActionRef.current({ type: PING_PONG_MOVEMENT_ACTIONS.MOVE_PADDLE, direction: PING_PONG_MOVEMENT_ACTIONS.DIRECTION_DOWN });
+      const ppState = currentState as IPingPongGameState;
+
+      let dir: "UP" | "DOWN" | null = null;
+      const hasUpKey = PING_PONG_KEYS.UP.intersection(keysDown.current).size > 0;
+      const hasDownKey = PING_PONG_KEYS.DOWN.intersection(keysDown.current).size > 0;
+      if (hasUpKey && !hasDownKey) {
+        dir = PING_PONG_MOVEMENT_ACTIONS.DIRECTION_UP;
+      } else if (hasDownKey && !hasUpKey) {
+        dir = PING_PONG_MOVEMENT_ACTIONS.DIRECTION_DOWN;
+      } else if (lastPointerBackendYRef.current != null) {
+        const isPlayer1 = ppState.player1Id === currentUser.id;
+        const paddleYBackend = isPlayer1 ? ppState.player1PaddleY : ppState.player2PaddleY;
+        const paddleHBackend = isPlayer1 ? ppState.player1PaddleHeight : ppState.player2PaddleHeight;
+        const paddleCenter = paddleYBackend + paddleHBackend / 2;
+        const diff = lastPointerBackendYRef.current - paddleCenter;
+        if (Math.abs(diff) > POINTER_DEAD_ZONE_PX) {
+          dir = diff < 0 ? PING_PONG_MOVEMENT_ACTIONS.DIRECTION_UP : PING_PONG_MOVEMENT_ACTIONS.DIRECTION_DOWN;
+        }
+      }
+
+      if (dir) {
+        const now = performance.now();
+        if (now - lastInputSentAtRef.current >= INPUT_SEND_INTERVAL_MS) {
+          lastInputSentAtRef.current = now;
+          sendActionRef.current({ type: PING_PONG_MOVEMENT_ACTIONS.MOVE_PADDLE, direction: dir });
         }
       }
       rafId.current = requestAnimationFrame(tick);
@@ -97,29 +124,20 @@ function PingPongPage() {
     const handlePointerMove = (e: PointerEvent) => {
       if (!stateRef.current || !userRef.current) return;
       const ppState = stateRef.current as IPingPongGameState;
-      const currentUser = userRef.current;
       if (ppState.isFinished) return;
       const rect = el.getBoundingClientRect();
       const y = e.clientY - rect.top;
       const clampedY = Math.max(0, Math.min(rect.height, y));
-      const isPlayer1 = ppState.player1Id === currentUser.id;
-      const paddleYBackend = isPlayer1 ? ppState.player1PaddleY : ppState.player2PaddleY;
-      const paddleHBackend = isPlayer1 ? ppState.player1PaddleHeight : ppState.player2PaddleHeight;
-      const paddleCenter = paddleYBackend + paddleHBackend / 2;
-      const pointerBackendY = (clampedY / rect.height) * ppState.boardHeight;
-      const dir: "UP" | "DOWN" =
-        pointerBackendY < paddleCenter ? PING_PONG_MOVEMENT_ACTIONS.DIRECTION_UP : PING_PONG_MOVEMENT_ACTIONS.DIRECTION_DOWN;
-      lastMouseDirectionRef.current = dir;
-      if (rafMouseSendRef.current != null) return;
-      rafMouseSendRef.current = requestAnimationFrame(() => {
-        rafMouseSendRef.current = null;
-        sendActionRef.current({ type: PING_PONG_MOVEMENT_ACTIONS.MOVE_PADDLE, direction: dir });
-      });
+      lastPointerBackendYRef.current = (clampedY / rect.height) * ppState.boardHeight;
+    };
+    const handlePointerLeave = () => {
+      lastPointerBackendYRef.current = null;
     };
     el.addEventListener("pointermove", handlePointerMove, { passive: true });
+    el.addEventListener("pointerleave", handlePointerLeave);
     return () => {
       el.removeEventListener("pointermove", handlePointerMove);
-      if (rafMouseSendRef.current != null) cancelAnimationFrame(rafMouseSendRef.current);
+      el.removeEventListener("pointerleave", handlePointerLeave);
     };
   }, []);
 
