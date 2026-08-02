@@ -39,6 +39,7 @@ namespace backend.Domain
             lock (_lock)
             {
                 if (WinnerPlayerId != null || !HasStarted) return;
+                if (_snake1.Count == 0 || _snake2.Count == 0) return; // Not initialized
 
                 ApplyDirections();
                 MovePlayers();
@@ -147,6 +148,7 @@ namespace backend.Domain
             lock (_lock)
             {
                 if (Player1Id != playerId && Player2Id != playerId) return;
+                if (_snake1.Count == 0 || _snake2.Count == 0) return; // Not initialized
                 if (!TryParseAction(action, out var dir)) return;
 
                 if (playerId == Player1Id && IsValidTurn(Dir1, dir)) _pending1 = dir;
@@ -174,6 +176,7 @@ namespace backend.Domain
             lock (_lock)
             {
                 if (!IsBotGame || IsFinished || !HasStarted || !_alive2) return;
+                if (_snake2.Count == 0) return; // Not initialized
 
                 var head = _snake2.First!.Value;
                 var best = Dir2;
