@@ -7,8 +7,8 @@ namespace backend.Domain
     {
         private readonly Lock _lock = new();
 
-        private const int BoardWidth = 30;
-        private const int BoardHeight = 20;
+        public static readonly int BoardWidth = 30;
+        public static readonly int BoardHeight = 20;
         private const int InitialLength = 3;
         private const int TickRateHz = 10;
         private const int GameTickIntervalMs = 1000 / TickRateHz;
@@ -115,8 +115,6 @@ namespace backend.Domain
 
         private bool IsDead(Point head, LinkedList<Point> me, LinkedList<Point> enemy, Point otherHead)
         {
-            if (head.X < 0 || head.X >= BoardWidth || head.Y < 0 || head.Y >= BoardHeight) return true;
-
             var cur = me.First!.Next;
             while (cur != null)
             {
@@ -196,11 +194,16 @@ public override void HandleAction(string playerId, JsonElement action)
 
         private int ScoreMove(Point p)
         {
-            if (p.X < 0 || p.X >= BoardWidth || p.Y < 0 || p.Y >= BoardHeight) return int.MinValue;
             if (_snake1.Contains(p) || _snake2.Contains(p)) return int.MinValue;
 
-            int s = p.Equals(Food) ? 1000 : 0;
-            s -= Math.Abs(p.X - Food.X) + Math.Abs(p.Y - Food.Y);
+            int dx = Math.Abs(p.X - Food.X);
+            int dy = Math.Abs(p.Y - Food.Y);
+            dx = Math.Min(dx, BoardWidth - dx);
+            dy = Math.Min(dy, BoardHeight - dy);
+            int dist = dx + dy;
+
+            int s = (p.X == Food.X && p.Y == Food.Y) ? 1000 : 0;
+            s -= dist;
             s += Math.Min(Math.Min(p.X, BoardWidth - 1 - p.X), Math.Min(p.Y, BoardHeight - 1 - p.Y)) * 2;
             return s;
         }
@@ -256,10 +259,10 @@ public override void HandleAction(string playerId, JsonElement action)
     {
         public Point Move(Direction d) => d switch
         {
-            Direction.Up => new(X, Y - 1),
-            Direction.Down => new(X, Y + 1),
-            Direction.Left => new(X - 1, Y),
-            Direction.Right => new(X + 1, Y),
+            Direction.Up => new(X, (Y - 1 + SnakeRoom.BoardHeight) % SnakeRoom.BoardHeight),
+            Direction.Down => new(X, (Y + 1) % SnakeRoom.BoardHeight),
+            Direction.Left => new((X - 1 + SnakeRoom.BoardWidth) % SnakeRoom.BoardWidth, Y),
+            Direction.Right => new((X + 1) % SnakeRoom.BoardWidth, Y),
             _ => this
         };
     }

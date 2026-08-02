@@ -140,6 +140,7 @@ namespace backend.Hubs
             if (!TryGetPlayerRoom(playerId, out var room, out var roomId)
                 || room!.IsFinished
                 || (room.WinnerPlayerId != null)
+                || !room.HasStarted
                 || (room.Player1Id != playerId && room.Player2Id != playerId))
                 return;
 
