@@ -25,7 +25,7 @@ export function MatchHistoryTable({ matches, locale, winLabel, lossLabel, drawLa
       {(match) => {
         const game = GamesList[match.kind];
         return (
-          <div className="flex items-center justify-between py-3 px-4 border-b border-border/50 last:border-0 hover:bg-surface/50 transition-colors gap-4">
+          <div className="flex items-center justify-between py-3 px-4 border-b border-border/50 last:border-0 gap-4">
             <div className="flex items-center gap-3 min-w-0 flex-1">
               <GIcon icon={game.icon} size={SizeEnum.sm} tile tileGradient={game.gradient} />
               <span className="font-medium text-text truncate">{gameLabels[match.kind]}</span>

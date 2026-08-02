@@ -24,6 +24,13 @@ import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 import { AvatarShapeEnum } from "@/domain/enum/AvatarShapeEnum";
 
+const statusColorText: Record<UserStatusEnum, string> = {
+  [UserStatusEnum.Online]: "text-success",
+  [UserStatusEnum.InGame]: "text-danger",
+  [UserStatusEnum.Offline]: "text-warning",
+  [UserStatusEnum.All]: "text-text-muted",
+};
+
 const formatStatus = (status: UserStatusEnum, t: TMessagesTranslation) => {
   switch (status) {
     case UserStatusEnum.Online:
@@ -137,38 +144,48 @@ function MessagesPage() {
               emptyMessage={t.noFriendsTitle}
               emptyDescription={t.noFriendsDescription}
               emptyIcon={<GIcon icon={MessagesSquare} size={SizeEnum.xl} color={AccentColorEnum.Muted} />}>
-              {(friend) => (
-                <GCard
-                  key={friend.id}
-                  padding={SizeEnum.sm}
-                  variant={CardVariantEnum.Outlined}
-                  rounded={SizeEnum.xl}
-                  onClick={() => router.push(`/messages?friend=${friend.id}`)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      router.push(`/messages?friend=${friend.id}`);
-                    }
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  className="flex items-center gap-3 cursor-pointer transition hover:bg-bg-card-hover focus-visible:ring-2 focus-visible:ring-primary">
-                  <div className="relative shrink-0">
-                    <GAvatar firstName={friend.firstName} lastName={friend.lastName} status={friend.status} size={SizeEnum.sm} shape={AvatarShapeEnum.Circle} />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="truncate text-sm font-semibold text-inherit">{friend.fullName}</h3>
-                    <div className="mt-1 flex items-center gap-2 text-xs text-text-muted">
-                      <span>@{friend.userName}</span>
+              {(friend) => {
+                const isActive = friend.id === selectedFriendId;
+                return (
+                  <GCard
+                    key={friend.id}
+                    padding={SizeEnum.sm}
+                    variant={CardVariantEnum.Outlined}
+                    rounded={SizeEnum.xl}
+                    onClick={() => {
+                      if (!isActive) router.push(`/messages?friend=${friend.id}`);
+                    }}
+                    onKeyDown={(e) => {
+                      if (!isActive && (e.key === "Enter" || e.key === " ")) {
+                        e.preventDefault();
+                        router.push(`/messages?friend=${friend.id}`);
+                      }
+                    }}
+                    role={!isActive ? "button" : undefined}
+                    tabIndex={!isActive ? 0 : undefined}
+                    className={clsx(
+                      "flex items-center gap-3",
+                      isActive
+                        ? "bg-primary-strong border-primary cursor-default"
+                        : "cursor-pointer transition hover:bg-bg-card-hover focus-visible:ring-2 focus-visible:ring-primary",
+                    )}>
+                    <div className="relative shrink-0">
+                      <GAvatar firstName={friend.firstName} lastName={friend.lastName} status={friend.status} size={SizeEnum.sm} shape={AvatarShapeEnum.Circle} />
                     </div>
-                  </div>
-                  {unreadCounts[friend.id] != null && unreadCounts[friend.id] > 0 && (
-                    <GBadge variant={AccentColorEnum.Danger} size={SizeEnum.sm} className="shrink-0 min-w-5 justify-center">
-                      {unreadCounts[friend.id]}
-                    </GBadge>
-                  )}
-                </GCard>
-              )}
+                    <div className="min-w-0 flex-1">
+                      <h3 className="truncate text-sm font-semibold text-inherit">{friend.fullName}</h3>
+                      <div className="mt-1 flex items-center gap-2 text-xs text-text-muted">
+                        <span>@{friend.userName}</span>
+                      </div>
+                    </div>
+                    {unreadCounts[friend.id] != null && unreadCounts[friend.id] > 0 && (
+                      <GBadge variant={AccentColorEnum.Danger} size={SizeEnum.sm} className="shrink-0 min-w-5 justify-center">
+                        {unreadCounts[friend.id]}
+                      </GBadge>
+                    )}
+                  </GCard>
+                );
+              }}
             </GList>
           )}
         </div>
@@ -192,11 +209,7 @@ function MessagesPage() {
               </div>
               <div className="min-w-0 flex-1">
                 <h2 className="truncate text-base font-bold text-text">{selectedFriend?.fullName ?? selectedFriendId}</h2>
-                <p
-                  className={clsx(
-                    "text-xs font-medium",
-                    (selectedFriend?.status ?? UserStatusEnum.Offline) === UserStatusEnum.InGame ? "text-primary" : "text-text-muted",
-                  )}>
+                <p className={clsx("text-xs font-medium", statusColorText[selectedFriend?.status ?? UserStatusEnum.Offline])}>
                   {selectedFriend ? formatStatus(selectedFriend.status ?? UserStatusEnum.Offline, t) : ""}
                 </p>
               </div>

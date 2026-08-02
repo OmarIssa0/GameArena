@@ -17,7 +17,7 @@ function GameCard({ name, desc, icon, onClick, gradientClass, playLabel, animati
   return (
     <GCard
       variant={CardVariantEnum.Glass}
-       padding={SizeEnum.lg}
+      padding={SizeEnum.lg}
       className={clsx(
         "group",
         "flex flex-col",
@@ -83,7 +83,10 @@ function GameCard({ name, desc, icon, onClick, gradientClass, playLabel, animati
 
         <p className="mt-2 text-sm text-text-secondary text-center flex-1">{desc}</p>
 
-        <GButton variant={AccentColorEnum.Primary} onClick={onClick} className="mt-6 w-full group-hover:scale-[1.02] transition-transform duration-200">
+        <GButton
+          variant={AccentColorEnum.Primary}
+          onClick={onClick}
+          className="mt-6 w-full group-hover:scale-[1.02] transition-transform duration-200">
           {playLabel}
         </GButton>
       </div>

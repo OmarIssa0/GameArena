@@ -45,6 +45,7 @@ function SentRequestsTab({ sentRequests, onCancel, t }: SentRequestsTabProps) {
               icon={isBusy ? Loader2 : X}
               size={SizeEnum.sm}
               tile
+              hover
               tileGradient="bg-danger/10"
               tileColor={AccentColorEnum.Danger}
               className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}

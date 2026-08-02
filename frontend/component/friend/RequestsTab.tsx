@@ -45,6 +45,7 @@ function RequestsTab({ requests, onAccept, onDecline, t }: RequestsTabProps) {
               icon={isBusy ? Loader2 : Check}
               size={SizeEnum.md}
               tile
+              hover
               tileGradient="bg-success/10"
               tileColor={AccentColorEnum.Success}
               className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}
@@ -62,6 +63,7 @@ function RequestsTab({ requests, onAccept, onDecline, t }: RequestsTabProps) {
               icon={isBusy ? Loader2 : X}
               size={SizeEnum.md}
               tile
+              hover
               tileGradient="bg-danger/10"
               tileColor={AccentColorEnum.Danger}
               className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}

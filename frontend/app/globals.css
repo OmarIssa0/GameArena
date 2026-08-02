@@ -69,6 +69,25 @@
   --color-danger-bg: rgb(229 115 115 / 0.1);
   --color-danger-strong: rgb(229 115 115 / 0.2);
 
+  --color-bg: var(--theme-bg);
+  --color-bg-elevated: var(--theme-bg-elevated);
+  --color-bg-card: var(--theme-bg-card);
+  --color-bg-card-hover: var(--theme-bg-card-hover);
+  --color-bg-sidebar: var(--theme-bg-sidebar);
+  --color-surface: var(--theme-surface);
+  --color-surface-hover: var(--theme-surface-hover);
+  --color-border: var(--theme-border);
+  --color-border-light: var(--theme-border-light);
+  --color-border-strong: var(--theme-border-strong);
+  --color-text: var(--theme-text);
+  --color-text-secondary: var(--theme-text-secondary);
+  --color-text-muted: var(--theme-text-muted);
+  --color-text-inverse: var(--theme-text-inverse);
+  --color-overlay: var(--theme-overlay);
+  --color-overlay-strong: var(--theme-overlay-strong);
+  --color-primary-glow: var(--theme-primary-glow);
+  --color-secondary-glow: var(--theme-secondary-glow);
+
   --transition-fast: 150ms ease;
   --transition-normal: 200ms ease;
   --transition-slow: 300ms ease;
@@ -275,8 +294,10 @@ select option {
   color: var(--color-text);
   border-color: var(--color-border);
 }
-*, *::before, *::after, ::backdrop {
-  border-color: var(--color-border-light);
+@layer base {
+  *, *::before, *::after, ::backdrop {
+    border-color: var(--color-border-light);
+  }
 }
 
 img, svg, video, canvas {

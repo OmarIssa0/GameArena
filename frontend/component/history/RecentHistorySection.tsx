@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowRight, Frown, Handshake, History, Trophy } from "lucide-react";
+import clsx from "clsx";
 import { useLocale, useTranslation } from "@/hooks/useSetting";
 import { useMatchHistory } from "@/hooks/useMatchHistory";
 import { GSpinner } from "@/component/common/GSpinner";
@@ -22,9 +23,9 @@ function RecentHistorySection({ title, viewAll, emptyTitle, emptyDescription, li
   const historyT = useTranslation({ en, ar }) as THistoryTranslation;
   const { matches, summary, loading } = useMatchHistory(MatchStatusEnum.All, limit);
   const items = [
-    { label: historyT.summary.wins, value: summary.wins, icon: Trophy, iconColor: AccentColorEnum.Success },
-    { label: historyT.summary.losses, value: summary.losses, icon: Frown, iconColor: AccentColorEnum.Danger },
-    { label: historyT.summary.draws, value: summary.draws, icon: Handshake, iconColor: AccentColorEnum.Primary },
+    { label: historyT.summary.wins, value: summary.wins, icon: Trophy, backGroundColor: AccentColorEnum.Success },
+    { label: historyT.summary.losses, value: summary.losses, icon: Frown, backGroundColor: AccentColorEnum.Danger },
+    { label: historyT.summary.draws, value: summary.draws, icon: Handshake, backGroundColor: AccentColorEnum.Warning },
   ];
   return (
     <section>
@@ -52,8 +53,10 @@ function RecentHistorySection({ title, viewAll, emptyTitle, emptyDescription, li
         <div className="flex flex-col gap-4">
           <GList items={items} keyExtractor={(item) => item.label} listClassName="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" noPagination>
             {(item) => (
-              <div className="flex items-center gap-3 p-3.5 bg-bg-card border border-border rounded-lg hover:border-border-light hover:bg-bg-card-hover transition-all duration-200">
-                <GIcon icon={item.icon} size={SizeEnum.md} tile tileGradient={`bg-${item.iconColor}`} tileColor={AccentColorEnum.Text} />
+              <div className="flex items-center gap-3 p-3.5 bg-bg-card border border-border rounded-lg">
+                <div className="relative">
+                  <GIcon icon={item.icon} size={SizeEnum.md} color={AccentColorEnum.Muted} tile tileGradient={item.backGroundColor} />
+                </div>
                 <div>
                   <p className="text-xl font-extrabold leading-tight text-text">{item.value}</p>
                   <p className="text-xs font-medium text-text-secondary mt-0.5">{item.label}</p>

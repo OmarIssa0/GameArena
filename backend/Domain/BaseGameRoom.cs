@@ -30,6 +30,7 @@ namespace backend.Domain
             {
                 GamesKind.TicTacToe => new TicTacToeRoom(),
                 GamesKind.PingPong => new PingPongRoom(),
+                GamesKind.Snake => new SnakeRoom(),
                 _ => throw new AppException(ErrorCode.InvalidGameType)
             };
         }

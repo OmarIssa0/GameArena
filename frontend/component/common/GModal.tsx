@@ -110,7 +110,7 @@ function GModal({
       <GBackdrop onClick={handleBackdropClick} />
       <GCard
         padding={cardPadding}
-        className={clsx("relative z-50 mx-auto w-full", sizeStyles[size])}
+        className={clsx("relative z-50 mx-auto w-full ", sizeStyles[size])}
         onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         {ariaDescription && (
           <p id="modal-description" className="sr-only">

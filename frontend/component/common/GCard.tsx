@@ -10,7 +10,7 @@ const variants: Record<CardVariantEnum, string> = {
   [CardVariantEnum.Glass]: "bg-bg-card border border-border transition-all duration-300 hover:border-border-light",
   [CardVariantEnum.Interactive]:
     "bg-bg-card border border-border transition-all duration-300 hover:border-border-light hover:bg-bg-card-hover hover:-translate-y-0.5 cursor-pointer",
-  [CardVariantEnum.Outlined]: "bg-transparent border border-border-light transition-all duration-300 hover:border-border",
+  [CardVariantEnum.Outlined]: "bg-transparent border border-border-light transition-all duration-300",
   [CardVariantEnum.Gradient]:
     "bg-bg-card border border-border relative before:content-[''] before:absolute before:-inset-[1px] before:rounded-[inherit] before:bg-gradient-to-br before:from-primary before:via-secondary before:to-accent before:opacity-0 before:transition-opacity before:duration-300 hover:before:opacity-100",
 };
