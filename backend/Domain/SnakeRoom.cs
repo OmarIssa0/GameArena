@@ -143,12 +143,13 @@ namespace backend.Domain
             if (WinnerPlayerId != null) IsFinished = true;
         }
 
-        public override void HandleAction(string playerId, JsonElement action)
+public override void HandleAction(string playerId, JsonElement action)
         {
             lock (_lock)
             {
+                Console.WriteLine($"[SnakeRoom] HandleAction: player={playerId}, action={action}");
                 if (Player1Id != playerId && Player2Id != playerId) return;
-                if (_snake1.Count == 0 || _snake2.Count == 0) return; // Not initialized
+                if (_snake1.Count == 0 || _snake2.Count == 0) return;
                 if (!TryParseAction(action, out var dir)) return;
 
                 if (playerId == Player1Id && IsValidTurn(Dir1, dir)) _pending1 = dir;
