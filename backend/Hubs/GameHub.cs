@@ -177,6 +177,7 @@ namespace backend.Hubs
 
             room.HasStarted = true;
             room.CurrentTurnPlayerId = room.Player1Id!;
+            room.ResetForNewRound();
 
             await _eventBus.PublishAsync(new GameStartedEvent(room.Player1Id!, room.Player2Id!));
             await Clients.Group(roomId!).SendAsync("gameState", room.GetStatePayload());
