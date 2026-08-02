@@ -115,16 +115,23 @@ namespace backend.Services
         {
             if (!_rooms.TryGetValue(roomId, out var room)) return;
 
-            room.HandleAction(playerId, action);
+            try
+            {
+                room.HandleAction(playerId, action);
 
-            if (room.IsBotGame)
-                room.MakeBotMove();
+                if (room.IsBotGame)
+                    room.MakeBotMove();
 
-            await _hubContext.Clients.Group(roomId)
-                .SendAsync("gameState", room.GetStatePayload());
+                await _hubContext.Clients.Group(roomId)
+                    .SendAsync("gameState", room.GetStatePayload());
 
-            if (room.WinnerPlayerId != null)
-                await FinishAndCleanupAsync(room, roomId, false);
+                if (room.WinnerPlayerId != null)
+                    await FinishAndCleanupAsync(room, roomId, false);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"ProcessActionAsync error: {ex.Message}");
+            }
         }
 
         public async Task RequestPlayAgainAsync(string roomId, string playerId)

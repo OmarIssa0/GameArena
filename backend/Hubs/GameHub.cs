@@ -143,7 +143,15 @@ namespace backend.Hubs
                 || (room.Player1Id != playerId && room.Player2Id != playerId))
                 return;
 
-            await _roomService.ProcessActionAsync(roomId!, playerId, action);
+            try
+            {
+                await _roomService.ProcessActionAsync(roomId!, playerId, action);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing game action for player {PlayerId}", playerId);
+                throw new HubException("Failed to process game action");
+            }
         }
 
         public async Task StartGame(string? friendId, GamesKind gameKind)
