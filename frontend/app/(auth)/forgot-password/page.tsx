@@ -83,7 +83,7 @@ function ForgotPasswordPage() {
             onChange={(e) => handleChange(e.target.value)}
             className="w-full"
           />
-          <GButton loading={loading} onClick={send} fullWidth>
+          <GButton loading={loading} loadingText={t.sendCode} onClick={send} fullWidth>
             {t.sendCode}
           </GButton>
           <div className="pt-2 text-center">

@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import type { GCardProps } from "./def/GCard";
-import { THashMap } from "@/domain/type/TCommon";
+import type { THashMap } from "@/domain/type/TCommon";
 
 const variants: Record<CardVariantEnum, string> = {
   [CardVariantEnum.Default]: "bg-bg-card border border-border transition-all duration-300",
@@ -25,10 +25,10 @@ const paddings: THashMap<string> = {
 
 const roundedStyles: THashMap<string> = {
   [SizeEnum.None]: "rounded-none",
-  [SizeEnum.sm]: "rounded-[var(--radius-sm)]",
-  [SizeEnum.md]: "rounded-[var(--radius-md)]",
-  [SizeEnum.lg]: "rounded-[var(--radius-lg)]",
-  [SizeEnum.xl]: "rounded-[var(--radius-xl)]",
+  [SizeEnum.sm]: "rounded-sm",
+  [SizeEnum.md]: "rounded-md",
+  [SizeEnum.lg]: "rounded-lg",
+  [SizeEnum.xl]: "rounded-xl",
   [SizeEnum.full]: "rounded-full",
 };
 

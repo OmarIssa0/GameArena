@@ -9,6 +9,9 @@ import type { IMessage } from "@/domain/meta/IMessage";
 import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import type { TNullable } from "@/domain/type/TCommon";
 import { useFetch } from "./useFetch";
+import { useTranslation } from "./useSetting";
+import { ar as messagesAr } from "@/app/(dashboard)/messages/i18n/ar.i18n";
+import { en as messagesEn, type TMessagesTranslation } from "@/app/(dashboard)/messages/i18n/en.i18n";
 
 const normalizeHistoryMessage = (message: IMessage): IMessage => ({
   ...message,
@@ -24,6 +27,7 @@ const areSameMessage = (left: IMessage, right: IMessage): boolean =>
 export function useMessages(initialFriendId?: TNullable<string>) {
   const { isChatConnected: isConnected } = useConnections();
   const { user } = useAuth();
+  const t = useTranslation({ en: messagesEn, ar: messagesAr }) as TMessagesTranslation;
   const { friends, loading: friendsLoading } = useFriends();
   const [selectedFriendId, setSelectedFriendId] = useState<TNullable<string>>(initialFriendId ?? null);
   const prevInitialRef = useRef(initialFriendId);
@@ -40,12 +44,16 @@ export function useMessages(initialFriendId?: TNullable<string>) {
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<TNullable<string>>(null);
 
-  const { data: apiMessages, loading: loadingMessages, error } = useFetch(() => {
-    if (!selectedFriendId) return Promise.resolve([] as IMessage[]);
-    return chatService
-      .getMessagesByFriendId(selectedFriendId)
-      .then((res) => (res.data ?? []).map(normalizeHistoryMessage));
-  }, [selectedFriendId]);
+  const { data: apiMessages, loading: loadingMessages, error } = useFetch(
+    () => {
+      if (!selectedFriendId) return Promise.resolve([] as IMessage[]);
+      return chatService
+        .getMessagesByFriendId(selectedFriendId)
+        .then((res) => (res.data ?? []).map(normalizeHistoryMessage));
+    },
+    [selectedFriendId],
+    t.error.title,
+  );
 
   const baseMessages = useMemo(() => apiMessages ?? [], [apiMessages]);
   const messages = useMemo(() => {
@@ -105,12 +113,12 @@ export function useMessages(initialFriendId?: TNullable<string>) {
     try {
       await chatService.sendMessage(selectedFriendId, content);
     } catch {
-      setSendError("Unable to send message. Please try again.");
+      setSendError(t.error.send);
       setLocalMessages((prev) => prev.filter((m) => m !== outgoing));
     } finally {
       setSending(false);
     }
-  }, [draft, selectedFriendId, user]);
+  }, [draft, selectedFriendId, user, t]);
 
   return {
     isConnected,

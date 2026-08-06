@@ -1,15 +1,21 @@
+"use client";
+
 import clsx from "clsx";
+
+import { ar } from "@/component/i18n/GLabel/ar.i18n";
+import { en, type GLabelTranslation } from "@/component/i18n/GLabel/en.i18n";
+import { useTranslation } from "@/hooks/useSetting";
+
 import type { GLabelProps } from "./def/GLabel";
 
 function GLabel({ required, className, children, ...props }: GLabelProps) {
+  const t = useTranslation({ en, ar }) as GLabelTranslation;
+
   return (
-    <label
-      className={clsx("block text-sm font-medium text-text-secondary", className)}
-      {...props}
-    >
+    <label className={clsx("block text-sm font-medium text-text-secondary", className)} {...props}>
       {children}
       {required && (
-        <span className="text-danger ms-0.5" aria-label="required">
+        <span className="text-danger ms-0.5" aria-label={t.required}>
           *
         </span>
       )}

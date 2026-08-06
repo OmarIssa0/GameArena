@@ -22,6 +22,10 @@ const ar: TMessagesTranslation = {
   selectConversationDescription: "اختر صديقاً من القائمة اليسرى لفتح الدردشة.",
   noUsername: "بدون اسم مستخدم",
   unknownUser: "مستخدم غير معروف",
+  error: {
+    title: "تعذر تحميل الرسائل",
+    send: "تعذر إرسال الرسالة. يرجى المحاولة مرة أخرى.",
+  },
 };
 
 export { ar };

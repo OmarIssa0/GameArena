@@ -28,7 +28,7 @@ export default function MatchHistoryPage() {
   const [locale] = useLocale();
   const t = useTranslation({ en, ar }) as THistoryTranslation;
   const [filter, setFilter] = useState(MatchStatusEnum.All);
-  const { matches, loading, error } = useMatchHistory(filter);
+  const { matches, loading, error } = useMatchHistory(filter, undefined, t.error.title);
   const tabs = useMemo<GTabItem<MatchStatusEnum>[]>(
     () => [
       { id: MatchStatusEnum.All, label: t.filters.all },
@@ -64,7 +64,7 @@ export default function MatchHistoryPage() {
         {!loading && error && (
           <GEmpty
             icon={<GIcon icon={AlertTriangle} size={SizeEnum.xl} color={AccentColorEnum.Danger} />}
-            title="Unable to load history"
+            title={t.error.title}
             description={error}
           />
         )}

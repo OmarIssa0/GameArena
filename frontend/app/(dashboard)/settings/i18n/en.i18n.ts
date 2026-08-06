@@ -10,6 +10,7 @@ const en = {
       email: "Email",
       save: "Save Changes",
       saved: "Profile updated successfully",
+      saveFailed: "Failed to save profile",
       linkedAccounts: "Linked Accounts",
       connected: "Connected",
       notConnected: "Not connected",
@@ -25,6 +26,7 @@ const en = {
       confirmPassword: "Confirm New Password",
       save: "Update Password",
       saved: "Password changed successfully",
+      saveFailed: "Failed to change password",
       invalidCurrentPassword: "Invalid current password",
     },
     preferences: {
@@ -32,6 +34,7 @@ const en = {
       subtitle: "Customize your Arena 404 experience",
       save: "Save Preferences",
       saved: "Preferences saved",
+      saveFailed: "Failed to save preferences",
       theme: "Dark Theme",
       darkMode: "Dark Mode",
       language: "Language",

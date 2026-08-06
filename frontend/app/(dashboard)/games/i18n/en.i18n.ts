@@ -14,6 +14,7 @@ const en = {
   leaveConfirm: "Leave & Start New",
   returnToGame: "Return to Game",
   gameRunning: "Game Running",
+  leaveConfirmation: "Leave game confirmation",
 };
 type TGamesTranslation = typeof en;
 export { en, type TGamesTranslation };

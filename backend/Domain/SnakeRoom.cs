@@ -10,22 +10,21 @@ namespace backend.Domain
         public static readonly int BoardWidth = 30;
         public static readonly int BoardHeight = 20;
         private const int InitialLength = 3;
-        private const int TickRateHz = 10;
-        private const int GameTickIntervalMs = 1000 / TickRateHz;
+        private const int GameTickIntervalMs = 100;
 
         private const string ActionChangeDirection = "CHANGE_DIRECTION";
 
         public int Score1 { get; private set; }
         public int Score2 { get; private set; }
         public Point Food { get; private set; }
-        public Direction Dir1 { get; private set; } = Direction.Right;
-        public Direction Dir2 { get; private set; } = Direction.Left;
+        public DirectionEnum Dir1 { get; private set; } = DirectionEnum.Right;
+        public DirectionEnum Dir2 { get; private set; } = DirectionEnum.Left;
 
         private readonly LinkedList<Point> _snake1 = new();
         private readonly LinkedList<Point> _snake2 = new();
 
-        private Direction? _pending1;
-        private Direction? _pending2;
+        private DirectionEnum? _pending1;
+        private DirectionEnum? _pending2;
         private bool _alive1 = true;
         private bool _alive2 = true;
 
@@ -64,7 +63,7 @@ namespace backend.Domain
             if (_alive2) MoveSnake(_snake2, Dir2);
         }
 
-        private bool MoveSnake(LinkedList<Point> snake, Direction dir)
+        private bool MoveSnake(LinkedList<Point> snake, DirectionEnum dir)
         {
             var head = snake.First!.Value;
             var next = head.Move(dir);
@@ -141,11 +140,10 @@ namespace backend.Domain
             if (WinnerPlayerId != null) IsFinished = true;
         }
 
-public override void HandleAction(string playerId, JsonElement action)
+        public override void HandleAction(string playerId, JsonElement action)
         {
             lock (_lock)
             {
-                Console.WriteLine($"[SnakeRoom] HandleAction: player={playerId}, action={action}");
                 if (Player1Id != playerId && Player2Id != playerId) return;
                 if (_snake1.Count == 0 || _snake2.Count == 0) return;
                 if (!TryParseAction(action, out var dir)) return;
@@ -155,20 +153,20 @@ public override void HandleAction(string playerId, JsonElement action)
             }
         }
 
-        private static bool TryParseAction(JsonElement action, out Direction dir)
+        private static bool TryParseAction(JsonElement action, out DirectionEnum dir)
         {
             dir = default;
             if (action.ValueKind != JsonValueKind.Object) return false;
             if (!action.TryGetProperty("type", out var t) || !t.ValueEquals(ActionChangeDirection)) return false;
             if (!action.TryGetProperty("direction", out var d)) return false;
-            return Enum.TryParse<Direction>(d.GetString(), true, out dir);
+            return Enum.TryParse<DirectionEnum>(d.GetString(), true, out dir);
         }
 
-        private static bool IsValidTurn(Direction cur, Direction next)
-            => (cur, next) is not (Direction.Up, Direction.Down)
-                and not (Direction.Down, Direction.Up)
-                and not (Direction.Left, Direction.Right)
-                and not (Direction.Right, Direction.Left);
+        private static bool IsValidTurn(DirectionEnum cur, DirectionEnum next)
+            => (cur, next) is not (DirectionEnum.Up, DirectionEnum.Down)
+                and not (DirectionEnum.Down, DirectionEnum.Up)
+                and not (DirectionEnum.Left, DirectionEnum.Right)
+                and not (DirectionEnum.Right, DirectionEnum.Left);
 
         public override void MakeBotMove()
         {
@@ -181,7 +179,7 @@ public override void HandleAction(string playerId, JsonElement action)
                 var best = Dir2;
                 var bestScore = int.MinValue;
 
-                foreach (var d in Enum.GetValues<Direction>())
+                foreach (var d in Enum.GetValues<DirectionEnum>())
                 {
                     if (!IsValidTurn(Dir2, d)) continue;
                     var next = head.Move(d);
@@ -214,7 +212,7 @@ public override void HandleAction(string playerId, JsonElement action)
             {
                 base.ResetForNewRound();
                 Score1 = Score2 = 0;
-                Dir1 = Direction.Right; Dir2 = Direction.Left;
+                Dir1 = DirectionEnum.Right; Dir2 = DirectionEnum.Left;
                 _pending1 = _pending2 = null;
                 _alive1 = _alive2 = true;
 
@@ -231,6 +229,7 @@ public override void HandleAction(string playerId, JsonElement action)
         public override object GetStatePayload() => new
         {
             roomId = RoomId,
+            gameType = GameType,
             player1Id = Player1Id,
             player1Username = Player1Username,
             player2Id = Player2Id,
@@ -244,28 +243,30 @@ public override void HandleAction(string playerId, JsonElement action)
             currentTurnPlayerId = CurrentTurnPlayerId,
             boardWidth = BoardWidth,
             boardHeight = BoardHeight,
-            foodPosition = Food,
-            snake1Positions = _snake1.ToArray(),
-            snake2Positions = _snake2.ToArray(),
+            food = Food,
+            player1Snake = _snake1.ToArray(),
+            player2Snake = _snake2.ToArray(),
             player1Direction = Dir1.ToString(),
             player2Direction = Dir2.ToString(),
             player1Score = Score1,
             player2Score = Score2,
-            score = Score
+            score = Score,
+            winScore = 0,
+            tickRateHz = 10
         };
     }
 
     public readonly record struct Point(int X, int Y)
     {
-        public Point Move(Direction d) => d switch
+        public Point Move(DirectionEnum d) => d switch
         {
-            Direction.Up => new(X, (Y - 1 + SnakeRoom.BoardHeight) % SnakeRoom.BoardHeight),
-            Direction.Down => new(X, (Y + 1) % SnakeRoom.BoardHeight),
-            Direction.Left => new((X - 1 + SnakeRoom.BoardWidth) % SnakeRoom.BoardWidth, Y),
-            Direction.Right => new((X + 1) % SnakeRoom.BoardWidth, Y),
+            DirectionEnum.Up => new(X, (Y - 1 + SnakeRoom.BoardHeight) % SnakeRoom.BoardHeight),
+            DirectionEnum.Down => new(X, (Y + 1) % SnakeRoom.BoardHeight),
+            DirectionEnum.Left => new((X - 1 + SnakeRoom.BoardWidth) % SnakeRoom.BoardWidth, Y),
+            DirectionEnum.Right => new((X + 1) % SnakeRoom.BoardWidth, Y),
             _ => this
         };
     }
 
-    public enum Direction { Up, Down, Left, Right }
+    
 }

@@ -20,10 +20,10 @@ function InviteModal({
   friends,
   onSelect,
   onClose,
-  title = "Invite a Friend",
-  cancelLabel = "Cancel",
-  searchPlaceholder = "Search friends...",
-  noFriendsText = "No friends found",
+  title,
+  cancelLabel,
+  searchPlaceholder,
+  noFriendsText,
 }: InviteModalProps) {
   if (!open) return null;
 

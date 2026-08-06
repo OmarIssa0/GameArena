@@ -2,14 +2,16 @@
 
 import { useState } from "react";
 import { Loader2, Send, X } from "lucide-react";
-import { FriendsList } from "../SocialPanel/FriendsList";
-import { GEmpty } from "../common/GEmpty";
-import { GIcon } from "../common/GIcon";
-import type { SentRequestsTabProps } from "./def/FriendsTab";
+
+import { GEmpty } from "@/component/common/GEmpty";
+import { GIcon } from "@/component/common/GIcon";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
 import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import type { TNullable } from "@/domain/type/TCommon";
-import { SizeEnum } from "@/domain/enum/SizeEnum";
-import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+
+import { FriendsList } from "../SocialPanel/FriendsList";
+import type { SentRequestsTabProps } from "./def/FriendsTab";
 
 function SentRequestsTab({ sentRequests, onCancel, t }: SentRequestsTabProps) {
   const [actionId, setActionId] = useState<TNullable<string>>(null);
@@ -35,8 +37,6 @@ function SentRequestsTab({ sentRequests, onCancel, t }: SentRequestsTabProps) {
   return (
     <FriendsList
       friends={friends}
-      messageLabel={t.message}
-      activeLabel={t.message}
       actions={(friend) => {
         const isBusy = actionId === friend.id;
         return (

@@ -29,13 +29,13 @@ const en = {
     pong: "Ping Pong",
     pongDesc: "Retro table tennis",
   },
-  recentHistory: {
+   recentHistory: {
     title: "Recent Battles",
     viewAll: "View all",
     emptyTitle: "No battles yet",
     emptyDescription: "Play your first match and your history will show up here.",
   },
-  enterArena: "Enter the Arena",
+enterArena: "Enter the Arena",
   gamesAvailable: "Games Available",
 };
 

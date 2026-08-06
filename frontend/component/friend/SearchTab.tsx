@@ -2,29 +2,31 @@
 
 import { useEffect, useState } from "react";
 import { Filter, Search, UserPlus, X } from "lucide-react";
-import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
-import { friendService } from "@/services/def/FriendService";
-import { userService } from "@/services/def/UserService";
-import { GButton } from "../common/GButton";
-import { GSelect } from "../common/GSelect";
-import { GSpinner } from "../common/GSpinner";
-import { GCard } from "../common/GCard";
-import { GList } from "../common/GList";
-import { GBadge } from "../common/GBadge";
-import { GAvatar } from "../common/GAvatar";
-import { GIcon } from "../common/GIcon";
-import { useTranslation } from "@/hooks/useSetting";
-import { GTextField } from "../common/GTextField";
-import { en, type TFriendsTranslation } from "@/app/(dashboard)/friends/i18n/en.i18n";
+
 import { ar } from "@/app/(dashboard)/friends/i18n/ar.i18n";
-import type { TNullable } from "@/domain/type/TCommon";
-import type { IUserFilterRequest } from "@/domain/meta/IUserFilterRequest";
-import type { IUserSummary } from "@/domain/meta/IUserSummary";
-import type { ISearchResult } from "./def/SearchTab";
+import { en, type TFriendsTranslation } from "@/app/(dashboard)/friends/i18n/en.i18n";
+import { GAvatar } from "@/component/common/GAvatar";
+import { GBadge } from "@/component/common/GBadge";
+import { GButton } from "@/component/common/GButton";
+import { GCard } from "@/component/common/GCard";
+import { GIcon } from "@/component/common/GIcon";
+import { GList } from "@/component/common/GList";
+import { GSelect } from "@/component/common/GSelect";
+import { GSpinner } from "@/component/common/GSpinner";
+import { GTextField } from "@/component/common/GTextField";
+import { AvatarShapeEnum } from "@/domain/enum/AvatarShapeEnum";
+import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
-import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
-import { AvatarShapeEnum } from "@/domain/enum/AvatarShapeEnum";
+import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
+import type { IUserFilterRequest } from "@/domain/meta/IUserFilterRequest";
+import type { IUserSummary } from "@/domain/meta/IUserSummary";
+import type { TNullable } from "@/domain/type/TCommon";
+import { useTranslation } from "@/hooks/useSetting";
+import { friendService } from "@/services/def/FriendService";
+import { userService } from "@/services/def/UserService";
+
+import type { ISearchResult } from "./def/SearchTab";
 
 const defaultFilter: IUserFilterRequest = {
   name: "",
@@ -67,7 +69,6 @@ function SearchTab() {
         ]);
 
         const sentIds = new Set((sentRes.data ?? []).map((request: { receiverId: string }) => request.receiverId));
-
         const friendIds = new Set((friendsRes.data ?? []).map((friend: IUserSummary) => friend.id));
 
         if (!ignore) {
@@ -127,13 +128,15 @@ function SearchTab() {
           startIcon={<GIcon icon={Search} size={SizeEnum.sm} color={AccentColorEnum.Muted} />}
           endIcon={
             userFilter.name && (
-              <button
+              <GButton
                 type="button"
                 onClick={clearSearch}
-                aria-label={t.searchTab.clearSearch || "Clear search"}
-                className="text-text-muted hover:text-text">
+                aria-label={t.searchTab.clearSearch}
+                variant={AccentColorEnum.Muted}
+                size={SizeEnum.xs}
+                className="!p-0 text-text-muted hover:text-text">
                 <GIcon icon={X} size={SizeEnum.sm} color={AccentColorEnum.Muted} flip={false} />
-              </button>
+              </GButton>
             )
           }
         />

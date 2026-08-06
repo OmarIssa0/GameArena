@@ -4,6 +4,8 @@
     {
         TicTacToe,
         PingPong,
-        Snake
+        Snake,
+        RockPaperScissors,
+        ConnectFour,
     }
 }

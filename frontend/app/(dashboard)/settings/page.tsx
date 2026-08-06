@@ -107,7 +107,7 @@ function SettingsPage() {
       });
       showMessage(t.settings.profile.saved);
     } catch {
-      showMessage("Failed to save profile");
+      showMessage(t.settings.profile.saveFailed);
     }
     setSaving(false);
   };
@@ -141,7 +141,7 @@ function SettingsPage() {
       if (message.includes("invalid") || message.includes("wrong") || message.includes("incorrect")) {
         setPasswordErrors({ oldPassword: t.settings.password.invalidCurrentPassword });
       } else {
-        showMessage("Failed to change password");
+        showMessage(t.settings.password.saveFailed);
       }
     }
     setSaving(false);
@@ -159,7 +159,7 @@ function SettingsPage() {
       updatePreferences(toPersist);
       showMessage(t.settings.preferences.saved);
     } catch {
-      showMessage("Failed to save preferences");
+      showMessage(t.settings.preferences.saveFailed);
     }
     setPrefSaving(false);
   };

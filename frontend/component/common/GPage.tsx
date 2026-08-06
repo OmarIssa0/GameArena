@@ -3,13 +3,13 @@ import type { GPageProps } from "./def/GPage";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 
 const pageWidth: Record<SizeEnum, string> = {
-  [SizeEnum.None]: "max-w-[48rem]",
-  [SizeEnum.xs]: "max-w-[30rem]",
-  [SizeEnum.sm]: "max-w-[36rem]",
-  [SizeEnum.md]: "max-w-[48rem]",
-  [SizeEnum.lg]: "max-w-[72rem]",
-  [SizeEnum.xl]: "max-w-[80rem]",
-  [SizeEnum.icon]: "max-w-[48rem]",
+  [SizeEnum.None]: "max-w-3xl",
+  [SizeEnum.xs]: "max-w-xl",
+  [SizeEnum.sm]: "max-w-2xl",
+  [SizeEnum.md]: "max-w-3xl",
+  [SizeEnum.lg]: "max-w-6xl",
+  [SizeEnum.xl]: "max-w-7xl",
+  [SizeEnum.icon]: "max-w-3xl",
   [SizeEnum.full]: "max-w-full",
 };
 

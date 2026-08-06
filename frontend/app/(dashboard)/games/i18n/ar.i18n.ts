@@ -14,6 +14,7 @@ const ar = {
   leaveConfirm: "غادر وابدأ جديدة",
   returnToGame: "العودة إلى اللعبة",
   gameRunning: "اللعبة جارية",
+  leaveConfirmation: "تأكيد مغادرة اللعبة",
 };
 
 export { ar };

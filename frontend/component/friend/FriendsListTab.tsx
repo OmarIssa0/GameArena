@@ -1,17 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { Users, MessageSquare, ShieldBan, UserMinus, Loader2 } from "lucide-react";
-import { FriendsList } from "../SocialPanel/FriendsList";
-import { GButton } from "../common/GButton";
-import { GEmpty } from "../common/GEmpty";
-import { GIcon } from "../common/GIcon";
-import type { FriendsListTabProps } from "./def/FriendsTab";
-import type { TNullable } from "@/domain/type/TCommon";
-import { SizeEnum } from "@/domain/enum/SizeEnum";
-import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { Loader2, MessageSquare, ShieldBan, UserMinus, Users } from "lucide-react";
 
-function FriendsListTab({ friends, messageLabel, activeLabel, onMessage, onBlock, onRemove, onAddFriend, t }: FriendsListTabProps) {
+import { GButton } from "@/component/common/GButton";
+import { GEmpty } from "@/component/common/GEmpty";
+import { GIcon } from "@/component/common/GIcon";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import type { TNullable } from "@/domain/type/TCommon";
+
+import { FriendsList } from "../SocialPanel/FriendsList";
+import type { FriendsListTabProps } from "./def/FriendsTab";
+
+function FriendsListTab({ friends, onMessage, onBlock, onRemove, onAddFriend, t }: FriendsListTabProps) {
   const [actionId, setActionId] = useState<TNullable<string>>(null);
 
   if (friends.length === 0) {
@@ -30,8 +32,6 @@ function FriendsListTab({ friends, messageLabel, activeLabel, onMessage, onBlock
   return (
     <FriendsList
       friends={friends}
-      messageLabel={messageLabel}
-      activeLabel={activeLabel}
       actions={(friend) => {
         const isBusy = actionId === friend.id;
         return (
@@ -62,7 +62,7 @@ function FriendsListTab({ friends, messageLabel, activeLabel, onMessage, onBlock
                   setActionId(null);
                 }
               }}
-              ariaLabel="Block"
+              ariaLabel={t.actions.block}
             />
             <GIcon
               icon={isBusy ? Loader2 : UserMinus}
@@ -80,7 +80,7 @@ function FriendsListTab({ friends, messageLabel, activeLabel, onMessage, onBlock
                   setActionId(null);
                 }
               }}
-              ariaLabel="Remove friend"
+              ariaLabel={t.actions.removeFriend}
             />
           </div>
         );

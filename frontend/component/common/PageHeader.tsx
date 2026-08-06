@@ -1,8 +1,6 @@
 import clsx from "clsx";
-import type { ReactNode } from "react";
 import { GIcon } from "./GIcon";
 import { GCard } from "./GCard";
-import type { LucideIcon } from "lucide-react";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";

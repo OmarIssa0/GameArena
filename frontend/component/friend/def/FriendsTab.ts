@@ -5,8 +5,6 @@ import type { TFriendsTranslation } from "@/app/(dashboard)/friends/i18n/en.i18n
 
 interface FriendsListTabProps {
   friends: IUserSummary[];
-  messageLabel: string;
-  activeLabel: string;
   onMessage: (friendId: string) => void;
   onBlock: (friendId: string) => Promise<void>;
   onRemove: (friendId: string) => Promise<void>;

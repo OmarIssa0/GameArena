@@ -53,6 +53,10 @@ const en = {
     unblock: "Unblock",
     unblockError: "Failed to unblock user. Please try again.",
   },
+  actions: {
+    block: "Block user",
+    removeFriend: "Remove friend",
+  },
 };
 
 type TFriendsTranslation = typeof en;

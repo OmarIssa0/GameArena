@@ -17,7 +17,7 @@ const variantStyles: Record<
   }
 > = {
   [TabsVariantEnum.Pills]: {
-    tab: "px-4 py-2 rounded-[var(--radius-md)] text-sm font-medium",
+    tab: "px-4 py-2 rounded-md text-sm font-medium",
     active: "bg-primary text-on-primary",
     idle: "text-text-secondary hover:bg-primary-muted hover:text-text",
   },
@@ -28,12 +28,12 @@ const variantStyles: Record<
     list: "border-b border-border",
   },
   [TabsVariantEnum.Sidebar]: {
-    tab: "px-3 py-2.5 text-sm font-medium",
-    active: "bg-primary-muted text-primary font-semibold border-s-[3px] border-s-primary",
-    idle: "text-text-secondary hover:bg-primary-muted hover:text-text border-s-[3px] border-s-transparent",
+    tab: "px-3 py-2.5 text-sm font-medium border-s-[3px]",
+    active: "bg-primary-muted text-primary font-semibold border-s-primary",
+    idle: "text-text-secondary hover:bg-primary-muted hover:text-text border-s-transparent",
   },
   [TabsVariantEnum.Default]: {
-    tab: "px-4 py-2 rounded-[var(--radius-md)] text-sm font-medium",
+    tab: "px-4 py-2 rounded-md text-sm font-medium",
     active: "bg-primary text-on-primary",
     idle: "text-text-secondary hover:bg-primary-muted hover:text-text",
   },

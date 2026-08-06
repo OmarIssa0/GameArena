@@ -1,5 +1,5 @@
 import { SizeEnum } from "@/domain/enum/SizeEnum";
-import { THashMap } from "@/domain/type/TCommon";
+import type { THashMap } from "@/domain/type/TCommon";
 
 export const INPUT_SIZES: THashMap<string> = {
   [SizeEnum.xs]: "px-2.5 py-1.5 text-xs",
@@ -11,7 +11,7 @@ export const INPUT_SIZES: THashMap<string> = {
 };
 
 export const FIELD_BASE_CLASS = `
-  w-full bg-surface border border-border rounded-[var(--radius-md)] text-text transition-all duration-150
+  w-full bg-surface border border-border rounded-md text-text transition-all duration-150
   hover:border-border-light focus:border-primary focus:ring-3 focus:ring-primary-muted
   placeholder:text-text-muted
 `;

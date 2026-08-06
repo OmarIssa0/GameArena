@@ -12,9 +12,13 @@ export const en = {
     title: "No notifications",
     description: "You're all caught up!",
   },
+  error: {
+    title: "Unable to load requests",
+  },
   gameInvite: {
     title: "Game Invitation",
     description: "{name} invited you to play {game}",
+    fallbackName: "Someone",
   },
   friendRequest: {
     title: "Friend Request",

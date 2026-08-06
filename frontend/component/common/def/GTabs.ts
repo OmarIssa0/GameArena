@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
-import { TabsDirectionEnum } from "@/domain/enum/TabsDirectionEnum";
-import { TabsVariantEnum } from "@/domain/enum/TabsVariantEnum";
-import { IndicatorPositionEnum } from "@/domain/enum/IndicatorPositionEnum";
+import type { TabsDirectionEnum } from "@/domain/enum/TabsDirectionEnum";
+import type { TabsVariantEnum } from "@/domain/enum/TabsVariantEnum";
+import type { IndicatorPositionEnum } from "@/domain/enum/IndicatorPositionEnum";
 
 interface GTabItem<T extends string | number = string> {
   id: T;

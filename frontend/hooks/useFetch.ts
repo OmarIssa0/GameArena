@@ -13,7 +13,11 @@ interface UseFetchResult<T> {
 
 type Fetcher<T> = ((signal: AbortSignal) => Promise<T>) | (() => Promise<T>);
 
-export function useFetch<T>(fetcher: Fetcher<T>, deps: ReadonlyArray<unknown> = []): UseFetchResult<T> {
+export function useFetch<T>(
+  fetcher: Fetcher<T>,
+  deps: ReadonlyArray<unknown> = [],
+  fallbackErrorMessage = "",
+): UseFetchResult<T> {
   const [data, setData] = useState<T>(null as unknown as T);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<TNullable<string>>(null);
@@ -25,6 +29,11 @@ export function useFetch<T>(fetcher: Fetcher<T>, deps: ReadonlyArray<unknown> = 
   useEffect(() => {
     fetcherRef.current = fetcher;
   }, [fetcher]);
+
+  const fallbackErrorRef = useRef(fallbackErrorMessage);
+  useEffect(() => {
+    fallbackErrorRef.current = fallbackErrorMessage;
+  }, [fallbackErrorMessage]);
 
   const execute = useCallback(() => {
     controllerRef.current?.abort();
@@ -44,7 +53,7 @@ export function useFetch<T>(fetcher: Fetcher<T>, deps: ReadonlyArray<unknown> = 
       })
       .catch((err) => {
         if (gen === genRef.current && mountedRef.current && !(err instanceof DOMException && err.name === "AbortError")) {
-          setError("Something went wrong. Please try again.");
+          setError(fallbackErrorRef.current);
           setLoading(false);
         }
       });

@@ -74,7 +74,7 @@ export function GameInvitesList({ onAfterAccept }: IGameInvitesListProps) {
         )}
       </GList>
 
-      <GModal open={pendingAccept !== null} onClose={handleCancelAccept} role="alertdialog" ariaLabel="Accept invite confirmation">
+      <GModal open={pendingAccept !== null} onClose={handleCancelAccept} role="alertdialog" ariaLabel={t.acceptInviteConfirmation}>
         <div className="text-center">
           <h2 className="text-xl font-bold text-text mb-2">{t.leaveTitle}</h2>
           <p className="text-sm text-text-secondary mb-6">{t.leaveDesc}</p>

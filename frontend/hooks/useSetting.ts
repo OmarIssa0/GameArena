@@ -101,10 +101,6 @@ function createProxy(langs: TTranslate, path: string[] = []): unknown {
 
         if (value !== undefined) return value;
 
-        if (process.env.NODE_ENV === "development") {
-          console.warn(`[i18n] missing key "${nextPath.join(".")}"`);
-        }
-
         return nextPath.join(".");
       },
     },

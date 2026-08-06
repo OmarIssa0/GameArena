@@ -15,7 +15,7 @@ function GAvatar({ firstName, lastName, size = SizeEnum.xs, shape = AvatarShapeE
   const avatarClassName = clsx(
     "flex shrink-0 items-center justify-center overflow-hidden bg-primary font-bold text-text",
     squareSize[size],
-    shape === AvatarShapeEnum.Circle ? "rounded-full" : "rounded-[var(--radius-md)]",
+    shape === AvatarShapeEnum.Circle ? "rounded-full" : "rounded-md",
   );
 
   return (

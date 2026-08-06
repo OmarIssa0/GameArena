@@ -1,6 +1,11 @@
-export interface IGameStateBase {
+import type { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
+
+export type RPSChoice = "Rock" | "Paper" | "Scissors";
+
+export interface IGameState {
   roomId: string;
-  player1Id: string;
+  gameType: GamesKindEnum;
+  player1Id?: string;
   player1Username?: string;
   player2Id?: string;
   player2Username?: string;
@@ -9,37 +14,45 @@ export interface IGameStateBase {
   isPrivate: boolean;
   isBotGame: boolean;
   isFinished: boolean;
-  currentTurnPlayerId?: string;
   winnerPlayerId?: string;
+  winnerSymbol?: string;
+  currentTurnPlayerId?: string;
   score: [number, number];
-}
-
-export interface ITicTacToeGameState extends IGameStateBase {
-  board: string[];
-}
-
-// Snake specific state
-export interface ISnakeGameState extends IGameStateBase {
-  grid: string[][];
-  snakePositions: { x: number; y: number }[];
-  foodPosition: { x: number; y: number };
-}
-
-// PingPong specific state
-export interface IPingPongGameState extends IGameStateBase {
   boardWidth: number;
   boardHeight: number;
-  ballPosition: { x: number; y: number };
-  ballSize: number;
-  player1PaddleX: number;
-  player1PaddleY: number;
-  player1PaddleHeight: number;
-  player2PaddleX: number;
-  player2PaddleY: number;
-  player2PaddleHeight: number;
-  paddleWidth: number;
   player1Score: number;
   player2Score: number;
+  winScore: number;
+  tickRateHz: number;
+
+  board?: string[];
+  player1Snake?: { x: number; y: number }[];
+  player2Snake?: { x: number; y: number }[];
+  food?: { x: number; y: number };
+  player1Direction?: string;
+  player2Direction?: string;
+
+  ball?: { x: number; y: number; vx: number; vy: number };
+  ballSize?: number;
+  player1Paddle?: { x: number; y: number; height: number };
+  player2Paddle?: { x: number; y: number; height: number };
+  paddleWidth?: number;
+
+  player1Choice?: RPSChoice;
+  player2Choice?: RPSChoice;
 }
 
-export type IGameState = ITicTacToeGameState | ISnakeGameState | IPingPongGameState;
+export type ITicTacToeGameState = IGameState & { board: string[] };
+export type ISnakeGameState = IGameState & {
+  player1Snake: { x: number; y: number }[];
+  player2Snake: { x: number; y: number }[];
+  food: { x: number; y: number };
+};
+export type IPingPongGameState = IGameState & {
+  ball: { x: number; y: number; vx: number; vy: number };
+  ballSize: number;
+  player1Paddle: { x: number; y: number; height: number };
+  player2Paddle: { x: number; y: number; height: number };
+  paddleWidth: number;
+};
+export type IConnectFourGameState = IGameState & { board: number[][] };

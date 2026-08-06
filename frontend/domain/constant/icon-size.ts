@@ -1,5 +1,5 @@
 import { SizeEnum } from "../enum/SizeEnum";
-import { THashMap } from "../type/TCommon";
+import type { THashMap } from "../type/TCommon";
 
 const IConSIZE: THashMap = {
   [SizeEnum.None]: "h-0 w-0",

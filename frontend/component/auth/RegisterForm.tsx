@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { UserPlus } from "lucide-react";
@@ -7,7 +9,7 @@ import { GIcon } from "@/component/common/GIcon";
 import { emailValidator, passwordValidator } from "@/lib/utils";
 import { en, type TRegisterTranslation } from "@/app/(auth)/register/i18n/en.i18n";
 import { ar } from "@/app/(auth)/register/i18n/ar.i18n";
-import { en as EnTextField, GTextFieldTranslation } from "@/component/i18n/GTextField/en.i18n";
+import { en as EnTextField, type GTextFieldTranslation } from "@/component/i18n/GTextField/en.i18n";
 import { ar as ArTextField } from "@/component/i18n/GTextField/ar.i18n";
 import { useTranslation } from "@/hooks/useSetting";
 import Link from "next/link";
@@ -194,8 +196,8 @@ function RegisterForm() {
           </div>
         </div>
 
-        <GButton loading={loading} fullWidth type="submit">
-          {loading ? t.createElipses : t.create}
+        <GButton loading={loading} loadingText={t.createElipses} fullWidth type="submit">
+          {t.create}
         </GButton>
 
         <div className="text-sm text-center text-text-secondary pt-2 border-t border-border/40">

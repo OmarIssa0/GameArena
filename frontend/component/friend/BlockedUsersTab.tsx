@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { Loader2, ShieldBan } from "lucide-react";
-import { FriendsList } from "../SocialPanel/FriendsList";
-import { GEmpty } from "../common/GEmpty";
-import { GIcon } from "../common/GIcon";
-import type { BlockedUsersTabProps } from "./def/FriendsTab";
-import type { TNullable } from "@/domain/type/TCommon";
-import { SizeEnum } from "@/domain/enum/SizeEnum";
+
+import { GEmpty } from "@/component/common/GEmpty";
+import { GIcon } from "@/component/common/GIcon";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import type { TNullable } from "@/domain/type/TCommon";
+
+import { FriendsList } from "../SocialPanel/FriendsList";
+import type { BlockedUsersTabProps } from "./def/FriendsTab";
 
 function BlockedUsersTab({ blockedUsers, onUnblock, t }: BlockedUsersTabProps) {
   const [actionId, setActionId] = useState<TNullable<string>>(null);
@@ -26,8 +28,6 @@ function BlockedUsersTab({ blockedUsers, onUnblock, t }: BlockedUsersTabProps) {
   return (
     <FriendsList
       friends={blockedUsers}
-      messageLabel={t.message}
-      activeLabel={t.message}
       actions={(friend) => {
         const isBusy = actionId === friend.id;
         return (

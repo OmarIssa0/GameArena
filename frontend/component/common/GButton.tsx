@@ -7,7 +7,7 @@ import type { GButtonProps } from "./def/GButton";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 import { AccentBackGroundEnum } from "@/domain/enum/AccentBackGroundEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
-import { THashMap } from "@/domain/type/TCommon";
+import type { THashMap } from "@/domain/type/TCommon";
 
 const sizeStyles: THashMap<string> = {
   [SizeEnum.xs]: "h-9 px-2.5 text-xs gap-1",
@@ -19,10 +19,10 @@ const sizeStyles: THashMap<string> = {
 };
 
 const roundedStyles: THashMap<string> = {
-  [SizeEnum.sm]: "rounded-[var(--radius-sm)]",
-  [SizeEnum.md]: "rounded-[var(--radius-md)]",
-  [SizeEnum.lg]: "rounded-[var(--radius-lg)]",
-  [SizeEnum.xl]: "rounded-[var(--radius-xl)]",
+  [SizeEnum.sm]: "rounded-sm",
+  [SizeEnum.md]: "rounded-md",
+  [SizeEnum.lg]: "rounded-lg",
+  [SizeEnum.xl]: "rounded-xl",
   [SizeEnum.full]: "rounded-full",
   [SizeEnum.None]: "rounded-none",
 };
@@ -60,7 +60,7 @@ const GButton = forwardRef<HTMLButtonElement, GButtonProps>(
     ref,
   ) => {
     const isDisabled = disabled || loading;
-    const resolvedLoadingText = loadingText ?? "Loading...";
+    const resolvedLoadingText = loadingText ?? "";
     const isIconOnly = !children && (startIcon || endIcon);
 
     return (

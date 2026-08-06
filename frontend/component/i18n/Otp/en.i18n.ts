@@ -6,6 +6,7 @@ const en = {
   verify: "Verify",
   invalidCode: "Invalid code",
   resendCodeFailed: "Failed to resend code",
+  digitLabel: (n: number) => `Digit ${n} of 6`,
 };
 
 type TOtpTranslation = typeof en;

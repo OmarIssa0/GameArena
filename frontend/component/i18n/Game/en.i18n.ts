@@ -11,6 +11,18 @@ const en = {
   pingpong: {
     name: "Ping Pong",
     description: "Classic paddle showdown in real-time",
+    controlHint: "Use W/S or ↑/↓ to move your paddle",
+  },
+  rockpaperscissors: {
+    name: "Rock Paper Scissors",
+    description: "Classic hand game - choose rock, paper, or scissors",
+    rock: "Rock",
+    paper: "Paper",
+    scissors: "Scissors",
+  },
+  connectfour: {
+    name: "Connect Four",
+    description: "Drop discs and connect four in a row to win",
   },
 
   lobby: {
@@ -21,6 +33,8 @@ const en = {
     cancelSearch: "Cancel Search",
     quick: "Quick",
     invite: "Invite",
+    searchError: "Failed to find a match. Please try again.",
+    createLobbyError: "Failed to create lobby. Please try again.",
   },
 
   waiting: {
@@ -52,6 +66,7 @@ const en = {
     yourTurn: "Your Turn - Make your move!",
     waitingFor: "Waiting for {name}...",
     leaveGame: "Leave Game",
+    firstTo: "First to {score}",
   },
 
   invite: {
@@ -64,6 +79,9 @@ const en = {
   result: {
     opponentForfeited: "Opponent Forfeited!",
     opponentForfeitedDesc: "Your opponent left the game. You win by default!",
+    winShort: "WIN",
+    loseShort: "LOSE",
+    drawShort: "DRAW",
     victory: "VICTORY! 🎉",
     victoryDesc: "Spectacular play! You defeated your opponent.",
     draw: "IT'S A DRAW! 🤝",

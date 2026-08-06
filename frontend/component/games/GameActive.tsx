@@ -1,50 +1,97 @@
 "use client";
 
+import { Home } from "lucide-react";
+
 import { useAuth } from "@/app/providers/AuthProvider";
 import { useGame } from "@/app/providers/GameProvider";
-import { useGameTranslation } from "@/hooks/useGameTranslation";
-import { GamePlayersHeader } from "@/component/games/common/GamePlayersHeader";
-import { GameTurnIndicator } from "@/component/games/common/GameTurnIndicator";
-import { GameResult } from "@/component/games/common/GameResult";
 import { GButton } from "@/component/common/GButton";
+import { GIcon } from "@/component/common/GIcon";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
+import type { TNullable, TOptional } from "@/domain/type/TCommon";
+import { useGameTranslation } from "@/hooks/useGameTranslation";
+
+import { GamePlayersHeader, GameTurnIndicator } from "./GameUI";
 import type { IGameActiveProps } from "./def/GameActive";
 
-function GameActive({ children }: IGameActiveProps) {
+function getResultKind(winnerPlayerId: TOptional<string>, userId: TOptional<string>, opponentDisconnected: boolean): TNullable<string> {
+  if (winnerPlayerId === "") return "draw";
+  if (winnerPlayerId === userId) return "win";
+  if (winnerPlayerId != null) return "loss";
+  if (opponentDisconnected) return "forfeit";
+  return null;
+}
+
+function GameActive({ children, gameType }: IGameActiveProps) {
   const { user } = useAuth();
-  const { state, leaveGame } = useGame();
+  const { state, leaveGame, requestedPlayAgain, requestPlayAgain, respondPlayAgain, pendingPlayAgainRequest, opponentDisconnected } = useGame();
   const t = useGameTranslation();
 
   if (!state) return null;
 
+  const isOver = state.winnerPlayerId != null || state.isFinished === true;
+  const resultKind = getResultKind(state.winnerPlayerId, user?.id, opponentDisconnected);
+  const sessionEnded = opponentDisconnected && resultKind !== "forfeit";
+  const isMyTurn = state.currentTurnPlayerId === user?.id;
   const opponentName = state.isBotGame
     ? t.game.aiBot
     : state.player1Id === user?.id
       ? state.player2Username || t.game.opponent
       : state.player1Username || t.game.opponent;
 
-  const isMyTurn = state.currentTurnPlayerId === user?.id;
-
   return (
-    <div className="flex items-center justify-center min-h-[150px] p-4">
+    <div className="flex items-center justify-center min-h-40 p-4">
       <div className="w-full max-w-xl space-y-6">
-        <GamePlayersHeader />
+        <GamePlayersHeader gameType={gameType} />
 
-        {!(state.winnerPlayerId || state.isFinished) && (
+        {!isOver && (
           <GameTurnIndicator isMyTurn={isMyTurn} currentTurnText={t.game.yourTurn} waitingText={t.game.waitingFor.replace("{name}", opponentName)} />
         )}
 
-        <div className="relative">
-          {children}
-          <GameResult />
-        </div>
+        <div>{children}</div>
 
-        {!(state.winnerPlayerId || state.isFinished) && (
+        {!isOver ? (
           <div className="flex justify-center">
             <GButton onClick={() => leaveGame()} variant={AccentColorEnum.Danger} size={SizeEnum.sm}>
               {t.game.leaveGame}
             </GButton>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-2 mt-8">
+            {pendingPlayAgainRequest && (
+              <p className="text-sm text-text-secondary">
+                {pendingPlayAgainRequest.requesterUsername} {t.result.playAgainRequest}
+              </p>
+            )}
+            <div className="flex gap-4 w-full max-w-xs">
+              {pendingPlayAgainRequest ? (
+                <>
+                  <GButton onClick={() => respondPlayAgain(true)} className="flex-1">
+                    {t.result.accept}
+                  </GButton>
+                  <GButton onClick={() => respondPlayAgain(false)} variant={AccentColorEnum.Danger} className="flex-1">
+                    {t.result.reject}
+                  </GButton>
+                </>
+              ) : sessionEnded ? (
+                <GButton onClick={() => leaveGame()} variant={AccentColorEnum.Secondary} className="flex-1" startIcon={<GIcon icon={Home} size={SizeEnum.sm} />}>
+                  {t.result.backToLobby}
+                </GButton>
+              ) : requestedPlayAgain ? (
+                <GButton loading loadingText={t.result.waiting} className="flex-1">
+                  {t.result.waiting}
+                </GButton>
+              ) : (
+                <GButton onClick={() => requestPlayAgain()} className="flex-1">
+                  {t.result.playAgain}
+                </GButton>
+              )}
+              {!sessionEnded && !pendingPlayAgainRequest && (
+                <GButton onClick={() => leaveGame()} variant={AccentColorEnum.Secondary} className="flex-1" startIcon={<GIcon icon={Home} size={SizeEnum.sm} />}>
+                  {t.result.backToLobby}
+                </GButton>
+              )}
+            </div>
           </div>
         )}
       </div>

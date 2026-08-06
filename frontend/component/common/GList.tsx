@@ -7,8 +7,11 @@ import { ChevronLeft, ChevronRight, List } from "lucide-react";
 import { GEmpty } from "./GEmpty";
 import { GIcon } from "./GIcon";
 import { GButton } from "./GButton";
-import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { ar } from "@/component/i18n/GList/ar.i18n";
+import { en, type GListTranslation } from "@/component/i18n/GList/en.i18n";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { useTranslation } from "@/hooks/useSetting";
 import type { IGListProps, IGListPaginationProps } from "./def/GList";
 
 function GList<T>({
@@ -25,6 +28,7 @@ function GList<T>({
   defaultPage = 0,
 }: IGListProps<T> & IGListPaginationProps) {
   const [page, setPage] = useState(defaultPage);
+  const t = useTranslation({ en, ar }) as GListTranslation;
 
   const totalPages = Math.ceil(items.length / pageSize);
 
@@ -38,7 +42,7 @@ function GList<T>({
     return (
       <GEmpty
         icon={emptyIcon ?? <GIcon icon={List} size={SizeEnum.xl} color={AccentColorEnum.Muted} />}
-        title={emptyMessage ?? "No items"}
+        title={emptyMessage}
         description={emptyDescription ?? ""}
       />
     );
@@ -60,7 +64,7 @@ function GList<T>({
             size={SizeEnum.icon}
             onClick={() => setPage((page) => Math.max(0, page - 1))}
             disabled={currentPage === 0}
-            aria-label="Previous page">
+            aria-label={t.previousPage}>
             <GIcon icon={ChevronLeft} size={SizeEnum.sm} color={AccentColorEnum.Secondary} />
           </GButton>
 
@@ -81,7 +85,7 @@ function GList<T>({
             size={SizeEnum.icon}
             onClick={() => setPage((page) => Math.min(totalPages - 1, page + 1))}
             disabled={currentPage === totalPages - 1}
-            aria-label="Next page">
+            aria-label={t.nextPage}>
             <GIcon icon={ChevronRight} size={SizeEnum.sm} color={AccentColorEnum.Secondary} />
           </GButton>
         </div>

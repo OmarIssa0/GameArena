@@ -8,10 +8,10 @@ interface InviteModalProps {
   friends: IUserSummary[];
   onSelect: (friendId: string) => void;
   onClose: () => void;
-  title?: string;
-  cancelLabel?: string;
-  searchPlaceholder?: string;
-  noFriendsText?: string;
+  title: string;
+  cancelLabel: string;
+  searchPlaceholder: string;
+  noFriendsText: string;
 }
 
 export type { InviteModalProps };

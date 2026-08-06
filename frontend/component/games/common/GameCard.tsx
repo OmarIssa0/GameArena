@@ -39,7 +39,7 @@ function GameCard({ name, desc, icon, onClick, gradientClass, playLabel, animati
           page ? "" : (gradientClass ?? "from-primary to-accent"),
         )}>
         {animation ? (
-          <div className="w-24 h-24">
+          <div className="w-24 h-24" aria-hidden="true">
             <LottiePlayer autoplay loop src={animation} className="w-full h-full" />
           </div>
         ) : (
@@ -54,7 +54,7 @@ function GameCard({ name, desc, icon, onClick, gradientClass, playLabel, animati
           )
         )}
         {!page && (
-          <div className="absolute bottom-3 inset-e-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="absolute bottom-3 inset-e-3 flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true">
             <GIcon
               icon={Gamepad2}
               size={SizeEnum.sm}

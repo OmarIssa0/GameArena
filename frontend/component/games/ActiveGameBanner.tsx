@@ -27,6 +27,17 @@ function ActiveGameBanner() {
   const gamePath = lastGameType !== null ? (GamesList.find((g) => g.type === (lastGameType as typeof g.type))?.path ?? "tic-tac-toe") : "tic-tac-toe";
   const game = GamesList.find((g) => g.type === (lastGameType as typeof g.type)) ?? GamesList[0];
 
+  const gameNameKey = (gameId: string): keyof typeof t => {
+    switch (gameId) {
+      case "pingpong":
+        return "pong";
+      case "snake":
+        return "snake";
+      default:
+        return "ticTacToe";
+    }
+  };
+
   return (
     <div className="fixed bottom-6 inset-inline-4 sm:inset-inline-end-4 sm:w-96 sm:max-w-none z-50 ga-slide-in-right">
       <GCard variant={CardVariantEnum.Glass} padding={SizeEnum.md} className="flex items-center gap-4">
@@ -35,7 +46,7 @@ function ActiveGameBanner() {
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-sm font-medium text-text-muted uppercase tracking-wider">{t.gameRunning}</div>
-          <div className="text-lg font-bold text-text truncate">{t[game?.name as keyof typeof t]}</div>
+          <div className="text-lg font-bold text-text truncate">{t[gameNameKey(game.id)]}</div>
         </div>
         <GButton variant={AccentColorEnum.Primary} size={SizeEnum.sm} className="whitespace-nowrap" onClick={() => router.push(`/games/${gamePath}`)}>
           <GIcon icon={Gamepad2} size={SizeEnum.sm} className="animate-pulse" />

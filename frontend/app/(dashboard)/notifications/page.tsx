@@ -20,7 +20,7 @@ import type { GTabItem } from "@/component/common/def/GTabs";
 import { friendService } from "@/services/def/FriendService";
 import type { IFriendRequestReceived } from "@/domain/meta/IFriendRequestReceived";
 import { AlertTriangle } from "lucide-react";
-import { TNullable } from "@/domain/type/TCommon";
+import type { TNullable } from "@/domain/type/TCommon";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 import { TabsVariantEnum } from "@/domain/enum/TabsVariantEnum";
@@ -53,9 +53,9 @@ export default function NotificationsPage() {
       .then((r) => {
         if (r.data) setRequests(r.data);
       })
-      .catch(() => setError("Unable to load friend requests"))
+      .catch(() => setError(t.error.title))
       .finally(() => setLoading(false));
-  }, []);
+  }, [t]);
 
   const unreadCount = useMemo(() => notifications.filter((n) => !n.isRead).length, [notifications]);
 
@@ -97,7 +97,7 @@ export default function NotificationsPage() {
         id: `g-${g.roomId}`,
         type: "GameInvite",
         title: t.gameInvite.title,
-        desc: t.gameInvite.description.replace("{name}", g.inviterName ?? "Someone").replace("{game}", "Game"),
+        desc: t.gameInvite.description.replace("{name}", g.inviterName ?? t.gameInvite.fallbackName).replace("{game}", t.gameInvite.fallbackName),
         time: timeAgo(new Date(), t),
         read: false,
         onAction: () => acceptGameInvite(g.roomId),
@@ -105,7 +105,7 @@ export default function NotificationsPage() {
       });
     }
     for (const r of requests) {
-      const name = `${r.senderFirstName ?? ""} ${r.senderLastName ?? ""}`.trim() || (r.senderUserName ?? "Someone");
+      const name = `${r.senderFirstName ?? ""} ${r.senderLastName ?? ""}`.trim() || (r.senderUserName ?? t.gameInvite.fallbackName);
       out.push({
         id: `fr-${r.senderId}`,
         type: "FriendRequest",
@@ -143,7 +143,7 @@ export default function NotificationsPage() {
         {error && tab === "friendRequests" ? (
           <GEmpty
             icon={<GIcon icon={AlertTriangle} size={SizeEnum.xl} color={AccentColorEnum.Danger} />}
-            title="Unable to load requests"
+            title={t.error.title}
             description={error}
           />
         ) : loading && tab === "friendRequests" ? (

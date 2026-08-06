@@ -1,53 +1,83 @@
 "use client";
 
 import clsx from "clsx";
-import { useAuth } from "@/app/providers/AuthProvider";
-import { useGame } from "@/app/providers/GameProvider";
-import { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
-import { GameLayoutWrapper } from "@/component/games/GameLayoutWrapper";
-import { GCard } from "@/component/common/GCard";
-import { SizeEnum } from "@/domain/enum/SizeEnum";
-import type { ITicTacToeGameState } from "@/app/providers/def/IGameState";
 
-const EMPTY = ".";
+import { useAuth } from "@/app/providers/AuthProvider";
+import type { ITicTacToeGameState } from "@/app/providers/def/IGameState";
+import { useGame } from "@/app/providers/GameProvider";
+import { GButton } from "@/component/common/GButton";
+import { GCard } from "@/component/common/GCard";
+import { GList } from "@/component/common/GList";
+import { GameLayoutWrapper } from "@/component/games/GameLayoutWrapper";
+import { GameActionTypes } from "@/domain/constant/game-actions";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { useGameTranslation } from "@/hooks/useGameTranslation";
+
+const BOARD_EMPTY = ".";
 const PLAYER_X = "X";
 const PLAYER_O = "O";
-const ACTION_MAKE_MOVE = "MAKE_MOVE";
 
 function TicTacToePage() {
   const { user } = useAuth();
   const { state, sendAction } = useGame();
+  const t = useGameTranslation();
 
   if (!state || !("board" in state)) {
     return <GameLayoutWrapper gameType={GamesKindEnum.TicTacToe}>{null}</GameLayoutWrapper>;
   }
 
   const tttState = state as ITicTacToeGameState;
-  const { board, isFinished } = tttState;
+  const { board, player1Score, player2Score, winScore } = tttState;
   const myPlayerId = user?.id;
   const isMyTurn = tttState.currentTurnPlayerId === myPlayerId;
+  const isOver = tttState.winnerPlayerId != null || tttState.isFinished === true;
 
-  const isCellOccupied = (cell: string): boolean => cell === PLAYER_X || cell === PLAYER_O;
-  const isCellPlayable = (cell: string): boolean => !isCellOccupied(cell) && isMyTurn && !isFinished;
+  const isCellPlayable = (cell: string): boolean => cell !== PLAYER_X && cell !== PLAYER_O && isMyTurn && !isOver;
+
+  const cells = board.map((cell, index) => ({ index, cell }));
 
   return (
     <GameLayoutWrapper gameType={GamesKindEnum.TicTacToe}>
-      <GCard padding={SizeEnum.md} rounded={SizeEnum.lg} className="grid grid-cols-3 gap-3">
-        {board.map((cell, index) => (
-          <button
-            key={index}
-            onClick={() => sendAction({ type: ACTION_MAKE_MOVE, cell: index })}
-            disabled={!isCellPlayable(cell)}
-            className={clsx(
-              "aspect-square min-w-[44px] min-h-[44px] flex items-center justify-center text-4xl font-bold border-2 rounded-md transition-colors duration-150",
-              cell === PLAYER_X && "text-accent bg-accent-muted border-accent/40",
-              cell === PLAYER_O && "text-warning bg-warning-bg border-warning/40",
-              cell === EMPTY && "bg-surface border-border-light hover:border-primary/40 hover:bg-primary-muted cursor-pointer",
-            )}>
-            {cell === PLAYER_X && <span className="text-accent">{PLAYER_X}</span>}
-            {cell === PLAYER_O && <span className="text-warning">{PLAYER_O}</span>}
-          </button>
-        ))}
+      <GCard padding={SizeEnum.md} rounded={SizeEnum.lg}>
+        <div className="flex justify-center gap-8 mb-4">
+          <div className="text-center">
+            <div className="text-3xl font-bold text-accent">{player1Score}</div>
+            <div className="text-xs text-text-muted">{PLAYER_X}</div>
+          </div>
+          <div className="text-center text-text-muted font-bold flex flex-col justify-center">
+            <span>{t.game.vs}</span>
+            <span className="text-xs">{t.game.firstTo.replace("{score}", String(winScore))}</span>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-warning">{player2Score}</div>
+            <div className="text-xs text-text-muted">{PLAYER_O}</div>
+          </div>
+        </div>
+        <GList
+          items={cells}
+          keyExtractor={(item) => item.index.toString()}
+          noPagination
+          listClassName="grid grid-cols-3 gap-3">
+          {({ index, cell }) => (
+            <GButton
+              onClick={() => sendAction({ type: GameActionTypes.MAKE_MOVE, cell: index })}
+              disabled={!isCellPlayable(cell)}
+              size={SizeEnum.lg}
+              rounded={SizeEnum.md}
+              className={clsx(
+                "aspect-square min-w-11 text-4xl font-bold transition-colors duration-150",
+                cell === PLAYER_X && "text-accent",
+                cell === PLAYER_O && "text-warning",
+              )}
+              variant={cell === BOARD_EMPTY ? AccentColorEnum.Secondary : AccentColorEnum.Muted}>
+              {cell === PLAYER_X && <span className="text-accent">{PLAYER_X}</span>}
+              {cell === PLAYER_O && <span className="text-warning">{PLAYER_O}</span>}
+              {cell === BOARD_EMPTY && <span>{BOARD_EMPTY}</span>}
+            </GButton>
+          )}
+        </GList>
       </GCard>
     </GameLayoutWrapper>
   );

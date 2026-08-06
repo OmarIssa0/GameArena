@@ -1,18 +1,22 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useRouter } from "next/navigation";
+
 import { useConnections } from "@/app/providers/ConnectionProvider";
 import { gameService } from "@/services/def/GameService";
 import { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
+import { PLAY_AGAIN_TIMEOUT_MS } from "@/domain/constant/game-constants";
 import type { TNullable } from "@/domain/type/TCommon";
+import { useGameTranslation } from "@/hooks/useGameTranslation";
 import type { IGameState } from "./def/IGameState";
 import type { IGameContext } from "./def/IGameContext";
-import { useRouter } from "next/navigation";
 
 const GameContext = createContext<TNullable<IGameContext>>(null);
 
 export function GameProvider({ children }: { children: ReactNode }) {
   const { isGameConnected } = useConnections();
+  const t = useGameTranslation();
   const [state, setState] = useState<TNullable<IGameState>>(null);
   const [isSearching, setIsSearching] = useState(false);
   const isSearchingRef = useRef(false);
@@ -38,7 +42,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
     router.push("/games");
   }, [router, clearFlags]);
 
-  // ── SignalR subscriptions via service ───────────────────────────────
   useEffect(() => {
     const offState = gameService.onGameState((value) => {
       setState(value);
@@ -70,7 +73,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
     };
   }, [goToLobby, clearFlags]);
 
-  // ── Actions ─────────────────────────────────────────────────────────
   const findMatch = useCallback(
     async (game: GamesKindEnum) => {
       if (isSearchingRef.current) return;
@@ -85,10 +87,10 @@ export function GameProvider({ children }: { children: ReactNode }) {
       } catch {
         isSearchingRef.current = false;
         setIsSearching(false);
-        setSearchError("Failed to find a match. Please try again.");
+        setSearchError(t.lobby.searchError);
       }
     },
-    [clearFlags],
+    [clearFlags, t.lobby.searchError],
   );
 
   const startGame = useCallback(async (friendId: TNullable<string>, gameKind: GamesKindEnum) => {
@@ -125,7 +127,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
     if (!requestedPlayAgain) return;
     const timer = setTimeout(() => {
       setRequestedPlayAgain(false);
-    }, 30000);
+    }, PLAY_AGAIN_TIMEOUT_MS);
     return () => clearTimeout(timer);
   }, [requestedPlayAgain]);
 
@@ -144,30 +146,28 @@ export function GameProvider({ children }: { children: ReactNode }) {
     try {
       if (isSearching) await gameService.cancelSearch();
     } catch {
-      /* ignore */
     }
     try {
       await gameService.leaveGame();
     } catch {
-      /* navigate regardless */
     }
     goToLobby();
   }, [goToLobby, isSearching]);
 
-  const createLobby = useCallback(async (gameKind: GamesKindEnum) => {
-    setLastGameType(gameKind);
-    try {
-      await gameService.createLobby(gameKind);
-    } catch {
-      setSearchError("Failed to create lobby. Please try again.");
-    }
-  }, []);
+  const createLobby = useCallback(
+    async (gameKind: GamesKindEnum) => {
+      setLastGameType(gameKind);
+      try {
+        await gameService.createLobby(gameKind);
+      } catch {
+        setSearchError(t.lobby.createLobbyError);
+      }
+    },
+    [t.lobby.createLobbyError],
+  );
 
-  const sendAction = useCallback(async (action: object) => {
-    // Do NOT await SignalR invoke here; awaiting per-frame creates backpressure/latency.
-    void gameService.sendAction(action).catch((err) => {
-      console.error("Failed to send game action:", err);
-    });
+  const sendAction = useCallback((action: object) => {
+    void gameService.sendAction(action).catch(() => {});
   }, []);
 
   const value = useMemo<IGameContext>(

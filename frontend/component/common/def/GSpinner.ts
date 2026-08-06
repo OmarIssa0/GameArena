@@ -1,6 +1,7 @@
-import { SizeEnum } from "@/domain/enum/SizeEnum";
+import type { SizeEnum } from "@/domain/enum/SizeEnum";
 
 export interface GSpinnerProps {
   size?: SizeEnum;
   className?: string;
+  ariaLabel?: string;
 }

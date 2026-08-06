@@ -31,6 +31,8 @@ namespace backend.Domain
                 GamesKind.TicTacToe => new TicTacToeRoom(),
                 GamesKind.PingPong => new PingPongRoom(),
                 GamesKind.Snake => new SnakeRoom(),
+                GamesKind.RockPaperScissors => new RockPaperScissors(),
+                GamesKind.ConnectFour => new ConnectFourRoom(),
                 _ => throw new AppException(ErrorCode.InvalidGameType)
             };
         }
@@ -38,6 +40,7 @@ namespace backend.Domain
         public abstract object GetStatePayload();
 
         public abstract void HandleAction(string playerId, JsonElement action);
+        public abstract void MakeBotMove();
 
         public virtual void ResetForNewRound()
         {
@@ -47,16 +50,10 @@ namespace backend.Domain
             HasStarted = true;
             CurrentTurnPlayerId = Player1Id;
         }
-
         public virtual bool NeedsGameLoop => false;
-
         public virtual int TickIntervalMs => 50;
-
         public virtual void Tick() { }
-
-        public virtual void MakeBotMove() { }
-
-        public virtual void ReplacePlayerWithBot(string playerId)
+        public void ReplacePlayerWithBot(string playerId)
         {
             IsBotGame = true;
             if (Player1Id == playerId)

@@ -15,29 +15,8 @@ import { en as EnTextField, type GTextFieldTranslation } from "@/component/i18n/
 import { ar as ArTextField } from "@/component/i18n/GTextField/ar.i18n";
 import { useTranslation } from "@/hooks/useSetting";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
-
-const en = {
-  title: "Verify Email",
-  description: "Enter your email to receive a verification code",
-  sendCode: "Send Code",
-  sending: "Sending...",
-  enterEmail: "Enter your email",
-  enterCode: "Enter the verification code sent to your email",
-  errorSendFailed: "Failed to send verification code. Please try again.",
-  backToLogin: "Back to login",
-};
-type TEmailVerifyTranslation = typeof en;
-
-const ar = {
-  title: "تأكيد البريد الإلكتروني",
-  description: "أدخل بريدك الإلكتروني لاستلام رمز التحقق",
-  sendCode: "إرسال الرمز",
-  sending: "جارٍ الإرسال...",
-  enterEmail: "أدخل بريدك الإلكتروني",
-  enterCode: "أدخل رمز التحقق المرسل إلى بريدك الإلكتروني",
-  errorSendFailed: "فشل إرسال رمز التحقق. حاول مرة أخرى",
-  backToLogin: "العودة لتسجيل الدخول",
-};
+import { ar as arEmailVerify } from "./i18n/ar.i18n";
+import { en as enEmailVerify, type TEmailVerifyTranslation } from "./i18n/en.i18n";
 
 function EmailVerifyPage() {
   const router = useRouter();
@@ -45,8 +24,8 @@ function EmailVerifyPage() {
   const emailParam = searchParams.get("email");
 
   const t = useTranslation({
-    en: { ...en, ...EnTextField },
-    ar: { ...ar, ...ArTextField },
+    en: { ...enEmailVerify, ...EnTextField },
+    ar: { ...arEmailVerify, ...ArTextField },
   }) as TEmailVerifyTranslation & GTextFieldTranslation;
 
   const [email, setEmail] = useState(emailParam || "");
@@ -120,8 +99,8 @@ function EmailVerifyPage() {
             {error}
           </p>
         )}
-        <GButton loading={loading} onClick={sendCode} fullWidth>
-          {loading ? t.sending : t.sendCode}
+        <GButton loading={loading} loadingText={t.sending} onClick={sendCode} fullWidth>
+          {t.sendCode}
         </GButton>
         {backToLogin}
       </div>

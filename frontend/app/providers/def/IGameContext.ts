@@ -1,4 +1,4 @@
-import { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
+import type { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
 import type { IGameState } from "./IGameState";
 import type { TNullable } from "@/domain/type/TCommon";
 
@@ -20,7 +20,7 @@ interface IGameContext {
   respondPlayAgain(accept: boolean): Promise<void>;
   resetGame(): Promise<void>;
   createLobby(gameKind: GamesKindEnum): Promise<void>;
-  sendAction(action: object): Promise<void>;
+  sendAction(action: object): void;
 }
 
 export type { IGameContext };

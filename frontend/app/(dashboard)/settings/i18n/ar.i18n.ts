@@ -10,6 +10,7 @@ const ar = {
       email: "البريد الإلكتروني",
       save: "حفظ التغييرات",
       saved: "تم تحديث الملف الشخصي بنجاح",
+      saveFailed: "فشل حفظ الملف الشخصي",
       linkedAccounts: "الحسابات المرتبطة",
       connected: "متصل",
       notConnected: "غير متصل",
@@ -25,6 +26,7 @@ const ar = {
       confirmPassword: "تأكيد كلمة المرور الجديدة",
       save: "تحديث كلمة المرور",
       saved: "تم تغيير كلمة المرور بنجاح",
+      saveFailed: "فشل تغيير كلمة المرور",
       invalidCurrentPassword: "كلمة المرور الحالية غير صحيحة",
     },
     preferences: {
@@ -32,6 +34,7 @@ const ar = {
       subtitle: "خصّص تجربة أرينا 404 الخاصة بك",
       save: "حفظ التفضيلات",
       saved: "تم حفظ التفضيلات",
+      saveFailed: "فشل حفظ التفضيلات",
       theme: "الوضع الداكن",
       darkMode: "الوضع الداكن",
       language: "اللغة",

@@ -1,52 +1,41 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
 import { useMemo } from "react";
 import { LogOut } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 
-import { useTranslation } from "@/hooks/useSetting";
-import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
 import { useAuth } from "@/app/providers/AuthProvider";
-import { useConnections } from "@/app/providers/ConnectionProvider";
-import { authService } from "@/services/def/AuthService";
-import { sidebarNav } from "@/domain/constant/sidebarNav";
-import { ar } from "@/component/i18n/SideBar/ar.i18n";
-import { en, type TSidebarTranslation } from "@/component/i18n/SideBar/en.i18n";
-import { GNav, type GNavItem } from "@/component/common/GNav";
-import { GButton } from "@/component/common/GButton";
+import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
+import { GAvatar } from "@/component/common/GAvatar";
 import { GBadge } from "@/component/common/GBadge";
+import { GButton } from "@/component/common/GButton";
 import { GCard } from "@/component/common/GCard";
 import { GIcon } from "@/component/common/GIcon";
-import { GAvatar } from "@/component/common/GAvatar";
+import { GNav, type GNavItem } from "@/component/common/GNav";
+import { ar } from "@/component/i18n/SideBar/ar.i18n";
+import { en, type TSidebarTranslation } from "@/component/i18n/SideBar/en.i18n";
 import { LangTheme } from "@/component/LangTheme";
-import { NavOrientationEnum } from "@/domain/enum/NavOrientationEnum";
-import { IndicatorPositionEnum } from "@/domain/enum/IndicatorPositionEnum";
-import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { sidebarNav } from "@/domain/constant/sidebarNav";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
-import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
 import { AvatarShapeEnum } from "@/domain/enum/AvatarShapeEnum";
+import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
+import { IndicatorPositionEnum } from "@/domain/enum/IndicatorPositionEnum";
+import { NavOrientationEnum } from "@/domain/enum/NavOrientationEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { useLogout } from "@/hooks/useLogout";
+import { useTranslation } from "@/hooks/useSetting";
 
-export function SidebarExpanded({ closeMobile }: { closeMobile?: () => void }) {
+import type { ISidebarProps } from "./def/Sidebar";
+
+export function SidebarExpanded({ closeMobile }: ISidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const t = useTranslation({ en, ar }) as TSidebarTranslation;
   const { friendRequestCount, unreadMessageCount, gameInvites, unreadNotificationCount } = useDashboardNotifications();
-  const { user, setUser } = useAuth();
-  const { stopConnections } = useConnections();
+  const { user } = useAuth();
+  const logout = useLogout();
 
   const activeId = sidebarNav.find((n) => pathname.startsWith(`/${n.id}`))?.id ?? "home";
-
-  const handleLogout = async () => {
-    try {
-      await authService.logout();
-    } catch (err) {
-      console.error("Logout failed:", err);
-    } finally {
-      await stopConnections();
-      setUser(null);
-      router.replace("/login");
-    }
-  };
 
   const navItems = useMemo<GNavItem[]>(
     () =>
@@ -108,10 +97,10 @@ export function SidebarExpanded({ closeMobile }: { closeMobile?: () => void }) {
             </div>
 
             <GButton
-              onClick={handleLogout}
+              onClick={logout}
               variant={AccentColorEnum.Muted}
               size={SizeEnum.lg}
-              className="!p-3 rounded-xl"
+              className="p-3! rounded-xl"
               title={t.logout}
               aria-label={t.logout}>
               <GIcon icon={LogOut} size={SizeEnum.md} />

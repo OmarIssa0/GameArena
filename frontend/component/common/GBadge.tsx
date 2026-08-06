@@ -3,7 +3,7 @@ import type { GBadgeProps } from "./def/GBadge";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 import { AccentBackGroundEnum } from "@/domain/enum/AccentBackGroundEnum";
-import { THashMap } from "@/domain/type/TCommon";
+import type { THashMap } from "@/domain/type/TCommon";
 
 const badgeBgColors: Record<AccentColorEnum, AccentBackGroundEnum> = {
   [AccentColorEnum.Primary]: AccentBackGroundEnum.PrimaryMuted,

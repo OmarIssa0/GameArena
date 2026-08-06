@@ -137,8 +137,8 @@ function LoginForm() {
             onChange={(e) => handleChange(LoginFieldEnum.Password, e.target.value)}
           />
 
-          <GButton type="submit" loading={loading} fullWidth>
-            {loading ? t.loggingIn : t.login}
+          <GButton type="submit" loading={loading} loadingText={t.loggingIn} fullWidth>
+            {t.login}
           </GButton>
         </div>
 

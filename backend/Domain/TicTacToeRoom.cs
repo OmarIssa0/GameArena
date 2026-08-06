@@ -13,9 +13,11 @@ public class TicTacToeRoom : BaseGameRoom
     public override object GetStatePayload() => new
     {
         roomId = RoomId,
+        gameType = GameType,
         board = Board,
         currentTurnPlayerId = CurrentTurnPlayerId,
         winnerPlayerId = WinnerPlayerId,
+        winnerSymbol = WinnerSymbol,
         isFinished = IsFinished,
         hasStarted = HasStarted,
         isFull = IsFull,
@@ -25,7 +27,13 @@ public class TicTacToeRoom : BaseGameRoom
         player1Username = Player1Username,
         player2Id = Player2Id,
         player2Username = Player2Username,
-        score = Score
+        score = Score,
+        boardWidth = 3,
+        boardHeight = 3,
+        winScore = 3,
+        player1Score = Score[0],
+        player2Score = Score[1],
+        tickRateHz = 0
     };
 
     public override void ResetForNewRound()
@@ -85,16 +93,12 @@ public class TicTacToeRoom : BaseGameRoom
         lock (_lock)
         {
             if (WinnerPlayerId != null || CurrentTurnPlayerId == null) return;
-
             var botId = Player1Id == "__BOT__" ? Player1Id : Player2Id;
             if (CurrentTurnPlayerId != botId) return;
-
             var botSymbol = botId == Player1Id ? "X" : "O";
             var botMove = TicTacToeMinimax.GetBestMove(Board, botSymbol);
             if (botMove < 0) return;
-
             Board[botMove] = botSymbol;
-
             if (GameHelper.CheckWinTicTacToe(Board))
             {
                 WinnerPlayerId = botId;

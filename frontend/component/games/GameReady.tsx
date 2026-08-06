@@ -1,14 +1,16 @@
 "use client";
 
 import { Play } from "lucide-react";
+
 import { useAuth } from "@/app/providers/AuthProvider";
 import { useGame } from "@/app/providers/GameProvider";
-import { useGameTranslation } from "@/hooks/useGameTranslation";
 import { GButton } from "@/component/common/GButton";
-import { GIcon } from "@/component/common/GIcon";
 import { GCard } from "@/component/common/GCard";
-import { getGameConfig } from "./gameConfig";
+import { GIcon } from "@/component/common/GIcon";
+import { getGameConfig } from "@/domain/constant/games";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { useGameTranslation } from "@/hooks/useGameTranslation";
+
 import type { IGameReadyProps } from "./def/GameReady";
 
 function GameReady({ gameType }: IGameReadyProps) {
@@ -22,9 +24,9 @@ function GameReady({ gameType }: IGameReadyProps) {
   const gameInfo = getGameConfig(gameType);
 
   return (
-    <div className="flex items-center justify-center min-h-[150px] p-4">
+    <div className="flex items-center justify-center min-h-40 p-4">
       <GCard padding={SizeEnum.lg} className="w-full max-w-lg text-center relative overflow-hidden">
-        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-primary via-accent to-secondary" />
+        <div className="absolute top-0 inset-x-0 h-1 bg-linear-to-r from-primary via-accent to-secondary" />
         <h2 className="text-2xl font-black text-text mb-6">{t.ready.title}</h2>
 
         <div className="flex items-center justify-center gap-6 mb-10">
@@ -51,7 +53,7 @@ function GameReady({ gameType }: IGameReadyProps) {
 
         <GButton
           disabled={!isHost}
-          onClick={() => startGame(state.player2Id!, gameType)}
+          onClick={() => startGame(state.player2Id ?? null, gameType)}
           fullWidth
           size={SizeEnum.lg}
           startIcon={<GIcon icon={Play} size={SizeEnum.lg} />}>

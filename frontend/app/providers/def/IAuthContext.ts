@@ -1,5 +1,5 @@
 import type { IUser } from "@/domain/meta/IUser";
-import { IUserPreferences } from "@/domain/meta/IUserPreferences";
+import type { IUserPreferences } from "@/domain/meta/IUserPreferences";
 import type { TNullable } from "@/domain/type/TCommon";
 
 interface AuthContextType {

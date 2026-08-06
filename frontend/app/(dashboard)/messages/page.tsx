@@ -8,6 +8,7 @@ import { useMessages } from "@/hooks/useMessages";
 import { GEmpty } from "@/component/common/GEmpty";
 import { GList } from "@/component/common/GList";
 import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
+import { statusColorText } from "@/domain/constant/status-color";
 import { ar } from "./i18n/ar.i18n";
 import { en, type TMessagesTranslation } from "./i18n/en.i18n";
 import { GButton } from "@/component/common/GButton";
@@ -23,13 +24,6 @@ import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 import { AvatarShapeEnum } from "@/domain/enum/AvatarShapeEnum";
-
-const statusColorText: Record<UserStatusEnum, string> = {
-  [UserStatusEnum.Online]: "text-success",
-  [UserStatusEnum.InGame]: "text-danger",
-  [UserStatusEnum.Offline]: "text-warning",
-  [UserStatusEnum.All]: "text-text-muted",
-};
 
 const formatStatus = (status: UserStatusEnum, t: TMessagesTranslation) => {
   switch (status) {
@@ -225,7 +219,7 @@ function MessagesPage() {
                 <div className="flex h-full items-center justify-center">
                   <GEmpty
                     icon={<GIcon icon={MessagesSquare} size={SizeEnum.xl} color={AccentColorEnum.Danger} />}
-                    title="Unable to load messages"
+                    title={t.error.title}
                     description={error}
                   />
                 </div>
@@ -249,7 +243,7 @@ function MessagesPage() {
                         className={clsx("flex", outgoing ? "justify-end" : "justify-start")}>
                         <div
                           className={clsx(
-                            "max-w-[85%] sm:max-w-[70%] min-w-0 px-4 py-2.5 text-sm leading-relaxed wrap-anywhere rounded-[var(--radius-lg)]",
+                            "max-w-[85%] sm:max-w-[70%] min-w-0 px-4 py-2.5 text-sm leading-relaxed wrap-anywhere rounded-lg",
                             outgoing ? "ms-auto rounded-ee-sm bg-primary text-on-primary" : "rounded-es-sm border border-border bg-surface text-text",
                           )}>
                           <p className="whitespace-pre-wrap">{message.content}</p>
@@ -299,6 +293,7 @@ function MessagesPage() {
                   onClick={() => void sendMessage()}
                   disabled={!draft.trim() || !isConnected || sending}
                   loading={sending}
+                  loadingText={t.send}
                   size={SizeEnum.md}
                   startIcon={<GIcon icon={Send} size={SizeEnum.sm} color={AccentColorEnum.OnPrimary} />}>
                   <span className="hidden sm:inline">{t.send}</span>

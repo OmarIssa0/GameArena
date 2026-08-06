@@ -2,16 +2,22 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Bell, X } from "lucide-react";
+
 import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
+import { GButton } from "@/component/common/GButton";
 import { GIcon } from "@/component/common/GIcon";
-import { X, Bell } from "lucide-react";
-import { GButton } from "../common/GButton";
-import type { TNullable } from "@/domain/type/TCommon";
-import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import type { TNullable } from "@/domain/type/TCommon";
+import { useTranslation } from "@/hooks/useSetting";
+
+import { ar } from "@/app/(dashboard)/notifications/i18n/ar.i18n";
+import { en, type TNotificationsTranslation } from "@/app/(dashboard)/notifications/i18n/en.i18n";
 
 function NotificationPopup() {
   const router = useRouter();
+  const t = useTranslation({ en, ar }) as TNotificationsTranslation;
   const { notifications } = useDashboardNotifications();
   const [visible, setVisible] = useState(false);
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
@@ -74,7 +80,7 @@ function NotificationPopup() {
             handleClick();
           }
         }}
-        className="flex items-center gap-3 bg-bg-elevated border border-primary/30 rounded-2xl shadow-xl shadow-primary/10 px-5 py-3 cursor-pointer transition hover:bg-bg-card-hover hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary outline-none max-w-[90vw] sm:max-w-md">
+        className="flex items-center gap-3 bg-bg-elevated border border-primary/30 rounded-2xl shadow-xl shadow-primary/10 px-5 py-3 cursor-pointer transition hover:bg-bg-card-hover hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary outline-none max-w-full sm:max-w-md">
         <div className="p-1.5 bg-primary-muted rounded-full shrink-0">
           <GIcon icon={Bell} size={SizeEnum.sm} color={AccentColorEnum.Primary} />
         </div>
@@ -82,7 +88,7 @@ function NotificationPopup() {
           <p className="text-sm font-semibold text-text truncate">{latest.title}</p>
           <p className="text-xs text-text-secondary truncate">{latest.body}</p>
         </div>
-        <GButton variant={AccentColorEnum.Muted} size={SizeEnum.icon} onClick={handleDismiss} className="shrink-0 min-w-[32px] min-h-[32px]" aria-label="Dismiss">
+        <GButton variant={AccentColorEnum.Muted} size={SizeEnum.icon} onClick={handleDismiss} className="shrink-0 w-8 h-8" aria-label={t.actions.dismiss}>
           <GIcon icon={X} size={SizeEnum.sm} color={AccentColorEnum.Muted} />
         </GButton>
       </div>

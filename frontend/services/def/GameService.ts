@@ -1,5 +1,4 @@
 import { SignalRServiceBase } from "../lib/SignalRServiceBase";
-import { gameRepository } from "@/repositories/def/GameRepository";
 import type { HubConnection } from "@microsoft/signalr";
 import type { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
 import type { IGameInvite } from "@/domain/meta/INotification";
@@ -7,6 +6,7 @@ import type { IGameState } from "@/app/providers/def/IGameState";
 import type { IGameService } from "../meta/IGameService";
 import type { TNullable, TPromise } from "@/domain/type/TCommon";
 import type { Handler } from "../lib/signalRUtils";
+import { gameRepository } from "@/repositories/def/GameRepository";
 
 class GameService extends SignalRServiceBase implements IGameService {
   private _connectionReady: Promise<void>;
@@ -14,37 +14,28 @@ class GameService extends SignalRServiceBase implements IGameService {
 
   constructor() {
     super();
-    this._connectionReady = new Promise((r) => { this._resolveConnectionReady = r; });
+    this._connectionReady = new Promise((r) => {
+      this._resolveConnectionReady = r;
+    });
+  }
+
+  async getCurrentState(): TPromise<TNullable<IGameState>> {
+    return gameRepository.getCurrentState();
   }
 
   private async ensureConnection(): Promise<HubConnection> {
     if (this.connection) return this.connection;
     await Promise.race([
       this._connectionReady,
-      new Promise<void>((_, reject) =>
-        setTimeout(() => reject(new Error("Game connection not established")), 10000)
-      ),
+      new Promise<void>((_, reject) => setTimeout(() => reject(new Error("Game connection not established")), 10000)),
     ]);
     if (!this.connection) throw new Error("Game connection not established");
     return this.connection;
   }
 
-  // ── REST API (via repository) ───────────────────────────────────────────
-
-  getCurrentState(): TPromise<TNullable<IGameState>> {
-    return gameRepository.getCurrentState();
-  }
-
-  // ── Connection management ───────────────────────────────────────────────
-
-  setConnection(connection: HubConnection): void {
-    super.setConnection(connection);
-    this._resolveConnectionReady();
-  }
-
   protected registerHandlers(): void {
     this.addHandler("gameState", (data: unknown) => {
-      this.subs.dispatch("game:state", data);
+      this.subs.dispatch("game:state", data as IGameState);
     });
 
     this.addHandler("OpponentDisconnected", () => {
@@ -68,8 +59,6 @@ class GameService extends SignalRServiceBase implements IGameService {
     const conn = await this.ensureConnection();
     return conn.invoke(method, ...args) as T;
   }
-
-  // ── SignalR invocations ─────────────────────────────────────────────────
 
   async findMatch(gameKind: GamesKindEnum): Promise<void> {
     await this.invoke("FindMatch", gameKind);
@@ -114,8 +103,6 @@ class GameService extends SignalRServiceBase implements IGameService {
   async createLobby(gameKind: GamesKindEnum): Promise<void> {
     await this.invoke("CreateLobby", gameKind);
   }
-
-  // ── SignalR subscriptions ───────────────────────────────────────────────
 
   onGameState(handler: (state: IGameState) => void): () => void {
     return this.subscribe("game:state", handler as Handler);

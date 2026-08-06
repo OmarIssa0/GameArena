@@ -7,25 +7,28 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { useTranslation } from "@/hooks/useSetting";
+import { useGameTranslation } from "@/hooks/useGameTranslation";
 import { ar } from "./i18n/ar.i18n";
 import { en, type TGamesTranslation } from "./i18n/en.i18n";
 
 import { GameCard } from "@/component/games/common/GameCard";
 import { GButton } from "@/component/common/GButton";
 import { GModal } from "@/component/common/GModal";
-import { GamesList, GamesMap } from "@/domain/constant/games";
+import { GamesList } from "@/domain/constant/games";
+import { translateGameInfo } from "@/domain/constant/games";
 import { useGame } from "@/app/providers/GameProvider";
 import { GBadge } from "@/component/common/GBadge";
 import { PageHeader } from "@/component/common/PageHeader";
 import { GPage } from "@/component/common/GPage";
-import { THashMap, TNullable } from "@/domain/type/TCommon";
+import type { TNullable } from "@/domain/type/TCommon";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 
 function GamesPage() {
   const router = useRouter();
-  const t = useTranslation({ en, ar }) as TGamesTranslation & THashMap<string>;
   const { state, leaveGame } = useGame();
+  const t = useTranslation({ en, ar }) as TGamesTranslation;
+  const gt = useGameTranslation();
   const [pendingPath, setPendingPath] = useState<TNullable<string>>(null);
 
   const handleGameSelect = (path: string) => {
@@ -55,16 +58,17 @@ function GamesPage() {
           </GBadge>
         }
       />
-      <GList items={[...GamesList]} keyExtractor={(game) => game.id} emptyMessage="" emptyDescription="">
+      <GList items={[...GamesList]} keyExtractor={(game) => game.id} emptyMessage="" emptyDescription="" listClassName="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" noPagination>
         {(game) => {
-          const gameConfig = GamesMap[game.id];
+          const { name, description } = translateGameInfo(gt, game.type);
           return (
             <GameCard
-              name={t[gameConfig.name]}
-              desc={t[gameConfig.description]}
-              onClick={() => handleGameSelect(gameConfig.path)}
-              gradientClass={gameConfig.gradientClass}
-              animation={gameConfig.animation}
+              name={name}
+              desc={description}
+              icon={game.icon}
+              onClick={() => handleGameSelect(game.path)}
+              gradientClass={game.gradientClass}
+              animation={game.animation}
               playLabel={t.play}
               page
             />
@@ -75,7 +79,7 @@ function GamesPage() {
         open={Boolean(state) && pendingPath !== null}
         onClose={() => setPendingPath(null)}
         role="alertdialog"
-        ariaLabel="Leave game confirmation">
+        ariaLabel={t.leaveConfirmation}>
         <div className="text-center">
           <GIcon icon={ArrowRightFromLine} size={SizeEnum.lg} color={AccentColorEnum.Warning} className="mx-auto mb-4" />
           <h2 className="text-xl font-bold text-text mb-2">{t.leaveTitle}</h2>

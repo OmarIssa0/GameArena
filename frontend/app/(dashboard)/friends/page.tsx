@@ -102,8 +102,6 @@ function FriendsPage() {
         return (
           <FriendsListTab
             friends={friends}
-            messageLabel={t.message}
-            activeLabel={t.message}
             onMessage={(id) => router.push(`/messages?friend=${id}`)}
             onBlock={blockUser}
             onRemove={removeFriend}

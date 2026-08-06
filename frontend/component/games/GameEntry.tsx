@@ -1,14 +1,15 @@
 "use client";
 
-import { Users, Lock } from "lucide-react";
+import { Lock, Users } from "lucide-react";
+
 import { useGame } from "@/app/providers/GameProvider";
-import { useGameTranslation } from "@/hooks/useGameTranslation";
 import { GButton } from "@/component/common/GButton";
 import { GIcon } from "@/component/common/GIcon";
-import { translateGameInfo } from "./gameConfig";
-import { GAMES_BY_TYPE } from "@/domain/constant/games";
-import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { GAMES_BY_TYPE, translateGameInfo } from "@/domain/constant/games";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { useGameTranslation } from "@/hooks/useGameTranslation";
+
 import type { IGameEntryProps } from "./def/GameEntry";
 
 function GameEntry({ gameType }: IGameEntryProps) {

@@ -24,6 +24,7 @@ const en = {
   noInvitesDescription: "When someone invites you to play, it will show up here.",
   noOnlineTitle: "No friends online",
   noOnlineDescription: "Your online friends will appear here for quick access.",
+  acceptInviteConfirmation: "Accept invite confirmation",
 };
 
 type TSocialPanelTranslation = typeof en;

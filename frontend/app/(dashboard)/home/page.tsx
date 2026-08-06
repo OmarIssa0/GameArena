@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { useTranslation } from "@/hooks/useSetting";
+import { useGameTranslation } from "@/hooks/useGameTranslation";
 import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
 import { ArrowRight, Gamepad2, MessageSquare, Users, Trophy, Zap, Sparkles } from "lucide-react";
 import { GIcon } from "@/component/common/GIcon";
 import { GList } from "@/component/common/GList";
 import { ar } from "./i18n/ar.i18n";
 import { en, type THomeTranslation } from "./i18n/en.i18n";
-import { GamesList } from "@/domain/constant/games";
+import { GamesList, translateGameInfo } from "@/domain/constant/games";
 import { RecentHistorySection } from "@/component/history/RecentHistorySection";
 import { GPage } from "@/component/common/GPage";
 import { GCard } from "@/component/common/GCard";
@@ -24,6 +25,7 @@ import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 function Home() {
   const { user } = useAuth();
   const t = useTranslation({ en, ar }) as THomeTranslation;
+  const gt = useGameTranslation();
   const { friendRequestCount, unreadMessageCount } = useDashboardNotifications();
   const router = useRouter();
 
@@ -150,10 +152,12 @@ function Home() {
           </div>
         </div>
         <GList items={[...GamesList]} keyExtractor={(game) => `${game.type}`} listClassName="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" noPagination>
-          {(game) => (
+          {(game) => {
+            const { name, description } = translateGameInfo(gt, game.type);
+            return (
             <GameCard
-              name={t.games[game.name as keyof typeof t.games]}
-              desc={t.games[game.description as keyof typeof t.games]}
+              name={name}
+              desc={description}
               icon={game.icon}
               gradientClass={game.gradientClass}
               animation={game.animation}
@@ -161,7 +165,8 @@ function Home() {
               playLabel={t.playNow}
               page
             />
-          )}
+          );
+          }}
         </GList>
       </section>
     </GPage>

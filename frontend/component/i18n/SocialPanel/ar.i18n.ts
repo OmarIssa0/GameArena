@@ -24,6 +24,7 @@ const ar = {
   noInvitesDescription: "عندما يدعوك أحدهم للعب، ستظهر هنا.",
   noOnlineTitle: "لا يوجد أصدقاء متصلون",
   noOnlineDescription: "سيظهر أصدقاؤك المتصلون هنا للوصول السريع.",
+  acceptInviteConfirmation: "تأكيد قبول الدعوة",
 };
 
 export { ar };

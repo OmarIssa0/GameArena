@@ -1,5 +1,5 @@
-import { SizeEnum } from "@/domain/enum/SizeEnum";
-import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import type { SizeEnum } from "@/domain/enum/SizeEnum";
+import type { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 import type { LucideIcon } from "lucide-react";
 import type { MouseEvent } from "react";
 interface GIconProps {

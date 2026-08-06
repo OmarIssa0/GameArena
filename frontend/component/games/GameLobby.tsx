@@ -1,19 +1,21 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { Play, UserPlus } from "lucide-react";
-import { useState, useMemo } from "react";
+
 import { useAuth } from "@/app/providers/AuthProvider";
 import { useGame } from "@/app/providers/GameProvider";
-import { useGameTranslation } from "@/hooks/useGameTranslation";
-import { useFriendList } from "@/hooks/useFriendList";
-import { GamePlayersHeader } from "@/component/games/common/GamePlayersHeader";
-import { InviteModal } from "@/component/games/common/InviteModal";
-import { translateGameInfo } from "./gameConfig";
 import { GButton } from "@/component/common/GButton";
-import { GIcon } from "@/component/common/GIcon";
 import { GCard } from "@/component/common/GCard";
-import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { GIcon } from "@/component/common/GIcon";
+import { InviteModal } from "@/component/games/common/InviteModal";
+import { translateGameInfo } from "@/domain/constant/games";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { useFriendList } from "@/hooks/useFriendList";
+import { useGameTranslation } from "@/hooks/useGameTranslation";
+
+import { GamePlayersHeader } from "./GameUI";
 import type { IGameLobbyProps } from "./def/GameLobby";
 
 function GameLobby({ gameType }: IGameLobbyProps) {
@@ -40,7 +42,7 @@ function GameLobby({ gameType }: IGameLobbyProps) {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[150px] p-4">
+    <div className="flex items-center justify-center min-h-40 p-4">
       <div className="w-full max-w-lg space-y-6">
         <div className="text-center space-y-1">
           <h1 className="text-2xl font-black text-text">{gameName}</h1>

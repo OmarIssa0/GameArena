@@ -1,12 +1,13 @@
-import { GamesList } from "@/domain/constant/games";
-import { MatchStatusEnum } from "@/domain/enum/MatchStatusEnum";
+import { GAvatar } from "@/component/common/GAvatar";
 import { GBadge } from "@/component/common/GBadge";
 import { GIcon } from "@/component/common/GIcon";
-import { GAvatar } from "@/component/common/GAvatar";
 import { GList } from "@/component/common/GList";
-import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { GamesList } from "@/domain/constant/games";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 import { AvatarShapeEnum } from "@/domain/enum/AvatarShapeEnum";
+import { MatchStatusEnum } from "@/domain/enum/MatchStatusEnum";
+import { SizeEnum } from "@/domain/enum/SizeEnum";
+
 import type { IMatchHistoryTableProps } from "./def/MatchHistoryTable";
 
 function resultBadge(result: MatchStatusEnum, winLabel: string, lossLabel: string, drawLabel: string) {
@@ -35,8 +36,8 @@ export function MatchHistoryTable({ matches, locale, winLabel, lossLabel, drawLa
                 firstName={match.opponent.firstName}
                 lastName={match.opponent.lastName}
                 status={match.opponent.status}
-                 size={SizeEnum.xs}
-                 shape={AvatarShapeEnum.Circle}
+                size={SizeEnum.xs}
+                shape={AvatarShapeEnum.Circle}
               />
               <span className="truncate text-text-secondary">@{match.opponent.fullName ?? match.opponent.userName}</span>
             </div>

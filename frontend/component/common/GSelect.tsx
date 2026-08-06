@@ -6,7 +6,7 @@ import { forwardRef } from "react";
 import { GLabel } from "./GLabel";
 import type { GSelectProps } from "./def/GSelect";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
-import { THashMap } from "@/domain/type/TCommon";
+import type { THashMap } from "@/domain/type/TCommon";
 
 const inputSize: THashMap<string> = {
   [SizeEnum.xs]: "px-1 py-1.5 text-xs",
@@ -29,7 +29,7 @@ const GSelect = forwardRef<HTMLSelectElement, GSelectProps<string | number>>(
           <select
             ref={ref}
             className={clsx(
-              "w-full bg-surface border border-border rounded-[var(--radius-md)] text-text transition-all duration-150 appearance-none",
+              "w-full bg-surface border border-border rounded-md text-text transition-all duration-150 appearance-none",
               "hover:border-border-light focus:border-primary focus:ring-3 focus:ring-primary-muted",
               "placeholder:text-text-muted",
               inputSize[size],

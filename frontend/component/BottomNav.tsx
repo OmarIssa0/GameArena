@@ -19,7 +19,7 @@ export function BottomNav() {
   };
 
   return (
-    <nav className="fixed inset-inline-0 bottom-0 flex items-center justify-around h-18 pb-[env(safe-area-inset-bottom)] bg-bg-sidebar border-t border-border z-fixed md:hidden overflow-x-auto w-full custom-scrollbar" role="navigation" aria-label="Bottom navigation">
+    <nav className="fixed inset-inline-0 bottom-0 flex items-center justify-around h-18 pb-[env(safe-area-inset-bottom)] bg-bg-sidebar border-t border-border z-fixed md:hidden overflow-x-auto w-full custom-scrollbar" role="navigation" aria-label={t.mainNavigation}>
       <div className="flex items-center justify-center min-w-full">
         {sidebarNav.map((item) => (
           <a
@@ -27,6 +27,7 @@ export function BottomNav() {
             href={`/${item.id}`}
             className={clsx(
               "flex flex-col items-center gap-0.5 p-2 text-text-muted bg-transparent border-none cursor-pointer transition-all min-w-18",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 rounded-lg",
               isActive(item.id) && "text-primary translate-y-[-2px]",
             )}
             aria-current={isActive(item.id) ? "page" : undefined}>

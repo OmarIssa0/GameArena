@@ -12,9 +12,13 @@ export const ar = {
     title: "لا توجد إشعارات",
     description: "أنت على اطلاع بكل شيء!",
   },
+  error: {
+    title: "تعذر تحميل الطلبات",
+  },
   gameInvite: {
     title: "دعوة لعبة",
     description: "{name} دعاك للعب {game}",
+    fallbackName: "شخص ما",
   },
   friendRequest: {
     title: "طلب صداقة",

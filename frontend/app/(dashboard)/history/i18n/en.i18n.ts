@@ -31,11 +31,16 @@ const en = {
     [GamesKindEnum.Snake]: "Snake",
     [GamesKindEnum.TicTacToe]: "Tic Tac Toe",
     [GamesKindEnum.PingPong]: "Ping Pong",
+    [GamesKindEnum.RockPaperScissors]: "Rock Paper Scissors",
+    [GamesKindEnum.ConnectFour]: "Connect Four",
   },
   empty: {
     title: "No matches yet",
     description: "Your battle history will appear here once you finish your first game.",
     filtered: "No matches found for this filter.",
+  },
+  error: {
+    title: "Unable to load history",
   },
 };
 

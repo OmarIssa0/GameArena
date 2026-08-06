@@ -106,6 +106,7 @@ function OtpForm({ email, onSuccess }: OtpFormProps) {
             pattern="[0-9]*"
             value={digit}
             maxLength={1}
+            aria-label={t.digitLabel(i + 1)}
             onChange={(e) => setDigit(i, e.target.value)}
             onKeyDown={(e) => handleKeyDown(i, e)}
             onPaste={handlePaste}
@@ -124,6 +125,7 @@ function OtpForm({ email, onSuccess }: OtpFormProps) {
       <div className="space-y-2 pt-1">
         <GButton
           loading={loading.verify}
+          loadingText={t.verify}
           onClick={verify}
           className="w-full"
         >

@@ -1,10 +1,11 @@
-import { GamesList } from "@/domain/constant/games";
-import { MatchStatusEnum } from "@/domain/enum/MatchStatusEnum";
 import { GBadge } from "@/component/common/GBadge";
 import { GCard } from "@/component/common/GCard";
 import { GIcon } from "@/component/common/GIcon";
+import { GamesList } from "@/domain/constant/games";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { MatchStatusEnum } from "@/domain/enum/MatchStatusEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
+
 import type { MatchHistoryItemProps } from "./def/MatchHistoryItem";
 
 export function MatchHistoryItem({ match, locale, winLabel, lossLabel, drawLabel, versusLabel, gameLabel }: MatchHistoryItemProps) {

@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
-import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
-import { SizeEnum } from "@/domain/enum/SizeEnum";
+import type { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import type { SizeEnum } from "@/domain/enum/SizeEnum";
 
 interface GButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;

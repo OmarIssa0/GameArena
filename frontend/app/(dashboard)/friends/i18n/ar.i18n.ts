@@ -55,6 +55,10 @@ const ar: TFriendsTranslation = {
     unblock: "إلغاء الحظر",
     unblockError: "فشل إلغاء الحظر. يرجى المحاولة مرة أخرى.",
   },
+  actions: {
+    block: "حظر المستخدم",
+    removeFriend: "إزالة الصديق",
+  },
 };
 
 export { ar };

@@ -76,7 +76,7 @@ function SocialDesktopExpanded({ friends, loading, gameInvites, isCompact, close
             description={t.noFriendsDescription}
           />
         ) : (
-          <FriendsList friends={filteredFriends} query={query} messageLabel={t.message} activeLabel={t.active} noPagination />
+          <FriendsList friends={filteredFriends} query={query} noPagination />
         )}
       </div>
     </div>

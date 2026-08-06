@@ -1,5 +1,5 @@
 import type { HTMLAttributes, ReactNode } from "react";
-import { SizeEnum } from "@/domain/enum/SizeEnum";
+import type { SizeEnum } from "@/domain/enum/SizeEnum";
 
 interface GModalProps extends HTMLAttributes<HTMLDivElement> {
   open: boolean;

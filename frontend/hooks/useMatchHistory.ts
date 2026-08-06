@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { MatchStatusEnum } from "@/domain/enum/MatchStatusEnum";
 import { matchHistoryService } from "@/services/def/MatchHistoryService";
 import type { IMatchHistory } from "@/domain/meta/IMatchHistory";
@@ -19,10 +19,15 @@ function buildSummary(matches: IMatchHistory[]) {
   );
 }
 
-function useMatchHistory(statusFilter: MatchStatusEnum = MatchStatusEnum.All, limit?: number) {
+function useMatchHistory(statusFilter: MatchStatusEnum = MatchStatusEnum.All, limit?: number, fallbackErrorMessage = "") {
   const [allMatches, setAllMatches] = useState<IMatchHistory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<TNullable<string>>(null);
+  const fallbackErrorRef = useRef(fallbackErrorMessage);
+
+  useEffect(() => {
+    fallbackErrorRef.current = fallbackErrorMessage;
+  }, [fallbackErrorMessage]);
 
   useEffect(() => {
     let alive = true;
@@ -34,7 +39,7 @@ function useMatchHistory(statusFilter: MatchStatusEnum = MatchStatusEnum.All, li
       })
       .catch((err: unknown) => {
         if (!alive) return;
-        const message = err instanceof Error ? err.message : "Failed to load match history";
+        const message = err instanceof Error && err.message ? err.message : fallbackErrorRef.current;
         setError(message);
       })
       .finally(() => {

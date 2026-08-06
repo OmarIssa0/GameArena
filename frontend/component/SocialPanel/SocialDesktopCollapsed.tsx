@@ -12,19 +12,13 @@ import { GAvatar } from "../common/GAvatar";
 import { GButton } from "../common/GButton";
 import { GList } from "../common/GList";
 import { GSpinner } from "../common/GSpinner";
-import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
+import { statusColor } from "@/domain/constant/status-color";
 import clsx from "clsx";
 import { SocialPanelTabEnum } from "@/domain/enum/SocialPanelTabEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 import { AvatarShapeEnum } from "@/domain/enum/AvatarShapeEnum";
 import type { ISocialDesktopCollapsedProps } from "./def/SocialDesktopCollapsed";
-
-const statusColor: Partial<Record<UserStatusEnum, string>> = {
-  [UserStatusEnum.Online]: "bg-success",
-  [UserStatusEnum.InGame]: "bg-primary",
-  [UserStatusEnum.Offline]: "bg-text-muted",
-};
 
 function SocialDesktopCollapsed({ friends, isCompact, closeMobile, loading }: ISocialDesktopCollapsedProps) {
   const router = useRouter();
@@ -53,7 +47,7 @@ function SocialDesktopCollapsed({ friends, isCompact, closeMobile, loading }: IS
           variant={activeTab === SocialPanelTabEnum.Friends ? AccentColorEnum.Primary : AccentColorEnum.Muted}
           size={SizeEnum.icon}
           onClick={() => setActiveTab(SocialPanelTabEnum.Friends)}
-          className="w-full min-h-[36px] justify-center"
+          className="w-full h-9 justify-center"
           aria-label={t.tabs.friends}>
           <GIcon icon={Users} size={SizeEnum.sm} />
         </GButton>
@@ -61,7 +55,7 @@ function SocialDesktopCollapsed({ friends, isCompact, closeMobile, loading }: IS
           variant={activeTab === SocialPanelTabEnum.Invites ? AccentColorEnum.Primary : AccentColorEnum.Muted}
           size={SizeEnum.icon}
           onClick={() => setActiveTab(SocialPanelTabEnum.Invites)}
-          className="w-full min-h-[36px] justify-center relative"
+          className="w-full h-9 justify-center relative"
           aria-label={t.tabs.invites}>
           <GIcon icon={Bell} size={SizeEnum.sm} />
           {gameInvites.length > 0 && <span className="absolute -top-0.5 -end-0.5 w-2 h-2 rounded-full bg-danger ring-1 ring-bg-sidebar" />}
@@ -77,25 +71,25 @@ function SocialDesktopCollapsed({ friends, isCompact, closeMobile, loading }: IS
             emptyMessage=""
             emptyDescription={t.noInvitesDescription}
             emptyIcon={<GIcon icon={Bell} size={SizeEnum.sm} color={AccentColorEnum.Muted} />}>
-             {(invite) => (
-               <div className="bg-primary-muted border border-primary/20 rounded-xl p-2 text-center">
-                 <p className="text-[10px] font-medium text-text leading-tight mb-1.5 truncate">
-                   {t.invites.wantsToPlay.replace("{{name}}", invite.inviterName ?? "")}
-                 </p>
-                 <div className="flex gap-1 justify-center">
-                   <GButton size={SizeEnum.xs} className="text-[10px]" onClick={() => acceptGameInvite(invite.roomId)}>
-                     {t.invites.accept}
-                   </GButton>
-                   <GButton
-                     size={SizeEnum.xs}
+              {(invite) => (
+                <div className="bg-primary-muted border border-primary/20 rounded-xl p-2 text-center">
+                  <p className="text-2xs font-medium text-text leading-tight mb-1.5 truncate">
+                    {t.invites.wantsToPlay.replace("{{name}}", invite.inviterName ?? "")}
+                  </p>
+                  <div className="flex gap-1 justify-center">
+                    <GButton size={SizeEnum.xs} className="text-2xs" onClick={() => acceptGameInvite(invite.roomId)}>
+                      {t.invites.accept}
+                    </GButton>
+                    <GButton
+                      size={SizeEnum.xs}
                       variant={AccentColorEnum.Secondary}
-                     className="text-[10px]"
-                     onClick={() => dismissGameInvite(invite.roomId)}>
-                     {t.invites.decline}
-                   </GButton>
-                 </div>
-               </div>
-             )}
+                      className="text-2xs"
+                      onClick={() => dismissGameInvite(invite.roomId)}>
+                      {t.invites.decline}
+                    </GButton>
+                  </div>
+                </div>
+              )}
           </GList>
         ) : (
           <GList
@@ -109,7 +103,7 @@ function SocialDesktopCollapsed({ friends, isCompact, closeMobile, loading }: IS
                 type="button"
                 onClick={() => goToChat(f.id)}
                 title={`${f.firstName ?? ""} ${f.lastName ?? ""}`.trim() || (f.userName ?? undefined)}
-                className="relative shrink-0 min-w-[40px] min-h-[40px] rounded-full transition hover:ring-2 hover:ring-primary focus-visible:ring-2 focus-visible:ring-primary outline-none">
+                className="relative shrink-0 w-10 h-10 rounded-full transition hover:ring-2 hover:ring-primary focus-visible:ring-2 focus-visible:ring-primary outline-none">
                 <GAvatar firstName={f.firstName} lastName={f.lastName} status={f.status} size={SizeEnum.sm} shape={AvatarShapeEnum.Circle} />
                 <span
                   className={clsx(

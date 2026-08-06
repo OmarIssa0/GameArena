@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
-import { IndicatorPositionEnum } from "@/domain/enum/IndicatorPositionEnum";
-import { NavOrientationEnum } from "@/domain/enum/NavOrientationEnum";
+import type { IndicatorPositionEnum } from "@/domain/enum/IndicatorPositionEnum";
+import type { NavOrientationEnum } from "@/domain/enum/NavOrientationEnum";
 
 interface GNavItem {
   id: string;

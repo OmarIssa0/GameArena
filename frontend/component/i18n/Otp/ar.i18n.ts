@@ -6,6 +6,7 @@ const ar = {
   verify: "تحقق",
   invalidCode: "رمز غير صالح",
   resendCodeFailed: "فشل في إعادة إرسال الرمز",
+  digitLabel: (n: number) => `رقم ${n} من 6`,
 };
 
 export { ar };

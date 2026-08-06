@@ -65,7 +65,7 @@ namespace backend.Domain
             lock (_lock)
             {
                 AdvanceBall();
-                AdvanceBot();
+                MakeBotMove();
             }
         }
 
@@ -130,7 +130,7 @@ namespace backend.Domain
             }
         }
 
-        private void AdvanceBot()
+        public override void MakeBotMove()
         {
             if (!IsBotGame || IsFinished || !HasStarted) return;
 
@@ -170,12 +170,13 @@ namespace backend.Domain
             if (botIsP1)
                 PadYP1 = botPaddleY;
             else
-                PadYP2 = botPaddleY;
+                PadYP2 = botPaddleY;;
         }
 
         public override object GetStatePayload() => new
         {
             roomId = RoomId,
+            gameType = GameType,
             player1Id = Player1Id,
             player1Username = Player1Username,
             player2Id = Player2Id,
@@ -189,18 +190,16 @@ namespace backend.Domain
             currentTurnPlayerId = CurrentTurnPlayerId,
             boardWidth = BoardWidthPx,
             boardHeight = BoardHeightPx,
-            ballPosition = new { x = BallPX * BoardWidthPx, y = BallPY * BoardHeightPx },
+            ball = new { x = BallPX * BoardWidthPx, y = BallPY * BoardHeightPx, vx = BallVX, vy = BallVY },
             ballSize = BallSizePx,
-            player1PaddleX = Paddle1Left * BoardWidthPx,
-            player1PaddleY = PadYP1 * BoardHeightPx,
-            player1PaddleHeight = PadHP1 * BoardHeightPx,
-            player2PaddleX = Paddle2Left * BoardWidthPx,
-            player2PaddleY = PadYP2 * BoardHeightPx,
-            player2PaddleHeight = PadHP2 * BoardHeightPx,
+            player1Paddle = new { x = Paddle1Left * BoardWidthPx, y = PadYP1 * BoardHeightPx, height = PadHP1 * BoardHeightPx },
+            player2Paddle = new { x = Paddle2Left * BoardWidthPx, y = PadYP2 * BoardHeightPx, height = PadHP2 * BoardHeightPx },
             paddleWidth = PaddleWidthPx,
             player1Score = ScoreP1,
             player2Score = ScoreP2,
-            score = Score
+            score = Score,
+            winScore = WinScore,
+            tickRateHz = 1000 / TickIntervalMs
         };
 
         public override void ResetForNewRound()

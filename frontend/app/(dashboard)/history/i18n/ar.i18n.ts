@@ -31,11 +31,16 @@ const ar = {
     [GamesKindEnum.Snake]: "الثعبان",
     [GamesKindEnum.TicTacToe]: "إكس أو",
     [GamesKindEnum.PingPong]: "بينغ بونغ",
+    [GamesKindEnum.RockPaperScissors]: "حجر ورقة مقص",
+    [GamesKindEnum.ConnectFour]: "اتصل بأربعة",
   },
   empty: {
     title: "لا توجد مباريات بعد",
     description: "سيظهر سجل مبارياتك هنا بعد إنهاء أول لعبة.",
     filtered: "لا توجد مباريات لهذا الفلتر.",
+  },
+  error: {
+    title: "تعذر تحميل السجل",
   },
 };
 

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { SizeEnum } from "@/domain/enum/SizeEnum";
+import type { SizeEnum } from "@/domain/enum/SizeEnum";
 
 interface GPageProps {
   children: ReactNode;

@@ -11,6 +11,18 @@ const ar = {
   pingpong: {
     name: "بينج بونج",
     description: "مواجهة المضرب الكلاسيكية في الوقت الفعلي",
+    controlHint: "استخدم W/S أو مفاتيح الأسهم تحريك المضرب",
+  },
+  rockpaperscissors: {
+    name: "حجر ورقة مقص",
+    description: "لعبة اليد الكلاسيكية - اختر حجرًا أو ورقةً أو مقصًا",
+    rock: "حجر",
+    paper: "ورقة",
+    scissors: "مقص",
+  },
+  connectfour: {
+    name: "اتصل بأربعة",
+    description: "أسقط الأقراص واربط أربعة في صف للفوز",
   },
 
   lobby: {
@@ -21,6 +33,8 @@ const ar = {
     cancelSearch: "إلغاء البحث",
     quick: "سريع",
     invite: "دعوة",
+    searchError: "تعذر العثور على مباراة. حاول مرة أخرى.",
+    createLobbyError: "تعذر إنشاء اللوبي. حاول مرة أخرى.",
   },
 
   waiting: {
@@ -52,6 +66,7 @@ const ar = {
     yourTurn: "دورك - قم بحركتك!",
     waitingFor: "في انتظار {name}...",
     leaveGame: "مغادرة اللعبة",
+    firstTo: "الأول إلى {score}",
   },
 
   invite: {
@@ -64,6 +79,9 @@ const ar = {
   result: {
     opponentForfeited: "استسلم الخصم!",
     opponentForfeitedDesc: "غادر خصمك اللعبة. لقد فزت بشكل افتراضي!",
+    winShort: "فوز",
+    loseShort: "خسارة",
+    drawShort: "تعادل",
     victory: "النصر! 🎉",
     victoryDesc: "لعب رائع! لقد هزمت خصمك.",
     draw: "تعادل! 🤝",
