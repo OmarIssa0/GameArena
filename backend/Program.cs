@@ -76,15 +76,21 @@ builder.Services.AddSignalR()
     });
 
 // CORS
-// when deploying, change the origin to your frontend domain
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("cors", policy =>
     {
-        var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
-            ?? new[] { "http://localhost:3000" };
+        var raw = builder.Configuration["Cors:AllowedOrigins"] ?? "";
+        var origins = raw
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(o => !string.IsNullOrWhiteSpace(o))
+            .ToArray();
 
-        policy.WithOrigins(allowedOrigins)
+        if (origins.Length == 0)
+            origins = ["http://localhost:3000"];
+
+        policy.WithOrigins(origins)
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
