@@ -13,12 +13,16 @@ import { useTranslation } from "@/hooks/useSetting";
 import type { TNullable } from "@/domain/type/TCommon";
 import type { OtpFormProps } from "./def/OtpForm";
 import { emailVerificationService } from "@/services/def/EmailVerificationService";
+import { useErrorMessage } from "@/hooks/useErrorMessage";
+import type { AxiosError } from "axios";
+import type { IApiResponse } from "@/domain/meta/IApiResponse";
 
 function OtpForm({ email, onSuccess }: OtpFormProps) {
   const [code, setCode] = useState<string[]>(Array(6).fill(""));
   const [loading, setLoading] = useState({ verify: false, resend: false });
   const [error, setError] = useState("");
   const t = useTranslation({ en, ar }) as TOtpTranslation;
+  const resolveError = useErrorMessage();
   const inputsRef = useRef<TNullable<HTMLInputElement>[]>([]);
 
   const setDigit = (index: number, value: string) => {
@@ -71,8 +75,9 @@ function OtpForm({ email, onSuccess }: OtpFormProps) {
       setError("");
       await emailVerificationService.verifyOtp({ email, otp });
       onSuccess(otp);
-    } catch {
-      setError(t.invalidCode);
+    } catch (e: unknown) {
+      const err = e as AxiosError<IApiResponse<unknown>>;
+      setError(resolveError(err?.response?.data?.errorCode, t.invalidCode));
     } finally {
       setLoading((prev) => ({ ...prev, verify: false }));
     }
@@ -84,8 +89,9 @@ function OtpForm({ email, onSuccess }: OtpFormProps) {
       setLoading((prev) => ({ ...prev, resend: true }));
       setError("");
       await emailVerificationService.sendOtp({ email });
-    } catch {
-      setError(t.resendCodeFailed);
+    } catch (e: unknown) {
+      const err = e as AxiosError<IApiResponse<unknown>>;
+      setError(resolveError(err?.response?.data?.errorCode, t.resendCodeFailed));
     } finally {
       setLoading((prev) => ({ ...prev, resend: false }));
     }

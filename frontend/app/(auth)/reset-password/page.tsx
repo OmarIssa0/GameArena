@@ -16,7 +16,10 @@ import { en as EnTextField } from "@/component/i18n/GTextField/en.i18n";
 import { ar as ArTextField } from "@/component/i18n/GTextField/ar.i18n";
 import { passwordValidator } from "@/lib/utils";
 import { authService } from "@/services/def/AuthService";
+import { useErrorMessage } from "@/hooks/useErrorMessage";
 import type { GTextFieldTranslation } from "@/component/i18n/GTextField/en.i18n";
+import type { AxiosError } from "axios";
+import type { IApiResponse } from "@/domain/meta/IApiResponse";
 import { ResetPasswordStepEnum } from "@/domain/enum/ResetPasswordStepEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 
@@ -26,6 +29,8 @@ function ResetPasswordPage() {
     en: { ...en, ...EnTextField },
     ar: { ...ar, ...ArTextField },
   }) as TResetPasswordTranslation & GTextFieldTranslation;
+
+  const resolveError = useErrorMessage();
 
   const email = useSearchParams().get("email");
 
@@ -65,8 +70,9 @@ function ResetPasswordPage() {
       setApiError("");
       await authService.resetPassword({ email, otp, newPassword });
       router.replace("/login");
-    } catch {
-      setApiError(t.passwordResetError);
+    } catch (e: unknown) {
+      const err = e as AxiosError<IApiResponse<unknown>>;
+      setApiError(resolveError(err?.response?.data?.errorCode, t.passwordResetError));
     } finally {
       setLoading(false);
     }

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Bell, Gamepad2, Users, MessageSquare, X, Check, Trash2, CheckCheck } from "lucide-react";
 import { useTranslation } from "@/hooks/useSetting";
 import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
+import { useErrorMessage } from "@/hooks/useErrorMessage";
 import { notificationService } from "@/services/def/NotificationService";
 import { GTabs } from "@/component/common/GTabs";
 import { GCard } from "@/component/common/GCard";
@@ -25,6 +26,8 @@ import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 import { TabsVariantEnum } from "@/domain/enum/TabsVariantEnum";
 import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
+import type { AxiosError } from "axios";
+import type { IApiResponse } from "@/domain/meta/IApiResponse";
 
 type Tab = "all" | "gameInvites" | "friendRequests";
 
@@ -41,6 +44,7 @@ const icons: Record<string, typeof Users> = { FriendRequest: Users, FriendReques
 
 export default function NotificationsPage() {
   const t = useTranslation({ en, ar }) as TNotificationsTranslation;
+  const resolveError = useErrorMessage();
   const { notifications, gameInvites, dismissGameInvite, acceptGameInvite } = useDashboardNotifications();
   const [tab, setTab] = useState<Tab>("all");
   const [requests, setRequests] = useState<IFriendRequestReceived[]>([]);
@@ -53,7 +57,10 @@ export default function NotificationsPage() {
       .then((r) => {
         if (r.data) setRequests(r.data);
       })
-      .catch(() => setError(t.error.title))
+      .catch((e: unknown) => {
+        const err = e as AxiosError<IApiResponse<unknown>>;
+        setError(resolveError(err?.response?.data?.errorCode, t.error.title));
+      })
       .finally(() => setLoading(false));
   }, [t]);
 

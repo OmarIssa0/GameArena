@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MatchStatusEnum } from "@/domain/enum/MatchStatusEnum";
 import { matchHistoryService } from "@/services/def/MatchHistoryService";
 import type { IMatchHistory } from "@/domain/meta/IMatchHistory";
 import type { TNullable } from "@/domain/type/TCommon";
+import type { AxiosError } from "axios";
+import type { IApiResponse } from "@/domain/meta/IApiResponse";
+import { useErrorMessage } from "./useErrorMessage";
 
 function buildSummary(matches: IMatchHistory[]) {
   return matches.reduce(
@@ -19,16 +22,11 @@ function buildSummary(matches: IMatchHistory[]) {
   );
 }
 
-function useMatchHistory(statusFilter: MatchStatusEnum = MatchStatusEnum.All, limit?: number, fallbackErrorMessage = "") {
+function useMatchHistory(statusFilter: MatchStatusEnum = MatchStatusEnum.All, limit?: number) {
   const [allMatches, setAllMatches] = useState<IMatchHistory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<TNullable<string>>(null);
-  const fallbackErrorRef = useRef(fallbackErrorMessage);
-
-  useEffect(() => {
-    fallbackErrorRef.current = fallbackErrorMessage;
-  }, [fallbackErrorMessage]);
-
+  const errorMsg = useErrorMessage();
   useEffect(() => {
     let alive = true;
     matchHistoryService
@@ -39,8 +37,9 @@ function useMatchHistory(statusFilter: MatchStatusEnum = MatchStatusEnum.All, li
       })
       .catch((err: unknown) => {
         if (!alive) return;
-        const message = err instanceof Error && err.message ? err.message : fallbackErrorRef.current;
-        setError(message);
+        const axiosErr = err as AxiosError<IApiResponse<unknown>>;
+        const code = axiosErr?.response?.data?.errorCode;
+        setError(errorMsg(code));
       })
       .finally(() => {
         if (alive) setLoading(false);
@@ -48,7 +47,7 @@ function useMatchHistory(statusFilter: MatchStatusEnum = MatchStatusEnum.All, li
     return () => {
       alive = false;
     };
-  }, []);
+  }, [errorMsg]);
 
   const summary = useMemo(() => buildSummary(allMatches), [allMatches]);
 

@@ -15,7 +15,10 @@ import { ar as ArTextField } from "@/component/i18n/GTextField/ar.i18n";
 import { useTranslation } from "@/hooks/useSetting";
 import { emailValidator } from "@/lib/utils";
 import { authService } from "@/services/def/AuthService";
+import { useErrorMessage } from "@/hooks/useErrorMessage";
 import type { GTextFieldTranslation } from "@/component/i18n/GTextField/en.i18n";
+import type { AxiosError } from "axios";
+import type { IApiResponse } from "@/domain/meta/IApiResponse";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 
@@ -25,6 +28,7 @@ function ForgotPasswordPage() {
     en: { ...en, ...EnTextField },
     ar: { ...ar, ...ArTextField },
   }) as TForgotPasswordTranslation & GTextFieldTranslation;
+  const resolveError = useErrorMessage();
 
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -50,8 +54,9 @@ function ForgotPasswordPage() {
       setApiError("");
       await authService.forgotPassword({ email });
       router.push("/reset-password?email=" + encodeURIComponent(email));
-    } catch {
-      setApiError(t.sendError);
+    } catch (e: unknown) {
+      const err = e as AxiosError<IApiResponse<unknown>>;
+      setApiError(resolveError(err?.response?.data?.errorCode, t.sendError));
     } finally {
       setLoading(false);
     }

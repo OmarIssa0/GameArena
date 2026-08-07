@@ -48,7 +48,7 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
         <DashboardNotificationsProvider>
           <div className="flex h-screen w-full bg-bg text-text overflow-hidden font-sans antialiased">
             <Sidebar />
-            <main className="flex-1 flex flex-col min-w-0 min-h-0 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden relative pb-16 lg:pb-0">
+            <main className="flex-1 flex flex-col min-w-0 min-h-0 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden relative pb-18 lg:pb-0">
               {children}
             </main>
             <SocialPanel />

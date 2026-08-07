@@ -23,8 +23,11 @@ import type { IUserFilterRequest } from "@/domain/meta/IUserFilterRequest";
 import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import type { TNullable } from "@/domain/type/TCommon";
 import { useTranslation } from "@/hooks/useSetting";
+import { useErrorMessage } from "@/hooks/useErrorMessage";
 import { friendService } from "@/services/def/FriendService";
 import { userService } from "@/services/def/UserService";
+import type { AxiosError } from "axios";
+import type { IApiResponse } from "@/domain/meta/IApiResponse";
 
 import type { ISearchResult } from "./def/SearchTab";
 
@@ -38,6 +41,7 @@ const displayName = (user: IUserSummary, fallback: string) =>
 
 function SearchTab() {
   const t = useTranslation({ en, ar }) as TFriendsTranslation;
+  const resolveError = useErrorMessage();
   const [userFilter, setUserFilter] = useState<IUserFilterRequest>(defaultFilter);
   const [searchResults, setSearchResults] = useState<ISearchResult[]>([]);
   const [searching, setSearching] = useState(false);
@@ -81,10 +85,11 @@ function SearchTab() {
               })),
           );
         }
-      } catch {
+      } catch (e: unknown) {
         if (!ignore) {
+          const err = e as AxiosError<IApiResponse<unknown>>;
           setSearchResults([]);
-          setSearchError(t.searchTab.searchError);
+          setSearchError(resolveError(err?.response?.data?.errorCode, t.searchTab.searchError));
         }
       } finally {
         if (!ignore) setSearching(false);
@@ -105,8 +110,9 @@ function SearchTab() {
     try {
       await friendService.sendFriendRequest(receiverId);
       setSearchResults((prev) => prev.map((user) => (user.id === receiverId ? { ...user, isSendRequest: true } : user)));
-    } catch {
-      setSearchError(t.searchTab.sendError);
+    } catch (e: unknown) {
+      const err = e as AxiosError<IApiResponse<unknown>>;
+      setSearchError(resolveError(err?.response?.data?.errorCode, t.searchTab.sendError));
     }
   };
 

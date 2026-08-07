@@ -7,8 +7,7 @@ import { GIcon } from "./common/GIcon";
 import { BrandText } from "./common/BrandText";
 import { AsideWrapper } from "@/component/aside/AsideWrapper";
 import { AsideHeader } from "@/component/aside/AsideHeader";
-import { SidebarCollapsed } from "@/component/Sidebar/SidebarCollapsed";
-import { SidebarExpanded } from "@/component/Sidebar/SidebarExpanded";
+import { SidebarNav } from "@/component/Sidebar/SidebarNav";
 import { AsidePlacementEnum } from "@/domain/enum/AsidePlacementEnum";
 import type { AsideConfig } from "@/component/aside/AsideTypes";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
@@ -43,11 +42,7 @@ function Sidebar() {
       config={asideConfig}
       aside={aside}
       header={<AsideHeader aside={aside} label={t.mainNavigation} brand={<SidebarBrand />} collapsedIcon={collapsedIcon} />}>
-      {aside.collapsed && aside.isDesktop ? (
-        <SidebarCollapsed closeMobile={aside.closeMobile} />
-      ) : (
-        <SidebarExpanded closeMobile={aside.closeMobile} />
-      )}
+      <SidebarNav closeMobile={aside.closeMobile} collapsed={aside.collapsed && aside.isDesktop} />
     </AsideWrapper>
   );
 }

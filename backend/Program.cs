@@ -76,21 +76,16 @@ builder.Services.AddSignalR()
     });
 
 // CORS
-// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("cors", policy =>
     {
         var raw = builder.Configuration["Cors:AllowedOrigins"] ?? "";
-        var origins = raw
-            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-            .Where(o => !string.IsNullOrWhiteSpace(o))
-            .ToArray();
+        var origins = raw.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToList();
 
-        if (origins.Length == 0)
-            origins = ["http://localhost:3000"];
+        origins.Add("http://localhost:3000");
 
-        policy.WithOrigins(origins)
+        policy.WithOrigins(origins.Distinct().ToArray())
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();

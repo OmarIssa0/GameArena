@@ -31,6 +31,10 @@ enum ErrorCodeEnum {
   NotBlocked = 4007,
   CannotSelfBlock = 4008,
   UserBlockedYou = 4009,
+  YouBlockedUser = 4010,
+
+  // Friend 
+  RequestAlreadyProcessed = 4011,
 
   // Game
   RoomNotFound = 5001,

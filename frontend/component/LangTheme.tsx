@@ -44,7 +44,7 @@ function LangTheme({ collapsed, className = "" }: { collapsed: boolean; classNam
         onClick={toggleLocale}
         title={locale === "en" ? t.switchToArabic : t.switchToEnglish}
         className={toggleBtn}>
-        <GIcon icon={Globe} size={SizeEnum.sm} />
+        <GIcon icon={Globe} size={SizeEnum.md} />
         {!collapsed && <span>{locale === "en" ? t.english : t.arabic}</span>}
       </GButton>
 
@@ -53,7 +53,7 @@ function LangTheme({ collapsed, className = "" }: { collapsed: boolean; classNam
         onClick={toggleTheme}
         title={isDark ? t.switchToLight : t.switchToDark}
         className={toggleBtn}>
-        <GIcon icon={isDark ? Moon : Sun} size={SizeEnum.sm} color={AccentColorEnum.Primary} />
+        <GIcon icon={isDark ? Moon : Sun} size={SizeEnum.md} color={AccentColorEnum.Primary} />
         {!collapsed && <span>{isDark ? t.light : t.dark}</span>}
       </GButton>
     </div>

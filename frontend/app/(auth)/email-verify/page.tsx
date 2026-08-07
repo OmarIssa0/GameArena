@@ -10,11 +10,15 @@ import { GTextField } from "@/component/common/GTextField";
 import { GButton } from "@/component/common/GButton";
 import { GIcon } from "@/component/common/GIcon";
 import { emailVerificationService } from "@/services/def/EmailVerificationService";
+import { authService } from "@/services/def/AuthService";
+import { useErrorMessage } from "@/hooks/useErrorMessage";
 import { emailValidator } from "@/lib/utils";
 import { en as EnTextField, type GTextFieldTranslation } from "@/component/i18n/GTextField/en.i18n";
 import { ar as ArTextField } from "@/component/i18n/GTextField/ar.i18n";
 import { useTranslation } from "@/hooks/useSetting";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
+import type { AxiosError } from "axios";
+import type { IApiResponse } from "@/domain/meta/IApiResponse";
 import { ar as arEmailVerify } from "./i18n/ar.i18n";
 import { en as enEmailVerify, type TEmailVerifyTranslation } from "./i18n/en.i18n";
 
@@ -22,11 +26,13 @@ function EmailVerifyPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const emailParam = searchParams.get("email");
+  const passwordParam = searchParams.get("password");
 
   const t = useTranslation({
     en: { ...enEmailVerify, ...EnTextField },
     ar: { ...arEmailVerify, ...ArTextField },
   }) as TEmailVerifyTranslation & GTextFieldTranslation;
+  const resolveError = useErrorMessage();
 
   const [email, setEmail] = useState(emailParam || "");
   const [step, setStep] = useState(emailParam ? "otp" : "email");
@@ -44,11 +50,25 @@ function EmailVerifyPage() {
       setError("");
       await emailVerificationService.sendOtp({ email });
       setStep("otp");
-    } catch {
-      setError(t.errorSendFailed);
+    } catch (e: unknown) {
+      const err = e as AxiosError<IApiResponse<unknown>>;
+      setError(resolveError(err?.response?.data?.errorCode, t.errorSendFailed));
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleOtpSuccess = async () => {
+    if (passwordParam) {
+      try {
+        await authService.login({ email, password: passwordParam });
+        router.replace("/home");
+        return;
+      } catch {
+        // auto-login failed, go to login page
+      }
+    }
+    router.replace("/login");
   };
 
   const backToLogin = (
@@ -70,7 +90,7 @@ function EmailVerifyPage() {
               {error}
             </p>
           )}
-          <OtpForm email={email} onSuccess={() => router.replace("/home")} />
+          <OtpForm email={email} onSuccess={handleOtpSuccess} />
           {backToLogin}
         </div>
       </AuthLayout>

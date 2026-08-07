@@ -19,10 +19,14 @@ import { userRepository } from "@/repositories/def/UserRepository";
 import { DEFAULT_USER_PREFERENCES, type IUserPreferences } from "@/domain/meta/IUserPreferences";
 import { passwordValidator } from "@/lib/utils";
 import { useAuth } from "@/app/providers/AuthProvider";
+import { useErrorMessage } from "@/hooks/useErrorMessage";
 import { ThemeEnum } from "@/domain/enum/ThemeEnum";
+import { ErrorCodeEnum } from "@/domain/enum/ErrorCodeEnum";
 import type { IUser } from "@/domain/meta/IUser";
 import type { GTabItem } from "@/component/common/def/GTabs";
 import type { TNullable } from "@/domain/type/TCommon";
+import type { AxiosError } from "axios";
+import type { IApiResponse } from "@/domain/meta/IApiResponse";
 import { LocaleEnum } from "@/domain/enum/LocaleEnum";
 import { SettingsTabEnum } from "@/domain/enum/SettingsTabEnum";
 import { TabsVariantEnum } from "@/domain/enum/TabsVariantEnum";
@@ -37,6 +41,7 @@ function SettingsPage() {
     en: { ...en, ...EnTextField },
     ar: { ...ar, ...ArTextField },
   }) as TSettingsTranslation & GTextFieldTranslation;
+  const resolveError = useErrorMessage();
   const [activeTab, setActiveTab] = useState<SettingsTabEnum>(SettingsTabEnum.Profile);
   const { updatePreferences } = useAuth();
   const [profile, setProfile] = useState<TNullable<IUser>>(null);
@@ -141,12 +146,13 @@ function SettingsPage() {
       setConfirmPassword("");
       setPasswordErrors({});
       showMessage(t.settings.password.saved);
-    } catch (err) {
-      const message = err instanceof Error ? err.message.toLowerCase() : "";
-      if (message.includes("invalid") || message.includes("wrong") || message.includes("incorrect")) {
+    } catch (e: unknown) {
+      const err = e as AxiosError<IApiResponse<unknown>>;
+      const code = err?.response?.data?.errorCode;
+      if (code === ErrorCodeEnum.InvalidCredentials) {
         setPasswordErrors({ oldPassword: t.settings.password.invalidCurrentPassword });
       } else {
-        showMessage(t.settings.password.saveFailed);
+        showMessage(resolveError(code, t.settings.password.saveFailed));
       }
     }
     setSaving(false);
