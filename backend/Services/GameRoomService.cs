@@ -56,15 +56,17 @@ namespace backend.Services
         public BaseGameRoom CreatePrivateRoom(GamesKind gameType, string playerId, string username, string? invitedPlayerId)
         {
             _playerToRoom.TryRemove(playerId, out _);
-
-            var room = BaseGameRoom.Create(gameType);
-            room.Player1Id = playerId;
-            room.Player1Username = username;
-            room.IsPrivate = true;
-            room.InvitedPlayerId = invitedPlayerId;
-            _rooms[room.RoomId] = room;
-            _playerToRoom[playerId] = room.RoomId;
-            return room;
+            lock (_matchLock)
+            {
+                var room = BaseGameRoom.Create(gameType);
+                room.Player1Id = playerId;
+                room.Player1Username = username;
+                room.IsPrivate = true;
+                room.InvitedPlayerId = invitedPlayerId;
+                _rooms[room.RoomId] = room;
+                _playerToRoom[playerId] = room.RoomId;
+                return room;
+            }
         }
 
         public bool TryGetRoom(string roomId, out BaseGameRoom? room)
@@ -82,20 +84,23 @@ namespace backend.Services
         public bool TryJoinRoom(string roomId, string playerId, string? username)
         {
             _playerToRoom.TryRemove(playerId, out _);
-            if (_rooms.TryGetValue(roomId, out var room)
-                && !room.IsFull
-                && room.Player1Id != playerId
-                && room.InvitedPlayerId == playerId)
+            lock (_matchLock)
             {
-                room.Player2Id = playerId;
-                room.Player2Username = username;
-                room.IsFull = true;
-                if (room.Player1Id != null)
-                    room.CurrentTurnPlayerId = room.Player1Id;
-                _playerToRoom[playerId] = roomId;
-                return true;
+                if (_rooms.TryGetValue(roomId, out var room)
+                    && !room.IsFull
+                    && room.Player1Id != playerId
+                    && room.InvitedPlayerId == playerId)
+                {
+                    room.Player2Id = playerId;
+                    room.Player2Username = username;
+                    room.IsFull = true;
+                    if (room.Player1Id != null)
+                        room.CurrentTurnPlayerId = room.Player1Id;
+                    _playerToRoom[playerId] = roomId;
+                    return true;
+                }
+                return false;
             }
-            return false;
         }
 
         public void RemoveRoomAndPlayers(string roomId)
@@ -126,7 +131,10 @@ namespace backend.Services
                     .SendAsync("gameState", room.GetStatePayload());
 
                 if (room.WinnerPlayerId != null)
+                {
+                    await PersistMatchResultAsync(room);
                     await FinishAndCleanupAsync(room, roomId, false);
+                }
             }
             catch (Exception ex)
             {
@@ -193,20 +201,28 @@ namespace backend.Services
 
             if (removeRoom)
             {
-                if (!room.IsBotGame)
-                {
-                    if (Guid.TryParse(room.Player1Id, out var _)
-                        && Guid.TryParse(room.Player2Id, out var _))
-                    {
-                        using var scope = _scopeFactory.CreateScope();
-                        var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
-                        await eventBus.PublishAsync(new GameFinishedEvent(room.Player1Id!, room.Player2Id!));
-
-                        var matchHistory = scope.ServiceProvider.GetRequiredService<IMatchHistoryService>();
-                        await matchHistory.SaveMatchHistoryAsync(room);
-                    }
-                }
+                await PersistMatchResultAsync(room);
                 RemoveRoomAndPlayers(roomId);
+            }
+        }
+
+        private async Task PersistMatchResultAsync(BaseGameRoom room)
+        {
+            if (room.IsBotGame) return;
+            if (!Guid.TryParse(room.Player1Id, out var _) || !Guid.TryParse(room.Player2Id, out var _)) return;
+
+            try
+            {
+                using var scope = _scopeFactory.CreateScope();
+                var matchHistory = scope.ServiceProvider.GetRequiredService<IMatchHistoryService>();
+                await matchHistory.SaveMatchHistoryAsync(room);
+
+                var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
+                await eventBus.PublishAsync(new GameFinishedEvent(room.Player1Id!, room.Player2Id!));
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"PersistMatchResultAsync error: {ex.Message}");
             }
         }
 
@@ -242,6 +258,7 @@ namespace backend.Services
 
                         if (currentRoom.WinnerPlayerId != null)
                         {
+                            await PersistMatchResultAsync(currentRoom);
                             await FinishAndCleanupAsync(currentRoom, roomId, false);
                             break;
                         }

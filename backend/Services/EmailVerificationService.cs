@@ -22,9 +22,9 @@ namespace backend.Services
 
             var recent = await _context.EmailVerifications
                 .Where(x => x.UserId == user.Id && x.Purpose == purpose && !x.IsUsed)
-                .OrderByDescending(x => x.ExpiresAt)
+                .OrderByDescending(x => x.CreatedAt)
                 .FirstOrDefaultAsync();
-            if (recent != null && recent.ExpiresAt > DateTime.UtcNow - OtpCooldown)
+            if (recent != null && recent.CreatedAt > DateTime.UtcNow - OtpCooldown)
                 throw new AppException(ErrorCode.RateLimited);
 
             var otp = RandomNumberGenerator.GetInt32(100000, 999999).ToString();
@@ -34,6 +34,7 @@ namespace backend.Services
             {
                 UserId = user.Id,
                 OtpHash = AuthHelper.Hash(otp),
+                CreatedAt = DateTime.UtcNow,
                 ExpiresAt = DateTime.UtcNow.AddMinutes(15),
                 IsUsed = false,
                 Purpose = purpose

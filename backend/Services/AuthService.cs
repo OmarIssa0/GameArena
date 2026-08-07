@@ -124,7 +124,16 @@ namespace backend.Services
                 .FirstOrDefaultAsync(u => u.Email == email) ?? throw new AppException(ErrorCode.EmailNotFound);
 
             user.PasswordHash = AuthHelper.HashPassword(user, newPassword);
+            await RevokeAllRefreshTokensAsync(user.Id);
             await _context.SaveChangesAsync();
+        }
+
+        private async Task RevokeAllRefreshTokensAsync(Guid userId)
+        {
+            var tokens = await _context.RefreshTokens
+                .Where(t => t.UserId == userId)
+                .ToListAsync();
+            _context.RefreshTokens.RemoveRange(tokens);
         }
         private async Task SaveNewRefreshToken(Guid userId, string rawRefreshToken)
         {

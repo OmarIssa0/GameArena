@@ -68,5 +68,13 @@ namespace backend.Services
                 return true;
             }
         }
+
+        public bool HasOtherConnections(string userId)
+        {
+            lock (_lock)
+            {
+                return _connectionCounts.GetValueOrDefault(userId, 0) > 1;
+            }
+        }
     }
 }

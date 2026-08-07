@@ -71,6 +71,8 @@ namespace backend.Services
             if (!AuthHelper.VerifyPassword(user, user.PasswordHash, oldPassword))
                 throw new AppException(ErrorCode.InvalidCredentials);
             user.PasswordHash = AuthHelper.HashPassword(user, newPassword);
+            var tokens = await _context.RefreshTokens.Where(t => t.UserId == userId).ToListAsync();
+            _context.RefreshTokens.RemoveRange(tokens);
             await _context.SaveChangesAsync();
         }
 

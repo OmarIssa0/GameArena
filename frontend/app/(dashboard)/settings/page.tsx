@@ -67,26 +67,31 @@ function SettingsPage() {
     let alive = true;
     const load = async () => {
       setLoading(true);
-      const res = await userRepository.profile();
-      if (!alive) return;
-      if (res.data) {
-        setProfile(res.data);
-        setFirstName(res.data.firstName ?? "");
-        setLastName(res.data.lastName ?? "");
-        setUserName(res.data.userName ?? "");
-        if (res.data.preferences) {
-          try {
-            const parsed = JSON.parse(res.data.preferences) as IUserPreferences;
-            const merged = { ...DEFAULT_USER_PREFERENCES, ...parsed } as IUserPreferences;
-            setPreferences(merged);
-            if (merged.theme === ThemeEnum.Light || merged.theme === ThemeEnum.Dark) setTheme(merged.theme);
-            if (merged.locale === LocaleEnum.En || merged.locale === LocaleEnum.Ar) setLocale(merged.locale);
-          } catch {
-            // fall back to defaults
+      try {
+        const res = await userRepository.profile();
+        if (!alive) return;
+        if (res.data) {
+          setProfile(res.data);
+          setFirstName(res.data.firstName ?? "");
+          setLastName(res.data.lastName ?? "");
+          setUserName(res.data.userName ?? "");
+          if (res.data.preferences) {
+            try {
+              const parsed = JSON.parse(res.data.preferences) as IUserPreferences;
+              const merged = { ...DEFAULT_USER_PREFERENCES, ...parsed } as IUserPreferences;
+              setPreferences(merged);
+              if (merged.theme === ThemeEnum.Light || merged.theme === ThemeEnum.Dark) setTheme(merged.theme);
+              if (merged.locale === LocaleEnum.En || merged.locale === LocaleEnum.Ar) setLocale(merged.locale);
+            } catch {
+              // fall back to defaults
+            }
           }
         }
+      } catch {
+        // profile request failed — show error state
+      } finally {
+        if (alive) setLoading(false);
       }
-      setLoading(false);
     };
     void load();
     return () => {

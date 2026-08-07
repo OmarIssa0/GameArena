@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslation } from "@/hooks/useSetting";
 import { GIcon } from "@/component/common/GIcon";
@@ -22,7 +23,7 @@ export function BottomNav() {
     <nav className="fixed inset-inline-0 bottom-0 flex items-center justify-around h-18 pb-[env(safe-area-inset-bottom)] bg-bg-sidebar border-t border-border z-fixed md:hidden overflow-x-auto w-full custom-scrollbar" role="navigation" aria-label={t.mainNavigation}>
       <div className="flex items-center justify-center min-w-full">
         {sidebarNav.map((item) => (
-          <a
+          <Link
             key={item.id}
             href={`/${item.id}`}
             className={clsx(
@@ -33,7 +34,7 @@ export function BottomNav() {
             aria-current={isActive(item.id) ? "page" : undefined}>
             <GIcon icon={item.icon} size={SizeEnum.md} />
             <span className="text-2xs font-semibold">{t[item.labelKey as keyof TSidebarTranslation]}</span>
-          </a>
+          </Link>
         ))}
       </div>
     </nav>

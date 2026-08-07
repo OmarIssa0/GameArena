@@ -122,6 +122,10 @@ namespace backend.Data
 
             modelBuilder.Entity<Notification>()
                 .HasIndex(n => n.CreatedAt);
+
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
         }
     }
 }

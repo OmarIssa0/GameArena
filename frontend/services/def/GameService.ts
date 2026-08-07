@@ -104,6 +104,11 @@ class GameService extends SignalRServiceBase implements IGameService {
     await this.invoke("CreateLobby", gameKind);
   }
 
+  override setConnection(connection: HubConnection): void {
+    super.setConnection(connection);
+    this._resolveConnectionReady();
+  }
+
   onGameState(handler: (state: IGameState) => void): () => void {
     return this.subscribe("game:state", handler as Handler);
   }

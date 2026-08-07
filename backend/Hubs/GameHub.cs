@@ -14,6 +14,7 @@ namespace backend.Hubs
     public class GameHub(
         IGameRoomService _roomService,
         IEventBus _eventBus,
+        IUserPresenceService _presence,
         ILogger<GameHub> _logger) : Hub
     {
         private string GetPlayerId() =>
@@ -39,6 +40,12 @@ namespace backend.Hubs
 
             var playerId = Context.UserIdentifier;
             if (playerId == null) return;
+
+            if (_presence.HasOtherConnections(playerId))
+            {
+                await base.OnDisconnectedAsync(exception);
+                return;
+            }
 
             if (TryGetPlayerRoom(playerId, out var room, out var roomId))
             {

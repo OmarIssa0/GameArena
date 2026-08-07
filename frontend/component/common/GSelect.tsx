@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 import { ChevronDown } from "lucide-react";
-import { forwardRef } from "react";
+import { forwardRef, useId } from "react";
 import { GLabel } from "./GLabel";
 import type { GSelectProps } from "./def/GSelect";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
@@ -18,16 +18,19 @@ const inputSize: THashMap<string> = {
 };
 
 const GSelect = forwardRef<HTMLSelectElement, GSelectProps<string | number>>(
-  ({ label, error, className, startIcon, options, placeholder, size = SizeEnum.md, ...props }, ref) => {
+  ({ label, error, className, startIcon, options, placeholder, size = SizeEnum.md, id: providedId, ...props }, ref) => {
+    const generatedId = useId();
+    const selectId = providedId ?? `select-${generatedId}`;
     return (
       <div className="space-y-2">
-        {label && <GLabel required={props.required}>{label}</GLabel>}
+        {label && <GLabel required={props.required} htmlFor={selectId}>{label}</GLabel>}
 
         <div className="relative">
           {startIcon && <div className="absolute inset-s-3 top-1/2 -translate-y-1/2 text-text-muted">{startIcon}</div>}
 
           <select
             ref={ref}
+            id={selectId}
             className={clsx(
               "w-full bg-surface border border-border rounded-md text-text transition-all duration-150 appearance-none",
               "hover:border-border-light focus:border-primary focus:ring-3 focus:ring-primary-muted",

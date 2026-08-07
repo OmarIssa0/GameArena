@@ -8,5 +8,6 @@ namespace backend.Services.Interface
         bool AddConnection(string userId);
         bool RemoveConnection(string userId);
         bool SetActivity(string userId, UserStatus status);
+        bool HasOtherConnections(string userId);
     }
 }

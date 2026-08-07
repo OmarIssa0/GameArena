@@ -4,10 +4,13 @@ using backend.Events.Handlers;
 using backend.Hubs;
 using backend.Services;
 using backend.Services.Interface;
+using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
