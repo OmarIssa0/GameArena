@@ -19,12 +19,14 @@ namespace backend.Services
         private readonly ConcurrentDictionary<string, string> _playAgainRequests = new();
         private readonly IHubContext<GameHub> _hubContext;
         private readonly IServiceScopeFactory _scopeFactory;
+        private readonly IEventBus _eventBus;
         private readonly ILogger<GameRoomService> _logger;
 
-        public GameRoomService(IHubContext<GameHub> hubContext, IServiceScopeFactory scopeFactory, ILogger<GameRoomService> logger)
+        public GameRoomService(IHubContext<GameHub> hubContext, IServiceScopeFactory scopeFactory, IEventBus eventBus, ILogger<GameRoomService> logger)
         {
             _hubContext = hubContext;
             _scopeFactory = scopeFactory;
+            _eventBus = eventBus;
             _logger = logger;
         }
 
@@ -142,6 +144,35 @@ namespace backend.Services
             {
                 _logger.LogError(ex, "ProcessActionAsync error");
             }
+        }
+
+        public async Task<bool> StartGameAsync(string roomId, string playerId, string? friendId)
+        {
+            if (!_rooms.TryGetValue(roomId, out var room)
+                || room.Player1Id != playerId
+                || room.HasStarted)
+                return false;
+
+            if (room.Player2Id == null)
+            {
+                room.Player2Id = "__BOT__";
+                room.Player2Username = "AI Bot";
+                room.IsFull = true;
+                room.IsBotGame = true;
+            }
+            else if (friendId != null && room.Player2Id != friendId)
+            {
+                return false;
+            }
+
+            room.HasStarted = true;
+            room.CurrentTurnPlayerId = room.Player1Id!;
+            room.ResetForNewRound();
+
+            await _eventBus.PublishAsync(new GameStartedEvent(room.Player1Id!, room.Player2Id!));
+            StartGameLoop(roomId);
+
+            return true;
         }
 
         public async Task RequestPlayAgainAsync(string roomId, string playerId)

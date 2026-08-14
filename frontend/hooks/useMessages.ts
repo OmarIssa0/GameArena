@@ -25,7 +25,7 @@ const areSameMessage = (left: IMessage, right: IMessage): boolean =>
   Math.abs(left.sentAt.getTime() - right.sentAt.getTime()) < 5000;
 
 export function useMessages(initialFriendId?: TNullable<string>) {
-  const { isChatConnected: isConnected } = useConnections();
+  const { isSocialConnected: isConnected } = useConnections();
   const { user } = useAuth();
   const t = useTranslation({ en: messagesEn, ar: messagesAr }) as TMessagesTranslation;
   const { friends, loading: friendsLoading } = useFriends();

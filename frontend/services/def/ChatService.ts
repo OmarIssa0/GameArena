@@ -33,7 +33,7 @@ class ChatService extends SignalRServiceBase implements IChatService {
   }
 
   async sendMessage(receiverId: string, content: string): Promise<void> {
-    await this.requireConnection("Chat").invoke("SendPrivateMessage", receiverId, content);
+    await this.requireConnection("Social").invoke("SendPrivateMessage", receiverId, content);
   }
 
   onPrivateMessage(handler: (message: IMessage) => void): () => void {

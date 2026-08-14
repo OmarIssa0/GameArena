@@ -20,7 +20,6 @@ import { useAuth } from "@/app/providers/AuthProvider";
 import { useErrorMessage, toErrorCode } from "@/hooks/useErrorMessage";
 import { ThemeEnum } from "@/domain/enum/ThemeEnum";
 import { ErrorCodeEnum } from "@/domain/enum/ErrorCodeEnum";
-import type { IUser } from "@/domain/meta/IUser";
 import type { TNullable } from "@/domain/type/TCommon";
 import { LocaleEnum } from "@/domain/enum/LocaleEnum";
 import { SettingsTabEnum } from "@/domain/enum/SettingsTabEnum";
@@ -36,22 +35,27 @@ function SettingsPage() {
   }) as TSettingsTranslation & GTextFieldTranslation;
   const resolveError = useErrorMessage();
   const [activeTab, setActiveTab] = useState<SettingsTabEnum>(SettingsTabEnum.Profile);
-  const { updatePreferences } = useAuth();
-  const [profile, setProfile] = useState<TNullable<IUser>>(null);
-  const [loading, setLoading] = useState(true);
+  const { user, updatePreferences, refreshUser } = useAuth();
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState<TNullable<string>>(null);
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [userName, setUserName] = useState("");
+  const [firstName, setFirstName] = useState(user?.firstName ?? "");
+  const [lastName, setLastName] = useState(user?.lastName ?? "");
+  const [userName, setUserName] = useState(user?.userName ?? "");
 
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordErrors, setPasswordErrors] = useState<Record<string, string>>({});
 
-  const [preferences, setPreferences] = useState<IUserPreferences>(DEFAULT_USER_PREFERENCES);
+  const [preferences, setPreferences] = useState<IUserPreferences>(() => {
+    try {
+      const parsed = JSON.parse(user?.preferences ?? "{}") as IUserPreferences;
+      return { ...DEFAULT_USER_PREFERENCES, ...parsed } as IUserPreferences;
+    } catch {
+      return DEFAULT_USER_PREFERENCES;
+    }
+  });
   const [prefSaving, setPrefSaving] = useState(false);
   const [theme, setTheme] = useTheme();
   const [locale, setLocale] = useLocale();
@@ -62,52 +66,28 @@ function SettingsPage() {
   }, []);
 
   useEffect(() => {
-    let alive = true;
-    const load = async () => {
-      setLoading(true);
-      try {
-        const res = await userRepository.profile();
-        if (!alive) return;
-        if (res.data) {
-          setProfile(res.data);
-          setFirstName(res.data.firstName ?? "");
-          setLastName(res.data.lastName ?? "");
-          setUserName(res.data.userName ?? "");
-          if (res.data.preferences) {
-            try {
-              const parsed = JSON.parse(res.data.preferences) as IUserPreferences;
-              const merged = { ...DEFAULT_USER_PREFERENCES, ...parsed } as IUserPreferences;
-              setPreferences(merged);
-              if (merged.theme === ThemeEnum.Light || merged.theme === ThemeEnum.Dark) setTheme(merged.theme);
-              if (merged.locale === LocaleEnum.En || merged.locale === LocaleEnum.Ar) setLocale(merged.locale);
-            } catch {
-              // fall back to defaults
-            }
-          }
-        }
-      } catch {
-        // profile request failed — show error state
-      } finally {
-        if (alive) setLoading(false);
-      }
-    };
-    void load();
-    return () => {
-      alive = false;
-    };
-  }, [setLocale, setTheme]);
+    if (!user) return;
+    try {
+      const parsed = JSON.parse(user.preferences ?? "{}") as IUserPreferences;
+      if (parsed.theme === ThemeEnum.Light || parsed.theme === ThemeEnum.Dark) setTheme(parsed.theme);
+      if (parsed.locale === LocaleEnum.En || parsed.locale === LocaleEnum.Ar) setLocale(parsed.locale);
+    } catch {
+      // fall back to defaults
+    }
+  }, [user, setLocale, setTheme]);
 
   const handleSaveProfile = async () => {
-    if (!profile) return;
+    if (!user) return;
     setSaving(true);
     try {
       await userRepository.updateProfile({
         firstName,
         lastName,
         userName,
-        email: profile.email,
+        email: user.email,
         password: null,
       });
+      await refreshUser();
       showMessage(t.settings.profile.saved);
     } catch {
       showMessage(t.settings.profile.saveFailed);
@@ -227,7 +207,7 @@ function SettingsPage() {
             void handleSaveProfile();
           }}
           className="space-y-4">
-          {loading ? (
+          {!user ? (
             <div className="flex justify-center py-10">
               <GSpinner size={SizeEnum.md} />
             </div>
@@ -240,7 +220,7 @@ function SettingsPage() {
                   <GTextField label={t.settings.profile.username} value={userName} onChange={(e) => setUserName(e.target.value)} />
                 </div>
                 <div className="sm:col-span-2">
-                  <GTextField label={t.settings.profile.email} value={profile?.email ?? ""} disabled />
+                  <GTextField label={t.settings.profile.email} value={user?.email ?? ""} disabled />
                 </div>
               </div>
               <div className="flex justify-end">

@@ -31,7 +31,7 @@ function updateThemeDOM(theme: ThemeEnum) {
 }
 
 if (typeof window !== "undefined") {
-  currentLocale = (localStorage.getItem("locale") as LocaleEnum) ?? "ar";
+  currentLocale = (localStorage.getItem("locale") as LocaleEnum) ?? "en";
   currentTheme = (localStorage.getItem("theme") as ThemeEnum) ?? "dark";
 }
 

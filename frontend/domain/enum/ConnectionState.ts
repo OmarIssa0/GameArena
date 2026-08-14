@@ -17,7 +17,6 @@ export enum ConnectionState {
  * Per-hub connection state tracking.
  */
 export interface HubConnectionStates {
-  chat: ConnectionState;
   game: ConnectionState;
   social: ConnectionState;
 }

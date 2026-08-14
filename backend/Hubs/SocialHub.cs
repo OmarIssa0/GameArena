@@ -9,6 +9,7 @@ namespace backend.Hubs
         IUserPresenceService _presence,
         INotificationService _notificationService,
         ISocialReadService _socialReadService,
+        IChatService _chatService,
         ILogger<SocialHub> _logger) : Hub
     {
         private Guid? CurrentUserId =>
@@ -62,6 +63,13 @@ namespace backend.Hubs
             await base.OnDisconnectedAsync(exception);
         }
 
+        public async Task SendPrivateMessage(Guid receiverId, string message)
+        {
+            if (CurrentUserId is not { } senderId) return;
+            var msg = await _chatService.CreatePrivateMessageAsync(senderId, receiverId, message);
+            await Clients.Group($"user:{receiverId}").SendAsync("chat:private", msg);
+        }
+
         public async Task RequestCounters()
         {
             if (CurrentUserId is { } userId)
@@ -84,12 +92,6 @@ namespace backend.Hubs
         {
             if (CurrentUserId is { } userId)
                 await _notificationService.SendBlockedAsync(userId);
-        }
-
-        public async Task RequestSocialData()
-        {
-            if (CurrentUserId is { } userId)
-                await _notificationService.SendSocialDataAsync(userId);
         }
 
         public async Task RequestNotifications(int limit = 50)

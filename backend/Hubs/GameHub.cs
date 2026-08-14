@@ -163,31 +163,13 @@ namespace backend.Hubs
         {
             var playerId = GetPlayerId();
             if (!TryGetPlayerRoom(playerId, out var room, out var roomId)
-                || room!.GameType != gameKind
-                || room.Player1Id != playerId
-                || room.HasStarted)
+                || room!.GameType != gameKind)
                 return;
 
-            if (room.Player2Id == null)
-            {
-                room.Player2Id = "__BOT__";
-                room.Player2Username = "AI Bot";
-                room.IsFull = true;
-                room.IsBotGame = true;
-            }
-            else if (friendId != null && room.Player2Id != friendId)
-            {
-                return;
-            }
+            var started = await _roomService.StartGameAsync(roomId!, playerId, friendId);
+            if (!started) return;
 
-            room.HasStarted = true;
-            room.CurrentTurnPlayerId = room.Player1Id!;
-            room.ResetForNewRound();
-
-            await _eventBus.PublishAsync(new GameStartedEvent(room.Player1Id!, room.Player2Id!));
             await Clients.Group(roomId!).SendAsync("gameState", room.GetStatePayload());
-
-            _roomService.StartGameLoop(roomId!);
         }
 
         public async Task LeaveGame()
