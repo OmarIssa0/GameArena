@@ -4,28 +4,20 @@ import clsx from "clsx";
 import { GAvatar } from "@/component/common/GAvatar";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import type { ReactNode } from "react";
+import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
 
 interface SocialListItemProps {
   firstName: string | null;
   lastName: string | null;
   userName?: string | null;
-  status?: string;
+  status?: UserStatusEnum;
   badge?: ReactNode;
   action?: ReactNode;
   onClick?: () => void;
   className?: string;
 }
 
-function SocialListItem({
-  firstName,
-  lastName,
-  userName,
-  status,
-  badge,
-  action,
-  onClick,
-  className,
-}: SocialListItemProps) {
+function SocialListItem({ firstName, lastName, userName, status, badge, action, onClick, className }: SocialListItemProps) {
   return (
     <button
       type="button"
@@ -38,21 +30,14 @@ function SocialListItem({
         className,
       )}>
       <div className="relative shrink-0">
-        <GAvatar
-          firstName={firstName}
-          lastName={lastName}
-          status={status as Parameters<typeof GAvatar>[0]["status"]}
-          size={SizeEnum.sm}
-        />
+        <GAvatar firstName={firstName} lastName={lastName} status={status as Parameters<typeof GAvatar>[0]["status"]} size={SizeEnum.sm} />
       </div>
 
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium text-text">
           {firstName} {lastName}
         </p>
-        {userName && (
-          <p className="truncate text-xs text-text-muted">@{userName}</p>
-        )}
+        {userName && <p className="truncate text-xs text-text-muted">@{userName}</p>}
       </div>
 
       {badge && <span className="shrink-0">{badge}</span>}
