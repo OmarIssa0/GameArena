@@ -10,13 +10,7 @@ const en = {
       email: "Email",
       save: "Save Changes",
       saved: "Profile updated successfully",
-      saveFailed: "Failed to save profile",
-      linkedAccounts: "Linked Accounts",
-      connected: "Connected",
-      notConnected: "Not connected",
-      discord: "Discord",
-      google: "Google",
-      twitch: "Twitch",
+      saveFailed: "Failed to save profile"
     },
     password: {
       title: "Change Password",
@@ -27,7 +21,7 @@ const en = {
       save: "Update Password",
       saved: "Password changed successfully",
       saveFailed: "Failed to change password",
-      invalidCurrentPassword: "Invalid current password",
+      invalidCurrentPassword: "Invalid current password"
     },
     preferences: {
       title: "Preferences",
@@ -35,22 +29,17 @@ const en = {
       save: "Save Preferences",
       saved: "Preferences saved",
       saveFailed: "Failed to save preferences",
-      theme: "Dark Theme",
       darkMode: "Dark Mode",
       language: "Language",
       sound: "Sound Effects",
       showOnline: "Show Online Status",
       showGameActivity: "Show Game Activity",
       showNotifications: "Show Notifications",
-      branding: "Custom Branding Colors",
-      primaryColor: "Primary Color",
-      secondaryColor: "Secondary Color",
-      backgroundColor: "Background",
-      bgPlaceholder: "Default",
-      pageSize: "Page Size",
-    },
-  },
-};
+      pageSize: "Page Size"
+    }
+  }
+}
+;
 
 type TSettingsTranslation = typeof en;
 

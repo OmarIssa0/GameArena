@@ -4,7 +4,7 @@ import clsx from "clsx";
 import { forwardRef, useId } from "react";
 import { GLabel } from "./GLabel";
 import type { GTextFieldProps } from "./def/GTextField";
-import { INPUT_SIZES, FIELD_BASE_CLASS } from "./constants";
+import { fieldBase, fieldSize } from "@/domain/constant/size-classes";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 
 const GTextField = forwardRef<HTMLInputElement, GTextFieldProps>(
@@ -32,18 +32,18 @@ const GTextField = forwardRef<HTMLInputElement, GTextFieldProps>(
             aria-describedby={error ? errorId : undefined}
             aria-invalid={error ? true : undefined}
             className={clsx(
-              FIELD_BASE_CLASS,
-              INPUT_SIZES[size],
+              fieldBase,
+              fieldSize[size],
               hasStartIcon && "ps-10",
               hasEndIcon && "pe-10",
-              error && "border-error focus:ring-3 focus:ring-error-muted",
+              error && "border-danger focus:ring-3 focus:ring-danger-muted",
               className,
             )}
           />
           {endIcon && <span className="absolute inset-e-3 top-1/2 -translate-y-1/2">{endIcon}</span>}
         </div>
         {error && (
-          <p id={errorId} role="alert" className="text-xs text-error mt-1.5">
+          <p id={errorId} role="alert" className="text-xs text-danger mt-1.5">
             {error}
           </p>
         )}

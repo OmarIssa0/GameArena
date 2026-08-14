@@ -3,21 +3,11 @@ using backend.Enums;
 
 namespace backend.Utils
 {
-    public interface IErrorResponse
-    {
-        ApiResponse<object> Value { get; set; }
-        int StatusCode { get; set; }
-    }
-
-    public class ErrorResponse : IErrorResponse
-    {
-        public ApiResponse<object> Value { get; set; } = null!;
-        public int StatusCode { get; set; }
-    }
-    public record ErrorDefinition(
-        int StatusCode,
-        string Message
-    );
+public class ErrorResponse
+{
+    public ApiResponse<object> Value { get; set; } = null!;
+    public int StatusCode { get; set; }
+}
 
     public static class ErrorHelper
     {
@@ -131,7 +121,7 @@ namespace backend.Utils
              [ErrorCode.None] =
              (500, "Unknown error")
          };
-        public static IErrorResponse GetErrorResponse(Exception ex)
+        public static ErrorResponse GetErrorResponse(Exception ex)
         {
             if (ex is not AppException appEx)
             {

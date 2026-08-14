@@ -19,6 +19,7 @@ import type { IGameInvitesListProps } from "./def/GameInvitesList";
 import type { TNullable, TOptional } from "@/domain/type/TCommon";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 
 const gamePath = (gameType: number) => GamesList.find((g) => g.type === gameType)?.path;
 
@@ -58,7 +59,7 @@ export function GameInvitesList({ onAfterAccept }: IGameInvitesListProps) {
 
   return (
     <div className="space-y-2">
-      <GList items={gameInvites} keyExtractor={(invite) => invite.roomId}>
+      <GList items={gameInvites} keyExtractor={(invite) => invite.roomId} pageSize={10} listClassName="gap-3">
         {(invite) => (
            <GCard key={invite.roomId} padding={SizeEnum.sm} className="bg-primary-muted border-primary/20">
             <p className="text-sm font-medium text-text">{t.invites.wantsToPlay.replace("{{name}}", invite.inviterName ?? "")}</p>
@@ -66,7 +67,7 @@ export function GameInvitesList({ onAfterAccept }: IGameInvitesListProps) {
               <GButton size={SizeEnum.md} onClick={() => handleAccept(invite.roomId, gamePath(invite.gameType))}>
                 {t.invites.accept}
               </GButton>
-              <GButton size={SizeEnum.md} variant={AccentColorEnum.Secondary} onClick={() => dismissGameInvite(invite.roomId)}>
+              <GButton size={SizeEnum.md} variant={ButtonVariantEnum.Secondary} onClick={() => dismissGameInvite(invite.roomId)}>
                 {t.invites.decline}
               </GButton>
             </div>
@@ -79,10 +80,10 @@ export function GameInvitesList({ onAfterAccept }: IGameInvitesListProps) {
           <h2 className="text-xl font-bold text-text mb-2">{t.leaveTitle}</h2>
           <p className="text-sm text-text-secondary mb-6">{t.leaveDesc}</p>
           <div className="flex gap-3">
-            <GButton onClick={handleCancelAccept} variant={AccentColorEnum.Secondary} fullWidth>
+            <GButton onClick={handleCancelAccept} variant={ButtonVariantEnum.Secondary} fullWidth>
               {t.cancel}
             </GButton>
-            <GButton onClick={handleConfirmAccept} variant={AccentColorEnum.Danger} fullWidth>
+            <GButton onClick={handleConfirmAccept} variant={ButtonVariantEnum.Danger} fullWidth>
               {t.leaveAccept}
             </GButton>
           </div>

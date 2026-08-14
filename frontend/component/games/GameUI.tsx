@@ -16,9 +16,9 @@ import { useGameTranslation } from "@/hooks/useGameTranslation";
 import type { IGamePlayersHeaderProps, IGameTurnIndicatorProps, IPlayerCardProps, TPlayerResult } from "./def/GameUI";
 
 const RESULT_STYLES: Record<TPlayerResult, { badge: string }> = {
-  win: { badge: "bg-success/10 text-success border-success/40" },
-  loss: { badge: "bg-error/10 text-error border-error/40" },
-  draw: { badge: "bg-surface text-text-secondary border-border" },
+  win: { badge: "bg-success/10 text-success border border-success/40" },
+  loss: { badge: "bg-danger/10 text-danger border border-danger/40" },
+  draw: { badge: "bg-surface text-text-secondary border border-border" },
 };
 
 function PlayerCard({ playerId, playerUsername, symbol, isBot, fallbackName, isTurn, symbolColors, score, result }: IPlayerCardProps) {
@@ -42,7 +42,7 @@ function PlayerCard({ playerId, playerUsername, symbol, isBot, fallbackName, isT
               : "border-border-light bg-surface",
         )}>
         {isBot ? (
-          <GIcon icon={Bot} size={SizeEnum.xl} className={symbol === "X" ? "text-neon-cyan" : "text-neon-magenta"} />
+          <GIcon icon={Bot} size={SizeEnum.xl} className={symbol === "X" ? "text-primary" : "text-accent"} />
         ) : (
           <GIcon icon={User} size={SizeEnum.xl} color={AccentColorEnum.Secondary} />
         )}
@@ -75,7 +75,7 @@ function GameTurnIndicator({ isMyTurn, currentTurnText, waitingText }: IGameTurn
         "w-full py-3 px-4 rounded-xl border text-center font-bold text-sm flex items-center justify-center gap-2",
         isMyTurn ? "bg-primary-muted border-primary/30 text-text" : "bg-surface border-border text-text-secondary",
       )}>
-      <GIcon icon={Zap} size={SizeEnum.sm} className={isMyTurn ? "text-neon-cyan" : "text-text-muted"} />
+      <GIcon icon={Zap} size={SizeEnum.sm} className={isMyTurn ? "text-primary" : "text-text-muted"} />
       {isMyTurn ? currentTurnText : waitingText}
     </div>
   );
@@ -145,4 +145,4 @@ function GamePlayersHeader({ gameType }: IGamePlayersHeaderProps) {
   );
 }
 
-export { PlayerCard, GameTurnIndicator, GamePlayersHeader };
+export { GameTurnIndicator, GamePlayersHeader };

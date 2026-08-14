@@ -1,7 +1,4 @@
 import type { ReactNode } from "react";
-import type { TabsDirectionEnum } from "@/domain/enum/TabsDirectionEnum";
-import type { TabsVariantEnum } from "@/domain/enum/TabsVariantEnum";
-import type { IndicatorPositionEnum } from "@/domain/enum/IndicatorPositionEnum";
 
 interface GTabItem<T extends string | number = string> {
   id: T;
@@ -15,13 +12,11 @@ interface GTabsProps<T extends string | number> {
   tabs: GTabItem<T>[];
   value: T;
   onChange: (tabId: T) => void;
-  direction?: TabsDirectionEnum;
-  variant?: TabsVariantEnum;
   className?: string;
   tabClassName?: string;
   fullWidth?: boolean;
+  /** Vertical (stacked) on mobile, horizontal on md+ */
   responsive?: boolean;
-  indicator?: IndicatorPositionEnum;
   renderLabel?: (tab: GTabItem<T>, active: boolean) => ReactNode;
   renderIcon?: (tab: GTabItem<T>, active: boolean) => ReactNode;
   renderBadge?: (tab: GTabItem<T>, active: boolean) => ReactNode;

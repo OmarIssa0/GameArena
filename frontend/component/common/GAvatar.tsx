@@ -2,20 +2,19 @@
 
 import clsx from "clsx";
 
-import { squareSize } from "@/domain/constant/square-size";
+import { squareSize } from "@/domain/constant/size-classes";
 import { statusColor } from "@/domain/constant/status-color";
 import type { GAvatarProps } from "./def/GAvatar";
 import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
-import { AvatarShapeEnum } from "@/domain/enum/AvatarShapeEnum";
 
-function GAvatar({ firstName, lastName, size = SizeEnum.xs, shape = AvatarShapeEnum.Circle, status = UserStatusEnum.All, className }: GAvatarProps) {
+function GAvatar({ firstName, lastName, size = SizeEnum.xs, status = UserStatusEnum.All, className }: GAvatarProps) {
   const initials = `${firstName?.[0] ?? ""}${lastName?.[0] ?? ""}`.toUpperCase();
 
   const avatarClassName = clsx(
     "flex shrink-0 items-center justify-center overflow-hidden bg-primary font-bold text-text",
     squareSize[size],
-    shape === AvatarShapeEnum.Circle ? "rounded-full" : "rounded-md",
+    "rounded-full",
   );
 
   return (

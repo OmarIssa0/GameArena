@@ -1,18 +1,18 @@
 const en = {
-  title: "Friends",
+  title: "Social",
   online: "online",
   message: "Message",
   active: "Active",
   searchPlaceholder: "Search friends...",
-  friendsAndInvites: "Friends and invites",
+  friendsAndInvites: "Social Panel",
   tabs: {
     friends: "Friends",
-    invites: "Invites",
+    notifications: "Alerts"
   },
   invites: {
     wantsToPlay: "{{name}} wants to play",
     accept: "Accept",
-    decline: "Decline",
+    decline: "Decline"
   },
   leaveTitle: "Leave current game?",
   leaveDesc: "You have an active game. Leave it to accept the invite?",
@@ -22,10 +22,16 @@ const en = {
   noFriendsDescription: "Start connecting with other players to build your friends list.",
   noInvitesTitle: "No invites yet",
   noInvitesDescription: "When someone invites you to play, it will show up here.",
-  noOnlineTitle: "No friends online",
-  noOnlineDescription: "Your online friends will appear here for quick access.",
+  noMessagesTitle: "No messages yet",
+  noMessagesDescription: "Select a friend to start a conversation.",
+  sentYouRequest: "sent you a friend request",
+  noNotificationsTitle: "No notifications",
+  noNotificationsDescription: "Notifications will appear here.",
   acceptInviteConfirmation: "Accept invite confirmation",
-};
+  send: "Send",
+  viewAll: "View All"
+}
+;
 
 type TSocialPanelTranslation = typeof en;
 export { en, type TSocialPanelTranslation };

@@ -9,40 +9,34 @@ const en = {
     all: "All",
     win: "Wins",
     loss: "Losses",
-    draw: "Draws",
+    draw: "Draws"
   },
   summary: {
     wins: "Wins",
     losses: "Losses",
-    draws: "Draws",
+    draws: "Draws"
   },
   results: {
     win: "Win",
     loss: "Loss",
-    draw: "Draw",
-  },
-  columns: {
-    game: "Game",
-    opponent: "Opponent",
-    result: "Result",
-    date: "Date",
+    draw: "Draw"
   },
   games: {
     [GamesKindEnum.Snake]: "Snake",
     [GamesKindEnum.TicTacToe]: "Tic Tac Toe",
     [GamesKindEnum.PingPong]: "Ping Pong",
     [GamesKindEnum.RockPaperScissors]: "Rock Paper Scissors",
-    [GamesKindEnum.ConnectFour]: "Connect Four",
-  },
+    [GamesKindEnum.ConnectFour]: "Connect Four"},
   empty: {
     title: "No matches yet",
     description: "Your battle history will appear here once you finish your first game.",
-    filtered: "No matches found for this filter.",
+    filtered: "No matches found for this filter."
   },
   error: {
-    title: "Unable to load history",
-  },
-};
+    title: "Unable to load history"
+  }
+}
+;
 
 type THistoryTranslation = typeof en;
 export { en, type THistoryTranslation };

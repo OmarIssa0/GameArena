@@ -11,14 +11,12 @@ import { GButton } from "@/component/common/GButton";
 import { GIcon } from "@/component/common/GIcon";
 import { emailVerificationService } from "@/services/def/EmailVerificationService";
 import { authService } from "@/services/def/AuthService";
-import { useErrorMessage } from "@/hooks/useErrorMessage";
+import { useErrorMessage, toErrorCode } from "@/hooks/useErrorMessage";
 import { emailValidator } from "@/lib/utils";
 import { en as EnTextField, type GTextFieldTranslation } from "@/component/i18n/GTextField/en.i18n";
 import { ar as ArTextField } from "@/component/i18n/GTextField/ar.i18n";
 import { useTranslation } from "@/hooks/useSetting";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
-import type { AxiosError } from "axios";
-import type { IApiResponse } from "@/domain/meta/IApiResponse";
 import { ar as arEmailVerify } from "./i18n/ar.i18n";
 import { en as enEmailVerify, type TEmailVerifyTranslation } from "./i18n/en.i18n";
 
@@ -51,8 +49,7 @@ function EmailVerifyPage() {
       await emailVerificationService.sendOtp({ email });
       setStep("otp");
     } catch (e: unknown) {
-      const err = e as AxiosError<IApiResponse<unknown>>;
-      setError(resolveError(err?.response?.data?.errorCode, t.errorSendFailed));
+      setError(resolveError(toErrorCode(e), t.errorSendFailed));
     } finally {
       setLoading(false);
     }
@@ -73,7 +70,7 @@ function EmailVerifyPage() {
 
   const backToLogin = (
     <div className="pt-2 text-center">
-      <Link href="/login" className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors">
+      <Link href="/login" className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-primary">
         <GIcon icon={ArrowLeft} size={SizeEnum.sm} flip />
         {t.backToLogin}
       </Link>
@@ -86,7 +83,7 @@ function EmailVerifyPage() {
         <div className="w-full space-y-4">
           <p className="text-sm text-text-secondary text-center">{t.enterCode}</p>
           {error && (
-            <p role="alert" className="text-error text-xs text-center">
+            <p role="alert" className="text-danger text-xs text-center">
               {error}
             </p>
           )}
@@ -115,7 +112,7 @@ function EmailVerifyPage() {
           className="w-full"
         />
         {error && (
-          <p role="alert" className="text-error text-xs">
+          <p role="alert" className="text-danger text-xs">
             {error}
           </p>
         )}

@@ -3,7 +3,5 @@ enum CardVariantEnum {
   Outlined = "outlined",
   Elevated = "elevated",
   Interactive = "interactive",
-  Glass = "glass",
-  Gradient = "gradient",
 }
 export { CardVariantEnum };

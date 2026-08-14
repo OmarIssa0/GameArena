@@ -1,13 +1,13 @@
 const ar = {
   welcome: (name: string) => "مرحباً بعودتك" + (name ? `، ${name}` : ""),
+  welcomeDesc: "هيا لنجد معركتك القادمة!",
   brand: "أرينا 404",
   heroSubtitle: "وجهتك النهائية للألعاب. مباريات فورية، معارك مصنفة، ومتعة لا تنتهي.",
   playNow: "العب الآن",
-  viewStats: "عرض الإحصائيات",
   stats: {
     gamesAvailable: "الألعاب المتاحة",
     unreadMessages: "الرسائل غير المقروءة",
-    friendRequests: "طلبات الصداقة",
+    friendRequests: "طلبات الصداقة"
   },
   features: {
     title: "لماذا أرينا 404؟",
@@ -19,7 +19,7 @@ const ar = {
     rankedMatches: "مباريات مصنفة",
     rankedMatchesDesc: "اصعد في قوائم المتصدرين",
     seasonalEvents: "فعاليات موسمية",
-    seasonalEventsDesc: "مكافآت وأوضاع حصرية",
+    seasonalEventsDesc: "مكافآت وأوضاع حصرية"
   },
   games: {
     snake: "الثعبان",
@@ -27,16 +27,17 @@ const ar = {
     ticTacToe: "إكس-أو",
     ticTacToeDesc: "مبارزة تكتيكية 3×3",
     pong: "بينغ بونغ",
-    pongDesc: "تنس طاولة كلاسيكي",
+    pongDesc: "تنس طاولة كلاسيكي"
   },
   recentHistory: {
     title: "المعارك الأخيرة",
     viewAll: "عرض الكل",
     emptyTitle: "لا توجد معارك بعد",
-    emptyDescription: "العب مباراتك الأولى وسيظهر سجلك هنا.",
+    emptyDescription: "العب مباراتك الأولى وسيظهر سجلك هنا."
   },
   enterArena: "ادخل الساحة",
-  gamesAvailable: "ألعاب متاحة",
-};
+  gamesAvailable: "ألعاب متاحة"
+}
+;
 
 export { ar };

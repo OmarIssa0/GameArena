@@ -3,7 +3,6 @@ import { ErrorCodeEnum } from "@/domain/enum/ErrorCodeEnum";
 const en = {
   register: "Register",
   createAccount: "Create your account and get started",
-  fillRequiredFields: "Please fill in all required fields",
   firstName: "First Name",
   lastName: "Last Name",
   userName: "Username",
@@ -14,12 +13,9 @@ const en = {
   create: "Create account",
   haveAccount: "Already have an account?",
   signIn: "Sign in",
-  joinUs: "Join Us Today",
   unknownError: "An unknown error occurred",
   RegisterErrorCodeEnum: {
-    [ErrorCodeEnum.EmailAlreadyExists]: "Email already exists",
-  },
-  goToLogin: "Go to Login",
+    [ErrorCodeEnum.EmailAlreadyExists]: "Email already exists"},
   dynamicFieldRequired: (field: string) => `${field} is required`,
   placeholder: {
     firstName: "Enter your first name",
@@ -27,9 +23,10 @@ const en = {
     userName: "Enter your username",
     email: "Enter your email",
     password: "Create a password",
-    confirmPassword: "Re-enter your password",
-  },
-};
+    confirmPassword: "Re-enter your password"
+  }
+}
+;
 
 type TRegisterTranslation = typeof en;
 export { en, type TRegisterTranslation };

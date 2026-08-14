@@ -99,7 +99,7 @@ export function DashboardNotificationsProvider({ children }: { children: React.R
     return () => off();
   }, []);
 
-  const unreadNotificationCount = useMemo(() => notifications.filter((n) => !n.isRead).length, [notifications]);
+  const unreadNotificationCount = notifications.filter((n) => !n.isRead).length;
 
   const dismissGameInvite = useCallback((roomId: string) => {
     setGameInvites((prev) => prev.filter((i) => i.roomId !== roomId));

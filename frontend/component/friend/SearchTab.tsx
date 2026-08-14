@@ -14,20 +14,18 @@ import { GList } from "@/component/common/GList";
 import { GSelect } from "@/component/common/GSelect";
 import { GSpinner } from "@/component/common/GSpinner";
 import { GTextField } from "@/component/common/GTextField";
-import { AvatarShapeEnum } from "@/domain/enum/AvatarShapeEnum";
 import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
 import type { IUserFilterRequest } from "@/domain/meta/IUserFilterRequest";
 import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import type { TNullable } from "@/domain/type/TCommon";
 import { useTranslation } from "@/hooks/useSetting";
-import { useErrorMessage } from "@/hooks/useErrorMessage";
+import { toErrorCode, useErrorMessage } from "@/hooks/useErrorMessage";
 import { friendService } from "@/services/def/FriendService";
 import { userService } from "@/services/def/UserService";
-import type { AxiosError } from "axios";
-import type { IApiResponse } from "@/domain/meta/IApiResponse";
 
 import type { ISearchResult } from "./def/SearchTab";
 
@@ -87,9 +85,8 @@ function SearchTab() {
         }
       } catch (e: unknown) {
         if (!ignore) {
-          const err = e as AxiosError<IApiResponse<unknown>>;
           setSearchResults([]);
-          setSearchError(resolveError(err?.response?.data?.errorCode, t.searchTab.searchError));
+          setSearchError(resolveError(toErrorCode(e), t.searchTab.searchError));
         }
       } finally {
         if (!ignore) setSearching(false);
@@ -104,15 +101,14 @@ function SearchTab() {
       window.clearTimeout(timer);
       ignore = true;
     };
-  }, [query, userFilter, t.searchTab.searchError]);
+  }, [query, userFilter, t.searchTab.searchError, resolveError]);
 
   const handleSendRequest = async (receiverId: string) => {
     try {
       await friendService.sendFriendRequest(receiverId);
       setSearchResults((prev) => prev.map((user) => (user.id === receiverId ? { ...user, isSendRequest: true } : user)));
     } catch (e: unknown) {
-      const err = e as AxiosError<IApiResponse<unknown>>;
-      setSearchError(resolveError(err?.response?.data?.errorCode, t.searchTab.sendError));
+      setSearchError(resolveError(toErrorCode(e), t.searchTab.sendError));
     }
   };
 
@@ -138,9 +134,9 @@ function SearchTab() {
                 type="button"
                 onClick={clearSearch}
                 aria-label={t.searchTab.clearSearch}
-                variant={AccentColorEnum.Muted}
+                variant={ButtonVariantEnum.Subtle}
                 size={SizeEnum.xs}
-                className="!p-0 text-text-muted hover:text-text">
+                className="p-0! text-text-muted hover:text-text">
                 <GIcon icon={X} size={SizeEnum.sm} color={AccentColorEnum.Muted} flip={false} />
               </GButton>
             )
@@ -168,7 +164,7 @@ function SearchTab() {
       <p className="text-xs text-text-muted">{t.searchTab.hint}</p>
 
       {searchError && (
-        <GCard padding={SizeEnum.md} className="text-center text-sm text-error border border-error/30 bg-error/5">
+        <GCard padding={SizeEnum.md} className="text-center text-sm text-danger border border-danger/30 bg-danger/5">
           {searchError}
         </GCard>
       )}
@@ -184,11 +180,11 @@ function SearchTab() {
               {t.searchTab.noResults}
             </GCard>
           ) : (
-            <GList items={searchResults} keyExtractor={(user) => user.id}>
+            <GList items={searchResults} keyExtractor={(user) => user.id} pageSize={10} listClassName="gap-3">
               {(user) => (
                 <GCard padding={SizeEnum.sm} className="flex items-center justify-between gap-4">
                   <div className="flex min-w-0 items-center gap-3">
-                    <GAvatar firstName={user.firstName} lastName={user.lastName} status={user.status} size={SizeEnum.sm} shape={AvatarShapeEnum.Circle} />
+                    <GAvatar firstName={user.firstName} lastName={user.lastName} status={user.status} size={SizeEnum.sm} />
                     <div className="min-w-0">
                       <p className="truncate font-medium text-text">{displayName(user, t.searchTab.unknownUser)}</p>
                       <p className="truncate text-xs text-text-muted">{user.userName ? `@${user.userName}` : t.searchTab.noUsername}</p>
@@ -201,6 +197,7 @@ function SearchTab() {
                     <GButton
                       onClick={() => void handleSendRequest(user.id)}
                       size={SizeEnum.sm}
+                      variant={ButtonVariantEnum.Primary}
                       startIcon={<GIcon icon={UserPlus} size={SizeEnum.sm} className="text-on-primary" />}>
                       {t.searchTab.add}
                     </GButton>
@@ -220,3 +217,5 @@ function SearchTab() {
 }
 
 export { SearchTab };
+
+

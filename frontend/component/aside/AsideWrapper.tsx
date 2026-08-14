@@ -1,71 +1,21 @@
 "use client";
 
 import clsx from "clsx";
-import { GBackdrop } from "../common/GBackdrop";
-import { GButton } from "../common/GButton";
-import { AsidePlacementEnum } from "@/domain/enum/AsidePlacementEnum";
-import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
-import { SizeEnum } from "@/domain/enum/SizeEnum";
 import type { AsideWrapperProps } from "./def/AsideWrapper";
 
-function AsideWrapper({ config, aside, header, children, footer, mobileFab, className }: AsideWrapperProps) {
-  const { collapsed, open, isDesktop, closeMobile } = aside;
-  const { placement, expandedWidth, collapsedWidth, label } = config;
+function AsideWrapper({ config, collapsed, header, children, footer, className }: AsideWrapperProps) {
+  const { expandedWidth, collapsedWidth, label } = config;
 
-  const isInlineDesktop = isDesktop;
-  const isOverlay = !isInlineDesktop;
-  const showBackdrop = isOverlay && open;
-
-  const openFab = mobileFab ?? (
-    <GButton
-      variant={AccentColorEnum.Secondary}
-      size={SizeEnum.icon}
-      rounded={SizeEnum.full}
-      onClick={aside.openMobile}
-      className={clsx("fixed inset-0 top-4 z-50", placement === AsidePlacementEnum.Start ? "inset-s-4" : "inset-e-4")}
-      aria-label={`Open ${label}`}>
-      {config.mobileIcon}
-    </GButton>
-  );
-
-  const openTransform = placement === AsidePlacementEnum.Start ? "ltr:translate-x-0 rtl:-translate-x-0" : "translate-x-0";
-  const closedTransform =
-    placement === AsidePlacementEnum.Start ? "ltr:-translate-x-full rtl:translate-x-full" : "ltr:translate-x-full rtl:-translate-x-full";
-
-  const asideClass = clsx(
-    "flex flex-col shrink-0 h-dvh-safe bg-bg-sidebar transition-transform duration-200",
-    placement === AsidePlacementEnum.Start ? "border-e border-border" : "border-s border-border",
-    isInlineDesktop
-      ? collapsed
-        ? collapsedWidth
-        : expandedWidth
-      : [
-          "fixed inset-y-0 z-50",
-          placement === AsidePlacementEnum.Start ? "start-0" : "end-0",
-          open ? [openTransform, expandedWidth] : [closedTransform, "w-0 overflow-hidden border-0 pointer-events-none"],
-        ],
-    className,
-  );
+  const width = collapsed ? collapsedWidth : expandedWidth;
 
   return (
-    <>
-      {showBackdrop && <GBackdrop onClick={closeMobile} />}
+    <aside aria-label={label} className={clsx("bg-bg-sidebar flex h-full shrink-0 flex-col", "border-border", "border-e", width, className)}>
+      {header}
 
-      <aside
-        className={asideClass}
-        aria-label={label}
-        role={isOverlay ? "dialog" : undefined}
-        aria-modal={isOverlay && open ? true : undefined}
-        aria-hidden={isOverlay && !open ? true : undefined}>
-        {header}
+      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar">{children}</div>
 
-        {(isInlineDesktop || open) && <main className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar">{children}</main>}
-
-        {footer && (isInlineDesktop || open) && <footer className="border-t border-border">{footer}</footer>}
-      </aside>
-
-      {isOverlay && !open && openFab}
-    </>
+      {footer && <footer className="shrink-0 border-t border-border">{footer}</footer>}
+    </aside>
   );
 }
 

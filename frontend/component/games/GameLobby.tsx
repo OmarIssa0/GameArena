@@ -10,7 +10,7 @@ import { GCard } from "@/component/common/GCard";
 import { GIcon } from "@/component/common/GIcon";
 import { InviteModal } from "@/component/games/common/InviteModal";
 import { translateGameInfo } from "@/domain/constant/games";
-import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { useFriendList } from "@/hooks/useFriendList";
 import { useGameTranslation } from "@/hooks/useGameTranslation";
@@ -45,7 +45,7 @@ function GameLobby({ gameType }: IGameLobbyProps) {
     <div className="flex items-center justify-center min-h-40 p-4">
       <div className="w-full max-w-lg space-y-6">
         <div className="text-center space-y-1">
-          <h1 className="text-2xl font-black text-text">{gameName}</h1>
+          <h1 className="text-2xl font-bold text-text">{gameName}</h1>
           <p className="text-text-secondary text-sm">{gameDescription}</p>
         </div>
 
@@ -54,7 +54,7 @@ function GameLobby({ gameType }: IGameLobbyProps) {
         <GCard padding={SizeEnum.md} className="text-center">
           <div className="flex items-center justify-center gap-3 mb-2">
             <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+              
               <span className="relative inline-flex rounded-full h-3 w-3 bg-primary" />
             </span>
             <p className="text-text-secondary text-sm">{t.waiting.subtitle}</p>
@@ -69,13 +69,13 @@ function GameLobby({ gameType }: IGameLobbyProps) {
                 <GButton
                   onClick={() => setShowInvitePicker(true)}
                   fullWidth
-                  variant={AccentColorEnum.Secondary}
+                  variant={ButtonVariantEnum.Secondary}
                   startIcon={<GIcon icon={UserPlus} size={SizeEnum.md} />}>
                   {t.waiting.inviteFriend}
                 </GButton>
               </>
             )}
-            <GButton onClick={() => resetGame()} variant={AccentColorEnum.Secondary} size={SizeEnum.sm}>
+            <GButton onClick={() => resetGame()} variant={ButtonVariantEnum.Secondary} size={SizeEnum.sm}>
               {t.waiting.cancelMatch}
             </GButton>
           </div>

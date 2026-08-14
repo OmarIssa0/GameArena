@@ -8,9 +8,12 @@ import { useDashboardNotifications } from "@/app/providers/DashboardNotification
 import { GButton } from "@/component/common/GButton";
 import { GIcon } from "@/component/common/GIcon";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
 import type { TNullable } from "@/domain/type/TCommon";
 import { useTranslation } from "@/hooks/useSetting";
+import { GCard } from "@/component/common/GCard";
 
 import { ar } from "@/app/(dashboard)/notifications/i18n/ar.i18n";
 import { en, type TNotificationsTranslation } from "@/app/(dashboard)/notifications/i18n/en.i18n";
@@ -24,10 +27,8 @@ function NotificationPopup() {
   const timerRef = useRef<TNullable<ReturnType<typeof setTimeout>>>(null);
   const lastIdRef = useRef<TNullable<string>>(null);
 
-  // Get the latest non-dismissed notification
   const latest = notifications.length > 0 ? (notifications.find((n) => !dismissedIds.has(n.id)) ?? notifications[0]) : null;
 
-  // Track visibility via ref to avoid cascading renders from setState in effect
   const visibleRef = useRef(false);
 
   useEffect(() => {
@@ -39,11 +40,9 @@ function NotificationPopup() {
     if (latest.id === lastIdRef.current) return;
     lastIdRef.current = latest.id;
 
-    // Show the popup
     visibleRef.current = true;
     setVisible(true);
 
-    // Auto-dismiss after 5 seconds
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
       visibleRef.current = false;
@@ -69,29 +68,26 @@ function NotificationPopup() {
   };
 
   return (
-    <div className="fixed top-4 start-1/2 -translate-x-1/2 z-[var(--z-popover)] animate-in">
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={handleClick}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            handleClick();
-          }
-        }}
-        className="flex items-center gap-3 bg-bg-elevated border border-primary/30 rounded-2xl shadow-xl shadow-primary/10 px-5 py-3 cursor-pointer transition hover:bg-bg-card-hover hover:border-primary/50 focus-visible:ring-2 focus-visible:ring-primary outline-none max-w-full sm:max-w-md">
-        <div className="p-1.5 bg-primary-muted rounded-full shrink-0">
+    <div className="fixed top-4 left-1/2 -translate-x-1/2 z-popover" role="status" aria-live="polite">
+      <GCard
+        variant={CardVariantEnum.Elevated}
+        padding={SizeEnum.md}
+        className="flex items-center gap-3 cursor-pointer max-w-full sm:max-w-md shadow-lg">
+        <button type="button" onClick={handleClick} className="flex items-center gap-3 flex-1">
           <GIcon icon={Bell} size={SizeEnum.sm} color={AccentColorEnum.Primary} />
-        </div>
-        <div className="min-w-0 flex-1 text-start">
-          <p className="text-sm font-semibold text-text truncate">{latest.title}</p>
-          <p className="text-xs text-text-secondary truncate">{latest.body}</p>
-        </div>
-        <GButton variant={AccentColorEnum.Muted} size={SizeEnum.icon} onClick={handleDismiss} className="shrink-0 w-8 h-8" aria-label={t.actions.dismiss}>
+          <div className="min-w-0 flex-1 text-start">
+            <p className="text-sm font-semibold text-text truncate">{latest.title}</p>
+            <p className="text-xs text-text-secondary truncate">{latest.body}</p>
+          </div>
+        </button>
+        <GButton
+          variant={ButtonVariantEnum.Subtle}
+          size={SizeEnum.icon}
+          onClick={handleDismiss}
+          aria-label={t.actions.dismiss}>
           <GIcon icon={X} size={SizeEnum.sm} color={AccentColorEnum.Muted} />
         </GButton>
-      </div>
+      </GCard>
     </div>
   );
 }

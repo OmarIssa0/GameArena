@@ -1,16 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import { BreakpointEnum } from "@/domain/enum/BreakpointEnum";
+import { useEffect, useState } from "react";
+
+const STORAGE_KEY = "sidebar-collapsed";
 
 export interface UseAsideReturn {
   collapsed: boolean;
   open: boolean;
-
-  isDesktop: boolean;
-  isCompact: boolean;
-  isTablet: boolean;
-  isMobile: boolean;
 
   expand: () => void;
   collapse: () => void;
@@ -21,72 +17,32 @@ export interface UseAsideReturn {
   toggleMobile: () => void;
 }
 
-const MOBILE_MAX = 639; // < 640px
-const DESKTOP_MIN = 1024; // >= 1024px
+function getInitialCollapsed(defaultDesktopCollapsed: boolean): boolean {
+  if (typeof window === "undefined") return defaultDesktopCollapsed;
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored === null) return defaultDesktopCollapsed;
+  return stored === "true";
+}
 
 export function useAside(defaultDesktopCollapsed = false): UseAsideReturn {
-  const [breakpoint, setBreakpoint] = useState<BreakpointEnum>(BreakpointEnum.Desktop);
-  const [collapsed, setCollapsed] = useState(defaultDesktopCollapsed);
+  const [collapsed, setCollapsed] = useState(() => getInitialCollapsed(defaultDesktopCollapsed));
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const mqMobile = window.matchMedia(`(max-width: ${MOBILE_MAX}px)`);
-    const mqDesktop = window.matchMedia(`(min-width: ${DESKTOP_MIN}px)`);
+    localStorage.setItem(STORAGE_KEY, String(collapsed));
+  }, [collapsed]);
 
-    const update = () => {
-      const next = mqDesktop.matches ? BreakpointEnum.Desktop : mqMobile.matches ? BreakpointEnum.Mobile : BreakpointEnum.Tablet;
+  const expand = () => setCollapsed(false);
+  const collapse = () => setCollapsed(true);
+  const toggleCollapsed = () => setCollapsed((c) => !c);
 
-      setBreakpoint(next);
-
-      if (next === BreakpointEnum.Desktop) setOpen(false);
-    };
-
-    update();
-    mqMobile.addEventListener("change", update);
-    mqDesktop.addEventListener("change", update);
-    return () => {
-      mqMobile.removeEventListener("change", update);
-      mqDesktop.removeEventListener("change", update);
-    };
-  }, []);
-
-  const isDesktop = breakpoint === BreakpointEnum.Desktop;
-  const isTablet = breakpoint === BreakpointEnum.Tablet;
-  const isMobile = breakpoint === BreakpointEnum.Mobile;
-  const isCompact = !isDesktop;
-
-  const expand = useCallback(() => setCollapsed(false), []);
-  const collapse = useCallback(() => setCollapsed(true), []);
-  const toggleCollapsed = useCallback(() => setCollapsed((c) => !c), []);
-
-  const openMobile = useCallback(() => setOpen(true), []);
-  const closeMobile = useCallback(() => setOpen(false), []);
-  const toggleMobile = useCallback(() => setOpen((o) => !o), []);
-
-  useEffect(() => {
-    if (!open || isDesktop) return;
-
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeMobile();
-    };
-    document.addEventListener("keydown", onKeyDown);
-
-    return () => {
-      document.body.style.overflow = prevOverflow;
-      document.removeEventListener("keydown", onKeyDown);
-    };
-  }, [open, isDesktop, closeMobile]);
+  const openMobile = () => setOpen(true);
+  const closeMobile = () => setOpen(false);
+  const toggleMobile = () => setOpen((o) => !o);
 
   return {
     collapsed,
     open,
-    isDesktop,
-    isCompact,
-    isTablet,
-    isMobile,
     expand,
     collapse,
     toggleCollapsed,

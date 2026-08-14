@@ -5,9 +5,8 @@ enum AccentColorEnum {
   Success = "text-success",
   Warning = "text-warning",
   Danger = "text-danger",
-  Inherit = "",
   OnPrimary = "text-on-primary",
   Accent = "text-accent",
-  Text = "text-text",
+  Inherit = "",
 }
 export { AccentColorEnum };

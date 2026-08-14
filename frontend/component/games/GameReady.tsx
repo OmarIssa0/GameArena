@@ -25,9 +25,8 @@ function GameReady({ gameType }: IGameReadyProps) {
 
   return (
     <div className="flex items-center justify-center min-h-40 p-4">
-      <GCard padding={SizeEnum.lg} className="w-full max-w-lg text-center relative overflow-hidden">
-        <div className="absolute top-0 inset-x-0 h-1 bg-linear-to-r from-primary via-accent to-secondary" />
-        <h2 className="text-2xl font-black text-text mb-6">{t.ready.title}</h2>
+      <GCard padding={SizeEnum.lg} className="w-full max-w-lg text-center">
+        <h2 className="text-2xl font-bold text-text mb-6">{t.ready.title}</h2>
 
         <div className="flex items-center justify-center gap-6 mb-10">
           <div className="flex flex-col items-center">
@@ -39,7 +38,7 @@ function GameReady({ gameType }: IGameReadyProps) {
             </span>
           </div>
 
-          <div className="text-text-muted font-black italic text-xl">{t.game.vs}</div>
+          <div className="text-text-muted font-bold italic text-xl">{t.game.vs}</div>
 
           <div className="flex flex-col items-center">
             <div className="w-20 h-20 rounded-2xl flex items-center justify-center border-2 border-warning bg-warning-bg">

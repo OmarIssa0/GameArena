@@ -10,7 +10,7 @@ import { GCard } from "@/component/common/GCard";
 import { GList } from "@/component/common/GList";
 import { GameLayoutWrapper } from "@/component/games/GameLayoutWrapper";
 import { GameActionTypes } from "@/domain/constant/game-actions";
-import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 import { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { useGameTranslation } from "@/hooks/useGameTranslation";
@@ -40,7 +40,7 @@ function TicTacToePage() {
 
   return (
     <GameLayoutWrapper gameType={GamesKindEnum.TicTacToe}>
-      <GCard padding={SizeEnum.md} rounded={SizeEnum.lg}>
+      <GCard padding={SizeEnum.md}>
         <div className="flex justify-center gap-8 mb-4">
           <div className="text-center">
             <div className="text-3xl font-bold text-accent">{player1Score}</div>
@@ -55,23 +55,19 @@ function TicTacToePage() {
             <div className="text-xs text-text-muted">{PLAYER_O}</div>
           </div>
         </div>
-        <GList
-          items={cells}
-          keyExtractor={(item) => item.index.toString()}
-          noPagination
-          listClassName="grid grid-cols-3 gap-3">
+        <GList items={cells} keyExtractor={(item) => item.index.toString()} listClassName="grid grid-cols-3 gap-3">
           {({ index, cell }) => (
             <GButton
               onClick={() => sendAction({ type: GameActionTypes.MAKE_MOVE, cell: index })}
               disabled={!isCellPlayable(cell)}
-              size={SizeEnum.lg}
+              size={SizeEnum.xl}
               rounded={SizeEnum.md}
               className={clsx(
-                "aspect-square min-w-11 text-4xl font-bold transition-colors duration-150",
+                "aspect-square",
                 cell === PLAYER_X && "text-accent",
                 cell === PLAYER_O && "text-warning",
               )}
-              variant={cell === BOARD_EMPTY ? AccentColorEnum.Secondary : AccentColorEnum.Muted}>
+              variant={cell === BOARD_EMPTY ? ButtonVariantEnum.Secondary : ButtonVariantEnum.Subtle}>
               {cell === PLAYER_X && <span className="text-accent">{PLAYER_X}</span>}
               {cell === PLAYER_O && <span className="text-warning">{PLAYER_O}</span>}
               {cell === BOARD_EMPTY && <span>{BOARD_EMPTY}</span>}
@@ -84,3 +80,5 @@ function TicTacToePage() {
 }
 
 export default TicTacToePage;
+
+

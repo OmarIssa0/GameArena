@@ -11,6 +11,7 @@ import { LocaleEnum } from "@/domain/enum/LocaleEnum";
 import { ThemeEnum } from "@/domain/enum/ThemeEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 
 function LangTheme({ collapsed, className = "" }: { collapsed: boolean; className?: string }) {
   const [locale, setLocale] = useLocale();
@@ -18,14 +19,6 @@ function LangTheme({ collapsed, className = "" }: { collapsed: boolean; classNam
   const t = useTranslation({ en, ar }) as TLangThemeTranslation;
 
   const isDark = theme === "dark";
-  const sizeClass = collapsed ? "h-10 w-10 min-w-10" : "flex-1 w-full";
-
-  const toggleBtn = clsx(
-    "flex items-center justify-center gap-2 text-xs font-semibold border border-border text-text-secondary bg-surface",
-    "rounded-[var(--radius-sm)] transition-colors duration-150",
-    "hover:text-primary hover:border-primary/40",
-    sizeClass,
-  );
 
   const toggleLocale = () => {
     const next = locale === LocaleEnum.En ? LocaleEnum.Ar : LocaleEnum.En;
@@ -38,21 +31,23 @@ function LangTheme({ collapsed, className = "" }: { collapsed: boolean; classNam
   };
 
   return (
-    <div className={clsx(" flex items-center justify-center gap-2", collapsed ? "flex-col" : "w-full", className)}>
+    <div className={clsx("flex items-center justify-center gap-1 flex-1", collapsed ? "flex-col" : "w-full", className)}>
       <GButton
-        variant={AccentColorEnum.Muted}
-        onClick={toggleLocale}
+        variant={ButtonVariantEnum.Secondary}
+        rounded={SizeEnum.sm}
+        className={!collapsed ? "flex-1" : ""}
         title={locale === "en" ? t.switchToArabic : t.switchToEnglish}
-        className={toggleBtn}>
+        onClick={toggleLocale}>
         <GIcon icon={Globe} size={SizeEnum.md} />
-        {!collapsed && <span>{locale === "en" ? t.english : t.arabic}</span>}
+        {!collapsed && <span>{locale === "en" ? t.arabic : t.english}</span>}
       </GButton>
 
       <GButton
-        variant={AccentColorEnum.Muted}
-        onClick={toggleTheme}
+        variant={ButtonVariantEnum.Secondary}
+        className={!collapsed ? "flex-1" : ""}
+        rounded={SizeEnum.sm}
         title={isDark ? t.switchToLight : t.switchToDark}
-        className={toggleBtn}>
+        onClick={toggleTheme}>
         <GIcon icon={isDark ? Moon : Sun} size={SizeEnum.md} color={AccentColorEnum.Primary} />
         {!collapsed && <span>{isDark ? t.light : t.dark}</span>}
       </GButton>

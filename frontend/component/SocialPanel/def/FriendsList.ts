@@ -6,7 +6,6 @@ interface IFriendsListProps {
   query?: TNullable<string>;
   unreadCounts?: Record<string, number>;
   actions?: (friend: IUserSummary) => React.ReactNode;
-  noPagination?: boolean;
 }
 
 export type { IFriendsListProps };

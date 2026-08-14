@@ -1,50 +1,77 @@
 "use client";
 
-import { useMemo } from "react";
 import clsx from "clsx";
-import { X } from "lucide-react";
+import { X, PanelLeftClose } from "lucide-react";
+
 import { GButton } from "../common/GButton";
-import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { GIcon } from "../common/GIcon";
+import { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import type { IAsideHeaderProps } from "./def/AsideHeader";
 
-function AsideHeader({ aside, brand, collapsedIcon, label, actions }: IAsideHeaderProps) {
-  const { collapsed, isDesktop, open, expand, collapse, closeMobile } = aside;
-
-  const isInlineDesktop = isDesktop;
-  const isOverlay = !isInlineDesktop;
-
-  const content = useMemo(() => {
-    if (collapsed && isInlineDesktop) {
-      return (
-        <GButton variant={AccentColorEnum.Muted} size={SizeEnum.icon} onClick={expand} aria-label={`Expand ${label}`}>
-          {collapsedIcon}
+function AsideHeader({
+  collapsed,
+  expand,
+  collapse,
+  closeMobile,
+  brand,
+  collapsedIcon,
+  label,
+  actions,
+  overlay = false,
+}: IAsideHeaderProps) {
+  // Overlay mode (tablet/mobile modal): always expanded, shows close button.
+  if (overlay) {
+    return (
+      <header className="flex min-h-16 w-full shrink-0 items-center gap-2 border-b border-border px-3">
+        <div className="min-w-0 flex-1">{brand}</div>
+        <GButton
+          variant={ButtonVariantEnum.Subtle}
+          size={SizeEnum.icon}
+          rounded={SizeEnum.full}
+          onClick={closeMobile}
+          aria-label={`Close ${label}`}
+          title={`Close ${label}`}>
+          <GIcon icon={X} size={SizeEnum.md} />
         </GButton>
-      );
-    }
-
-    return <div className="flex-1 min-w-0 flex items-center gap-3">{brand}</div>;
-  }, [collapsed, isInlineDesktop, expand, collapsedIcon, brand, label]);
+        {actions}
+      </header>
+    );
+  }
 
   return (
-    <header className="h-20 shrink-0 border-b border-border flex items-center px-4">
-      <div className={clsx("flex items-center w-full gap-2", collapsed && isInlineDesktop && "justify-center")}>
-        {content}
+    <header
+      className={clsx(
+        "flex min-h-16 w-full shrink-0 items-center gap-2 border-b border-border px-3",
+        collapsed && "justify-center",
+      )}>
+      {collapsed ? (
+        <GButton
+          variant={ButtonVariantEnum.Subtle}
+          size={SizeEnum.icon}
+          rounded={SizeEnum.full}
+          onClick={expand}
+          aria-label={`Expand ${label}`}
+          title={label}>
+          {collapsedIcon}
+        </GButton>
+      ) : (
+        <div className="min-w-0 flex-1">{brand}</div>
+      )}
 
-        {isInlineDesktop && !collapsed && (
-          <GButton variant={AccentColorEnum.Muted} size={SizeEnum.icon} onClick={collapse} className="ms-auto" aria-label={`Collapse ${label}`}>
-            <X size={18} />
-          </GButton>
-        )}
+      {!collapsed && (
+        <GButton
+          variant={ButtonVariantEnum.Subtle}
+          size={SizeEnum.icon}
+          rounded={SizeEnum.full}
+          onClick={collapse}
+          aria-label={`Collapse ${label}`}
+          title={label}>
+          <GIcon icon={PanelLeftClose} size={SizeEnum.sm} />
+        </GButton>
+      )}
 
-        {isOverlay && open && (
-          <GButton variant={AccentColorEnum.Muted} size={SizeEnum.icon} onClick={closeMobile} className="ms-auto" aria-label={`Close ${label}`}>
-            <X size={20} />
-          </GButton>
-        )}
-
-        {actions}
-      </div>
+      {actions}
     </header>
   );
 }

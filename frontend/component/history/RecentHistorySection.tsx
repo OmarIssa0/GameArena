@@ -23,7 +23,7 @@ import type { RecentHistorySectionProps } from "./def/RecentHistorySection";
 function RecentHistorySection({ title, viewAll, emptyTitle, emptyDescription, limit = 3 }: RecentHistorySectionProps) {
   const [locale] = useLocale() as [LocaleEnum, (l: LocaleEnum) => void];
   const historyT = useTranslation({ en, ar }) as THistoryTranslation;
-  const { matches, summary, loading } = useMatchHistory(MatchStatusEnum.All, limit, historyT.error.title);
+  const { matches, summary, loading } = useMatchHistory(MatchStatusEnum.All, limit);
 
   const items = [
     { label: historyT.summary.wins, value: summary.wins, icon: Trophy, backGroundColor: AccentColorEnum.Success },
@@ -32,14 +32,14 @@ function RecentHistorySection({ title, viewAll, emptyTitle, emptyDescription, li
   ];
 
   return (
-    <section>
+    <section className="mt-8">
       <div className="flex items-center justify-between gap-3 mb-4">
         <h2 className="text-sm font-bold text-text-secondary uppercase tracking-widest">{title}</h2>
         <Link
           href="/history"
-          className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary-hover transition-colors">
+          className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary-hover">
           {viewAll}
-          <GIcon icon={ArrowRight} size={SizeEnum.xs} color={AccentColorEnum.Primary} className="rtl:-scale-x-100" />
+          <GIcon icon={ArrowRight} size={SizeEnum.xs} color={AccentColorEnum.Primary} flip />
         </Link>
       </div>
 
@@ -55,12 +55,10 @@ function RecentHistorySection({ title, viewAll, emptyTitle, emptyDescription, li
         />
       ) : (
         <div className="flex flex-col gap-4">
-          <GList items={items} keyExtractor={(item) => item.label} listClassName="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" noPagination>
+          <GList items={items} keyExtractor={(item) => item.label} listClassName="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {(item) => (
               <GCard padding={SizeEnum.sm} className="flex items-center gap-3">
-                <div className="relative">
-                  <GIcon icon={item.icon} size={SizeEnum.md} color={AccentColorEnum.Muted} tile tileGradient={item.backGroundColor} />
-                </div>
+                <GIcon icon={item.icon} size={SizeEnum.md} color={AccentColorEnum.Muted} tile tileGradient={item.backGroundColor} />
                 <div>
                   <p className="text-xl font-extrabold leading-tight text-text">{item.value}</p>
                   <p className="text-xs font-medium text-text-secondary mt-0.5">{item.label}</p>
@@ -68,21 +66,19 @@ function RecentHistorySection({ title, viewAll, emptyTitle, emptyDescription, li
               </GCard>
             )}
           </GList>
-          <div className="flex flex-col gap-3">
-            <GList items={matches} keyExtractor={(match) => match.id} noPagination>
-              {(match) => (
-                <MatchHistoryItem
-                  match={match}
-                  winLabel={historyT.results.win}
-                  lossLabel={historyT.results.loss}
-                  drawLabel={historyT.results.draw}
-                  gameLabel={historyT.games[match.kind as keyof typeof historyT.games]}
-                  locale={locale}
-                  versusLabel={historyT.versus}
-                />
-              )}
-            </GList>
-          </div>
+          <GList items={matches} keyExtractor={(match) => match.id} listClassName="gap-3">
+            {(match) => (
+              <MatchHistoryItem
+                match={match}
+                winLabel={historyT.results.win}
+                lossLabel={historyT.results.loss}
+                drawLabel={historyT.results.draw}
+                gameLabel={historyT.games[match.kind as keyof typeof historyT.games]}
+                locale={locale}
+                versusLabel={historyT.versus}
+              />
+            )}
+          </GList>
         </div>
       )}
     </section>
@@ -90,3 +86,4 @@ function RecentHistorySection({ title, viewAll, emptyTitle, emptyDescription, li
 }
 
 export { RecentHistorySection };
+

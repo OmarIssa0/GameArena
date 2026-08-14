@@ -1,4 +1,4 @@
-export interface ISnakePoint {
+interface ISnakePoint {
   x: number;
   y: number;
 }

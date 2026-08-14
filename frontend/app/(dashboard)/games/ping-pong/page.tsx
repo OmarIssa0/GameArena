@@ -56,7 +56,7 @@ function PingPongPage() {
 
   return (
     <GameLayoutWrapper gameType={GamesKindEnum.PingPong}>
-      <GCard padding={SizeEnum.md} rounded={SizeEnum.lg}>
+      <GCard padding={SizeEnum.md}>
         <div className="flex justify-center gap-8 mb-4">
           <div className="text-center">
             <div className="text-3xl font-bold text-accent">{player1Score}</div>
@@ -108,3 +108,4 @@ function PingPongPage() {
 }
 
 export default PingPongPage;
+

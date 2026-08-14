@@ -11,7 +11,6 @@ namespace backend.Hubs
         {
             var userId = GetUserId();
             await Groups.AddToGroupAsync(Context.ConnectionId, $"user:{userId}");
-            await Groups.AddToGroupAsync(Context.ConnectionId, "GlobalChat");
             await base.OnConnectedAsync();
         }
 
@@ -20,13 +19,6 @@ namespace backend.Hubs
             var senderId = GetUserId();
             var msg = await _chatService.CreatePrivateMessageAsync(senderId, receiverId, message);
             await Clients.Group($"user:{receiverId}").SendAsync("chat:private", msg);
-        }
-
-        public async Task SendGlobalMessage(string message)
-        {
-            var senderId = GetUserId();
-            var msg = await _chatService.CreateGlobalMessageAsync(senderId, message);
-            await Clients.Group("GlobalChat").SendAsync("chat:global", msg);
         }
 
         private Guid GetUserId()

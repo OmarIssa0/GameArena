@@ -35,8 +35,7 @@ api.interceptors.response.use(
       original?.url?.includes("/auth/refresh") ||
       original?.url?.includes("/auth/logout") ||
       original?.url?.includes("/auth/forgot-password") ||
-      original?.url?.includes("/auth/reset-password") ||
-      original?.url?.includes("/auth/verify-email")
+      original?.url?.includes("/auth/reset-password")
     ) {
       return Promise.reject(error);
     }

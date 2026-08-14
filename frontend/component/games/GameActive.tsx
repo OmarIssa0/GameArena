@@ -6,7 +6,7 @@ import { useAuth } from "@/app/providers/AuthProvider";
 import { useGame } from "@/app/providers/GameProvider";
 import { GButton } from "@/component/common/GButton";
 import { GIcon } from "@/component/common/GIcon";
-import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import type { TNullable, TOptional } from "@/domain/type/TCommon";
 import { useGameTranslation } from "@/hooks/useGameTranslation";
@@ -39,6 +39,12 @@ function GameActive({ children, gameType }: IGameActiveProps) {
       ? state.player2Username || t.game.opponent
       : state.player1Username || t.game.opponent;
 
+  const backToLobbyButton = (
+    <GButton onClick={() => leaveGame()} variant={ButtonVariantEnum.Secondary} className="flex-1" startIcon={<GIcon icon={Home} size={SizeEnum.sm} />}>
+      {t.result.backToLobby}
+    </GButton>
+  );
+
   return (
     <div className="flex items-center justify-center min-h-40 p-4">
       <div className="w-full max-w-xl space-y-6">
@@ -47,12 +53,10 @@ function GameActive({ children, gameType }: IGameActiveProps) {
         {!isOver && (
           <GameTurnIndicator isMyTurn={isMyTurn} currentTurnText={t.game.yourTurn} waitingText={t.game.waitingFor.replace("{name}", opponentName)} />
         )}
-
         <div>{children}</div>
-
         {!isOver ? (
           <div className="flex justify-center">
-            <GButton onClick={() => leaveGame()} variant={AccentColorEnum.Danger} size={SizeEnum.sm}>
+            <GButton onClick={() => leaveGame()} variant={ButtonVariantEnum.Danger} size={SizeEnum.sm}>
               {t.game.leaveGame}
             </GButton>
           </div>
@@ -69,14 +73,12 @@ function GameActive({ children, gameType }: IGameActiveProps) {
                   <GButton onClick={() => respondPlayAgain(true)} className="flex-1">
                     {t.result.accept}
                   </GButton>
-                  <GButton onClick={() => respondPlayAgain(false)} variant={AccentColorEnum.Danger} className="flex-1">
+                  <GButton onClick={() => respondPlayAgain(false)} variant={ButtonVariantEnum.Danger} className="flex-1">
                     {t.result.reject}
                   </GButton>
                 </>
               ) : sessionEnded ? (
-                <GButton onClick={() => leaveGame()} variant={AccentColorEnum.Secondary} className="flex-1" startIcon={<GIcon icon={Home} size={SizeEnum.sm} />}>
-                  {t.result.backToLobby}
-                </GButton>
+                backToLobbyButton
               ) : requestedPlayAgain ? (
                 <GButton loading loadingText={t.result.waiting} className="flex-1">
                   {t.result.waiting}
@@ -86,11 +88,7 @@ function GameActive({ children, gameType }: IGameActiveProps) {
                   {t.result.playAgain}
                 </GButton>
               )}
-              {!sessionEnded && !pendingPlayAgainRequest && (
-                <GButton onClick={() => leaveGame()} variant={AccentColorEnum.Secondary} className="flex-1" startIcon={<GIcon icon={Home} size={SizeEnum.sm} />}>
-                  {t.result.backToLobby}
-                </GButton>
-              )}
+              {!sessionEnded && !pendingPlayAgainRequest && backToLobbyButton}
             </div>
           </div>
         )}

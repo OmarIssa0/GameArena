@@ -17,6 +17,11 @@ interface GNavProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onCli
   orientation?: NavOrientationEnum;
   indicator?: IndicatorPositionEnum;
   collapsed?: boolean;
+  stacked?: boolean;
+  /** Horizontal (pills) on mobile, vertical (sidebar shape) on md+ */
+  responsive?: boolean;
+  /** Inverted responsive: vertical (sidebar shape) on mobile, horizontal (pills) on md+ */
+  responsiveInverted?: boolean;
   className?: string;
 }
 

@@ -254,16 +254,6 @@ namespace backend.Hubs
             });
         }
 
-        public Task<object?> GetCurrentState()
-        {
-            var playerId = GetPlayerId();
-
-            if (TryGetPlayerRoom(playerId, out var room, out _))
-                return Task.FromResult<object?>(room!.GetStatePayload());
-
-            return Task.FromResult<object?>(null);
-        }
-
         public async Task CancelSearch()
         {
             var playerId = GetPlayerId();

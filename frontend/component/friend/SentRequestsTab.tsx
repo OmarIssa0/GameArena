@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Loader2, Send, X } from "lucide-react";
 
 import { GEmpty } from "@/component/common/GEmpty";
@@ -8,13 +7,13 @@ import { GIcon } from "@/component/common/GIcon";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import type { IUserSummary } from "@/domain/meta/IUserSummary";
-import type { TNullable } from "@/domain/type/TCommon";
+import { useBusyAction } from "@/hooks/useBusyAction";
 
 import { FriendsList } from "../SocialPanel/FriendsList";
 import type { SentRequestsTabProps } from "./def/FriendsTab";
 
 function SentRequestsTab({ sentRequests, onCancel, t }: SentRequestsTabProps) {
-  const [actionId, setActionId] = useState<TNullable<string>>(null);
+  const { run, isBusy, busyClass } = useBusyAction();
 
   if (sentRequests.length === 0) {
     return (
@@ -38,25 +37,18 @@ function SentRequestsTab({ sentRequests, onCancel, t }: SentRequestsTabProps) {
     <FriendsList
       friends={friends}
       actions={(friend) => {
-        const isBusy = actionId === friend.id;
+        const busy = isBusy(friend.id);
         return (
           <div className="flex gap-1">
             <GIcon
-              icon={isBusy ? Loader2 : X}
+              icon={busy ? Loader2 : X}
               size={SizeEnum.sm}
               tile
               hover
               tileGradient="bg-danger/10"
               tileColor={AccentColorEnum.Danger}
-              className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}
-              onClick={async () => {
-                setActionId(friend.id);
-                try {
-                  await onCancel(friend.id);
-                } finally {
-                  setActionId(null);
-                }
-              }}
+              className={busyClass(friend.id)}
+              onClick={() => run(friend.id, () => onCancel(friend.id))}
               ariaLabel={t.sentTab.cancel}
             />
           </div>

@@ -10,6 +10,7 @@ import type { InviteModalProps } from "./def/InviteModal";
 import { GTextField } from "@/component/common/GTextField";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
 
 function InviteModal({
@@ -28,10 +29,10 @@ function InviteModal({
   if (!open) return null;
 
   return (
-    <GCard variant={CardVariantEnum.Outlined} padding={SizeEnum.sm} className="bg-surface/50 border-border/60">
+    <GCard variant={CardVariantEnum.Outlined} padding={SizeEnum.sm} className="bg-surface border-border">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold text-text">{title}</h3>
-        <GButton onClick={onClose} variant={AccentColorEnum.Secondary} size={SizeEnum.sm}>
+        <GButton onClick={onClose} variant={ButtonVariantEnum.Secondary} size={SizeEnum.sm}>
           {cancelLabel}
         </GButton>
       </div>
@@ -45,11 +46,11 @@ function InviteModal({
         {loading ? (
           <GSpinner size={SizeEnum.sm} />
         ) : friends.length > 0 ? (
-          <GList items={friends} keyExtractor={(friend) => friend.id}>
+          <GList items={friends} keyExtractor={(friend) => friend.id} pageSize={10} listClassName="gap-3">
             {(friend) => (
               <GButton
                 key={friend.id}
-                variant={AccentColorEnum.Muted}
+                variant={ButtonVariantEnum.Subtle}
                 fullWidth
                 className="justify-start text-sm"
                 startIcon={<GIcon icon={UserPlus} size={SizeEnum.sm} />}
@@ -70,3 +71,5 @@ function InviteModal({
 }
 
 export { InviteModal };
+
+

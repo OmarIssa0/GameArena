@@ -59,25 +59,6 @@ namespace backend.Services
             return MapperHelper.ToDto(msg);
         }
 
-        public async Task<MessageResponse> CreateGlobalMessageAsync(Guid senderId, string message)
-        {
-            var msg = new Message
-            {
-                SenderId = senderId,
-                Content = message,
-                SentAt = DateTime.UtcNow
-            };
-            _context.Messages.Add(msg);
-            await _context.SaveChangesAsync();
-
-            return MapperHelper.ToDto(msg);
-        }
-
-        public async Task<int> GetUnreadMessagesCountAsync(Guid userId)
-        {
-            return await _context.Messages.CountAsync(m => m.ReceiverId == userId && m.IsRead == false);
-        }
-
         public async Task<List<PerFriendUnreadCountResponse>> GetUnreadCountsPerFriendAsync(Guid userId)
         {
             return await _context.Messages

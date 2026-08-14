@@ -41,19 +41,6 @@ namespace backend.Services
             return [.. results];
         }
 
-        public async Task<UserResponse> UpdateUserAsync(UserResponse request)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == request.Id) ?? throw new AppException(ErrorCode.UserNotFound);
-            user.UserName = request.UserName;
-            user.Email = request.Email;
-            user.FirstName = request.FirstName;
-            user.LastName = request.LastName;
-            user.Role = request.Role;
-            user.Status = request.Status;
-            await _context.SaveChangesAsync();
-            return MapperHelper.ToDto(user);
-        }
-
         public async Task<UserResponse> UpdateProfileAsync(Guid userId, RegisterRequest request)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId) ?? throw new AppException(ErrorCode.UserNotFound);

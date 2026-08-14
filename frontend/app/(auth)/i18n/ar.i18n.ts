@@ -1,10 +1,5 @@
 const ar = {
   brand: "أرينا 404",
-  welcomeBack: "أهلاً بعودتك",
-  signInDesc: "سجل الدخول لمتابعة رحلة اللعب",
-  bySigningIn: "بالتسجيل، أنت توافق على",
-  trustedBy: "يثق بنا",
-  playersOnline: "٥٠ألف",
   features: {
     instantPlay: "لعب فوري",
     instantPlayDesc: "انضم للمباريات في ثوانٍ",
@@ -13,13 +8,14 @@ const ar = {
     rankedMatches: "مباريات مصنفة",
     rankedMatchesDesc: "اصعد في قوائم المتصدرين",
     seasonalEvents: "فعاليات موسمية",
-    seasonalEventsDesc: "مكافآت وأوضاع حصرية",
+    seasonalEventsDesc: "مكافآت وأوضاع حصرية"
   },
   heroSubtitle: "وجهتك المثالية للألعاب. مباريات فورية، معارك مصنفة، ومتعة لا نهائية.",
   stats: {
     activePlayers: "+١٠٠٠٠ لاعب نشط",
-    matchesPerDay: "+٥٠٠ مباراة يوميًا",
-  },
-};
+    matchesPerDay: "+٥٠٠ مباراة يوميًا"
+  }
+}
+;
 
 export { ar };

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Bell, Gamepad2, Users, MessageSquare, X, Check, Trash2, CheckCheck } from "lucide-react";
 import { useTranslation } from "@/hooks/useSetting";
 import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
-import { useErrorMessage } from "@/hooks/useErrorMessage";
+import { useErrorMessage, toErrorCode } from "@/hooks/useErrorMessage";
 import { notificationService } from "@/services/def/NotificationService";
 import { GTabs } from "@/component/common/GTabs";
 import { GCard } from "@/component/common/GCard";
@@ -24,10 +24,8 @@ import { AlertTriangle } from "lucide-react";
 import type { TNullable } from "@/domain/type/TCommon";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
-import { TabsVariantEnum } from "@/domain/enum/TabsVariantEnum";
+import { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
-import type { AxiosError } from "axios";
-import type { IApiResponse } from "@/domain/meta/IApiResponse";
 
 type Tab = "all" | "gameInvites" | "friendRequests";
 
@@ -58,13 +56,12 @@ export default function NotificationsPage() {
         if (r.data) setRequests(r.data);
       })
       .catch((e: unknown) => {
-        const err = e as AxiosError<IApiResponse<unknown>>;
-        setError(resolveError(err?.response?.data?.errorCode, t.error.title));
+        setError(resolveError(toErrorCode(e), t.error.title));
       })
       .finally(() => setLoading(false));
-  }, [t]);
+  }, [t, resolveError]);
 
-  const unreadCount = useMemo(() => notifications.filter((n) => !n.isRead).length, [notifications]);
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   const tabs = useMemo<GTabItem<Tab>[]>(
     () => [
@@ -139,15 +136,14 @@ export default function NotificationsPage() {
       <PageHeader icon={Bell} title={t.title} subtitle={t.subtitle} />
       {tab === "all" && unreadCount > 0 && (
         <div className="flex justify-end flex-wrap -mt-3 mb-3">
-          <GButton size={SizeEnum.md} variant={AccentColorEnum.Muted} onClick={() => notificationService.markAllNotificationsRead()}>
+          <GButton size={SizeEnum.md} variant={ButtonVariantEnum.Subtle} onClick={() => notificationService.markAllNotificationsRead()}>
             <CheckCheck size={16} />
             <span className="ms-1">{t.markAllRead}</span>
           </GButton>
         </div>
       )}
-      <GCard padding={SizeEnum.sm}>
-        <GTabs tabs={tabs} value={tab} onChange={setTab} variant={TabsVariantEnum.Pills} fullWidth className="mb-2" />
-        {error && tab === "friendRequests" ? (
+      <GTabs tabs={tabs} value={tab} onChange={setTab} fullWidth className="mb-2" />
+      {error && tab === "friendRequests" ? (
           <GEmpty
             icon={<GIcon icon={AlertTriangle} size={SizeEnum.xl} color={AccentColorEnum.Danger} />}
             title={t.error.title}
@@ -165,6 +161,8 @@ export default function NotificationsPage() {
           <GList
             items={filtered}
             keyExtractor={(n) => n.id}
+            pageSize={10}
+            listClassName="gap-3"
             emptyMessage={t.empty.title}
             emptyDescription={t.empty.description}
             emptyIcon={<GIcon icon={Bell} size={SizeEnum.xl} color={AccentColorEnum.Muted} />}>
@@ -190,20 +188,20 @@ export default function NotificationsPage() {
                     {n.onAction && (
                       <GButton
                         size={SizeEnum.md}
-                        variant={n.type === "GameInvite" || n.type === "FriendRequest" ? AccentColorEnum.Primary : AccentColorEnum.Muted}
+                        variant={n.type === "GameInvite" || n.type === "FriendRequest" ? ButtonVariantEnum.Primary : ButtonVariantEnum.Subtle}
                         onClick={n.onAction}>
                         {n.type === "FriendRequest" || n.type === "GameInvite" ? <Check size={16} /> : <CheckCheck size={16} />}
                       </GButton>
                     )}
                     {n.onDismiss && (
-                      <GButton size={SizeEnum.md} variant={AccentColorEnum.Muted} onClick={n.onDismiss}>
+                      <GButton size={SizeEnum.md} variant={ButtonVariantEnum.Subtle} onClick={n.onDismiss}>
                         <X size={16} />
                       </GButton>
                     )}
                     {!n.onAction && !n.onDismiss && n.read && (
                       <GButton
                         size={SizeEnum.md}
-                        variant={AccentColorEnum.Muted}
+                        variant={ButtonVariantEnum.Subtle}
                         onClick={() => notificationService.deleteNotification(n.id)}
                         className="text-text-muted hover:text-danger">
                         <Trash2 size={16} />
@@ -215,7 +213,8 @@ export default function NotificationsPage() {
             )}
           </GList>
         )}
-      </GCard>
     </GPage>
   );
 }
+
+

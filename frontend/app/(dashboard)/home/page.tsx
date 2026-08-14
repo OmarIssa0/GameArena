@@ -7,20 +7,20 @@ import { useGameTranslation } from "@/hooks/useGameTranslation";
 import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
 import { ArrowRight, Gamepad2, MessageSquare, Users, Trophy, Zap, Sparkles } from "lucide-react";
 import { GIcon } from "@/component/common/GIcon";
-import { GList } from "@/component/common/GList";
 import { ar } from "./i18n/ar.i18n";
 import { en, type THomeTranslation } from "./i18n/en.i18n";
 import { GamesList, translateGameInfo } from "@/domain/constant/games";
 import { RecentHistorySection } from "@/component/history/RecentHistorySection";
 import { GPage } from "@/component/common/GPage";
 import { GCard } from "@/component/common/GCard";
-import { GButton } from "@/component/common/GButton";
-import { GBadge } from "@/component/common/GBadge";
 import { GameCard } from "@/component/games/common/GameCard";
 import { useRouter } from "next/navigation";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import dynamic from "next/dynamic";
+
+const LottiePlayer = dynamic(() => import("@lottiefiles/react-lottie-player").then((mod) => mod.Player), { ssr: false });
 
 function Home() {
   const { user } = useAuth();
@@ -49,88 +49,63 @@ function Home() {
   return (
     <GPage size={SizeEnum.xl} className="py-6 sm:py-8 lg:py-10">
       {/* Hero Section */}
-      <section className="mb-10 lg:mb-14 animate-in">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <div className="flex items-center gap-3">
+      <section className="mb-8 lg:mb-12">
+        <GCard variant={CardVariantEnum.Elevated} padding={SizeEnum.md} className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
             <GIcon icon={Gamepad2} size={SizeEnum.lg} tile color={AccentColorEnum.OnPrimary} />
-            <div className="min-w-0">
-               <GBadge variant={AccentColorEnum.Primary} className="mb-2 text-xs">
-                {t.features.badge}
-              </GBadge>
-              <p className="text-sm font-medium text-primary truncate">{t.welcome(user?.firstName || "")}</p>
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight bg-linear-to-br from-primary to-secondary bg-clip-text text-transparent">
-                {t.brand}
-              </h1>
-            </div>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-text">{t.brand}</h1>
           </div>
-          <div className="flex items-center gap-3 sm:ms-auto">
-            <Link href="/games">
-              <GButton size={SizeEnum.lg} startIcon={<GIcon icon={Gamepad2} size={SizeEnum.md} />}>
-                {t.playNow}
-              </GButton>
-            </Link>
-            <Link href="/history">
-              <GButton variant={AccentColorEnum.Text} size={SizeEnum.lg} startIcon={<GIcon icon={Trophy} size={SizeEnum.md} />}>
-                {t.viewStats}
-              </GButton>
-            </Link>
+          <div className="text-right">
+            <strong className="block text-sm font-medium text-primary truncate">{t.welcome(user?.firstName || "")}</strong>
+            <p className="text-sm text-text-secondary truncate">{t.welcomeDesc}</p>
           </div>
-        </div>
+          <LottiePlayer autoplay loop src={"/game.json"} className="w-24 h-24 sm:w-32 sm:h-32" />
+        </GCard>
 
         {/* Stats Grid */}
-        <GList items={stats} keyExtractor={(stat) => stat.label} noPagination listClassName="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-          {({ label, value, icon: Icon, gradient, href }) => (
-            <Link href={href} className="group">
-              <GCard
-                variant={CardVariantEnum.Interactive}
-                className="flex items-center gap-4 p-4 transition-all duration-300 group-hover:-translate-y-1 h-full">
-                <GIcon
-                  icon={Icon}
-                  size={SizeEnum.md}
-                  tile
-                  tileGradient={gradient}
-                  className="group-hover:scale-110 transition-transform duration-300"
-                />
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 mt-6">
+          {stats.map((stat) => (
+            <Link key={stat.label} href={stat.href} className="group">
+              <GCard variant={CardVariantEnum.Interactive} className="flex items-center gap-4 p-4 h-full">
+                <GIcon icon={stat.icon} size={SizeEnum.md} tile tileGradient={stat.gradient} />
                 <div className="min-w-0 flex-1">
-                  <p className="text-2xl sm:text-3xl font-black text-primary">{value}</p>
-                  <p className="mt-1 truncate text-xs font-medium uppercase tracking-wide text-text-secondary">{label}</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-primary">{stat.value}</p>
+                  <p className="mt-1 truncate text-xs font-medium uppercase tracking-wide text-text-secondary">{stat.label}</p>
                 </div>
-                <GIcon
-                  icon={ArrowRight}
-                  size={SizeEnum.sm}
-                  color={AccentColorEnum.Muted}
-                  className="group-hover:text-primary group-hover:translate-x-1 rtl:-translate-x-1 transition-all duration-200"
-                />
+                <GIcon icon={ArrowRight} size={SizeEnum.sm} color={AccentColorEnum.Muted} flip />
               </GCard>
             </Link>
-          )}
-        </GList>
+          ))}
+        </div>
       </section>
 
       {/* Features Section */}
-      <section className="mb-10 lg:mb-14 animate-in" style={{ animationDelay: "100ms" }}>
-        <div className="flex items-center justify-between mb-6">
-          <div>
-             <GBadge variant={AccentColorEnum.Secondary} className="mb-2 text-xs">
-              {t.features.badge}
-            </GBadge>
-            <h2 className="text-2xl sm:text-3xl font-bold text-text">{t.features.title}</h2>
-          </div>
-        </div>
-        <GList items={features} keyExtractor={(feature) => feature.title} listClassName="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4" noPagination>
-          {({ icon, title, desc }) => (
-            <GCard
-              variant={CardVariantEnum.Glass}
-              padding={SizeEnum.lg}
-              className="group text-center transition-all duration-300 group-hover:border-primary/50 h-full">
-              <div className="w-12 h-12 mx-auto mb-4 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
-                <GIcon icon={icon} size={SizeEnum.lg} color={AccentColorEnum.Primary} />
+      <section className="mb-8 lg:mb-12">
+        <h2 className="text-2xl font-bold text-text mb-6">{t.features.title}</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          {features.map((feature) => (
+            <GCard key={feature.title} variant={CardVariantEnum.Default} padding={SizeEnum.lg} className="text-center h-full">
+              <div className="mx-auto mb-4">
+                <GIcon icon={feature.icon} size={SizeEnum.lg} color={AccentColorEnum.Primary} />
               </div>
-              <h3 className="text-lg font-bold text-text mb-1">{title}</h3>
-              <p className="text-sm text-text-secondary">{desc}</p>
+              <h3 className="text-lg font-bold text-text mb-1">{feature.title}</h3>
+              <p className="text-sm text-text-secondary">{feature.desc}</p>
             </GCard>
-          )}
-        </GList>
+          ))}
+        </div>
+      </section>
+
+      {/* Games Grid */}
+      <section>
+        <h2 className="text-2xl font-bold text-text mb-6">{t.gamesAvailable}</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+          {GamesList.map((game) => {
+            const { name, description } = translateGameInfo(gt, game.type);
+            return (
+              <GameCard key={game.type} name={name} desc={description} animation={game.animation} onClick={() => handleGameSelect(game.path)} playLabel={t.playNow} />
+            );
+          })}
+        </div>
       </section>
 
       {/* Recent History */}
@@ -140,37 +115,9 @@ function Home() {
         emptyTitle={t.recentHistory.emptyTitle}
         emptyDescription={t.recentHistory.emptyDescription}
       />
-
-      {/* Games Grid */}
-      <section className="mt-8 lg:mt-12 animate-in" style={{ animationDelay: "200ms" }}>
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <GBadge variant={AccentColorEnum.Primary} className="mb-2 text-xs">
-              {t.enterArena}
-            </GBadge>
-            <h2 className="text-2xl sm:text-3xl font-bold text-text">{t.gamesAvailable}</h2>
-          </div>
-        </div>
-        <GList items={[...GamesList]} keyExtractor={(game) => `${game.type}`} listClassName="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" noPagination>
-          {(game) => {
-            const { name, description } = translateGameInfo(gt, game.type);
-            return (
-            <GameCard
-              name={name}
-              desc={description}
-              icon={game.icon}
-              gradientClass={game.gradientClass}
-              animation={game.animation}
-              onClick={() => handleGameSelect(game.path)}
-              playLabel={t.playNow}
-              page
-            />
-          );
-          }}
-        </GList>
-      </section>
     </GPage>
   );
 }
 
 export default Home;
+

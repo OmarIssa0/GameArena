@@ -11,8 +11,8 @@ const ar = {
   backToLogin: "العودة لتسجيل الدخول",
   placeholder: {
     email: "أدخل بريدك الإلكتروني",
-    otp: "أدخل رمز التحقق",
-    newPassword: "أدخل كلمة المرور الجديدة",
-  },
-};
+    newPassword: "أدخل كلمة المرور الجديدة"
+  }
+}
+;
 export { ar };

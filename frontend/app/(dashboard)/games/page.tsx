@@ -11,11 +11,10 @@ import { useGameTranslation } from "@/hooks/useGameTranslation";
 import { ar } from "./i18n/ar.i18n";
 import { en, type TGamesTranslation } from "./i18n/en.i18n";
 
-import { GameCard } from "@/component/games/common/GameCard";
+import { GameRow } from "@/component/games/common/GameRow";
 import { GButton } from "@/component/common/GButton";
 import { GModal } from "@/component/common/GModal";
 import { GamesList } from "@/domain/constant/games";
-import { translateGameInfo } from "@/domain/constant/games";
 import { useGame } from "@/app/providers/GameProvider";
 import { GBadge } from "@/component/common/GBadge";
 import { PageHeader } from "@/component/common/PageHeader";
@@ -23,6 +22,7 @@ import { GPage } from "@/component/common/GPage";
 import type { TNullable } from "@/domain/type/TCommon";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 
 function GamesPage() {
   const router = useRouter();
@@ -58,22 +58,15 @@ function GamesPage() {
           </GBadge>
         }
       />
-      <GList items={[...GamesList]} keyExtractor={(game) => game.id} emptyMessage="" emptyDescription="" listClassName="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" noPagination>
-        {(game) => {
-          const { name, description } = translateGameInfo(gt, game.type);
-          return (
-            <GameCard
-              name={name}
-              desc={description}
-              icon={game.icon}
-              onClick={() => handleGameSelect(game.path)}
-              gradientClass={game.gradientClass}
-              animation={game.animation}
-              playLabel={t.play}
-              page
-            />
-          );
-        }}
+      <GList items={[...GamesList]} keyExtractor={(game) => game.id} emptyMessage="" emptyDescription="" listClassName="grid-cols-1 gap-3">
+        {(game) => (
+          <GameRow
+            game={game}
+            gt={gt}
+            onClick={() => handleGameSelect(game.path)}
+            playLabel={t.play}
+          />
+        )}
       </GList>
       <GModal
         open={Boolean(state) && pendingPath !== null}
@@ -85,10 +78,10 @@ function GamesPage() {
           <h2 className="text-xl font-bold text-text mb-2">{t.leaveTitle}</h2>
           <p className="text-sm text-text-secondary mb-6">{t.leaveDesc}</p>
           <div className="flex gap-3">
-            <GButton onClick={() => setPendingPath(null)} variant={AccentColorEnum.Secondary} fullWidth>
+            <GButton variant={ButtonVariantEnum.Secondary} fullWidth onClick={() => setPendingPath(null)}>
               {t.cancel}
             </GButton>
-            <GButton onClick={handleConfirmLeave} variant={AccentColorEnum.Danger} fullWidth>
+            <GButton variant={ButtonVariantEnum.Danger} fullWidth onClick={handleConfirmLeave}>
               {t.leaveConfirm}
             </GButton>
           </div>
@@ -99,3 +92,4 @@ function GamesPage() {
 }
 
 export default GamesPage;
+

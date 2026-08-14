@@ -9,7 +9,6 @@ import { ar } from "./i18n/ar.i18n";
 import { en, type TFriendsTranslation } from "./i18n/en.i18n";
 
 import { GTabs } from "@/component/common/GTabs";
-import { GCard } from "@/component/common/GCard";
 import { GPage } from "@/component/common/GPage";
 import { PageHeader } from "@/component/common/PageHeader";
 import { GBadge } from "@/component/common/GBadge";
@@ -24,7 +23,6 @@ import { FriendsTabEnum } from "@/domain/enum/FriendsTabEnum";
 import { useFriends } from "@/hooks/useFriends";
 import type { GTabItem } from "@/component/common/def/GTabs";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
-import { TabsVariantEnum } from "@/domain/enum/TabsVariantEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 
 function FriendsPage() {
@@ -141,19 +139,17 @@ function FriendsPage() {
         }
       />
 
-        <GCard padding={SizeEnum.sm} className="space-y-4">
-        <GTabs tabs={tabs} value={activeTab} onChange={changeTab} variant={TabsVariantEnum.Pills} fullWidth responsive />
+      <GTabs tabs={tabs} value={activeTab} onChange={changeTab} fullWidth responsive />
 
-        <div className="pt-1 text-start gap-3">
-          {tabLoading ? (
-            <div className="flex justify-center py-10">
-              <GSpinner size={SizeEnum.lg} />
-            </div>
-          ) : (
-            renderTab()
-          )}
-        </div>
-      </GCard>
+      <div className="pt-1">
+        {tabLoading ? (
+          <div className="flex justify-center py-10">
+            <GSpinner size={SizeEnum.lg} />
+          </div>
+        ) : (
+          renderTab()
+        )}
+      </div>
     </GPage>
   );
 }

@@ -1,7 +1,7 @@
 enum UserStatusEnum {
-  Offline = "offline",
-  Online = "online",
-  InGame = "ingame",
-  All = "all",
+  Offline,
+  Online,
+  InGame,
+  All,
 }
 export { UserStatusEnum };

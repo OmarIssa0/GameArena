@@ -10,13 +10,7 @@ const ar = {
       email: "البريد الإلكتروني",
       save: "حفظ التغييرات",
       saved: "تم تحديث الملف الشخصي بنجاح",
-      saveFailed: "فشل حفظ الملف الشخصي",
-      linkedAccounts: "الحسابات المرتبطة",
-      connected: "متصل",
-      notConnected: "غير متصل",
-      discord: "ديسكورد",
-      google: "جوجل",
-      twitch: "تويتش",
+      saveFailed: "فشل حفظ الملف الشخصي"
     },
     password: {
       title: "تغيير كلمة المرور",
@@ -27,7 +21,7 @@ const ar = {
       save: "تحديث كلمة المرور",
       saved: "تم تغيير كلمة المرور بنجاح",
       saveFailed: "فشل تغيير كلمة المرور",
-      invalidCurrentPassword: "كلمة المرور الحالية غير صحيحة",
+      invalidCurrentPassword: "كلمة المرور الحالية غير صحيحة"
     },
     preferences: {
       title: "التفضيلات",
@@ -35,21 +29,16 @@ const ar = {
       save: "حفظ التفضيلات",
       saved: "تم حفظ التفضيلات",
       saveFailed: "فشل حفظ التفضيلات",
-      theme: "الوضع الداكن",
       darkMode: "الوضع الداكن",
       language: "اللغة",
       sound: "المؤثرات الصوتية",
       showOnline: "إظهار حالة الاتصال",
       showGameActivity: "إظهار نشاط اللعب",
       showNotifications: "إظهار الإشعارات",
-      branding: "ألوان العلامة التجارية",
-      primaryColor: "اللون الأساسي",
-      secondaryColor: "اللون الثانوي",
-      backgroundColor: "الخلفية",
-      bgPlaceholder: "افتراضي",
-      pageSize: "حجم الصفحة",
-    },
-  },
-};
+      pageSize: "حجم الصفحة"
+    }
+  }
+}
+;
 
 export { ar };

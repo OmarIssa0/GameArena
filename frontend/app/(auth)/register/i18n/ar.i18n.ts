@@ -3,7 +3,6 @@ import { ErrorCodeEnum } from "@/domain/enum/ErrorCodeEnum";
 const ar = {
   register: "تسجيل",
   createAccount: "قم بإنشاء حسابك وابدأ",
-  fillRequiredFields: "يرجى تعبئة جميع الحقول المطلوبة",
   firstName: "الاسم الأول",
   lastName: "الاسم الأخير",
   userName: "اسم المستخدم",
@@ -14,12 +13,9 @@ const ar = {
   create: "إنشاء الحساب",
   haveAccount: "هل لديك حساب بالفعل؟",
   signIn: "تسجيل الدخول",
-  joinUs: "انضم إلينا اليوم",
   unknownError: "حدث خطأ غير معروف",
   RegisterErrorCodeEnum: {
-    [ErrorCodeEnum.EmailAlreadyExists]: "البريد الإلكتروني موجود بالفعل",
-  },
-  goToLogin: "الذهاب إلى تسجيل الدخول",
+    [ErrorCodeEnum.EmailAlreadyExists]: "البريد الإلكتروني موجود بالفعل"},
   dynamicFieldRequired: (field: string) => `حقل ${field} مطلوب`,
   placeholder: {
     firstName: "أدخل اسمك الأول",
@@ -27,8 +23,9 @@ const ar = {
     userName: "أدخل اسم المستخدم الخاص بك",
     email: "أدخل بريدك الإلكتروني",
     password: "قم بإنشاء كلمة مرور",
-    confirmPassword: "أعد إدخال كلمة المرور الخاصة بك",
-  },
-};
+    confirmPassword: "أعد إدخال كلمة المرور الخاصة بك"
+  }
+}
+;
 
 export { ar };

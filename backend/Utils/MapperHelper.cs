@@ -22,17 +22,6 @@ namespace backend.Utils
                 Preferences = user.Preferences
             };
         }
-        public static UserSummaryResponse ToDtoSummary(UserResponse user)
-        {
-            return new UserSummaryResponse
-            {
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                UserName = user.UserName,
-                Status = user.Status
-            };
-        }
         public static UserSummaryResponse ToDtoSummary(User user)
         {
             return new UserSummaryResponse

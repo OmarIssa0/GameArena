@@ -2,12 +2,9 @@ import type { HubConnection } from "@microsoft/signalr";
 import type { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
 import type { IGameInvite } from "@/domain/meta/INotification";
 import type { IGameState } from "@/app/providers/def/IGameState";
-import type { TNullable, TPromise } from "@/domain/type/TCommon";
+import type { TNullable } from "@/domain/type/TCommon";
 
 interface IGameService {
-  // REST API (via repository)
-  getCurrentState(): TPromise<TNullable<IGameState>>;
-
   // SignalR invocations
   findMatch(gameKind: GamesKindEnum): Promise<void>;
   startGame(friendId: TNullable<string>, gameKind: GamesKindEnum): Promise<void>;
@@ -31,7 +28,7 @@ interface IGameService {
   // Connection management
   handleReconnect(): void;
   onReconnect(handler: () => void): () => void;
-   setConnection(connection: HubConnection): void;
+  setConnection(connection: HubConnection): void;
 }
 
 export type { IGameService };

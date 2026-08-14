@@ -7,13 +7,10 @@ const en = {
   message: "Message",
   invite: "Invite",
   addFriend: "Add Friend",
-  subtitle:
-    "Manage your social network in one place. Browse your friends, review incoming and sent friend requests, discover new players, and manage blocked users without leaving the page.",
+  subtitle: "Manage your social network in one place. Browse your friends, review incoming and sent friend requests, discover new players, and manage blocked users without leaving the page.",
   community: "Community",
   noFriendsTitle: "No friends yet",
   noFriendsDescription: "Search for users and add them as friends.",
-  retry: "Retry",
-  loadError: "Failed to load friends. Please try again.",
   searchTab: {
     placeholder: "Search users by name or email...",
     clearSearch: "Clear search",
@@ -29,35 +26,30 @@ const en = {
     add: "Add",
     emptyHint: "Use the search field above to look up users.",
     noUsername: "No username",
-    unknownUser: "Unknown user",
+    unknownUser: "Unknown user"
   },
   requestsTab: {
-    loadError: "Failed to load requests. Please try again.",
-    acceptError: "Failed to accept request. Please try again.",
-    declineError: "Failed to decline request. Please try again.",
     emptyTitle: "No pending requests",
     emptyDescription: "You're all caught up! No friend requests to review.",
-    wantsToBeFriends: "Wants to be friends",
     accept: "Accept request",
-    decline: "Decline request",
+    decline: "Decline request"
   },
   sentTab: {
     emptyTitle: "No sent requests",
     emptyDescription: "You haven't sent any friend requests yet.",
-    cancel: "Cancel request",
-    cancelError: "Failed to cancel request. Please try again.",
+    cancel: "Cancel request"
   },
   blockedTab: {
     emptyTitle: "No blocked users",
     emptyDescription: "You haven't blocked anyone.",
-    unblock: "Unblock",
-    unblockError: "Failed to unblock user. Please try again.",
+    unblock: "Unblock"
   },
   actions: {
     block: "Block user",
-    removeFriend: "Remove friend",
-  },
-};
+    removeFriend: "Remove friend"
+  }
+}
+;
 
 type TFriendsTranslation = typeof en;
 export { en, type TFriendsTranslation };

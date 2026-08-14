@@ -15,9 +15,8 @@ import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
-import { AvatarShapeEnum } from "@/domain/enum/AvatarShapeEnum";
 
-export function FriendsList({ friends, query, unreadCounts, actions, noPagination = false }: IFriendsListProps) {
+export function FriendsList({ friends, query, unreadCounts, actions }: IFriendsListProps) {
   const router = useRouter();
   const searchRegex = useMemo(() => {
     if (!query?.trim()) return null;
@@ -50,14 +49,13 @@ export function FriendsList({ friends, query, unreadCounts, actions, noPaginatio
     <GList
       items={friends}
       keyExtractor={(friend) => friend.id}
-      noPagination={noPagination}
+      listClassName="gap-3"
       emptyIcon={<GIcon icon={UsersRound} size={SizeEnum.xl} color={AccentColorEnum.Muted} />}>
       {(friend) => (
         <GCard
           key={friend.id}
-           padding={SizeEnum.sm}
-           variant={CardVariantEnum.Outlined}
-           rounded={SizeEnum.xl}
+          padding={SizeEnum.sm}
+          variant={CardVariantEnum.Outlined}
           onClick={() => {
             if (!actions) router.push(`/messages?friend=${friend.id}`);
           }}
@@ -71,10 +69,11 @@ export function FriendsList({ friends, query, unreadCounts, actions, noPaginatio
           tabIndex={!actions ? 0 : undefined}
           className={clsx(
             "flex items-center gap-3",
-            !actions && "cursor-pointer transition hover:bg-bg-card-hover focus-visible:ring-2 focus-visible:ring-primary",
-          )}>
+            !actions && "cursor-pointer hover:bg-bg-card-hover focus-visible:ring-2 focus-visible:ring-primary",
+          )}
+        >
           <div className="relative shrink-0">
-            <GAvatar firstName={friend.firstName} lastName={friend.lastName} status={friend.status} size={SizeEnum.sm} shape={AvatarShapeEnum.Circle} />
+            <GAvatar firstName={friend.firstName} lastName={friend.lastName} status={friend.status} size={SizeEnum.sm} />
           </div>
 
           <div className="min-w-0 flex-1">

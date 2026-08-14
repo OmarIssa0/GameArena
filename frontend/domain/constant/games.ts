@@ -9,8 +9,7 @@ export interface IGameConfig {
   type: GamesKindEnum;
   icon: LucideIcon;
   path: string;
-  gradient: string; // CSS text color, e.g. "text-primary"
-  gradientClass: string; // gradient class for tiles, e.g. "from-primary to-acent"
+  tileGradient: string; // tile background for game icons, e.g. "from-primary to-accent"
   animation: string;
   symbol1: string;
   symbol2: string;
@@ -27,8 +26,7 @@ const gameConfigs: Record<GamesKindEnum, IGameConfig> = {
     type: GamesKindEnum.TicTacToe,
     icon: Grid3X3,
     path: "tic-tac-toe",
-    gradient: "text-primary",
-    gradientClass: "from-primary to-accent",
+    tileGradient: "from-primary to-accent",
     animation: "/tic_tac_toe_1.json",
     symbol1: "X",
     symbol2: "O",
@@ -43,8 +41,7 @@ const gameConfigs: Record<GamesKindEnum, IGameConfig> = {
     type: GamesKindEnum.PingPong,
     icon: Volleyball,
     path: "ping-pong",
-    gradient: "text-success",
-    gradientClass: "from-success to-secondary",
+    tileGradient: "from-success to-secondary",
     animation: "/ping-pong.json",
     symbol1: "P1",
     symbol2: "P2",
@@ -59,13 +56,12 @@ const gameConfigs: Record<GamesKindEnum, IGameConfig> = {
     type: GamesKindEnum.Snake,
     icon: Worm,
     path: "snake",
-    gradient: "text-success",
-    gradientClass: "from-success to-secondary",
+    tileGradient: "from-success to-secondary",
     animation: "/Snake.json",
     symbol1: "P1",
     symbol2: "P2",
-    player1Colors: { box: "border-neon-green bg-success-bg", badge: "bg-success", turn: "text-success" },
-    player2Colors: { box: "border-neon-magenta bg-accent-muted", badge: "bg-accent", turn: "text-accent" },
+    player1Colors: { box: "border-success bg-success-bg", badge: "bg-success", turn: "text-success" },
+    player2Colors: { box: "border-accent bg-accent-muted", badge: "bg-accent", turn: "text-accent" },
     needsInput: true,
     nameKey: "snake.name",
     descriptionKey: "snake.description",
@@ -75,8 +71,7 @@ const gameConfigs: Record<GamesKindEnum, IGameConfig> = {
     type: GamesKindEnum.RockPaperScissors,
     icon: Hand,
     path: "rock-paper-scissors",
-    gradient: "text-primary",
-    gradientClass: "from-primary to-accent",
+    tileGradient: "from-primary to-accent",
     animation: "/rock_paper_scissors.json",
     symbol1: "✊",
     symbol2: "✌️",
@@ -91,8 +86,7 @@ const gameConfigs: Record<GamesKindEnum, IGameConfig> = {
     type: GamesKindEnum.ConnectFour,
     icon: Grid3X3,
     path: "connect-four",
-    gradient: "text-primary",
-    gradientClass: "from-primary to-accent",
+    tileGradient: "from-primary to-accent",
     animation: "/connect_four.json",
     symbol1: "🔴",
     symbol2: "🟡",
@@ -108,16 +102,6 @@ export const GAMES_BY_TYPE = gameConfigs;
 
 export const GamesList: IGameConfig[] = Object.values(gameConfigs);
 
-export const GamesMap: Record<string, IGameConfig> = Object.fromEntries(GamesList.map((g) => [g.id, g]));
-
-/** Defaults shared by all games. */
-export const GAME_DEFAULTS = {
-  MIN_PLAYERS: 1,
-  MAX_PLAYERS: 2,
-  TIMEOUT: 30000,
-  RECONNECT_ATTEMPTS: 3,
-} as const;
-
 export function getGameConfig(gameType: GamesKindEnum): IGameConfig {
   const config = gameConfigs[gameType];
   if (!config) throw new Error(`No game config found for game type: ${gameType}`);
@@ -130,5 +114,3 @@ export function translateGameInfo(t: GameTranslations, gameType: GamesKindEnum):
   const lookup = (key: string): string => (t as unknown as Record<string, unknown>)[key] as string;
   return { name: lookup(config.nameKey), description: lookup(config.descriptionKey) };
 }
-
-export { GamesKindEnum };

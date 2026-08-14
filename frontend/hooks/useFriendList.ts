@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
 import { friendService } from "@/services/def/FriendService";
 import { useConnections } from "@/app/providers/ConnectionProvider";
@@ -40,10 +40,7 @@ export function useFriendList() {
     friendService.invokeFriends().catch(() => {});
   }, []);
 
-  const onlineCount = useMemo(
-    () => friends.filter((f) => f.status !== UserStatusEnum.Offline).length,
-    [friends]
-  );
+  const onlineCount = friends.filter((f) => f.status !== UserStatusEnum.Offline).length;
 
   return { friends, loading, hasReceivedData, onlineCount, reload, isOffline };
 }

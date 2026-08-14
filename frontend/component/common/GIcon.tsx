@@ -4,32 +4,14 @@ import clsx from "clsx";
 import type { GIconProps } from "./def/GIcon";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
-import { IConSIZE } from "@/domain/constant/icon-size";
-import type { THashMap } from "@/domain/type/TCommon";
+import { accentHoverBg } from "@/domain/constant/accent-bg";
+import { iconSize, radiusSize } from "@/domain/constant/size-classes";
 
-const toRounded = (r: SizeEnum) => (r === SizeEnum.None ? "rounded-none" : `rounded-${r}`);
-
-const hoverBg: THashMap<string> = {
-  [AccentColorEnum.Primary]: "hover:bg-primary",
-  [AccentColorEnum.Secondary]: "hover:bg-text-secondary",
-  [AccentColorEnum.Muted]: "hover:bg-text-muted",
-  [AccentColorEnum.Success]: "hover:bg-success",
-  [AccentColorEnum.Warning]: "hover:bg-warning",
-  [AccentColorEnum.Danger]: "hover:bg-danger",
-  [AccentColorEnum.Inherit]: "",
-  [AccentColorEnum.OnPrimary]: "hover:bg-on-primary",
-  [AccentColorEnum.Accent]: "hover:bg-accent",
-  [AccentColorEnum.Text]: "hover:bg-text",
-  "": "",
-};
-
-const resolveTileBg = (gradient: string) =>
-  gradient.startsWith("bg-") || gradient.startsWith("from-") ? gradient : `bg-${gradient.replace(/^text-/, "")}`;
 function GIcon({
   icon: Icon,
   size = SizeEnum.md,
   color = AccentColorEnum.Inherit,
-  flip = true,
+  flip = false,
   className,
   onClick,
   ariaLabel,
@@ -40,45 +22,49 @@ function GIcon({
   tileClassName,
   hover = false,
 }: GIconProps) {
-  const iconSize = IConSIZE[size] as string;
-  const isRtl = flip && "rtl:-scale-x-100";
+  const sizeClass = iconSize[size];
+  const isRtl = flip ? "rtl:scale-x-[-1]" : "";
+
   if (!tile) {
-    const iconEl = <Icon className={clsx("shrink-0", iconSize, color, isRtl, onClick && "cursor-pointer", className)} aria-hidden="true" />;
-    return onClick ? (
-      <button
-        type="button"
-        onClick={onClick}
-        aria-label={ariaLabel}
-        className={clsx(
-          "inline-flex items-center justify-center bg-transparent border-0 p-0 cursor-pointer rounded-sm",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
-        )}>
-        {iconEl}
-      </button>
-    ) : (
-      iconEl
-    );
+    if (onClick) {
+      return (
+         <button
+           type="button"
+           onClick={onClick}
+           aria-label={ariaLabel}
+           className={clsx(
+             "inline-flex items-center justify-center bg-transparent border-0 p-0 cursor-pointer",
+             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
+             className,
+           )}>
+          <Icon className={clsx("shrink-0", sizeClass, color, isRtl)} aria-hidden="true" />
+        </button>
+      );
+    }
+    return <Icon className={clsx("shrink-0", sizeClass, color, isRtl, className)} aria-hidden="true" />;
   }
+
   const activeColor = tileColor || AccentColorEnum.OnPrimary;
-  const iconEl = <Icon className={clsx(iconSize, activeColor, isRtl, "group-hover:text-text")} aria-hidden="true" />;
   const wrapperClasses = clsx(
     "inline-flex items-center justify-center shrink-0 p-2",
-    toRounded(tileRounded),
-    resolveTileBg(tileGradient),
-    hover && hoverBg[activeColor],
-    onClick && `cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 group`,
+    radiusSize[tileRounded],
+    tileGradient,
+    hover && accentHoverBg[activeColor],
+    onClick && "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
     tileClassName,
   );
 
-  return onClick ? (
-    <button type="button" onClick={onClick} aria-label={ariaLabel} className={wrapperClasses}>
-      {iconEl}
-    </button>
-  ) : (
-    <div className={wrapperClasses} role={ariaLabel ? "img" : undefined} aria-label={ariaLabel}>
-      {iconEl}
-    </div>
-  );
+  const iconEl = <Icon className={clsx(sizeClass, activeColor, isRtl)} aria-hidden="true" />;
+
+  if (onClick) {
+    return (
+      <button type="button" onClick={onClick} aria-label={ariaLabel} className={wrapperClasses}>
+        {iconEl}
+      </button>
+    );
+  }
+
+  return <div className={wrapperClasses}>{iconEl}</div>;
 }
 
 export { GIcon };

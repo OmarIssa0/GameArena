@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import clsx from "clsx";
 
 import { useAuth } from "@/app/providers/AuthProvider";
 import type { ISnakeGameState } from "@/app/providers/def/IGameState";
@@ -16,11 +16,11 @@ import { useGameTranslation } from "@/hooks/useGameTranslation";
 
 import type { ICellProps, IGameBoardProps } from "./def/SnakeBoard";
 
-const CELL_STYLES: Record<number, CSSProperties> = {
-  0: { background: "var(--color-surface)", border: "1px solid var(--color-border-light)" },
-  1: { background: "var(--color-accent)", border: "1px solid var(--color-accent)" },
-  2: { background: "var(--color-primary)", border: "1px solid var(--color-primary)" },
-  3: { background: "var(--color-warning)", animation: "pulse 1s infinite" },
+const CELL_STYLES: Record<number, string> = {
+  0: "bg-surface border border-border-light",
+  1: "bg-accent border border-accent",
+  2: "bg-primary border border-primary",
+  3: "bg-warning border border-warning",
 };
 
 function SnakePage() {
@@ -65,7 +65,7 @@ function SnakePage() {
 
   return (
     <GameLayoutWrapper gameType={GamesKindEnum.Snake}>
-      <GCard padding={SizeEnum.md} rounded={SizeEnum.lg}>
+      <GCard padding={SizeEnum.md}>
         <div className="flex justify-between items-center mb-4">
           <div className="text-center">
             <div className="text-sm text-text-muted">{t.game.you}</div>
@@ -121,7 +121,8 @@ function GameBoard({ boardWidth, boardHeight, mySnake, oppSnake, food }: IGameBo
 }
 
 function Cell({ type }: ICellProps) {
-  return <div className="w-full h-full transition-colors duration-100" style={CELL_STYLES[type]} />;
+  return <div className={clsx("w-full h-full", CELL_STYLES[type])} />;
 }
 
 export default SnakePage;
+

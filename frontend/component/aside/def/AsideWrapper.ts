@@ -1,12 +1,11 @@
-import type { AsideConfig, AsideState } from "../AsideTypes";
+import type { AsideConfig } from "../AsideTypes";
 
 interface AsideWrapperProps {
   config: AsideConfig;
-  aside: AsideState;
-  header: React.ReactNode;
+  collapsed: boolean;
+  header?: React.ReactNode;
   children: React.ReactNode;
   footer?: React.ReactNode;
-  mobileFab?: React.ReactNode;
   className?: string;
 }
 

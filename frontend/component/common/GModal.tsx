@@ -5,19 +5,19 @@ import clsx from "clsx";
 import { useCallback, useEffect, useRef } from "react";
 import { GBackdrop } from "./GBackdrop";
 import { GCard } from "./GCard";
-import type { GModalProps } from "./def/GModal";
-import type { THashMap, TNullable } from "@/domain/type/TCommon";
+import type { GModalProps, GModalSide } from "./def/GModal";
+import type { TNullable } from "@/domain/type/TCommon";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
-
-const sizeStyles: THashMap<string> = {
-  [SizeEnum.sm]: "max-w-xs",
-  [SizeEnum.md]: "max-w-sm",
-  [SizeEnum.lg]: "max-w-md",
-  [SizeEnum.xl]: "max-w-lg",
-};
+import { modalSize } from "@/domain/constant/size-classes";
 
 const FOCUSABLE =
   'a[href],button:not([disabled]),input:not([disabled]),textarea:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])';
+
+const sheetSideStyles: Record<Exclude<GModalSide, "center">, string> = {
+  start: "inset-y-0 start-0 w-72 sheet-max-width border-e border-border",
+  end: "inset-y-0 end-0 w-80 sheet-max-width border-s border-border",
+  bottom: "inset-x-0 bottom-0 sheet-max-height border-t border-border rounded-t-3xl",
+};
 
 function GModal({
   open,
@@ -27,6 +27,8 @@ function GModal({
   closeOnEscape = true,
   size = SizeEnum.md,
   cardPadding = SizeEnum.lg,
+  side = "center",
+  panelClassName,
   role = "dialog",
   ariaLabel,
   ariaDescription,
@@ -36,6 +38,8 @@ function GModal({
   const modalRef = useRef<TNullable<HTMLDivElement>>(null);
   const previousFocusRef = useRef<TNullable<HTMLElement>>(null);
 
+  const isSheet = side !== "center";
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (closeOnEscape && e.key === "Escape") {
@@ -43,30 +47,29 @@ function GModal({
         return;
       }
 
-      if (e.key === "Tab" && modalRef.current) {
-        const focusable = modalRef.current.querySelectorAll<HTMLElement>(FOCUSABLE);
-        if (focusable.length === 0) {
+      if (isSheet || !modalRef.current) return;
+
+      if (e.key !== "Tab") return;
+
+      const focusable = modalRef.current.querySelectorAll<HTMLElement>(FOCUSABLE);
+      if (focusable.length === 0) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
           e.preventDefault();
-          return;
+          last.focus();
         }
-
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-
-        if (e.shiftKey) {
-          if (document.activeElement === first) {
-            e.preventDefault();
-            last.focus();
-          }
-        } else {
-          if (document.activeElement === last) {
-            e.preventDefault();
-            first.focus();
-          }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
         }
       }
     },
-    [closeOnEscape, onClose],
+    [closeOnEscape, isSheet, onClose],
   );
 
   const handleBackdropClick = useCallback(() => {
@@ -77,9 +80,18 @@ function GModal({
   useEffect(() => {
     if (!open) return;
 
-    previousFocusRef.current = document.activeElement as HTMLElement;
-
     document.addEventListener("keydown", handleKeyDown);
+
+    if (isSheet) {
+      const previousOverflow = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = previousOverflow;
+        document.removeEventListener("keydown", handleKeyDown);
+      };
+    }
+
+    previousFocusRef.current = document.activeElement as HTMLElement;
 
     const timer = requestAnimationFrame(() => {
       if (modalRef.current) {
@@ -94,14 +106,33 @@ function GModal({
       previousFocusRef.current?.focus();
       previousFocusRef.current = null;
     };
-  }, [open, handleKeyDown]);
+  }, [open, isSheet, handleKeyDown]);
+
+  if (isSheet) {
+    return (
+      <div className={className}>
+        {open && (
+          <>
+            <GBackdrop onClick={handleBackdropClick} />
+            <aside
+              role={role}
+              aria-modal="true"
+              aria-label={ariaLabel}
+              className={clsx("fixed z-drawer flex flex-col bg-bg-sidebar", sheetSideStyles[side], panelClassName)}>
+              {children}
+            </aside>
+          </>
+        )}
+      </div>
+    );
+  }
 
   if (!open) return null;
 
   return (
     <div
       ref={modalRef}
-      className={clsx("fixed inset-0 z-50 flex items-center justify-center", className)}
+      className={clsx("fixed inset-0 z-modal flex items-center justify-center", className)}
       role={role}
       aria-modal="true"
       aria-label={ariaLabel}
@@ -110,7 +141,7 @@ function GModal({
       <GBackdrop onClick={handleBackdropClick} />
       <GCard
         padding={cardPadding}
-        className={clsx("relative z-50 mx-auto w-full ", sizeStyles[size])}
+        className={clsx("relative z-modal mx-auto w-full ", modalSize[size])}
         onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         {ariaDescription && (
           <p id="modal-description" className="sr-only">

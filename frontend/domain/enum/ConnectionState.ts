@@ -1,5 +1,3 @@
-import { HubConnectionState } from "@microsoft/signalr";
-
 /**
  * Connection state enum for SignalR hubs.
  * Mirrors SignalR's internal states but simplified.
@@ -22,20 +20,4 @@ export interface HubConnectionStates {
   chat: ConnectionState;
   game: ConnectionState;
   social: ConnectionState;
-}
-
-/**
- * Helper: map SignalR connection state to our enum.
- */
-export function fromSignalRState(state: HubConnectionState): ConnectionState {
-  switch (state) {
-    case HubConnectionState.Connected:
-      return ConnectionState.Connected;
-    case HubConnectionState.Connecting:
-      return ConnectionState.Connecting;
-    case HubConnectionState.Reconnecting:
-      return ConnectionState.Reconnecting;
-    default:
-      return ConnectionState.Disconnected;
-  }
 }

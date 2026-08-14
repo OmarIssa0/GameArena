@@ -1,58 +1,47 @@
 const en = {
   tictactoe: {
     name: "Tic Tac Toe",
-    description: "Deploy strategic marks in a classic 3x3 duel",
+    description: "Deploy strategic marks in a classic 3x3 duel"
   },
   snake: {
     name: "Snake",
     description: "Grow your snake and dominate the arena",
-    arrowKeysHint: "Use arrow keys to control",
+    arrowKeysHint: "Use arrow keys to control"
   },
   pingpong: {
     name: "Ping Pong",
     description: "Classic paddle showdown in real-time",
-    controlHint: "Use W/S or ↑/↓ to move your paddle",
+    controlHint: "Use W/S or ↑/↓ to move your paddle"
   },
   rockpaperscissors: {
     name: "Rock Paper Scissors",
     description: "Classic hand game - choose rock, paper, or scissors",
     rock: "Rock",
     paper: "Paper",
-    scissors: "Scissors",
+    scissors: "Scissors"
   },
   connectfour: {
     name: "Connect Four",
-    description: "Drop discs and connect four in a row to win",
+    description: "Drop discs and connect four in a row to win"
   },
-
   lobby: {
-    findMatch: "Find Match",
-    connecting: "Connecting to Game Server...",
     searchingTitle: "Searching for opponent...",
-    searchingSubtitle: "Checking Arena 404 servers",
-    cancelSearch: "Cancel Search",
     quick: "Quick",
     invite: "Invite",
     searchError: "Failed to find a match. Please try again.",
-    createLobbyError: "Failed to create lobby. Please try again.",
+    createLobbyError: "Failed to create lobby. Please try again."
   },
-
   waiting: {
-    title: "Waiting for Opponent",
     subtitle: "Waiting for opponent to accept invite or join...",
     startVsAI: "Start Game (vs AI)",
     inviteFriend: "Invite Friend",
-    cancelMatch: "Cancel Match",
-    searchFriends: "Search friends...",
-    noFriendsFound: "No friends found",
+    cancelMatch: "Cancel Match"
   },
-
   ready: {
     title: "OPPONENT FOUND!",
     startGame: "Start Game",
-    waitingForStart: "Waiting for host to start...",
+    waitingForStart: "Waiting for host to start..."
   },
-
   game: {
     you: "You",
     youSuffix: "(You)",
@@ -66,36 +55,27 @@ const en = {
     yourTurn: "Your Turn - Make your move!",
     waitingFor: "Waiting for {name}...",
     leaveGame: "Leave Game",
-    firstTo: "First to {score}",
+    firstTo: "First to {score}"
   },
-
   invite: {
     title: "Invite a Friend",
     cancel: "Cancel",
     searchFriends: "Search friends...",
-    noFriends: "No friends found",
+    noFriends: "No friends found"
   },
-
   result: {
-    opponentForfeited: "Opponent Forfeited!",
-    opponentForfeitedDesc: "Your opponent left the game. You win by default!",
     winShort: "WIN",
     loseShort: "LOSE",
     drawShort: "DRAW",
-    victory: "VICTORY! 🎉",
-    victoryDesc: "Spectacular play! You defeated your opponent.",
-    draw: "IT'S A DRAW! 🤝",
-    drawDesc: "A hard-fought battle! It's a tie.",
-    defeat: "DEFEAT! 😢",
-    defeatDesc: "Good effort, but opponent claimed victory this time.",
     playAgain: "Play Again",
     backToLobby: "Back to Lobby",
     waiting: "Waiting...",
     accept: "Accept",
     reject: "Reject",
-    playAgainRequest: "wants to play again!",
-  },
-};
+    playAgainRequest: "wants to play again!"
+  }
+}
+;
 
 type GameTranslations = typeof en;
 

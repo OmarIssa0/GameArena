@@ -12,4 +12,4 @@ function withFullName<T extends IUserSummary>(user: T): T {
   };
 }
 
-export { buildFullName, withFullName };
+export { withFullName };

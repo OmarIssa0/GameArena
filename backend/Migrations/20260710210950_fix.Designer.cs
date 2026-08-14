@@ -13,7 +13,7 @@ namespace backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     [Migration("20260710210950_fix")]
-    partial class fix
+    partial class Fix
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

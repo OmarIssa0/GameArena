@@ -10,7 +10,7 @@ import { GCard } from "@/component/common/GCard";
 import { GList } from "@/component/common/GList";
 import { GameLayoutWrapper } from "@/component/games/GameLayoutWrapper";
 import { GameActionTypes } from "@/domain/constant/game-actions";
-import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 import { CellEnum } from "@/domain/enum/CellEnum";
 import { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
@@ -42,7 +42,7 @@ function ConnectFourPage() {
 
   return (
     <GameLayoutWrapper gameType={GamesKindEnum.ConnectFour}>
-      <GCard padding={SizeEnum.md} rounded={SizeEnum.lg}>
+      <GCard padding={SizeEnum.md}>
         <div className="flex justify-center gap-8 mb-4">
           <div className="text-center">
             <div className="text-3xl font-bold text-accent">{player1Score}</div>
@@ -58,7 +58,7 @@ function ConnectFourPage() {
           </div>
         </div>
 
-        <GList items={[1, 2, 3, 4, 5, 6, 7]} keyExtractor={(item) => `${item}`} noPagination listClassName="grid grid-cols-7 gap-2">
+        <GList items={[1, 2, 3, 4, 5, 6, 7]} keyExtractor={(item) => `${item}`} listClassName="grid grid-cols-7 gap-1">
           {(item) => {
             const isColFull = board[item - 1][0] !== CellEnum.None;
 
@@ -68,8 +68,7 @@ function ConnectFourPage() {
                 disabled={!isMyTurn || isOver || isColFull}
                 size={SizeEnum.sm}
                 rounded={SizeEnum.full}
-                variant={AccentColorEnum.Secondary}
-                className="aspect-square min-w-11">
+                variant={ButtonVariantEnum.Secondary}>
                 <span>{item}</span>
               </GButton>
             );
@@ -79,13 +78,13 @@ function ConnectFourPage() {
         <GList
           items={cells}
           keyExtractor={(item) => `${item.row}-${item.col}`}
-          noPagination
-          listClassName="grid grid-cols-7 gap-2 mt-2"
+         
+          listClassName="grid grid-cols-7 gap-2"
           className="bg-surface rounded-xl p-3">
           {({ value }) => (
             <div
               className={clsx(
-                "aspect-square rounded-full border-2 border-border/50 transition-colors duration-150",
+                "aspect-square rounded-full border-2 border-border/50",
                 value === CellEnum.None && "bg-bg-elevated",
                 value === CellEnum.PlayerOne && "bg-accent border-accent",
                 value === CellEnum.PlayerTwo && "bg-warning border-warning",
@@ -99,3 +98,4 @@ function ConnectFourPage() {
 }
 
 export default ConnectFourPage;
+

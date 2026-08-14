@@ -7,7 +7,6 @@ namespace backend.Services.Interface
     {
         Task<UserResponse> GetUserByIdAsync(Guid userId);
         Task<List<UserSummaryResponse>> GetUsersAsync(Guid currentUserId, UserFilterRequest? filter);
-        Task<UserResponse> UpdateUserAsync(UserResponse request);
         Task<UserResponse> UpdateProfileAsync(Guid userId, RegisterRequest request);
         Task ChangePasswordAsync(Guid userId, string oldPassword, string newPassword);
         Task<string?> GetPreferencesAsync(Guid userId);

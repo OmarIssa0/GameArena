@@ -6,39 +6,33 @@ import { forwardRef, useId } from "react";
 import { GLabel } from "./GLabel";
 import type { GSelectProps } from "./def/GSelect";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
-import type { THashMap } from "@/domain/type/TCommon";
-
-const inputSize: THashMap<string> = {
-  [SizeEnum.xs]: "px-1 py-1.5 text-xs",
-  [SizeEnum.sm]: "px-1 py-1 text-sm",
-  [SizeEnum.md]: "px-2 py-2 text-sm",
-  [SizeEnum.lg]: "px-2 py-2.5 text-base",
-  [SizeEnum.xl]: "px-3 py-3 text-base",
-  [SizeEnum.icon]: "px-3 py-3 text-base",
-};
+import { fieldSize } from "@/domain/constant/size-classes";
 
 const GSelect = forwardRef<HTMLSelectElement, GSelectProps<string | number>>(
   ({ label, error, className, startIcon, options, placeholder, size = SizeEnum.md, id: providedId, ...props }, ref) => {
     const generatedId = useId();
     const selectId = providedId ?? `select-${generatedId}`;
+    const errorId = `${selectId}-error`;
     return (
       <div className="space-y-2">
         {label && <GLabel required={props.required} htmlFor={selectId}>{label}</GLabel>}
 
         <div className="relative">
-          {startIcon && <div className="absolute inset-s-3 top-1/2 -translate-y-1/2 text-text-muted">{startIcon}</div>}
+          {startIcon && <div className="pointer-events-none absolute inset-s-3 top-1/2 -translate-y-1/2 text-text-muted">{startIcon}</div>}
 
           <select
             ref={ref}
             id={selectId}
+            aria-describedby={error ? errorId : undefined}
+            aria-invalid={error ? true : undefined}
             className={clsx(
-              "w-full bg-surface border border-border rounded-md text-text transition-all duration-150 appearance-none",
+              "w-full bg-surface border border-border rounded-md text-text appearance-none",
               "hover:border-border-light focus:border-primary focus:ring-3 focus:ring-primary-muted",
               "placeholder:text-text-muted",
-              inputSize[size],
-              startIcon && "ps-9",
+              fieldSize[size],
+              startIcon && "ps-10",
               "pe-9",
-              error && "border-error focus:ring-3 focus:ring-error-muted",
+              error && "border-danger focus:ring-3 focus:ring-danger-muted",
               className,
             )}
             {...props}>
@@ -58,7 +52,7 @@ const GSelect = forwardRef<HTMLSelectElement, GSelectProps<string | number>>(
         </div>
 
         {error && (
-          <p role="alert" className="text-xs text-error mt-1.5">
+          <p id={errorId} role="alert" className="text-xs text-danger mt-1.5">
             {error}
           </p>
         )}

@@ -1,7 +1,7 @@
 import type { SelectHTMLAttributes, ReactNode } from "react";
 import type { SizeEnum } from "@/domain/enum/SizeEnum";
 
-export interface GSelectOption<TValue extends string | number = string> {
+interface GSelectOption<TValue extends string | number = string> {
   value: TValue;
   label: string;
 }

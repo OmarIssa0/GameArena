@@ -15,10 +15,8 @@ import { ar as ArTextField } from "@/component/i18n/GTextField/ar.i18n";
 import { useTranslation } from "@/hooks/useSetting";
 import { emailValidator } from "@/lib/utils";
 import { authService } from "@/services/def/AuthService";
-import { useErrorMessage } from "@/hooks/useErrorMessage";
+import { useErrorMessage, toErrorCode } from "@/hooks/useErrorMessage";
 import type { GTextFieldTranslation } from "@/component/i18n/GTextField/en.i18n";
-import type { AxiosError } from "axios";
-import type { IApiResponse } from "@/domain/meta/IApiResponse";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 
@@ -55,8 +53,7 @@ function ForgotPasswordPage() {
       await authService.forgotPassword({ email });
       router.push("/reset-password?email=" + encodeURIComponent(email));
     } catch (e: unknown) {
-      const err = e as AxiosError<IApiResponse<unknown>>;
-      setApiError(resolveError(err?.response?.data?.errorCode, t.sendError));
+      setApiError(resolveError(toErrorCode(e), t.sendError));
     } finally {
       setLoading(false);
     }
@@ -72,7 +69,7 @@ function ForgotPasswordPage() {
             <p className="text-sm text-text-muted mt-0.5">{t.description}</p>
           </div>
         </div>
-        <div className="space-y-5">
+        <form onSubmit={(e) => { e.preventDefault(); void send(); }} className="space-y-5">
           {apiError && (
             <div role="alert" className="rounded-md border border-danger/30 bg-danger/10 px-4 py-3 text-sm text-danger">
               {apiError}
@@ -88,16 +85,16 @@ function ForgotPasswordPage() {
             onChange={(e) => handleChange(e.target.value)}
             className="w-full"
           />
-          <GButton loading={loading} loadingText={t.sendCode} onClick={send} fullWidth>
+          <GButton type="submit" loading={loading} loadingText={t.sendCode} fullWidth>
             {t.sendCode}
           </GButton>
           <div className="pt-2 text-center">
-            <Link href="/login" className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-primary transition-colors">
+            <Link href="/login" className="inline-flex items-center gap-2 text-sm text-text-secondary hover:text-primary">
               <GIcon icon={ArrowLeft} size={SizeEnum.sm} flip />
               {t.backToLogin}
             </Link>
           </div>
-        </div>
+        </form>
       </div>
     </AuthLayout>
   );

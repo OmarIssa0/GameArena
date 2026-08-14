@@ -9,39 +9,33 @@ const ar = {
     all: "الكل",
     win: "انتصارات",
     loss: "خسائر",
-    draw: "تعادل",
+    draw: "تعادل"
   },
   summary: {
     wins: "انتصارات",
     losses: "خسائر",
-    draws: "تعادل",
+    draws: "تعادل"
   },
   results: {
     win: "فوز",
     loss: "خسارة",
-    draw: "تعادل",
-  },
-  columns: {
-    game: "اللعبة",
-    opponent: "الخصم",
-    result: "النتيجة",
-    date: "التاريخ",
+    draw: "تعادل"
   },
   games: {
     [GamesKindEnum.Snake]: "الثعبان",
     [GamesKindEnum.TicTacToe]: "إكس أو",
     [GamesKindEnum.PingPong]: "بينغ بونغ",
     [GamesKindEnum.RockPaperScissors]: "حجر ورقة مقص",
-    [GamesKindEnum.ConnectFour]: "اتصل بأربعة",
-  },
+    [GamesKindEnum.ConnectFour]: "اتصل بأربعة"},
   empty: {
     title: "لا توجد مباريات بعد",
     description: "سيظهر سجل مبارياتك هنا بعد إنهاء أول لعبة.",
-    filtered: "لا توجد مباريات لهذا الفلتر.",
+    filtered: "لا توجد مباريات لهذا الفلتر."
   },
   error: {
-    title: "تعذر تحميل السجل",
-  },
-};
+    title: "تعذر تحميل السجل"
+  }
+}
+;
 
 export { ar };

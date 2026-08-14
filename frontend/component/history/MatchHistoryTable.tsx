@@ -4,7 +4,6 @@ import { GIcon } from "@/component/common/GIcon";
 import { GList } from "@/component/common/GList";
 import { GamesList } from "@/domain/constant/games";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
-import { AvatarShapeEnum } from "@/domain/enum/AvatarShapeEnum";
 import { MatchStatusEnum } from "@/domain/enum/MatchStatusEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 
@@ -22,13 +21,13 @@ function resultBadge(result: MatchStatusEnum, winLabel: string, lossLabel: strin
 
 export function MatchHistoryTable({ matches, locale, winLabel, lossLabel, drawLabel, gameLabels }: IMatchHistoryTableProps) {
   return (
-    <GList items={matches} keyExtractor={(match) => match.id}>
+    <GList items={matches} keyExtractor={(match) => match.id} pageSize={10} listClassName="gap-3">
       {(match) => {
         const game = GamesList[match.kind];
         return (
           <div className="flex items-center justify-between py-3 px-4 border-b border-border/50 last:border-0 gap-4">
             <div className="flex items-center gap-3 min-w-0 flex-1">
-              <GIcon icon={game.icon} size={SizeEnum.sm} tile tileGradient={game.gradient} />
+              <GIcon icon={game.icon} size={SizeEnum.sm} tile tileGradient={game.tileGradient} />
               <span className="font-medium text-text truncate">{gameLabels[match.kind]}</span>
             </div>
             <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -37,7 +36,6 @@ export function MatchHistoryTable({ matches, locale, winLabel, lossLabel, drawLa
                 lastName={match.opponent.lastName}
                 status={match.opponent.status}
                 size={SizeEnum.xs}
-                shape={AvatarShapeEnum.Circle}
               />
               <span className="truncate text-text-secondary">@{match.opponent.fullName ?? match.opponent.userName}</span>
             </div>
@@ -51,3 +49,4 @@ export function MatchHistoryTable({ matches, locale, winLabel, lossLabel, drawLa
     </GList>
   );
 }
+

@@ -1,20 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import { Loader2, MessageSquare, ShieldBan, UserMinus, Users } from "lucide-react";
+import { Loader2, MessageSquare, ShieldBan, UserMinus, Users, UserPlus } from "lucide-react";
 
 import { GButton } from "@/component/common/GButton";
 import { GEmpty } from "@/component/common/GEmpty";
 import { GIcon } from "@/component/common/GIcon";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
-import type { TNullable } from "@/domain/type/TCommon";
+import { useBusyAction } from "@/hooks/useBusyAction";
 
 import { FriendsList } from "../SocialPanel/FriendsList";
 import type { FriendsListTabProps } from "./def/FriendsTab";
 
 function FriendsListTab({ friends, onMessage, onBlock, onRemove, onAddFriend, t }: FriendsListTabProps) {
-  const [actionId, setActionId] = useState<TNullable<string>>(null);
+  const { run, isBusy, busyClass } = useBusyAction();
 
   if (friends.length === 0) {
     return (
@@ -22,7 +21,7 @@ function FriendsListTab({ friends, onMessage, onBlock, onRemove, onAddFriend, t 
         icon={<GIcon icon={Users} size={SizeEnum.xl} color={AccentColorEnum.Muted} />}
         title={t.noFriendsTitle}
         description={t.noFriendsDescription}>
-        <GButton onClick={onAddFriend} className="mt-4">
+        <GButton onClick={onAddFriend} className="mt-4" startIcon={<GIcon icon={UserPlus} size={SizeEnum.sm} />}>
           {t.addFriend}
         </GButton>
       </GEmpty>
@@ -33,7 +32,7 @@ function FriendsListTab({ friends, onMessage, onBlock, onRemove, onAddFriend, t 
     <FriendsList
       friends={friends}
       actions={(friend) => {
-        const isBusy = actionId === friend.id;
+        const busy = isBusy(friend.id);
         return (
           <div className="flex gap-1">
             <GIcon
@@ -47,39 +46,25 @@ function FriendsListTab({ friends, onMessage, onBlock, onRemove, onAddFriend, t 
               ariaLabel={t.message}
             />
             <GIcon
-              icon={isBusy ? Loader2 : ShieldBan}
+              icon={busy ? Loader2 : ShieldBan}
               size={SizeEnum.md}
               tile
               hover
               tileGradient="bg-warning/10"
               tileColor={AccentColorEnum.Warning}
-              className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}
-              onClick={async () => {
-                setActionId(friend.id);
-                try {
-                  await onBlock(friend.id);
-                } finally {
-                  setActionId(null);
-                }
-              }}
+              className={busyClass(friend.id)}
+              onClick={() => run(friend.id, () => onBlock(friend.id))}
               ariaLabel={t.actions.block}
             />
             <GIcon
-              icon={isBusy ? Loader2 : UserMinus}
+              icon={busy ? Loader2 : UserMinus}
               size={SizeEnum.md}
               tile
               hover
               tileGradient="bg-danger/10"
               tileColor={AccentColorEnum.Danger}
-              className={isBusy ? "animate-spin opacity-50 pointer-events-none" : ""}
-              onClick={async () => {
-                setActionId(friend.id);
-                try {
-                  await onRemove(friend.id);
-                } finally {
-                  setActionId(null);
-                }
-              }}
+              className={busyClass(friend.id)}
+              onClick={() => run(friend.id, () => onRemove(friend.id))}
               ariaLabel={t.actions.removeFriend}
             />
           </div>

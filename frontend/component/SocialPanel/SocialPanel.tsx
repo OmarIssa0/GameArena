@@ -1,122 +1,131 @@
 "use client";
 
-import { Users } from "lucide-react";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Search } from "lucide-react";
+import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
 
 import { useTranslation } from "@/hooks/useSetting";
 import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
 import { useFriends } from "@/hooks/useFriends";
+import { useAside, type UseAsideReturn } from "@/hooks/useAside";
 import { en, type TSocialPanelTranslation } from "@/component/i18n/SocialPanel/en.i18n";
 import { ar } from "@/component/i18n/SocialPanel/ar.i18n";
-import { useAside } from "@/hooks/useAside";
 import { GIcon } from "@/component/common/GIcon";
-import { AsideWrapper } from "@/component/aside/AsideWrapper";
-import { AsideHeader } from "@/component/aside/AsideHeader";
-import { SocialDesktopCollapsed } from "./SocialDesktopCollapsed";
-import { SocialDesktopExpanded } from "./SocialDesktopExpanded";
-import type { AsideConfig } from "@/component/aside/AsideTypes";
-import type { IUserSummary } from "@/domain/meta/IUserSummary";
-import { AsidePlacementEnum } from "@/domain/enum/AsidePlacementEnum";
+import { GTextField } from "@/component/common/GTextField";
+import { GModal } from "@/component/common/GModal";
+import { SocialPanelHeader } from "../social/SocialPanelHeader";
+import { SocialTabs, SocialTabId } from "../social/SocialTabs";
+import { SocialPanelContent } from "./SocialPanelContent";
+import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 
-function SocialBrand({ onlineCount }: { onlineCount: number }) {
-  const t = useTranslation({ en, ar }) as TSocialPanelTranslation;
-
-  return (
-    <div className="min-w-0">
-      <p className="font-bold text-text flex items-center gap-2">
-        <GIcon icon={Users} size={SizeEnum.sm} className="shrink-0" />
-        <span className="truncate">{t.title}</span>
-      </p>
-      <p className="text-xs text-text-muted">
-        {onlineCount} {t.online}
-      </p>
-    </div>
-  );
+interface SocialPanelProps {
+  aside?: UseAsideReturn;
 }
 
-function SocialBody({
-  collapsed,
-  isDesktop,
-  isCompact,
-  closeMobile,
-  friends,
-  onlineCount,
-  loading,
-  gameInvites,
-}: {
-  collapsed: boolean;
-  isDesktop: boolean;
-  isCompact: boolean;
-  closeMobile: () => void;
-  friends: IUserSummary[];
-  onlineCount: number;
-  loading: boolean;
-  gameInvites: { roomId: string }[];
-}) {
-  // ── Collapsed rail view (desktop only) ──────────────────────────────────
-  if (collapsed && isDesktop) {
-    return (
-      <div className="flex flex-col h-full">
-        {/* Online count summary for collapsed state */}
-        <div className="px-3 pt-3 pb-1 text-center">
-          <p className="text-xs text-text-muted">{onlineCount}</p>
-        </div>
-        <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
-          <SocialDesktopCollapsed friends={friends} isCompact={isCompact} closeMobile={closeMobile} loading={loading} />
-        </div>
-      </div>
-    );
-  }
-
-  // ── Expanded full view (desktop expanded or mobile overlay) ────────────
-  return <SocialDesktopExpanded friends={friends} loading={loading} gameInvites={gameInvites} isCompact={isCompact} closeMobile={closeMobile} />;
-}
-
-/**
- * Social panel — right-side panel for friends, invites, and social features.
- *
- * useFriends() is called ONCE here and data is passed as props to children.
- * This prevents SignalR re-invocations when toggling collapsed/expanded.
- */
-function SocialPanel() {
+function SocialPanel({ aside: asideProp }: SocialPanelProps) {
+  const router = useRouter();
   const t = useTranslation({ en, ar }) as TSocialPanelTranslation;
-  const { gameInvites } = useDashboardNotifications();
-  const { friends, loading, onlineCount } = useFriends();
-  const aside = useAside(false);
+  const { friendRequestCount, unreadMessageCount, unreadNotificationCount, gameInvites, notifications } =
+    useDashboardNotifications();
+  const { friends, requests, loading, acceptRequest, declineRequest } = useFriends();
+  const asideDefault = useAside(false);
+  const aside = asideProp ?? asideDefault;
 
-  const collapsedIcon = (
-    <span className="relative inline-flex">
-      <GIcon icon={Users} size={SizeEnum.md} tile />
-      {gameInvites.length > 0 && <span className="absolute -top-1 -inset-e-1 w-2 h-2 rounded-full bg-primary ring-2 ring-bg-sidebar" />}
-    </span>
-  );
+  const [activeTab, setActiveTab] = useState<SocialTabId>(SocialTabId.Friends);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const asideConfig: AsideConfig = {
-    placement: AsidePlacementEnum.End,
-    expandedWidth: "w-80",
-    collapsedWidth: "w-20",
-    label: t.friendsAndInvites,
-    mobileIcon: collapsedIcon,
-  };
+  const onlineCount = friends.filter((f) => f.status !== UserStatusEnum.Offline).length;
 
-  return (
-    <AsideWrapper
-      config={asideConfig}
-      aside={aside}
-      header={
-        <AsideHeader aside={aside} label={t.friendsAndInvites} brand={<SocialBrand onlineCount={onlineCount} />} collapsedIcon={collapsedIcon} />
-      }>
-      <SocialBody
-        collapsed={aside.collapsed}
-        isDesktop={aside.isDesktop}
-        isCompact={aside.isCompact}
-        closeMobile={aside.closeMobile}
-        friends={friends}
+  const unreadAll =
+    friendRequestCount + unreadMessageCount + unreadNotificationCount + gameInvites.length;
+
+  const panelContent = (
+    <>
+      <SocialPanelHeader
+        title={t.title}
         onlineCount={onlineCount}
-        loading={loading}
-        gameInvites={gameInvites}
+        onlineLabel={t.online}
+        showClose={aside.open}
+        onClose={aside.closeMobile}
       />
-    </AsideWrapper>
+
+      <div className="px-2">
+        <SocialTabs
+          value={activeTab}
+          onChange={(tab) => {
+            setActiveTab(tab);
+            setSearchQuery("");
+          }}
+          labels={{
+            friends: t.tabs.friends,
+            notifications: t.tabs.notifications,
+          }}
+          badges={{
+            notifications: unreadAll > 0 ? unreadAll : undefined,
+          }}
+        />
+      </div>
+
+      {activeTab === SocialTabId.Friends && (
+        <div className="px-2 pt-2">
+          <GTextField
+            id="social-search"
+            value={searchQuery}
+            placeholder={t.searchPlaceholder}
+            startIcon={<GIcon icon={Search} size={SizeEnum.sm} color={AccentColorEnum.Muted} />}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+      )}
+
+      <SocialPanelContent
+        router={router}
+        activeTab={activeTab}
+        friends={friends}
+        gameInvites={gameInvites}
+        requests={requests}
+        notifications={notifications}
+        loading={loading}
+        searchQuery={searchQuery}
+        closeMobile={aside.closeMobile}
+        acceptRequest={acceptRequest}
+        declineRequest={declineRequest}
+        t={t}
+      />
+    </>
+  );
+
+  return (
+    <>
+      {/* Laptop (xl+): real layout column - removed from layout when collapsed */}
+      {!aside.collapsed && (
+        <aside className="hidden xl:flex xl:h-full xl:w-80 xl:shrink-0 xl:flex-col xl:border-s xl:border-border xl:bg-bg-sidebar">
+          {panelContent}
+        </aside>
+      )}
+
+      {/* Tablet (md–xl): modal overlay from the logical end side */}
+      <GModal
+        open={aside.open}
+        onClose={aside.closeMobile}
+        side="end"
+        ariaLabel={t.friendsAndInvites}
+        className="hidden md:block xl:hidden">
+        {panelContent}
+      </GModal>
+
+      {/* Mobile (<md): bottom sheet */}
+      <GModal
+        open={aside.open}
+        onClose={aside.closeMobile}
+        side="bottom"
+        ariaLabel={t.friendsAndInvites}
+        className="md:hidden">
+        {panelContent}
+      </GModal>
+    </>
   );
 }
 

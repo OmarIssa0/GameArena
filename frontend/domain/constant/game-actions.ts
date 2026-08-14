@@ -12,11 +12,11 @@ export const DirectionValues = {
   RIGHT: "RIGHT",
 } as const;
 
-export type TPaddleAction = { type: typeof GameActionTypes.MOVE_PADDLE; direction: "UP" | "DOWN" };
-export type TDirectionAction = { type: typeof GameActionTypes.CHANGE_DIRECTION; direction: "UP" | "DOWN" | "LEFT" | "RIGHT" };
-export type TMakeMoveAction = { type: typeof GameActionTypes.MAKE_MOVE; choice?: string; cell?: number };
-export type TPlaceAction = { type: typeof GameActionTypes.PLACE; col: number };
-export type TGameAction = TPaddleAction | TDirectionAction | TMakeMoveAction | TPlaceAction;
+export type TGameAction =
+  | { type: typeof GameActionTypes.MOVE_PADDLE; direction: "UP" | "DOWN" }
+  | { type: typeof GameActionTypes.CHANGE_DIRECTION; direction: "UP" | "DOWN" | "LEFT" | "RIGHT" }
+  | { type: typeof GameActionTypes.MAKE_MOVE; choice?: string; cell?: number }
+  | { type: typeof GameActionTypes.PLACE; col: number };
 
 export const PADDLE_KEYS = {
   UP: new Set(["ArrowUp", "w", "W"]),

@@ -1,40 +1,37 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Save, User, Lock, Settings, Moon, Volume2, Activity, Gamepad2, Languages, Bell, List } from "lucide-react";
 import { useTranslation, useTheme, useLocale } from "@/hooks/useSetting";
 import { ar } from "./i18n/ar.i18n";
 import { en, type TSettingsTranslation } from "./i18n/en.i18n";
 import { en as EnTextField, type GTextFieldTranslation } from "@/component/i18n/GTextField/en.i18n";
 import { ar as ArTextField } from "@/component/i18n/GTextField/ar.i18n";
-import { GTabs } from "@/component/common/GTabs";
-import { Save, User, Lock, Settings, Moon, Volume2, Activity, Gamepad2, Sliders, Languages, Bell, List } from "lucide-react";
-import { GList } from "@/component/common/GList";
 import { GButton } from "@/component/common/GButton";
-import { GCard } from "@/component/common/GCard";
+import { GPage } from "@/component/common/GPage";
 import { GTextField } from "@/component/common/GTextField";
 import { GSelect } from "@/component/common/GSelect";
 import { GIcon } from "@/component/common/GIcon";
 import { GSpinner } from "@/component/common/GSpinner";
+import { GNav } from "@/component/common/GNav";
+import type { GNavItem } from "@/component/common/def/GNav";
 import { userRepository } from "@/repositories/def/UserRepository";
 import { DEFAULT_USER_PREFERENCES, type IUserPreferences } from "@/domain/meta/IUserPreferences";
 import { passwordValidator } from "@/lib/utils";
 import { useAuth } from "@/app/providers/AuthProvider";
-import { useErrorMessage } from "@/hooks/useErrorMessage";
+import { useErrorMessage, toErrorCode } from "@/hooks/useErrorMessage";
 import { ThemeEnum } from "@/domain/enum/ThemeEnum";
 import { ErrorCodeEnum } from "@/domain/enum/ErrorCodeEnum";
 import type { IUser } from "@/domain/meta/IUser";
-import type { GTabItem } from "@/component/common/def/GTabs";
 import type { TNullable } from "@/domain/type/TCommon";
-import type { AxiosError } from "axios";
-import type { IApiResponse } from "@/domain/meta/IApiResponse";
 import { LocaleEnum } from "@/domain/enum/LocaleEnum";
 import { SettingsTabEnum } from "@/domain/enum/SettingsTabEnum";
-import { TabsVariantEnum } from "@/domain/enum/TabsVariantEnum";
-import { TabsDirectionEnum } from "@/domain/enum/TabsDirectionEnum";
 import { IndicatorPositionEnum } from "@/domain/enum/IndicatorPositionEnum";
+import { NavOrientationEnum } from "@/domain/enum/NavOrientationEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
-import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
-import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
+import { PageHeader } from "@/component/common/PageHeader";
+import { GTabs } from "@/component/common/GTabs";
+import { GTabItem } from "@/component/common/def/GTabs";
 
 function SettingsPage() {
   const t = useTranslation({
@@ -147,8 +144,7 @@ function SettingsPage() {
       setPasswordErrors({});
       showMessage(t.settings.password.saved);
     } catch (e: unknown) {
-      const err = e as AxiosError<IApiResponse<unknown>>;
-      const code = err?.response?.data?.errorCode;
+      const code = toErrorCode(e);
       if (code === ErrorCodeEnum.InvalidCredentials) {
         setPasswordErrors({ oldPassword: t.settings.password.invalidCurrentPassword });
       } else {
@@ -181,25 +177,18 @@ function SettingsPage() {
     updatePreferences({ [key]: next });
   };
 
-  const tabs = useMemo<GTabItem<SettingsTabEnum>[]>(
-    () => [
-      {
-        id: SettingsTabEnum.Profile,
-        label: t.settings.profile.title,
-        icon: <GIcon icon={User} size={SizeEnum.md} />,
-      },
-      {
-        id: SettingsTabEnum.Password,
-        label: t.settings.password.title,
-        icon: <GIcon icon={Lock} size={SizeEnum.md} />,
-      },
-      {
-        id: SettingsTabEnum.Preferences,
-        label: t.settings.preferences.title,
-        icon: <GIcon icon={Settings} size={SizeEnum.md} />,
-      },
-    ],
-    [t],
+  const navItems = useMemo<GTabItem[]>(
+    () =>
+      [
+        { id: SettingsTabEnum.Profile, label: t.settings.profile.title, icon: <GIcon icon={User} size={SizeEnum.md} /> },
+        { id: SettingsTabEnum.Password, label: t.settings.password.title, icon: <GIcon icon={Lock} size={SizeEnum.md} /> },
+        { id: SettingsTabEnum.Preferences, label: t.settings.preferences.title, icon: <GIcon icon={Settings} size={SizeEnum.md} /> },
+      ].map((item) => ({
+        ...item,
+        active: activeTab === item.id,
+        onClick: () => setActiveTab(item.id),
+      })),
+    [t, activeTab],
   );
 
   const pageSizeOptions = [5, 10, 15, 20, 25];
@@ -224,215 +213,161 @@ function SettingsPage() {
   ];
 
   return (
-    <div className="h-full flex flex-col lg:flex-row overflow-hidden">
-      <aside className="w-full md:w-64 shrink-0 border-b md:border-b-0 md:border-e border-border bg-bg-sidebar">
-        <div className="p-4 lg:p-6">
-          <div className="mb-8">
-            <header className="flex items-center gap-3">
-              <GIcon icon={Settings} size={SizeEnum.xl} tile tileGradient="bg-primary" tileColor={AccentColorEnum.OnPrimary} />
-              <div className="flex-1">
-                <h1 className="text-2xl font-extrabold text-text tracking-tight leading-tight">{t.title}</h1>
+    <GPage size={SizeEnum.xl} className="py-6 sm:py-8">
+      <PageHeader icon={Settings} title={t.title} subtitle={t.settings.profile.subtitle} />
+
+      {saveMsg && (
+        <div role="status" className="mb-6 p-4 rounded-xl bg-success-bg border border-success text-success text-sm text-center">
+          {saveMsg}
+        </div>
+      )}
+
+      <GTabs tabs={navItems} value={activeTab} responsive fullWidth onChange={(id) => setActiveTab(id as SettingsTabEnum)} />
+
+      {activeTab === SettingsTabEnum.Profile && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            void handleSaveProfile();
+          }}
+          className="space-y-4">
+          {loading ? (
+            <div className="flex justify-center py-10">
+              <GSpinner size={SizeEnum.md} />
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <GTextField label={t.settings.profile.firstName} value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+                <GTextField label={t.settings.profile.lastName} value={lastName} onChange={(e) => setLastName(e.target.value)} />
+                <div className="sm:col-span-2">
+                  <GTextField label={t.settings.profile.username} value={userName} onChange={(e) => setUserName(e.target.value)} />
+                </div>
+                <div className="sm:col-span-2">
+                  <GTextField label={t.settings.profile.email} value={profile?.email ?? ""} disabled />
+                </div>
               </div>
-            </header>
-          </div>
-          <GTabs
-            tabs={tabs}
-            value={activeTab}
-            onChange={setActiveTab}
-            direction={TabsDirectionEnum.V}
-            variant={TabsVariantEnum.Sidebar}
-            indicator={IndicatorPositionEnum.Start}
-            fullWidth
+              <div className="flex justify-end">
+                <GButton type="submit" loading={saving} loadingText={t.settings.profile.save} startIcon={<GIcon icon={Save} size={SizeEnum.sm} />}>
+                  {t.settings.profile.save}
+                </GButton>
+              </div>
+            </>
+          )}
+        </form>
+      )}
+
+      {activeTab === SettingsTabEnum.Password && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            void handleSavePassword();
+          }}
+          className="space-y-4">
+          <GTextField
+            label={t.settings.password.oldPassword}
+            type="password"
+            value={oldPassword}
+            error={passwordErrors.oldPassword}
+            onChange={(e) => setOldPassword(e.target.value)}
           />
-        </div>
-      </aside>
+          <GTextField
+            label={t.settings.password.newPassword}
+            type="password"
+            value={newPassword}
+            error={passwordErrors.newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+          <GTextField
+            label={t.settings.password.confirmPassword}
+            type="password"
+            value={confirmPassword}
+            error={passwordErrors.confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+          <div className="flex justify-end">
+            <GButton type="submit" loading={saving} loadingText={t.settings.password.save} startIcon={<GIcon icon={Save} size={SizeEnum.sm} />}>
+              {t.settings.password.save}
+            </GButton>
+          </div>
+        </form>
+      )}
 
-      <main className="flex-1 overflow-y-auto custom-scrollbar p-4 lg:p-8 bg-bg">
-        <div className="max-w-2xl mx-auto w-full">
-          {saveMsg && <div className="mb-6 p-4 rounded-xl bg-success-bg border border-success text-success text-sm text-center">{saveMsg}</div>}
+      {activeTab === SettingsTabEnum.Preferences && (
+        <div className="space-y-2">
+          <div className="flex items-center justify-between py-3 border-b border-border">
+            <div className="flex items-center gap-3">
+              <GIcon icon={Moon} size={SizeEnum.sm} />
+              <span className="text-sm text-text">{t.settings.preferences.darkMode}</span>
+            </div>
+            <GTextField
+              type="checkbox"
+              className="size-5"
+              aria-label={t.settings.preferences.darkMode}
+              checked={theme === ThemeEnum.Dark}
+              onChange={(e) => setTheme(e.target.checked ? ThemeEnum.Dark : ThemeEnum.Light)}
+            />
+          </div>
 
-          {activeTab === SettingsTabEnum.Profile && (
-            <GCard variant={CardVariantEnum.Elevated} padding={SizeEnum.xl} className="animate-in">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-3 bg-primary/10 rounded-xl">
-                  <GIcon icon={User} size={SizeEnum.lg} color={AccentColorEnum.Primary} />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-text">{t.settings.profile.title}</h2>
-                  <p className="text-sm text-text-muted">{t.settings.profile.subtitle}</p>
-                </div>
-              </div>
+          <div className="flex items-center justify-between py-3 border-b border-border">
+            <div className="flex items-center gap-3">
+              <GIcon icon={Languages} size={SizeEnum.sm} />
+              <span className="text-sm text-text">{t.settings.preferences.language}</span>
+            </div>
+            <GSelect
+              className="w-36"
+              aria-label={t.settings.preferences.language}
+              value={locale}
+              options={[
+                { value: LocaleEnum.En, label: "English" },
+                { value: LocaleEnum.Ar, label: "العربية" },
+              ]}
+              onChange={(e) => setLocale(e.target.value as LocaleEnum)}
+            />
+          </div>
 
-              {loading ? (
-                <div className="flex justify-center py-10">
-                  <GSpinner size={SizeEnum.md} />
-                </div>
-              ) : (
-                <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <GTextField label={t.settings.profile.firstName} value={firstName} onChange={(e) => setFirstName(e.target.value)} />
-                    <GTextField label={t.settings.profile.lastName} value={lastName} onChange={(e) => setLastName(e.target.value)} />
-                    <div className="sm:col-span-2">
-                      <GTextField label={t.settings.profile.username} value={userName} onChange={(e) => setUserName(e.target.value)} />
-                    </div>
-                    <div className="sm:col-span-2">
-                      <GTextField label={t.settings.profile.email} value={profile?.email ?? ""} disabled />
-                    </div>
-                  </div>
-                  <div className="mt-8 flex justify-end">
-                    <GButton
-                      startIcon={saving ? <GSpinner size={SizeEnum.sm} /> : <GIcon icon={Save} size={SizeEnum.sm} className="text-on-primary" />}
-                      onClick={handleSaveProfile}
-                      disabled={saving}>
-                      {t.settings.profile.save}
-                    </GButton>
-                  </div>
-                </>
-              )}
-            </GCard>
-          )}
-
-          {activeTab === SettingsTabEnum.Password && (
-            <GCard variant={CardVariantEnum.Elevated} padding={SizeEnum.xl} className="animate-in">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-3 bg-warning/10 rounded-xl">
-                  <GIcon icon={Lock} size={SizeEnum.lg} color={AccentColorEnum.Warning} />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-text">{t.settings.password.title}</h2>
-                  <p className="text-sm text-text-muted">{t.settings.password.subtitle}</p>
-                </div>
-              </div>
-
-              <div className="space-y-4 max-w-sm">
-                <GTextField
-                  label={t.settings.password.oldPassword}
-                  type="password"
-                  value={oldPassword}
-                  onChange={(e) => setOldPassword(e.target.value)}
-                  error={passwordErrors.oldPassword}
-                />
-                <GTextField
-                  label={t.settings.password.newPassword}
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  error={passwordErrors.newPassword}
-                />
-                <GTextField
-                  label={t.settings.password.confirmPassword}
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  error={passwordErrors.confirmPassword}
-                />
-              </div>
-
-              <div className="mt-8 flex justify-end">
-                <GButton
-                  startIcon={saving ? <GSpinner size={SizeEnum.sm} /> : <GIcon icon={Save} size={SizeEnum.sm} className="text-on-primary" />}
-                  onClick={handleSavePassword}
-                  disabled={saving}>
-                  {t.settings.password.save}
-                </GButton>
-              </div>
-            </GCard>
-          )}
-
-          {activeTab === SettingsTabEnum.Preferences && (
-            <GCard variant={CardVariantEnum.Elevated} padding={SizeEnum.xl} className="space-y-6 animate-in">
+          {prefItems.map((item) => (
+            <div key={item.key} className="flex items-center justify-between py-3 border-b border-border">
               <div className="flex items-center gap-3">
-                <div className="p-3 bg-accent/10 rounded-xl">
-                  <GIcon icon={Sliders} size={SizeEnum.lg} color={AccentColorEnum.Accent} />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-text">{t.settings.preferences.title}</h2>
-                  <p className="text-sm text-text-muted">{t.settings.preferences.subtitle}</p>
-                </div>
+                {item.icon}
+                <span className="text-sm text-text">{item.label}</span>
               </div>
+              <GTextField
+                type="checkbox"
+                className="size-5"
+                aria-label={item.label}
+                checked={preferences[item.key] as boolean}
+                onChange={() => togglePref(item.key)}
+              />
+            </div>
+          ))}
 
-              <div className="space-y-4">
-                <label className="flex items-center justify-between py-3 border-b border-border/50 group">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-surface rounded-lg group-hover:bg-primary/10 transition-colors">
-                      <GIcon icon={Moon} size={SizeEnum.sm} />
-                    </div>
-                    <span className="text-sm text-text">{t.settings.preferences.darkMode}</span>
-                  </div>
-                  <GTextField
-                    type="checkbox"
-                    className="flex items-center justify-center"
-                    size={SizeEnum.md}
-                    checked={theme === ThemeEnum.Dark}
-                    onChange={(e) => setTheme(e.target.checked ? ThemeEnum.Dark : ThemeEnum.Light)}
-                  />
-                </label>
+          <div className="flex items-center justify-between py-3 border-b border-border">
+            <div className="flex items-center gap-3">
+              <GIcon icon={List} size={SizeEnum.sm} />
+              <span className="text-sm text-text">{t.settings.preferences.pageSize}</span>
+            </div>
+            <GSelect
+              className="w-20"
+              aria-label={t.settings.preferences.pageSize}
+              value={preferences.pageSize}
+              options={pageSizeOptions.map((n) => ({ value: n, label: `${n}` }))}
+              onChange={(e) => setPreferences((prev) => ({ ...prev, pageSize: Number(e.target.value) }))}
+            />
+          </div>
 
-                <div className="flex items-center justify-between py-3 border-b border-border/50">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-surface rounded-lg">
-                      <GIcon icon={Languages} size={SizeEnum.sm} />
-                    </div>
-                    <span className="text-sm text-text">{t.settings.preferences.language}</span>
-                  </div>
-                  <GSelect
-                    className="w-36"
-                    value={locale}
-                    onChange={(e) => setLocale(e.target.value as LocaleEnum)}
-                    options={[
-                      { value: LocaleEnum.En, label: "English" },
-                      { value: LocaleEnum.Ar, label: "العربية" },
-                    ]}
-                  />
-                </div>
-
-                <GList items={prefItems} keyExtractor={(item) => item.key} noPagination>
-                  {(item) => (
-                    <label className="flex items-center justify-between py-3 border-b border-border/50 group">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-surface rounded-lg group-hover:bg-primary/10 transition-colors">{item.icon}</div>
-                        <span className="text-sm text-text">{item.label}</span>
-                      </div>
-                      <GTextField
-                        type="checkbox"
-                        className="flex items-center justify-center"
-                        checked={preferences[item.key] as boolean}
-                        onChange={() => togglePref(item.key)}
-                        size={SizeEnum.sm}
-                      />
-                    </label>
-                  )}
-                </GList>
-
-                <div className="flex items-center justify-between py-3 border-b border-border/50">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-surface rounded-lg">
-                      <GIcon icon={List} size={SizeEnum.sm} />
-                    </div>
-                    <span className="text-sm text-text">{t.settings.preferences.pageSize}</span>
-                  </div>
-                  <GSelect
-                    className="w-20"
-                    value={preferences.pageSize}
-                    onChange={(e) => setPreferences((prev) => ({ ...prev, pageSize: Number(e.target.value) }))}
-                    options={pageSizeOptions.map((n) => ({ value: n, label: `${n}` }))}
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end pt-4 border-t border-border">
-                <GButton
-                  startIcon={prefSaving ? <GSpinner size={SizeEnum.sm} /> : <GIcon icon={Save} size={SizeEnum.sm} className="text-on-primary" />}
-                  onClick={handleSavePreferences}
-                  disabled={prefSaving}>
-                  {t.settings.preferences.save}
-                </GButton>
-              </div>
-            </GCard>
-          )}
+          <div className="flex justify-end pt-4">
+            <GButton
+              loading={prefSaving}
+              loadingText={t.settings.preferences.save}
+              startIcon={<GIcon icon={Save} size={SizeEnum.sm} />}
+              onClick={() => void handleSavePreferences()}>
+              {t.settings.preferences.save}
+            </GButton>
+          </div>
         </div>
-      </main>
-    </div>
+      )}
+    </GPage>
   );
 }
 

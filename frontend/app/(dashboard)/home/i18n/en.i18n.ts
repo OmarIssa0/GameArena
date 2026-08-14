@@ -1,13 +1,13 @@
 const en = {
   welcome: (name: string) => "Welcome back" + (name ? `, ${name}` : ""),
+  welcomeDesc: "let's find your next battle!",
   brand: "Arena 404",
   heroSubtitle: "Your ultimate gaming destination. Instant matches, ranked battles, and endless fun.",
   playNow: "PLAY NOW",
-  viewStats: "VIEW STATS",
   stats: {
     gamesAvailable: "Games Available",
     unreadMessages: "Unread Messages",
-    friendRequests: "Friend Requests",
+    friendRequests: "Friend Requests"
   },
   features: {
     title: "Why Arena 404?",
@@ -19,7 +19,7 @@ const en = {
     rankedMatches: "Ranked Matches",
     rankedMatchesDesc: "Climb the leaderboards",
     seasonalEvents: "Seasonal Events",
-    seasonalEventsDesc: "Exclusive rewards & modes",
+    seasonalEventsDesc: "Exclusive rewards & modes"
   },
   games: {
     snake: "Snake",
@@ -27,17 +27,18 @@ const en = {
     ticTacToe: "Tic Tac Toe",
     ticTacToeDesc: "3×3 tactical duel",
     pong: "Ping Pong",
-    pongDesc: "Retro table tennis",
+    pongDesc: "Retro table tennis"
   },
-   recentHistory: {
+  recentHistory: {
     title: "Recent Battles",
     viewAll: "View all",
     emptyTitle: "No battles yet",
-    emptyDescription: "Play your first match and your history will show up here.",
+    emptyDescription: "Play your first match and your history will show up here."
   },
-enterArena: "Enter the Arena",
-  gamesAvailable: "Games Available",
-};
+  enterArena: "Enter the Arena",
+  gamesAvailable: "Games Available"
+}
+;
 
 type THomeTranslation = typeof en;
 export { en, type THomeTranslation };

@@ -3,9 +3,7 @@
 import { useAuth } from "@/app/providers/AuthProvider";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { Sidebar } from "@/component/SideBar";
 import { SocialPanel } from "@/component/SocialPanel/SocialPanel";
-import { BottomNav } from "@/component/BottomNav";
 import { ConnectionProvider } from "@/app/providers/ConnectionProvider";
 import { GameProvider } from "@/app/providers/GameProvider";
 import { DashboardNotificationsProvider } from "@/app/providers/DashboardNotificationsProvider";
@@ -13,11 +11,17 @@ import { ActiveGameBanner } from "@/component/games/ActiveGameBanner";
 import { NotificationPopup } from "@/component/notification/NotificationPopup";
 import { GSpinner } from "@/component/common/GSpinner";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { Sidebar } from "@/component/Sidebar/Sidebar";
+import { Header } from "@/component/Header/Header";
+import { MobileFooter } from "@/component/MobileFooter/MobileFooter";
+import { useAside } from "@/hooks/useAside";
 
 function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
   const redirectedRef = useRef(false);
+  const sidebarAside = useAside(false);
+  const socialAside = useAside(false);
 
   useEffect(() => {
     if (!loading && !user && !redirectedRef.current) {
@@ -26,15 +30,7 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
     }
   }, [loading, user, router]);
 
-  if (loading) {
-    return (
-      <div className="flex min-h-screen w-full bg-bg items-center justify-center">
-        <GSpinner size={SizeEnum.lg} />
-      </div>
-    );
-  }
-
-  if (!user) {
+  if (loading || !user) {
     return (
       <div className="flex min-h-screen w-full bg-bg items-center justify-center">
         <GSpinner size={SizeEnum.lg} />
@@ -46,16 +42,17 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
     <ConnectionProvider>
       <GameProvider>
         <DashboardNotificationsProvider>
-          <div className="flex h-screen w-full bg-bg text-text overflow-hidden font-sans antialiased">
-            <Sidebar />
-            <main className="flex-1 flex flex-col min-w-0 min-h-0 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden relative pb-18 lg:pb-0">
-              {children}
-            </main>
-            <SocialPanel />
+          <div className="flex h-dvh w-full flex-col overflow-hidden bg-bg font-sans text-text antialiased">
+            <Header sidebar={sidebarAside} social={socialAside} />
+            <div className="flex min-h-0 flex-1 pt-14">
+              <Sidebar aside={sidebarAside} />
+              <main className="flex min-w-0 flex-1 flex-col overflow-y-auto pb-mobile-nav md:pb-0 custom-scrollbar">{children}</main>
+              <SocialPanel aside={socialAside} />
+            </div>
+            <MobileFooter />
           </div>
           <NotificationPopup />
           <ActiveGameBanner />
-          <BottomNav />
         </DashboardNotificationsProvider>
       </GameProvider>
     </ConnectionProvider>

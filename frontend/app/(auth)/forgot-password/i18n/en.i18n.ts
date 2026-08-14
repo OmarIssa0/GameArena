@@ -11,9 +11,9 @@ const en = {
   backToLogin: "Back to login",
   placeholder: {
     email: "Enter your email",
-    otp: "Enter the OTP",
-    newPassword: "Enter your new password",
-  },
-};
+    newPassword: "Enter your new password"
+  }
+}
+;
 type TForgotPasswordTranslation = typeof en;
 export { en, type TForgotPasswordTranslation };

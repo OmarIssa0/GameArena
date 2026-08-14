@@ -7,15 +7,14 @@ import {
   type KeyboardEvent,
 } from "react";
 import { GButton } from "@/component/common/GButton";
+import { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 import { en, type TOtpTranslation } from "../i18n/Otp/en.i18n";
 import { ar } from "../i18n/Otp/ar.i18n";
 import { useTranslation } from "@/hooks/useSetting";
 import type { TNullable } from "@/domain/type/TCommon";
 import type { OtpFormProps } from "./def/OtpForm";
 import { emailVerificationService } from "@/services/def/EmailVerificationService";
-import { useErrorMessage } from "@/hooks/useErrorMessage";
-import type { AxiosError } from "axios";
-import type { IApiResponse } from "@/domain/meta/IApiResponse";
+import { toErrorCode, useErrorMessage } from "@/hooks/useErrorMessage";
 
 function OtpForm({ email, onSuccess }: OtpFormProps) {
   const [code, setCode] = useState<string[]>(Array(6).fill(""));
@@ -76,8 +75,7 @@ function OtpForm({ email, onSuccess }: OtpFormProps) {
       await emailVerificationService.verifyOtp({ email, otp });
       onSuccess(otp);
     } catch (e: unknown) {
-      const err = e as AxiosError<IApiResponse<unknown>>;
-      setError(resolveError(err?.response?.data?.errorCode, t.invalidCode));
+      setError(resolveError(toErrorCode(e), t.invalidCode));
     } finally {
       setLoading((prev) => ({ ...prev, verify: false }));
     }
@@ -90,15 +88,14 @@ function OtpForm({ email, onSuccess }: OtpFormProps) {
       setError("");
       await emailVerificationService.sendOtp({ email });
     } catch (e: unknown) {
-      const err = e as AxiosError<IApiResponse<unknown>>;
-      setError(resolveError(err?.response?.data?.errorCode, t.resendCodeFailed));
+      setError(resolveError(toErrorCode(e), t.resendCodeFailed));
     } finally {
       setLoading((prev) => ({ ...prev, resend: false }));
     }
   };
 
   return (
-    <div className="w-full max-w-sm mx-auto space-y-5">
+    <form onSubmit={(e) => { e.preventDefault(); void verify(); }} className="w-full max-w-sm mx-auto space-y-5">
       {/* Input Array Blocks Container */}
       <div className="flex gap-2 justify-center dir-ltr" dir="ltr">
         {code.map((digit, i) => (
@@ -112,34 +109,31 @@ function OtpForm({ email, onSuccess }: OtpFormProps) {
             pattern="[0-9]*"
             value={digit}
             maxLength={1}
+            autoFocus={i === 0}
             aria-label={t.digitLabel(i + 1)}
             onChange={(e) => setDigit(i, e.target.value)}
             onKeyDown={(e) => handleKeyDown(i, e)}
             onPaste={handlePaste}
-            className="w-12 h-14 text-center font-bold text-lg border border-border rounded-xl bg-surface/40 text-text focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+            className="w-12 h-14 text-center font-bold text-lg border border-border rounded-xl bg-surface text-text focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none"
           />
         ))}
       </div>
 
       {/* Semantic Error Output Box */}
       {error && (
-        <p role="alert" className="text-error text-xs font-medium text-center">
+        <p role="alert" className="text-danger text-xs font-medium text-center">
           {error}
         </p>
       )}
 
       <div className="space-y-2 pt-1">
-        <GButton
-          loading={loading.verify}
-          loadingText={t.verify}
-          onClick={verify}
-          className="w-full"
-        >
+        <GButton type="submit" loading={loading.verify} loadingText={t.verify} className="w-full">
           {t.verify}
         </GButton>
 
         <GButton
           type="button"
+          variant={ButtonVariantEnum.Subtle}
           disabled={loading.verify || loading.resend}
           onClick={resend}
           className="w-full"
@@ -147,7 +141,7 @@ function OtpForm({ email, onSuccess }: OtpFormProps) {
           {t.resendCode}
         </GButton>
       </div>
-    </div>
+    </form>
   );
 }
 

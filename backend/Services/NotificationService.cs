@@ -124,13 +124,6 @@ namespace backend.Services
             return notifications.Select(MapperHelper.ToDto).ToList();
         }
 
-        public async Task<int> GetUnreadNotificationCountAsync(Guid userId)
-        {
-            await using var context = await contextFactory.CreateDbContextAsync();
-            return await context.Notifications
-                .CountAsync(n => n.UserId == userId && !n.IsRead);
-        }
-
         public async Task<NotificationResponse> CreateNotificationAsync(Guid userId, string type, string title, string body, string? referenceId = null)
         {
             await using var context = await contextFactory.CreateDbContextAsync();

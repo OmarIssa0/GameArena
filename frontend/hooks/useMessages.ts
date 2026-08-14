@@ -55,11 +55,10 @@ export function useMessages(initialFriendId?: TNullable<string>) {
     t.error.title,
   );
 
-  const baseMessages = useMemo(() => apiMessages ?? [], [apiMessages]);
   const messages = useMemo(() => {
-    const combined = [...baseMessages, ...localMessages];
+    const combined = [...(apiMessages ?? []), ...localMessages];
     return combined.sort((a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime());
-  }, [baseMessages, localMessages]);
+  }, [apiMessages, localMessages]);
 
   const selectedFriend = useMemo<TNullable<IUserSummary>>(() => {
     if (!selectedFriendId) return null;

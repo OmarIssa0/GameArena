@@ -1,18 +1,18 @@
 const ar = {
-  title: "الأصدقاء",
+  title: "التواصل",
   online: "متصل",
   message: "رسالة",
   active: "نشط",
   searchPlaceholder: "بحث عن الأصدقاء...",
-  friendsAndInvites: "الأصدقاء والدعوات",
+  friendsAndInvites: "لوحة التواصل",
   tabs: {
     friends: "الأصدقاء",
-    invites: "الدعوات",
+    notifications: "الإشعارات"
   },
   invites: {
     wantsToPlay: "{{name}} يريد اللعب",
     accept: "قبول",
-    decline: "رفض",
+    decline: "رفض"
   },
   leaveTitle: "مغادرة اللعبة الحالية؟",
   leaveDesc: "لديك لعبة نشطة. هل تغادرها لقبول الدعوة؟",
@@ -22,9 +22,15 @@ const ar = {
   noFriendsDescription: "ابدأ بالتواصل مع اللاعبين الآخرين لبناء قائمة أصدقائك.",
   noInvitesTitle: "لا توجد دعوات بعد",
   noInvitesDescription: "عندما يدعوك أحدهم للعب، ستظهر هنا.",
-  noOnlineTitle: "لا يوجد أصدقاء متصلون",
-  noOnlineDescription: "سيظهر أصدقاؤك المتصلون هنا للوصول السريع.",
+  noMessagesTitle: "لا توجد رسائل بعد",
+  noMessagesDescription: "اختر صديقاً لبدء المحادثة.",
+  sentYouRequest: "أرسل لك طلب صداقة",
+  noNotificationsTitle: "لا توجد إشعارات",
+  noNotificationsDescription: "الإشعارات ستظهر هنا.",
   acceptInviteConfirmation: "تأكيد قبول الدعوة",
-};
+  send: "إرسال",
+  viewAll: "عرض الكل"
+}
+;
 
 export { ar };
