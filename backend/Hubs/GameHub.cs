@@ -57,8 +57,6 @@ namespace backend.Hubs
 
         private async Task HandlePlayerDisconnectionAsync(BaseGameRoom room, string roomId, string playerId)
         {
-            room.DisconnectedPlayerId = playerId;
-
             if (room.WinnerPlayerId != null)
             {
                 room.IsFinished = true;
@@ -103,7 +101,6 @@ namespace backend.Hubs
                 if (TryGetPlayerRoom(playerId, out var existingRoom, out var existingRoomId)
                     && !existingRoom!.IsFinished)
                 {
-                    existingRoom.DisconnectedPlayerId = null;
                     await Groups.AddToGroupAsync(Context.ConnectionId, existingRoomId!);
                     await Clients.Caller.SendAsync("gameState", existingRoom.GetStatePayload());
                     return;
@@ -283,7 +280,6 @@ namespace backend.Hubs
             if (TryGetPlayerRoom(playerId, out var existingRoom, out var existingRoomId)
                 && !existingRoom!.IsFinished)
             {
-                existingRoom.DisconnectedPlayerId = null;
                 await Groups.AddToGroupAsync(Context.ConnectionId, existingRoomId!);
                 await Clients.Caller.SendAsync("gameState", existingRoom.GetStatePayload());
                 return;
@@ -300,6 +296,7 @@ namespace backend.Hubs
                 inviterId = playerId,
                 inviterName = username
             });
+            await _eventBus.PublishAsync(new GameInviteSentEvent(friendId, room.RoomId, playerId, username, gameType));
         }
 
         public async Task AcceptInvite(string roomId)

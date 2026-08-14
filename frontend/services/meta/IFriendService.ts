@@ -16,7 +16,6 @@ interface IFriendService {
   removeFriend(friendId: string): TPromise<void>;
   blockUser(blockedId: string): TPromise<void>;
   unblockUser(blockedId: string): TPromise<void>;
-  getBlockedUsers(): TPromise<IUserSummary[]>;
 
   onFriendListUpdate(handler: (friends: IUserSummary[]) => void): () => void;
   onFriendRequestUpdate(handler: (data: { received: IFriendRequestReceived[]; sent: IFriendRequestSent[] }) => void): () => void;

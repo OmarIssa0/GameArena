@@ -15,7 +15,8 @@ const ar = {
   signIn: "تسجيل الدخول",
   unknownError: "حدث خطأ غير معروف",
   RegisterErrorCodeEnum: {
-    [ErrorCodeEnum.EmailAlreadyExists]: "البريد الإلكتروني موجود بالفعل"},
+    [ErrorCodeEnum.EmailAlreadyExists]: "البريد الإلكتروني موجود بالفعل",
+    [ErrorCodeEnum.UsernameAlreadyExists]: "اسم المستخدم موجود بالفعل"},
   dynamicFieldRequired: (field: string) => `حقل ${field} مطلوب`,
   placeholder: {
     firstName: "أدخل اسمك الأول",

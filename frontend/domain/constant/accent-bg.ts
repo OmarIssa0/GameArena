@@ -24,3 +24,15 @@ export const accentHoverBg: Record<AccentColorEnum, string> = {
   [AccentColorEnum.Accent]: "hover:bg-accent",
   [AccentColorEnum.Inherit]: "hover:bg-surface-hover",
 };
+
+export const accentHoverText: Record<AccentColorEnum, string> = {
+  [AccentColorEnum.Primary]: "hover:text-on-primary",
+  [AccentColorEnum.Secondary]: "hover:text-on-primary",
+  [AccentColorEnum.Muted]: "hover:text-text",
+  [AccentColorEnum.Success]: "hover:text-on-primary",
+  [AccentColorEnum.Warning]: "hover:text-on-primary",
+  [AccentColorEnum.Danger]: "hover:text-on-primary",
+  [AccentColorEnum.OnPrimary]: "hover:text-primary",
+  [AccentColorEnum.Accent]: "hover:text-on-primary",
+  [AccentColorEnum.Inherit]: "hover:text-text",
+};

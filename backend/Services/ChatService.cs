@@ -30,18 +30,11 @@ namespace backend.Services
 
         public async Task<MessageResponse> CreatePrivateMessageAsync(Guid senderId, Guid receiverId, string message)
         {
-            var isBlocked = await _context.Blocks.AnyAsync(b =>
-                (b.BlockerId == senderId && b.BlockedId == receiverId) ||
-                (b.BlockerId == receiverId && b.BlockedId == senderId));
-
-            if (isBlocked)
+            if (await SocialQueryHelper.GetBlockerAsync(_context, senderId, receiverId) != null)
                 throw new AppException(ErrorCode.UserBlockedYou);
 
-            var isFriend = await _context.UserFriends.AnyAsync(x =>
-                (x.UserId == senderId && x.FriendId == receiverId) ||
-                (x.UserId == receiverId && x.FriendId == senderId));
-
-            if (!isFriend) throw new AppException(ErrorCode.IsNotFriend);
+            if (!await SocialQueryHelper.AreFriendsAsync(_context, senderId, receiverId))
+                throw new AppException(ErrorCode.IsNotFriend);
 
             var msg = new Message
             {

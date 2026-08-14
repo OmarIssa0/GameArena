@@ -1,5 +1,7 @@
 "use client";
 
+import { useRef } from "react";
+
 import type { IPingPongGameState } from "@/app/providers/def/IGameState";
 import { useGame } from "@/app/providers/GameProvider";
 import { GCard } from "@/component/common/GCard";
@@ -16,6 +18,7 @@ const calculatePercentage = (value: number, total: number) => `${(value / total)
 function PingPongPage() {
   const { state } = useGame();
   const t = useGameTranslation();
+  const boardRef = useRef<HTMLDivElement>(null);
 
   const isActive = !!state && "ball" in state && !state.isFinished;
 
@@ -34,6 +37,8 @@ function PingPongPage() {
     resolveDirection,
     createAction: (dir) => ({ type: GameActionTypes.MOVE_PADDLE, direction: dir as "UP" | "DOWN" }),
     throttleMs: INPUT_THROTTLE_MS.PING_PONG,
+    boardRef,
+    touchMode: "drag",
   });
 
   if (!state || !("ball" in state)) {
@@ -70,7 +75,8 @@ function PingPongPage() {
         </div>
         <div className="flex justify-center">
           <div
-            className="relative bg-surface border-2 border-border-light rounded-lg mx-auto w-full max-w-full overflow-hidden"
+            ref={boardRef}
+            className="relative bg-surface border-2 border-border-light rounded-lg mx-auto w-full max-w-full overflow-hidden touch-none select-none"
             style={{ aspectRatio: boardWidth / boardHeight }}>
             <div
               className="absolute bg-accent rounded"

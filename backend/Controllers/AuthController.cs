@@ -16,7 +16,7 @@ namespace backend.Controllers
         {
             await _authService.RegisterAsync(request);
 
-            return Ok(new ApiResponse<object> { Message = "User registered. Check email for OTP." });
+            return Ok(new ApiResponse<object>());
         }
 
         [HttpPost("login")]
@@ -26,7 +26,7 @@ namespace backend.Controllers
 
             AuthCookieHelper.SetAuthCookies(Response, response);
 
-            return Ok(new ApiResponse<object> { Message = "Login successful" });
+            return Ok(new ApiResponse<object>());
         }
 
         [HttpPost("logout")]
@@ -35,7 +35,7 @@ namespace backend.Controllers
             var refreshToken = Request.Cookies["refresh_token"] ?? throw new AppException(ErrorCode.Unauthorized);
             await _authService.RevokeRefreshTokenAsync(refreshToken);
             AuthCookieHelper.ClearAuthCookies(Response);
-            return Ok(new ApiResponse<object> { Message = "Logged out" });
+            return Ok(new ApiResponse<object>());
         }
 
         [HttpPost("refresh")]
@@ -47,14 +47,14 @@ namespace backend.Controllers
             var response = await _authService.RefreshAccessTokenAsync(refreshToken);
             AuthCookieHelper.SetAuthCookies(Response, response);
 
-            return Ok(new ApiResponse<object> { Message = "Token refreshed" });
+            return Ok(new ApiResponse<object>());
         }
 
         [HttpPost("forgot-password")]
         public async Task<ActionResult<ApiResponse<object>>> ForgotPassword(ForgotPasswordRequest request)
         {
             await _authService.ForgotPasswordAsync(request.Email);
-            return Ok(new ApiResponse<object> { Message = "If the email exists, OTP has been sent" });
+            return Ok(new ApiResponse<object>());
         }
 
         [HttpPost("reset-password")]
@@ -62,7 +62,7 @@ namespace backend.Controllers
         {
             await _authService.ResetPasswordAsync(request.Email, request.Otp, request.NewPassword);
 
-            return Ok(new ApiResponse<object> { Message = "Password reset successful" });
+            return Ok(new ApiResponse<object>());
         }
     }
 }

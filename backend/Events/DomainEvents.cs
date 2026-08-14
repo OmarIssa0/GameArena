@@ -1,3 +1,5 @@
+using backend.Enums;
+
 namespace backend.Events;
 
 public sealed record FriendRequestSentEvent(
@@ -51,4 +53,12 @@ public sealed record GameFinishedEvent(
 
 public sealed record GameLeftEvent(
     string PlayerId
+) : DomainEvent;
+
+public sealed record GameInviteSentEvent(
+    string ReceiverId,
+    string RoomId,
+    string InviterId,
+    string InviterName,
+    GamesKind GameType
 ) : DomainEvent;

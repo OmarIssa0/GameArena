@@ -19,7 +19,6 @@ namespace backend.Domain
         public bool HasStarted { get; set; } = false;
         public string? WinnerPlayerId { get; set; }
         public string? WinnerSymbol { get; set; }
-        public string? DisconnectedPlayerId { get; set; }
         public bool IsBotGame { get; set; } = false;
         public string? CurrentTurnPlayerId { get; set; }
         public int[] Score { get; set; } = [0, 0];

@@ -12,6 +12,7 @@ const en: THashMap<string, number> = {
   [ErrorCodeEnum.EmailNotFound]: "Email not found",
   [ErrorCodeEnum.EmailAlreadyExists]: "Email already registered",
   [ErrorCodeEnum.EmailAlreadyVerified]: "Email is already verified",
+  [ErrorCodeEnum.UsernameAlreadyExists]: "Username is already used",
   [ErrorCodeEnum.RateLimited]: "Too many attempts. Please wait a moment",
   [ErrorCodeEnum.UserNotFound]: "User not found",
   [ErrorCodeEnum.RequestAlreadyExists]: "Friend request already sent",

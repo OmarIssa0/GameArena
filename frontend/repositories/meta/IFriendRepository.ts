@@ -15,6 +15,5 @@ interface IFriendRepository {
   cancelFriendRequest(receiverId: string): TPromise<void>;
   blockUser(blockedId: string): TPromise<void>;
   unblockUser(blockedId: string): TPromise<void>;
-  getBlockedUsers(): TPromise<IUserSummary[]>;
 }
 export type { IFriendRepository };

@@ -8,8 +8,6 @@ export const GameActionTypes = {
 export const DirectionValues = {
   UP: "UP",
   DOWN: "DOWN",
-  LEFT: "LEFT",
-  RIGHT: "RIGHT",
 } as const;
 
 export type TGameAction =
@@ -18,14 +16,16 @@ export type TGameAction =
   | { type: typeof GameActionTypes.MAKE_MOVE; choice?: string; cell?: number }
   | { type: typeof GameActionTypes.PLACE; col: number };
 
-export const PADDLE_KEYS = {
-  UP: new Set(["ArrowUp", "w", "W"]),
-  DOWN: new Set(["ArrowDown", "s", "S"]),
-} as const;
-
-export const DIRECTIONS: Record<"UP" | "DOWN" | "LEFT" | "RIGHT", string[]> = {
+const DIRECTION_KEYS: Record<"UP" | "DOWN" | "LEFT" | "RIGHT", string[]> = {
   UP: ["ArrowUp", "w", "W"],
   DOWN: ["ArrowDown", "s", "S"],
   LEFT: ["ArrowLeft", "a", "A"],
   RIGHT: ["ArrowRight", "d", "D"],
+};
+
+export const PADDLE_KEYS = {
+  UP: new Set(DIRECTION_KEYS.UP),
+  DOWN: new Set(DIRECTION_KEYS.DOWN),
 } as const;
+
+export const DIRECTIONS: Record<"UP" | "DOWN" | "LEFT" | "RIGHT", string[]> = DIRECTION_KEYS;

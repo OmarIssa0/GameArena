@@ -84,7 +84,6 @@ namespace backend.Utils
                 Opponent = ToDtoSummary(opponent),
                 Player1Score = matchHistory.Player1Score,
                 Player2Score = matchHistory.Player2Score,
-                IsWinner = myScore > opponentScore,
                 Result = myScore > opponentScore
                     ? MatchStatus.Win
                     : myScore < opponentScore

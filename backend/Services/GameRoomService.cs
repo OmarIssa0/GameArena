@@ -19,11 +19,13 @@ namespace backend.Services
         private readonly ConcurrentDictionary<string, string> _playAgainRequests = new();
         private readonly IHubContext<GameHub> _hubContext;
         private readonly IServiceScopeFactory _scopeFactory;
+        private readonly ILogger<GameRoomService> _logger;
 
-        public GameRoomService(IHubContext<GameHub> hubContext, IServiceScopeFactory scopeFactory)
+        public GameRoomService(IHubContext<GameHub> hubContext, IServiceScopeFactory scopeFactory, ILogger<GameRoomService> logger)
         {
             _hubContext = hubContext;
             _scopeFactory = scopeFactory;
+            _logger = logger;
         }
 
         public (BaseGameRoom room, bool isNew) FindOrCreateRoom(GamesKind gameType, string playerId, string username)
@@ -138,7 +140,7 @@ namespace backend.Services
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"ProcessActionAsync error: {ex.Message}");
+                _logger.LogError(ex, "ProcessActionAsync error");
             }
         }
 
@@ -222,7 +224,7 @@ namespace backend.Services
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"PersistMatchResultAsync error: {ex.Message}");
+                _logger.LogError(ex, "PersistMatchResultAsync error");
             }
         }
 

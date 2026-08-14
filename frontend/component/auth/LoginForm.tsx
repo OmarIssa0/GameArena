@@ -76,7 +76,7 @@ function LoginForm() {
       const err = e as AxiosError<IApiResponse<unknown>>;
       const data = err?.response?.data;
       const code = data?.errorCode;
-      const errorMessage = t.loginErrorCodeEnum[code as keyof typeof t.loginErrorCodeEnum] || data?.message || t.unknownError;
+      const errorMessage = t.loginErrorCodeEnum[code as keyof typeof t.loginErrorCodeEnum] || t.unknownError;
 
       if (code === ErrorCodeEnum.EmailNotVerified) {
         setApiError({

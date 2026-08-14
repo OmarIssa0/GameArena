@@ -7,10 +7,6 @@ import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { GButton } from "./GButton";
 import { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 
-// Single nav pattern shared with GNav: muted active fill, text + weight change
-const activeStyle = "bg-primary-muted text-primary font-semibold";
-const idleStyle = "text-text-secondary hover:bg-primary-muted hover:text-text";
-
 function renderTabBadge<T extends string | number>(tab: { id: T; badge?: number }, renderBadge: GTabsProps<T>["renderBadge"], active: boolean) {
   if (renderBadge) {
     return renderBadge(tab, active);

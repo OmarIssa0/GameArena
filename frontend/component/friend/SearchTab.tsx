@@ -24,6 +24,7 @@ import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import type { TNullable } from "@/domain/type/TCommon";
 import { useTranslation } from "@/hooks/useSetting";
 import { toErrorCode, useErrorMessage } from "@/hooks/useErrorMessage";
+import { SEARCH_DEBOUNCE_MS } from "@/domain/constant/debounce";
 import { friendService } from "@/services/def/FriendService";
 import { userService } from "@/services/def/UserService";
 
@@ -95,7 +96,7 @@ function SearchTab() {
 
     const timer = window.setTimeout(() => {
       void performSearch();
-    }, 300);
+    }, SEARCH_DEBOUNCE_MS);
 
     return () => {
       window.clearTimeout(timer);

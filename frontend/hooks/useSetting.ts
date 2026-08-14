@@ -108,6 +108,10 @@ function createProxy(langs: TTranslate, path: string[] = []): unknown {
 }
 
 export function useTranslation<T>(langs: TTranslate): T {
-  useLocale();
-  return useMemo(() => createProxy(langs) as T, [langs]);
+  const [locale] = useLocale();
+  // The langs objects are module constants; memoizing on the locale keeps the
+  // translation proxy identity stable across re-renders (inline callers pass
+  // fresh literals with identical values on every render).
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  return useMemo(() => createProxy(langs) as T, [locale]);
 }

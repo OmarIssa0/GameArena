@@ -11,115 +11,118 @@ public class ErrorResponse
 
     public static class ErrorHelper
     {
-        public static readonly IDictionary<ErrorCode, (int StatusCode, string Message)> Errors =
-         new Dictionary<ErrorCode, (int StatusCode, string Message)>
+        public static readonly IDictionary<ErrorCode, int> Errors =
+         new Dictionary<ErrorCode, int>
          {
              // AUTH
 
              [ErrorCode.InvalidCredentials] =
-             (401, "Invalid credentials"),
+             401,
 
              [ErrorCode.Unauthorized] =
-             (401, "Unauthorized access"),
+             401,
 
              [ErrorCode.TokenExpired] =
-             (401, "Token has expired"),
+             401,
 
              [ErrorCode.EmailNotVerified] =
-             (401, "Email is not verified"),
+             401,
 
              [ErrorCode.RefreshTokenInvalid] =
-             (401, "Invalid refresh token"),
+             401,
 
              [ErrorCode.EmailAlreadyVerified] =
-             (400, "Email is already verified"),
+             400,
 
              // EMAIL / OTP
 
              [ErrorCode.EmailNotFound] =
-             (404, "Email not found"),
+             404,
 
              [ErrorCode.EmailAlreadyExists] =
-             (409, "Email already exists"),
+             409,
+
+             [ErrorCode.UsernameAlreadyExists] =
+             409,
 
              [ErrorCode.OtpInvalid] =
-             (400, "Invalid OTP"),
+             400,
 
              [ErrorCode.OtpExpired] =
-             (400, "OTP has expired"),
+             400,
 
              [ErrorCode.RateLimited] =
-             (429, "Too many requests. Please wait before requesting a new OTP."),
+             429,
 
              // USER
 
              [ErrorCode.UserNotFound] =
-             (404, "User not found"),
+             404,
 
               [ErrorCode.AlreadyBlocked] =
-              (400, "User is already blocked"),
+              400,
 
               [ErrorCode.NotBlocked] =
-              (400, "User is not blocked"),
+              400,
 
               [ErrorCode.CannotSelfBlock] =
-              (400, "Cannot block yourself"),
+              400,
 
               [ErrorCode.UserBlockedYou] =
-              (403, "User has blocked you"),
+              403,
 
               [ErrorCode.YouBlockedUser] =
-              (403, "You have blocked this user"),
+              403,
 
              // FRIEND SYSTEM
 
              [ErrorCode.RequestAlreadyExists] =
-             (409, "Friend request already exists"),
+             409,
 
              [ErrorCode.AlreadyFriends] =
-             (409, "Users are already friends"),
+             409,
 
              [ErrorCode.ReceiverHasAlreadySentRequest] =
-             (409, "Receiver has already sent a friend request"),
+             409,
 
              [ErrorCode.FriendRequestNotFound] =
-             (404, "Friend request not found"),
+             404,
 
              [ErrorCode.IsNotFriend] =
-             (400, "Users are not friends"),
+             400,
 
              [ErrorCode.RequestAlreadyProcessed] =
-             (409, "Friend request was already processed"),
+             409,
 
              // GAME
 
              [ErrorCode.RoomNotFound] =
-             (404, "Game room not found"),
+             404,
 
              [ErrorCode.PlayerNotFound] =
-             (404, "Player not found"),
+             404,
 
              [ErrorCode.InvalidGameType] =
-             (400, "Invalid game type"),
+             400,
 
              [ErrorCode.InvalidRoomId] =
-             (400, "Invalid room ID"),
+             400,
 
              // VALIDATION / REQUEST
 
              [ErrorCode.InvalidRequest] =
-             (400, "Invalid request"),
+             400,
 
              [ErrorCode.ValidationError] =
-             (400, "Validation failed"),
+             400,
 
              // SYSTEM
 
              [ErrorCode.ServerError] =
-             (500, "Internal server error"),
+             500,
 
              [ErrorCode.None] =
-             (500, "Unknown error")
+             500
          };
         public static ErrorResponse GetErrorResponse(Exception ex)
         {
@@ -127,27 +130,24 @@ public class ErrorResponse
             {
                 return Create(
                     500,
-                    ErrorCode.ServerError,
-                    "Internal server error"
+                    ErrorCode.ServerError
                 );
             }
 
-            if (!Errors.TryGetValue(appEx.ErrorCode, out var definition))
+            if (!Errors.TryGetValue(appEx.ErrorCode, out var statusCode))
             {
                 throw new Exception($"Missing ErrorCode mapping: {appEx.ErrorCode}");
             }
 
             return Create(
-                definition.StatusCode,
-                appEx.ErrorCode,
-                definition.Message
+                statusCode,
+                appEx.ErrorCode
             );
         }
 
         private static ErrorResponse Create(
             int statusCode,
-            ErrorCode code,
-            string message)
+            ErrorCode code)
         {
             return new ErrorResponse
             {
@@ -156,7 +156,6 @@ public class ErrorResponse
                 {
                     Success = false,
                     ErrorCode = code,
-                    Message = message,
                     Data = null
                 }
             };

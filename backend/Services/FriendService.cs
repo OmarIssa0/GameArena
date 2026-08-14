@@ -16,13 +16,11 @@ namespace backend.Services
             if (senderId == receiverId)
                 throw new AppException(ErrorCode.InvalidRequest);
 
-            var (blocked, userBlockedBy) = await IsBlockedAsync(senderId, receiverId);
-            if (blocked)
-                throw new AppException(userBlockedBy == receiverId ? ErrorCode.UserBlockedYou : ErrorCode.YouBlockedUser);
+            var blocker = await SocialQueryHelper.GetBlockerAsync(_context, senderId, receiverId);
+            if (blocker != null)
+                throw new AppException(blocker == receiverId ? ErrorCode.UserBlockedYou : ErrorCode.YouBlockedUser);
 
-            if (await _context.UserFriends.AnyAsync(x =>
-                (x.UserId == senderId && x.FriendId == receiverId) ||
-                (x.UserId == receiverId && x.FriendId == senderId)))
+            if (await SocialQueryHelper.AreFriendsAsync(_context, senderId, receiverId))
                 throw new AppException(ErrorCode.AlreadyFriends);
 
             var existingRequest = await _context.FriendRequests
@@ -56,9 +54,9 @@ namespace backend.Services
 
         public async Task AcceptRequestAsync(Guid userId, Guid senderId)
         {
-            var (blocked, userBlockedBy) = await IsBlockedAsync(userId, senderId);
-            if (blocked)
-                throw new AppException(userBlockedBy == senderId ? ErrorCode.YouBlockedUser : ErrorCode.UserBlockedYou);
+            var blocker = await SocialQueryHelper.GetBlockerAsync(_context, userId, senderId);
+            if (blocker != null)
+                throw new AppException(blocker == senderId ? ErrorCode.YouBlockedUser : ErrorCode.UserBlockedYou);
 
             var request = await _context.FriendRequests
                 .FirstOrDefaultAsync(fr =>
@@ -143,11 +141,7 @@ namespace backend.Services
 
         public async Task RemoveFriendAsync(Guid userId, Guid friendId)
         {
-            var friendships = await _context.UserFriends
-                .Where(uf =>
-                    (uf.UserId == userId && uf.FriendId == friendId) ||
-                    (uf.UserId == friendId && uf.FriendId == userId))
-                .ToListAsync();
+            var friendships = await SocialQueryHelper.GetFriendshipsAsync(_context, userId, friendId);
 
             if (friendships.Count == 0)
                 throw new AppException(ErrorCode.IsNotFriend);
@@ -167,11 +161,7 @@ namespace backend.Services
 
             _context.Blocks.Add(new Block { BlockerId = blockerId, BlockedId = blockedId });
 
-            var friendships = await _context.UserFriends
-                .Where(uf =>
-                    (uf.UserId == blockerId && uf.FriendId == blockedId) ||
-                    (uf.UserId == blockedId && uf.FriendId == blockerId))
-                .ToListAsync();
+            var friendships = await SocialQueryHelper.GetFriendshipsAsync(_context, blockerId, blockedId);
 
             _context.UserFriends.RemoveRange(friendships);
 
@@ -209,14 +199,6 @@ namespace backend.Services
 
             _context.Blocks.Remove(block);
             await _context.SaveChangesAsync();
-        }
-
-        private async Task<(bool Blocked, Guid WhoBlocked)> IsBlockedAsync(Guid firstUserId, Guid secondUserId)
-        {
-            var block = await _context.Blocks.FirstOrDefaultAsync(b =>
-                (b.BlockerId == secondUserId && b.BlockedId == firstUserId) ||
-                (b.BlockerId == firstUserId && b.BlockedId == secondUserId));
-            return (block != null, block?.BlockerId ?? Guid.Empty);
         }
     }
 }

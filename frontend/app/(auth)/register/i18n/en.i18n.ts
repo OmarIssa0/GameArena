@@ -15,7 +15,8 @@ const en = {
   signIn: "Sign in",
   unknownError: "An unknown error occurred",
   RegisterErrorCodeEnum: {
-    [ErrorCodeEnum.EmailAlreadyExists]: "Email already exists"},
+    [ErrorCodeEnum.EmailAlreadyExists]: "Email already exists",
+    [ErrorCodeEnum.UsernameAlreadyExists]: "Username already exists"},
   dynamicFieldRequired: (field: string) => `${field} is required`,
   placeholder: {
     firstName: "Enter your first name",

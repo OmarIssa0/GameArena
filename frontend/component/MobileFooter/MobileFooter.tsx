@@ -6,6 +6,7 @@ import { useNavigation } from "@/hooks/useNavigation";
 import { NavOrientationEnum } from "@/domain/enum/NavOrientationEnum";
 import { IndicatorPositionEnum } from "@/domain/enum/IndicatorPositionEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
+import { iconSize } from "@/domain/constant/size-classes";
 
 function MobileFooter() {
   const router = useRouter();
@@ -15,7 +16,7 @@ function MobileFooter() {
 
   const navItems = mobileNavItems.map(({ id, labelKey, icon: Icon }) => ({
     id,
-    icon: <Icon size={SizeEnum.sm} />,
+    icon: <Icon className={iconSize[SizeEnum.sm]} />,
     size: SizeEnum.sm,
     label: t[labelKey as keyof typeof t],
     active: activeId === id,
@@ -24,7 +25,7 @@ function MobileFooter() {
 
   return (
     <GNav
-      className="md:hidden bg-bg-sidebar border-t"
+      className="md:hidden bg-bg-sidebar border-t pb-safe"
       aria-label={t.mainNavigation}
       items={navItems}
       orientation={NavOrientationEnum.Horizontal}

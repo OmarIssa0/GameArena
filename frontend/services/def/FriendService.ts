@@ -123,10 +123,6 @@ class FriendService extends SignalRServiceBase implements IFriendService {
     return this.repo.unblockUser(blockedId);
   }
 
-  getBlockedUsers(): TPromise<IUserSummary[]> {
-    return this.repo.getBlockedUsers();
-  }
-
   // ── SignalR subscriptions ────────────────────────────────────────────
 
   onFriendListUpdate(handler: (friends: IUserSummary[]) => void): () => void {
@@ -146,10 +142,6 @@ class FriendService extends SignalRServiceBase implements IFriendService {
   }
 
   // ── SignalR invocations ────────────────────────────────────────────────
-
-  async invokeSocialData(): Promise<void> {
-    await this.requireConnection("Social").invoke("RequestSocialData");
-  }
 
   async invokeFriends(): Promise<void> {
     await this.requireConnection("Social").invoke("RequestFriends");

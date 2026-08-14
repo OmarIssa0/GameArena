@@ -117,6 +117,7 @@ builder.Services.AddScoped<IEventHandler<GameStartedEvent>>(sp => sp.GetRequired
 builder.Services.AddScoped<IEventHandler<GameFinishedEvent>>(sp => sp.GetRequiredService<SocialNotificationHandler>());
 builder.Services.AddScoped<IEventHandler<GameLeftEvent>>(sp => sp.GetRequiredService<SocialNotificationHandler>());
 builder.Services.AddScoped<IEventHandler<UserBlockedEvent>>(sp => sp.GetRequiredService<SocialNotificationHandler>());
+builder.Services.AddScoped<IEventHandler<GameInviteSentEvent>>(sp => sp.GetRequiredService<SocialNotificationHandler>());
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddSingleton<IUserPresenceService, UserPresenceService>();
 builder.Services.AddSingleton<IGameRoomService, GameRoomService>();

@@ -1,6 +1,7 @@
 "use client";
 
 import clsx from "clsx";
+import { useRef } from "react";
 
 import { useAuth } from "@/app/providers/AuthProvider";
 import type { ISnakeGameState } from "@/app/providers/def/IGameState";
@@ -27,6 +28,7 @@ function SnakePage() {
   const { state } = useGame();
   const { user } = useAuth();
   const t = useGameTranslation();
+  const boardRef = useRef<HTMLDivElement>(null);
 
   const isSnake = !!state && "player1Snake" in state;
   const isActive = isSnake && !(state as ISnakeGameState).isFinished;
@@ -48,6 +50,8 @@ function SnakePage() {
     resolveDirection,
     createAction: (dir) => ({ type: GameActionTypes.CHANGE_DIRECTION, direction: dir }),
     throttleMs: INPUT_THROTTLE_MS.SNAKE,
+    boardRef,
+    touchMode: "swipe",
   });
 
   if (!state || !isSnake) {
@@ -78,7 +82,8 @@ function SnakePage() {
         </div>
 
         <div
-          className="relative rounded border border-border-light overflow-hidden"
+          ref={boardRef}
+          className="relative rounded border border-border-light overflow-hidden touch-none select-none"
           style={{ aspectRatio: `${snakeState.boardWidth} / ${snakeState.boardHeight}` }}>
           <GameBoard
             boardWidth={snakeState.boardWidth}

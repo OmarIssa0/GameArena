@@ -4,7 +4,7 @@ import clsx from "clsx";
 import type { GIconProps } from "./def/GIcon";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
-import { accentHoverBg } from "@/domain/constant/accent-bg";
+import { accentHoverBg, accentHoverText } from "@/domain/constant/accent-bg";
 import { iconSize, radiusSize } from "@/domain/constant/size-classes";
 
 function GIcon({
@@ -54,7 +54,7 @@ function GIcon({
     tileClassName,
   );
 
-  const iconEl = <Icon className={clsx(sizeClass, activeColor, isRtl)} aria-hidden="true" />;
+  const iconEl = <Icon className={clsx(sizeClass, activeColor, hover && accentHoverText[activeColor], isRtl)} aria-hidden="true" />;
 
   if (onClick) {
     return (

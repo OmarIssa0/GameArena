@@ -19,7 +19,8 @@ public class SocialNotificationHandler(
     IEventHandler<GameFinishedEvent>,
     IEventHandler<GameLeftEvent>,
     IEventHandler<UserBlockedEvent>,
-    IEventHandler<FriendRequestCancelledEvent>
+    IEventHandler<FriendRequestCancelledEvent>,
+    IEventHandler<GameInviteSentEvent>
 {
     public async Task HandleAsync(FriendRequestSentEvent eventHappen)
     {
@@ -119,6 +120,19 @@ public class SocialNotificationHandler(
         );
 
         await _notificationService.SendCountersAsync(eventHappen.ReceiverId);
+    }
+
+    public async Task HandleAsync(GameInviteSentEvent eventHappen)
+    {
+        if (!Guid.TryParse(eventHappen.ReceiverId, out var receiverId)) return;
+
+        await _notificationService.CreateNotificationAsync(
+            receiverId,
+            "GameInvite",
+            "Game Invite",
+            $"{eventHappen.InviterName} invited you to play {eventHappen.GameType}",
+            eventHappen.RoomId
+        );
     }
 
     public async Task HandleAsync(GameStartedEvent eventHappen)

@@ -1,5 +1,6 @@
 ﻿using backend.Utils;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace backend.Data
 {
@@ -8,6 +9,7 @@ namespace backend.Data
         private static readonly JsonSerializerOptions _jsonOptions = new()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
         };
 
         public async Task InvokeAsync(HttpContext context)

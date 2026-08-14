@@ -132,7 +132,7 @@ function GModal({
   return (
     <div
       ref={modalRef}
-      className={clsx("fixed inset-0 z-modal flex items-center justify-center", className)}
+      className={clsx("fixed inset-0 z-modal flex items-center justify-center p-4", className)}
       role={role}
       aria-modal="true"
       aria-label={ariaLabel}
@@ -141,7 +141,7 @@ function GModal({
       <GBackdrop onClick={handleBackdropClick} />
       <GCard
         padding={cardPadding}
-        className={clsx("relative z-modal mx-auto w-full ", modalSize[size])}
+        className={clsx("relative z-modal mx-auto w-full max-h-full overflow-y-auto custom-scrollbar", modalSize[size])}
         onClick={(e: React.MouseEvent) => e.stopPropagation()}>
         {ariaDescription && (
           <p id="modal-description" className="sr-only">

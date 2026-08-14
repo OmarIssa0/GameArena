@@ -2,8 +2,6 @@ namespace backend.Utils
 {
     public static class TicTacToeMinimax
     {
-        private static readonly int[][] WinLines = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
-
         public static int GetBestMove(string[] board, string aiSymbol)
         {
             int bestScore = int.MinValue;
@@ -30,8 +28,8 @@ namespace backend.Utils
 
         private static int Minimax(string[] board, int depth, bool isMaximizing, string aiSymbol, string humanSymbol)
         {
-            if (CheckWinner(board, aiSymbol)) return 10 - depth;
-            if (CheckWinner(board, humanSymbol)) return depth - 10;
+            if (GameHelper.CheckWinTicTacToe(board, aiSymbol)) return 10 - depth;
+            if (GameHelper.CheckWinTicTacToe(board, humanSymbol)) return depth - 10;
             if (IsBoardFull(board)) return 0;
 
             if (isMaximizing)
@@ -60,16 +58,6 @@ namespace backend.Utils
                 }
                 return bestScore;
             }
-        }
-
-        private static bool CheckWinner(string[] board, string symbol)
-        {
-            foreach (var line in WinLines)
-            {
-                if (board[line[0]] == symbol && board[line[1]] == symbol && board[line[2]] == symbol)
-                    return true;
-            }
-            return false;
         }
 
         private static bool IsBoardFull(string[] board)

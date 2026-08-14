@@ -46,7 +46,6 @@ function UserMenu() {
     setOpen(false);
     router.push("/settings");
   };
-console.log("user", user);
   return (
     <GDropdown
       open={open}

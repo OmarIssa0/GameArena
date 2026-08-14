@@ -49,6 +49,10 @@ namespace backend.Services
 
             var exists = await _context.Users.AnyAsync(u => u.Email == request.Email);
             if (exists) throw new AppException(ErrorCode.EmailAlreadyExists);
+
+            var userNameExists = await _context.Users.AnyAsync(u => u.UserName == request.UserName);
+            if (userNameExists) throw new AppException(ErrorCode.UsernameAlreadyExists);
+
             var user = new User
             {
                 UserName = request.UserName,
@@ -61,7 +65,20 @@ namespace backend.Services
             };
 
             _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                // Two simultaneous registrations can bypass the checks above;
+                // the database unique indexes are the final authority.
+                if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+                    throw new AppException(ErrorCode.EmailAlreadyExists);
+                if (await _context.Users.AnyAsync(u => u.UserName == request.UserName))
+                    throw new AppException(ErrorCode.UsernameAlreadyExists);
+                throw;
+            }
             await _emailVerificationService.GenerateAndSendOtpAsync(user.Email, OtpPurpose.EmailVerification);
         }
 

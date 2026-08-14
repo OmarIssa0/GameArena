@@ -50,15 +50,30 @@ export default function NotificationsPage() {
   const [error, setError] = useState<TNullable<string>>(null);
 
   useEffect(() => {
+    let alive = true;
+
+    const off = friendService.onFriendRequestUpdate((data) => {
+      if (!alive) return;
+      setRequests(data.received ?? []);
+      setLoading(false);
+    });
+
     friendService
       .getReceivedFriendRequests()
       .then((r) => {
-        if (r.data) setRequests(r.data);
+        if (alive && r.data) setRequests(r.data);
       })
       .catch((e: unknown) => {
-        setError(resolveError(toErrorCode(e), t.error.title));
+        if (alive) setError(resolveError(toErrorCode(e), t.error.title));
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (alive) setLoading(false);
+      });
+
+    return () => {
+      alive = false;
+      off();
+    };
   }, [t, resolveError]);
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
@@ -86,6 +101,8 @@ export default function NotificationsPage() {
     const out: Array<{ id: string; type: string; title: string; desc: string; time: string; read: boolean; onAction?(): void; onDismiss?(): void }> =
       [];
     for (const n of notifications) {
+      const isGameInvite = n.type === "GameInvite" && n.referenceId != null;
+      if (isGameInvite && gameInvites.some((g) => g.roomId === n.referenceId)) continue;
       out.push({
         id: n.id,
         type: n.type,
@@ -93,7 +110,21 @@ export default function NotificationsPage() {
         desc: n.body,
         time: timeAgo(new Date(n.createdAt), t),
         read: n.isRead,
-        onAction: n.isRead ? undefined : () => notificationService.markNotificationRead(n.id),
+        onAction: isGameInvite
+          ? () => {
+              acceptGameInvite(n.referenceId as string)
+                .then(() => notificationService.markNotificationRead(n.id))
+                .catch(() => {});
+            }
+          : n.isRead
+            ? undefined
+            : () => notificationService.markNotificationRead(n.id),
+        onDismiss: isGameInvite
+          ? () => {
+              dismissGameInvite(n.referenceId as string);
+              notificationService.deleteNotification(n.id);
+            }
+          : undefined,
       });
     }
     for (const g of gameInvites) {

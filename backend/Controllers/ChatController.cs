@@ -12,7 +12,8 @@ namespace backend.Controllers
     public class ChatController(
         IChatService _chatService,
         ICurrentUserService _currentUser,
-        IServiceScopeFactory _scopeFactory) : ControllerBase
+        IServiceScopeFactory _scopeFactory,
+        ILogger<ChatController> _logger) : ControllerBase
     {
         [HttpGet("messages/{friendId}")]
         public async Task<ActionResult<ApiResponse<List<MessageResponse>>>> GetMessages(Guid friendId)
@@ -35,8 +36,7 @@ namespace backend.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Failed to push counters for {userId} after reading messages.");
-                Console.WriteLine(ex);
+                _logger.LogError(ex, "Failed to push counters for {UserId} after reading messages", userId);
             }
         }
 

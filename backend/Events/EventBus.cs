@@ -1,6 +1,6 @@
 namespace backend.Events;
 
-public class EventBus(IServiceScopeFactory _scopeFactory) : IEventBus
+public class EventBus(IServiceScopeFactory _scopeFactory, ILogger<EventBus> _logger) : IEventBus
 {
     public async Task PublishAsync<TEvent>(TEvent eventHappen) where TEvent : DomainEvent
     {
@@ -14,7 +14,7 @@ public class EventBus(IServiceScopeFactory _scopeFactory) : IEventBus
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"EventBus handler error for {typeof(TEvent).Name}: {ex.Message}");
+                _logger.LogError(ex, "EventBus handler error for {EventType}", typeof(TEvent).Name);
             }
         }
     }

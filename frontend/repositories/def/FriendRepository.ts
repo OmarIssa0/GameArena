@@ -50,10 +50,6 @@ class FriendRepository implements IFriendRepository {
     return this.api.unblockUser({ blockedId });
   }
 
-  getBlockedUsers(): TPromise<IUserSummary[]> {
-    return this.api.getBlockedUsers();
-  }
-
   static getInstance() {
     if (!FriendRepository.instance) {
       FriendRepository.instance = new FriendRepository();

@@ -4,6 +4,10 @@ export const INPUT_THROTTLE_MS = {
   SNAKE: 100, // 10 ticks/sec
 } as const;
 
+// Touch controls
+export const SWIPE_THRESHOLD_PX = 20;
+export const DRAG_THRESHOLD_PX = 4;
+
 // Play-again request window (ms)
 export const PLAY_AGAIN_TIMEOUT_MS = 30000;
 

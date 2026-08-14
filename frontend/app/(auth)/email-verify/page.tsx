@@ -11,6 +11,7 @@ import { GButton } from "@/component/common/GButton";
 import { GIcon } from "@/component/common/GIcon";
 import { emailVerificationService } from "@/services/def/EmailVerificationService";
 import { authService } from "@/services/def/AuthService";
+import { useAuth } from "@/app/providers/AuthProvider";
 import { useErrorMessage, toErrorCode } from "@/hooks/useErrorMessage";
 import { emailValidator } from "@/lib/utils";
 import { en as EnTextField, type GTextFieldTranslation } from "@/component/i18n/GTextField/en.i18n";
@@ -25,6 +26,7 @@ function EmailVerifyPage() {
   const searchParams = useSearchParams();
   const emailParam = searchParams.get("email");
   const passwordParam = searchParams.get("password");
+  const { refreshUser } = useAuth();
 
   const t = useTranslation({
     en: { ...enEmailVerify, ...EnTextField },
@@ -59,6 +61,7 @@ function EmailVerifyPage() {
     if (passwordParam) {
       try {
         await authService.login({ email, password: passwordParam });
+        await refreshUser();
         router.replace("/home");
         return;
       } catch {

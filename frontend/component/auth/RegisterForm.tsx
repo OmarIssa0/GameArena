@@ -94,7 +94,7 @@ function RegisterForm() {
       const errorMessage =
         code !== undefined && t.RegisterErrorCodeEnum[code as keyof typeof t.RegisterErrorCodeEnum]
           ? t.RegisterErrorCodeEnum[code as keyof typeof t.RegisterErrorCodeEnum]
-          : data?.message || t.unknownError;
+          : t.unknownError;
 
       if (code === ErrorCodeEnum.EmailAlreadyExists) {
         setApiError({ link: "/login", message: errorMessage });

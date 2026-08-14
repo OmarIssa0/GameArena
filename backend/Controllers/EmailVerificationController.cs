@@ -14,14 +14,14 @@ namespace backend.Controllers
         public async Task<ActionResult<ApiResponse<object>>> Send([FromBody] SendOtpRequest request)
         {
             await _service.GenerateAndSendOtpAsync(request.Email, OtpPurpose.EmailVerification);
-            return Ok(new ApiResponse<object> { Message = "OTP sent successfully" });
+            return Ok(new ApiResponse<object>());
         }
 
         [HttpPost("verify")]
         public async Task<ActionResult<ApiResponse<object>>> Verify([FromBody] VerifyOtpRequest request)
         {
             await _service.VerifyOtpAsync(request.Email, request.Otp, OtpPurpose.EmailVerification);
-            return Ok(new ApiResponse<object> { Message = "Email verified successfully" });
+            return Ok(new ApiResponse<object>());
         }
     }
 }

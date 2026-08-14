@@ -12,6 +12,7 @@ const ar: THashMap<string, number> = {
   [ErrorCodeEnum.EmailNotFound]: "البريد الإلكتروني غير موجود",
   [ErrorCodeEnum.EmailAlreadyExists]: "البريد الإلكتروني مسجل بالفعل",
   [ErrorCodeEnum.EmailAlreadyVerified]: "البريد الإلكتروني مؤكد بالفعل",
+  [ErrorCodeEnum.UsernameAlreadyExists]: "اسم المستخدم مستخدم بالفعل",
   [ErrorCodeEnum.RateLimited]: "طلبات كثيرة جداً. يرجى الانتظار قليلاً",
   [ErrorCodeEnum.UserNotFound]: "المستخدم غير موجود",
   [ErrorCodeEnum.RequestAlreadyExists]: "طلب الصداقة مرسل بالفعل",

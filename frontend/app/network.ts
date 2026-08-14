@@ -62,7 +62,7 @@ api.interceptors.response.use(
 
       if (typeof window !== "undefined") {
         const path = window.location.pathname;
-        const authPages = ["/login", "/register", "/forgot-password", "/reset-password", "/verify-email"];
+        const authPages = ["/login", "/register", "/forgot-password", "/reset-password", "/email-verify"];
         if (!authPages.includes(path)) {
           window.localStorage.setItem("auth:logout", Date.now().toString());
           window.location.replace("/login");

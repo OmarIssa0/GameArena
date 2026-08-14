@@ -1,22 +1,39 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import { useGame } from "@/app/providers/GameProvider";
 import { PADDLE_KEYS, DIRECTIONS, type TGameAction } from "@/domain/constant/game-actions";
+import { SWIPE_THRESHOLD_PX, DRAG_THRESHOLD_PX } from "@/domain/constant/game-constants";
 
-interface GameInputConfig {
+type Direction = "UP" | "DOWN" | "LEFT" | "RIGHT";
+
+const OPPOSITE: Record<Direction, Direction> = {
+  UP: "DOWN",
+  DOWN: "UP",
+  LEFT: "RIGHT",
+  RIGHT: "LEFT",
+};
+
+interface GameInputConfig<T extends HTMLElement = HTMLElement> {
   gameKey: "PING_PONG" | "SNAKE";
   isActive: boolean;
-  resolveDirection: (keys: Set<string>) => "UP" | "DOWN" | "LEFT" | "RIGHT" | null;
-  createAction: (direction: "UP" | "DOWN" | "LEFT" | "RIGHT") => TGameAction;
+  resolveDirection: (keys: Set<string>) => Direction | null;
+  createAction: (direction: Direction) => TGameAction;
   throttleMs: number;
+  boardRef?: RefObject<T | null>;
+  touchMode?: "swipe" | "drag";
 }
 
-export function useGameInput(config: GameInputConfig) {
+export function useGameInput<T extends HTMLElement>(config: GameInputConfig<T>) {
   const { sendAction } = useGame();
   const keysDown = useRef<Set<string>>(new Set());
-  const lastActionRef = useRef<"UP" | "DOWN" | "LEFT" | "RIGHT" | null>(null);
+  const lastActionRef = useRef<Direction | null>(null);
   const lastSendRef = useRef(0);
+  const configRef = useRef(config);
+
+  useEffect(() => {
+    configRef.current = config;
+  });
 
   useEffect(() => {
     if (!config.isActive) return;
@@ -32,22 +49,24 @@ export function useGameInput(config: GameInputConfig) {
         keysDown.current.delete(e.key);
       }
     };
+    const pressed = keysDown.current;
 
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
+      pressed.clear();
     };
   }, [config.isActive, config.gameKey]);
 
   useEffect(() => {
-    const { isActive, resolveDirection, createAction, throttleMs } = config;
-    if (!isActive) return;
+    if (!config.isActive) return;
 
     let rafId: number | null = null;
 
     const tick = () => {
+      const { resolveDirection, createAction, throttleMs } = configRef.current;
       const direction = resolveDirection(keysDown.current);
       const now = Date.now();
 
@@ -66,8 +85,80 @@ export function useGameInput(config: GameInputConfig) {
     };
 
     rafId = requestAnimationFrame(tick);
-    return () => { if (rafId) cancelAnimationFrame(rafId); };
-  }, [config.isActive, config.resolveDirection, config.createAction, config.throttleMs, config, sendAction]);
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+    };
+  }, [config.isActive, sendAction]);
+
+  useEffect(() => {
+    const cfg = configRef.current;
+    if (!cfg.isActive || !cfg.touchMode || !cfg.boardRef?.current) return;
+    const board = cfg.boardRef.current;
+
+    const start = { x: 0, y: 0, yLast: 0 };
+    let touching = false;
+
+    const handlePointerDown = (e: PointerEvent) => {
+      touching = true;
+      start.x = e.clientX;
+      start.y = e.clientY;
+      start.yLast = e.clientY;
+      if (cfg.touchMode === "drag") board.setPointerCapture(e.pointerId);
+    };
+
+    const handlePointerMove = (e: PointerEvent) => {
+      if (!touching || cfg.touchMode !== "drag") return;
+
+      const dy = e.clientY - start.yLast;
+      if (Math.abs(dy) < DRAG_THRESHOLD_PX) return;
+
+      start.yLast = e.clientY;
+      const now = Date.now();
+      if (now - lastSendRef.current < cfg.throttleMs) return;
+
+      lastSendRef.current = now;
+      sendAction(cfg.createAction(dy > 0 ? "DOWN" : "UP"));
+    };
+
+    const handlePointerUp = (e: PointerEvent) => {
+      if (!touching) return;
+      touching = false;
+      if (cfg.touchMode === "drag") return;
+
+      const dx = e.clientX - start.x;
+      const dy = e.clientY - start.y;
+      if (Math.max(Math.abs(dx), Math.abs(dy)) < SWIPE_THRESHOLD_PX) return;
+
+      const direction: Direction = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "RIGHT" : "LEFT") : (dy > 0 ? "DOWN" : "UP");
+
+      const last = lastActionRef.current;
+      if (last && direction === OPPOSITE[last]) return;
+
+      lastActionRef.current = direction;
+      lastSendRef.current = Date.now();
+      sendAction(cfg.createAction(direction));
+    };
+
+    const handlePointerCancel = (e: PointerEvent) => {
+      if (!touching) return;
+      touching = false;
+      if (cfg.touchMode === "drag" && board.hasPointerCapture(e.pointerId)) {
+        board.releasePointerCapture(e.pointerId);
+      }
+    };
+
+    board.addEventListener("pointerdown", handlePointerDown);
+    board.addEventListener("pointermove", handlePointerMove);
+    board.addEventListener("pointerup", handlePointerUp);
+    board.addEventListener("pointercancel", handlePointerCancel);
+    return () => {
+      board.removeEventListener("pointerdown", handlePointerDown);
+      board.removeEventListener("pointermove", handlePointerMove);
+      board.removeEventListener("pointerup", handlePointerUp);
+      board.removeEventListener("pointercancel", handlePointerCancel);
+      touching = false;
+    };
+  }, [config.isActive, config.touchMode, config.boardRef, sendAction]);
 }
 
 function isDirectionKey(key: string, gameKey: "PING_PONG" | "SNAKE"): boolean {

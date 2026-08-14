@@ -9,7 +9,6 @@ import type { UseAsideReturn } from "@/hooks/useAside";
 import { GButton } from "@/component/common/GButton";
 import { GIcon } from "@/component/common/GIcon";
 import { GBadge } from "@/component/common/GBadge";
-import { BrandText } from "@/component/common/BrandText";
 import { UserMenu } from "@/component/UserMenu/UserMenu";
 
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";

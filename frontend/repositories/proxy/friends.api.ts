@@ -44,10 +44,6 @@ const friendsApi = clientFactory(
       verb: HttpVerbEnum.Post,
       template: "/unblock/{blockedId}",
     },
-    getBlockedUsers: {
-      verb: HttpVerbEnum.Get,
-      template: "/blocked",
-    },
   },
   undefined,
   (data) => data,

@@ -7,7 +7,6 @@ namespace backend.DTOs.Responses
         public Guid Id { get; init; }
 
         public DateTime CompletedAt { get; set; }
-        public bool IsWinner { get; set; }
         public MatchStatus Result { get; set; }
         public UserSummaryResponse Opponent { get; set; } = null!;
         public GamesKind Kind { get; set; }

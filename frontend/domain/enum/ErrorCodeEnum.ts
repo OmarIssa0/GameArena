@@ -14,6 +14,7 @@ enum ErrorCodeEnum {
   EmailNotFound = 2004,
   EmailAlreadyExists = 2005,
   EmailAlreadyVerified = 2006,
+  UsernameAlreadyExists = 2007,
   RateLimited = 2008,
 
   // User
