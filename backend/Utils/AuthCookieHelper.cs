@@ -15,7 +15,7 @@ public static class AuthCookieHelper
                 Secure = true,
                 SameSite = SameSiteMode.None,
                 Path = "/",
-                Expires = DateTime.UtcNow.AddMinutes(5)
+                Expires = DateTime.UtcNow.AddMinutes(15)
             });
 
         response.Cookies.Append(

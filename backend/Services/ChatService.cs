@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend.Services
 {
-    public class ChatService(AppDbContext _context, IEventBus _eventBus) : IChatService
+    public class ChatService(AppDbContext _context, IEventBus _eventBus, INotificationService _notificationService) : IChatService
     {
         public async Task<List<MessageResponse>> GetMessagesAsync(Guid userId, Guid friendId)
         {
-            await _context.Messages
+            var unreadCount = await _context.Messages
                 .Where(m => m.ReceiverId == userId && m.SenderId == friendId && !m.IsRead)
                 .ExecuteUpdateAsync(setters => setters.SetProperty(m => m.IsRead, true));
 
@@ -24,6 +24,9 @@ namespace backend.Services
                     (m.SenderId == friendId && m.ReceiverId == userId))
                 .OrderBy(m => m.SentAt)
                 .ToListAsync();
+
+            if (unreadCount > 0)
+                await _notificationService.SendCountersAsync(userId);
 
             return messages.Select(m => m.ToResponse()).ToList();
         }

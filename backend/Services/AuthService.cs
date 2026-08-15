@@ -28,7 +28,6 @@ namespace backend.Services
 
             var accessToken = AuthHelper.CreateToken(user, _configuration);
             var refreshToken = AuthHelper.GenerateRefreshTokenString();
-            user.Status = UserStatus.Online;
             await SaveNewRefreshToken(user.Id, refreshToken);
             return new AuthResponse
             {
@@ -82,12 +81,6 @@ namespace backend.Services
             if (storedToken.User == null) throw new AppException(ErrorCode.UserNotFound);
 
             if (!storedToken.User.IsVerified) throw new AppException(ErrorCode.EmailNotVerified);
-            if (storedToken.User.Status != UserStatus.Online)
-            {
-                storedToken.User.Status = UserStatus.Online;
-                await _context.SaveChangesAsync();
-            }
-
             _context.RefreshTokens.Remove(storedToken);
             var newAccessToken = AuthHelper.CreateToken(storedToken.User, _configuration);
             var newRefreshToken = AuthHelper.GenerateRefreshTokenString();
@@ -105,13 +98,6 @@ namespace backend.Services
             var storedToken = await _context.RefreshTokens
                 .Include(t => t.User)
                 .FirstOrDefaultAsync(t => t.TokenHash == tokenHash) ?? throw new AppException(ErrorCode.RefreshTokenInvalid);
-
-            if (storedToken.User != null)
-            {
-                var hasOtherActive = await _context.RefreshTokens
-                    .AnyAsync(t => t.UserId == storedToken.UserId && t.Id != storedToken.Id && t.ExpiresAt > DateTime.UtcNow);
-                if (!hasOtherActive) storedToken.User.Status = UserStatus.Offline;
-            }
 
             _context.RefreshTokens.Remove(storedToken);
             await _context.SaveChangesAsync();

@@ -13,7 +13,10 @@ namespace backend.Middleware
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unhandled exception");
+                if (ex is AppException)
+                    _logger.LogWarning("Request failed with application error {ErrorCode}", ((AppException)ex).ErrorCode);
+                else
+                    _logger.LogError(ex, "Unhandled exception");
                 var error = ErrorHelper.GetErrorResponse(ex);
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = error.StatusCode;

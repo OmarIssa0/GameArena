@@ -28,7 +28,7 @@ namespace backend.Controllers
         }
 
         [HttpPut("update-profile")]
-        public async Task<ActionResult<ApiResponse<UserResponse>>> UpdateProfile([FromBody] RegisterRequest request)
+        public async Task<ActionResult<ApiResponse<UserResponse>>> UpdateProfile([FromBody] UpdateProfileRequest request)
         {
             var updatedUser = await _userService.UpdateProfileAsync(_currentUser.UserId, request);
             return Ok(new ApiResponse<UserResponse> { Data = updatedUser });

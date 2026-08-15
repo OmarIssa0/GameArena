@@ -14,7 +14,7 @@ namespace backend.Services
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId) ?? throw new AppException(ErrorCode.UserNotFound);
 
-            return user.ToResponse();
+            return user.ToResponse() with { Status = _presence.GetStatus(user.Id.ToString()) };
         }
 
         public async Task<List<UserSummaryResponse>> GetUsersAsync(Guid currentUserId, UserFilterRequest? filter)
@@ -35,7 +35,7 @@ namespace backend.Services
             return [.. results];
         }
 
-        public async Task<UserResponse> UpdateProfileAsync(Guid userId, RegisterRequest request)
+        public async Task<UserResponse> UpdateProfileAsync(Guid userId, UpdateProfileRequest request)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId) ?? throw new AppException(ErrorCode.UserNotFound);
             user.UserName = request.UserName;
@@ -43,7 +43,7 @@ namespace backend.Services
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
             await _context.SaveChangesAsync();
-            return user.ToResponse();
+            return user.ToResponse() with { Status = _presence.GetStatus(user.Id.ToString()) };
         }
 
         public async Task ChangePasswordAsync(Guid userId, string oldPassword, string newPassword)

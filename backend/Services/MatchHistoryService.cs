@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend.Services
 {
-    public class MatchHistoryService(AppDbContext _context) : IMatchHistoryService
+    public class MatchHistoryService(AppDbContext _context, IUserPresenceService _presence) : IMatchHistoryService
     {
         public async Task<List<MatchHistoryResponse>> GetMatchHistoryByUserIdAsync(Guid userId)
         {
@@ -27,8 +27,7 @@ namespace backend.Services
                     OpponentId = m.Player1Id == userId ? m.Player2Id!.Value : m.Player1Id!.Value,
                     OpponentUserName = m.Player1Id == userId ? m.Player2.UserName : m.Player1.UserName,
                     OpponentFirstName = m.Player1Id == userId ? m.Player2.FirstName : m.Player1.FirstName,
-                    OpponentLastName = m.Player1Id == userId ? m.Player2.LastName : m.Player1.LastName,
-                    OpponentStatus = m.Player1Id == userId ? m.Player2.Status : m.Player1.Status
+                    OpponentLastName = m.Player1Id == userId ? m.Player2.LastName : m.Player1.LastName
                 })
                 .ToListAsync();
 
@@ -39,7 +38,7 @@ namespace backend.Services
                 CompletedAt = m.CompletedAt,
                 Player1Score = m.Player1Score,
                 Player2Score = m.Player2Score,
-                Opponent = new UserSummaryResponse(m.OpponentId, m.OpponentUserName, m.OpponentFirstName, m.OpponentLastName, m.OpponentStatus),
+                Opponent = new UserSummaryResponse(m.OpponentId, m.OpponentUserName, m.OpponentFirstName, m.OpponentLastName, _presence.GetStatus(m.OpponentId.ToString())),
                 Result = m.IsP1
                     ? (m.Player1Score > m.Player2Score ? MatchStatus.Win : m.Player1Score < m.Player2Score ? MatchStatus.Lost : MatchStatus.Draw)
                     : (m.Player2Score > m.Player1Score ? MatchStatus.Win : m.Player2Score < m.Player1Score ? MatchStatus.Lost : MatchStatus.Draw)

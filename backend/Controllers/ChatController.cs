@@ -2,7 +2,6 @@ using backend.DTOs.Responses;
 using backend.Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace backend.Controllers
 {
@@ -11,33 +10,15 @@ namespace backend.Controllers
     [Authorize]
     public class ChatController(
         IChatService _chatService,
-        ICurrentUserService _currentUser,
-        IServiceScopeFactory _scopeFactory,
-        ILogger<ChatController> _logger) : ControllerBase
+        ICurrentUserService _currentUser) : ControllerBase
     {
         [HttpGet("messages/{friendId}")]
         public async Task<ActionResult<ApiResponse<List<MessageResponse>>>> GetMessages(Guid friendId)
         {
             var userId = _currentUser.UserId;
             var messages = await _chatService.GetMessagesAsync(userId, friendId);
-            _ = SendCountersAsyncSafe(userId);
 
             return Ok(new ApiResponse<List<MessageResponse>> { Data = messages });
-        }
-
-        private async Task SendCountersAsyncSafe(Guid userId)
-        {
-            try
-            {
-                await using var scope = _scopeFactory.CreateAsyncScope();
-                var notificationService = scope.ServiceProvider
-                    .GetRequiredService<INotificationService>();
-                await notificationService.SendCountersAsync(userId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to push counters for {UserId} after reading messages", userId);
-            }
         }
 
         [HttpGet("unread/per-friend")]

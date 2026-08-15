@@ -9,7 +9,6 @@ namespace backend.Services
     {
         public async Task SendAsync(string to, string subject, string body)
         {
-            var apiKey = _config["EmailSettings:Password"];
             var fromEmail = _config["EmailSettings:Email"] ?? "noreply@gamearena.com";
             var payload = new
             {
@@ -25,11 +24,10 @@ namespace backend.Services
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
 
-            using var client = _httpClientFactory.CreateClient();
-            client.DefaultRequestHeaders.Add("api-key", apiKey);
+            using var client = _httpClientFactory.CreateClient("Brevo");
 
             var response = await client.PostAsync(
-                "https://api.brevo.com/v3/smtp/email",
+                "email",
                 new StringContent(json, Encoding.UTF8, "application/json")
             );
 

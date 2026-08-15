@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Threading;
 using backend.Enums;
 using backend.Utils;
 
@@ -22,6 +23,10 @@ namespace backend.Domain
         public bool IsBotGame { get; set; }
         public string? CurrentTurnPlayerId { get; set; }
         public int[] Score { get; set; } = [0, 0];
+        private int _roundResultPersisted;
+
+        public bool TryMarkRoundResultPersisted() =>
+            Interlocked.CompareExchange(ref _roundResultPersisted, 1, 0) == 0;
 
         public static BaseGameRoom Create(GamesKind gameType)
         {
@@ -72,6 +77,7 @@ namespace backend.Domain
 
         public virtual void ResetForNewRound()
         {
+            Interlocked.Exchange(ref _roundResultPersisted, 0);
             WinnerPlayerId = null;
             WinnerSymbol = null;
             IsFinished = false;

@@ -16,10 +16,13 @@ namespace backend.Services.Interface
         void RemoveRoomAndPlayers(string roomId);
         void StartGameLoop(string roomId);
         void StopGameLoop(string roomId);
+        void RegisterConnection(string playerId, string connectionId);
+        Task UnregisterConnectionAsync(string playerId, string connectionId);
         Task ProcessActionAsync(string roomId, string playerId, JsonElement action);
         Task<bool> StartGameAsync(string roomId, string playerId, string? friendId);
         Task RequestPlayAgainAsync(string roomId, string playerId);
         Task RespondPlayAgainAsync(string roomId, string playerId, bool accept);
-        Task FinishAndCleanupAsync(BaseGameRoom room, string roomId, bool removeRoom = true);
+        Task LeaveGameAsync(string playerId);
+        Task CancelSearchAsync(string playerId);
     }
 }

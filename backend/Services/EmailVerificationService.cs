@@ -30,7 +30,7 @@ namespace backend.Services
             var otp = RandomNumberGenerator.GetInt32(100000, 999999).ToString();
             var body = AuthHelper.GetHtmlTemplate(user.UserName, otp);
 
-            _context.EmailVerifications.Add(new EmailVerification
+            var verification = new EmailVerification
             {
                 UserId = user.Id,
                 OtpHash = AuthHelper.Hash(otp),
@@ -38,10 +38,20 @@ namespace backend.Services
                 ExpiresAt = DateTime.UtcNow.AddMinutes(15),
                 IsUsed = false,
                 Purpose = purpose
-            });
+            };
+            _context.EmailVerifications.Add(verification);
 
             await _context.SaveChangesAsync();
-            await _emailService.SendAsync(user.Email, "Arena 404 OTP Code", body);
+            try
+            {
+                await _emailService.SendAsync(user.Email, "Arena 404 OTP Code", body);
+            }
+            catch
+            {
+                _context.EmailVerifications.Remove(verification);
+                await _context.SaveChangesAsync();
+                throw;
+            }
         }
 
         public async Task VerifyOtpAsync(string email, string otp, OtpPurpose purpose)
