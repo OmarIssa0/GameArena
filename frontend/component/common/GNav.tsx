@@ -12,15 +12,11 @@ const navBase = {
   itemActive: "bg-primary-muted text-primary font-semibold",
 };
 
-// Responsive (horizontal on mobile, vertical on md+): Start indicator moves
-// from the top edge (horizontal pill) to the start edge (vertical item).
 const responsiveIndicator = {
   active: "border-t-[3px] border-t-primary md:border-t-0 md:border-s-[3px] md:border-s-primary",
   idle: "border-t-[3px] border-t-transparent md:border-t-0 md:border-s-[3px] md:border-s-transparent",
 };
 
-// Inverted responsive (vertical on mobile, horizontal pills on md+):
-// Start indicator on mobile, bottom-edge (Top) indicator on desktop.
 const invertedResponsiveIndicator = {
   active: "border-s-[3px] border-s-primary md:border-s-0 md:border-t-[3px] md:border-t-primary",
   idle: "border-s-[3px] border-s-transparent md:border-s-0 md:border-t-[3px] md:border-t-transparent",
@@ -42,18 +38,13 @@ const GNav = forwardRef<HTMLDivElement, GNavProps>(
     ref,
   ) => {
     const isVertical = orientation === NavOrientationEnum.Vertical;
-    const indicatorStyles = responsive && indicator === IndicatorPositionEnum.Start
-      ? responsiveIndicator
-      : responsiveInverted
-        ? invertedResponsiveIndicator
-        : navIndicator[indicator];
-    const itemWidth = responsive
-      ? "w-auto md:w-full"
-      : responsiveInverted
-        ? "w-full md:w-auto"
-        : isVertical
-          ? "w-full"
-          : "shrink-0";
+    const indicatorStyles =
+      responsive && indicator === IndicatorPositionEnum.Start
+        ? responsiveIndicator
+        : responsiveInverted
+          ? invertedResponsiveIndicator
+          : navIndicator[indicator];
+    const itemWidth = responsive ? "w-auto md:w-full" : responsiveInverted ? "w-full md:w-auto" : isVertical ? "w-full" : "shrink-0";
 
     return (
       <div
@@ -92,11 +83,13 @@ const GNav = forwardRef<HTMLDivElement, GNavProps>(
                 <span className={clsx("relative shrink-0", collapsed && "mx-auto", stacked && "mb-0.5")}>
                   {item.icon}
 
-                  {collapsed && item.badge && <span className="absolute -top-1.5 -end-1.5">{item.badge}</span>}
+                  {collapsed && item.badge && <span className="absolute -top-1.5 -inset-e-1.5">{item.badge}</span>}
                 </span>
               )}
               {!collapsed && item.label && (
-                <span className={clsx("min-w-0 leading-snug whitespace-normal truncate", (responsive || responsiveInverted) && "md:flex-1")}>{item.label}</span>
+                <span className={clsx("min-w-0 leading-snug whitespace-normal truncate", (responsive || responsiveInverted) && "md:flex-1")}>
+                  {item.label}
+                </span>
               )}
               {!collapsed && item.badge && <span className="ms-auto shrink-0">{item.badge}</span>}
             </button>

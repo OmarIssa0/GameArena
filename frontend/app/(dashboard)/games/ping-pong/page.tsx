@@ -36,9 +36,10 @@ function PingPongPage() {
     isActive,
     resolveDirection,
     createAction: (dir) => ({ type: GameActionTypes.MOVE_PADDLE, direction: dir as "UP" | "DOWN" }),
+    createPositionAction: (y) => ({ type: GameActionTypes.SET_PADDLE, y }),
     throttleMs: INPUT_THROTTLE_MS.PING_PONG,
     boardRef,
-    touchMode: "drag",
+    touchMode: "follow",
   });
 
   if (!state || !("ball" in state)) {
@@ -46,30 +47,22 @@ function PingPongPage() {
   }
 
   const pongState = state as IPingPongGameState;
-  const {
-    boardWidth,
-    boardHeight,
-    ball,
-    ballSize,
-    player1Paddle,
-    player2Paddle,
-    paddleWidth,
-    player1Score,
-    player2Score,
-    isFinished,
-  } = pongState;
+  const { boardWidth, boardHeight, ball, ballSize, player1Paddle, player2Paddle, paddleWidth, score, winScore, isFinished } = pongState;
 
   return (
     <GameLayoutWrapper gameType={GamesKindEnum.PingPong}>
       <GCard padding={SizeEnum.md}>
         <div className="flex justify-center gap-8 mb-4">
           <div className="text-center">
-            <div className="text-3xl font-bold text-accent">{player1Score}</div>
+            <div className="text-3xl font-bold text-accent">{score[0]}</div>
             <div className="text-xs text-text-muted">{t.game.player1}</div>
           </div>
-          <div className="text-center text-text-muted font-bold">{t.game.vs}</div>
+          <div className="text-center text-text-muted font-bold flex flex-col justify-center">
+            <span>{t.game.vs}</span>
+            <span className="text-xs">{t.game.firstTo.replace("{score}", String(winScore))}</span>
+          </div>
           <div className="text-center">
-            <div className="text-3xl font-bold text-warning">{player2Score}</div>
+            <div className="text-3xl font-bold text-warning">{score[1]}</div>
             <div className="text-xs text-text-muted">{t.game.player2}</div>
           </div>
         </div>
@@ -114,4 +107,3 @@ function PingPongPage() {
 }
 
 export default PingPongPage;
-

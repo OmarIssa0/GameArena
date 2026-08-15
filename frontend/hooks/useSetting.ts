@@ -62,7 +62,7 @@ function setTheme(theme: ThemeEnum) {
 }
 
 export function useLocale() {
-  const locale = useSyncExternalStore(subscribe, getLocale, () => "en");
+  const locale = useSyncExternalStore(subscribe, getLocale, () => "en" as LocaleEnum);
   return [locale, setLocale] as const;
 }
 
@@ -77,8 +77,7 @@ function resolve(obj: THashMap, path: string[]): unknown {
     return (acc as THashMap)[key];
   }, obj);
 }
-
-function createProxy(langs: TTranslate, path: string[] = []): unknown {
+function createProxy(langs: TTranslate, locale: LocaleEnum, path: string[] = []): unknown {
   return new Proxy(
     {},
     {
@@ -89,14 +88,12 @@ function createProxy(langs: TTranslate, path: string[] = []): unknown {
           return undefined;
         }
 
-        // Support dotted keys ("tictactoe.name") alongside nested proxy access
         const segments = key.split(".");
-        const locale = langs[getLocale()] ?? langs.en;
         const nextPath = [...path, ...segments];
-        const value = resolve(locale as THashMap, nextPath);
+        const value = resolve(langs[locale] ?? langs.en, nextPath);
 
         if (value && typeof value === "object" && !Array.isArray(value)) {
-          return createProxy(langs, nextPath);
+          return createProxy(langs, locale, nextPath);
         }
 
         if (value !== undefined) return value;
@@ -109,9 +106,6 @@ function createProxy(langs: TTranslate, path: string[] = []): unknown {
 
 export function useTranslation<T>(langs: TTranslate): T {
   const [locale] = useLocale();
-  // The langs objects are module constants; memoizing on the locale keeps the
-  // translation proxy identity stable across re-renders (inline callers pass
-  // fresh literals with identical values on every render).
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  return useMemo(() => createProxy(langs) as T, [locale]);
+
+  return useMemo(() => createProxy({ en: langs.en, ar: langs.ar }, locale) as T, [locale, langs.en, langs.ar]);
 }

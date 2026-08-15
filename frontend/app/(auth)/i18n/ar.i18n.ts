@@ -8,14 +8,12 @@ const ar = {
     rankedMatches: "مباريات مصنفة",
     rankedMatchesDesc: "اصعد في قوائم المتصدرين",
     seasonalEvents: "فعاليات موسمية",
-    seasonalEventsDesc: "مكافآت وأوضاع حصرية"
+    seasonalEventsDesc: "مكافآت وأوضاع حصرية",
   },
   heroSubtitle: "وجهتك المثالية للألعاب. مباريات فورية، معارك مصنفة، ومتعة لا نهائية.",
   stats: {
     activePlayers: "+١٠٠٠٠ لاعب نشط",
-    matchesPerDay: "+٥٠٠ مباراة يوميًا"
-  }
-}
-;
-
+    matchesPerDay: "+٥٠٠ مباراة يوميًا",
+  },
+};
 export { ar };

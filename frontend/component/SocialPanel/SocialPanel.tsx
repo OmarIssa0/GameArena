@@ -27,8 +27,7 @@ interface SocialPanelProps {
 function SocialPanel({ aside: asideProp }: SocialPanelProps) {
   const router = useRouter();
   const t = useTranslation({ en, ar }) as TSocialPanelTranslation;
-  const { friendRequestCount, unreadMessageCount, unreadNotificationCount, gameInvites, notifications } =
-    useDashboardNotifications();
+  const { friendRequestCount, unreadMessageCount, unreadNotificationCount, gameInvites, notifications } = useDashboardNotifications();
   const { friends, requests, loading, acceptRequest, declineRequest } = useFriends();
   const asideDefault = useAside(false);
   const aside = asideProp ?? asideDefault;
@@ -38,18 +37,11 @@ function SocialPanel({ aside: asideProp }: SocialPanelProps) {
 
   const onlineCount = friends.filter((f) => f.status !== UserStatusEnum.Offline).length;
 
-  const unreadAll =
-    friendRequestCount + unreadMessageCount + unreadNotificationCount + gameInvites.length;
+  const unreadAll = friendRequestCount + unreadMessageCount + unreadNotificationCount + gameInvites.length;
 
   const panelContent = (
     <>
-      <SocialPanelHeader
-        title={t.title}
-        onlineCount={onlineCount}
-        onlineLabel={t.online}
-        showClose={aside.open}
-        onClose={aside.closeMobile}
-      />
+      <SocialPanelHeader title={t.title} onlineCount={onlineCount} onlineLabel={t.online} showClose={aside.open} onClose={aside.closeMobile} />
 
       <div className="px-2">
         <SocialTabs
@@ -99,30 +91,17 @@ function SocialPanel({ aside: asideProp }: SocialPanelProps) {
 
   return (
     <>
-      {/* Laptop (xl+): real layout column - removed from layout when collapsed */}
       {!aside.collapsed && (
         <aside className="hidden xl:flex xl:h-full xl:w-80 xl:shrink-0 xl:flex-col xl:border-s xl:border-border xl:bg-bg-sidebar">
           {panelContent}
         </aside>
       )}
 
-      {/* Tablet (md–xl): modal overlay from the logical end side */}
-      <GModal
-        open={aside.open}
-        onClose={aside.closeMobile}
-        side="end"
-        ariaLabel={t.friendsAndInvites}
-        className="hidden md:block xl:hidden">
+      <GModal open={aside.open} onClose={aside.closeMobile} side="end" ariaLabel={t.friendsAndInvites} className="hidden md:block xl:hidden">
         {panelContent}
       </GModal>
 
-      {/* Mobile (<md): bottom sheet */}
-      <GModal
-        open={aside.open}
-        onClose={aside.closeMobile}
-        side="bottom"
-        ariaLabel={t.friendsAndInvites}
-        className="md:hidden">
+      <GModal open={aside.open} onClose={aside.closeMobile} side="bottom" ariaLabel={t.friendsAndInvites} className="md:hidden">
         {panelContent}
       </GModal>
     </>

@@ -76,8 +76,6 @@ api.interceptors.response.use(
   },
 );
 
-/* ---------------- URL ---------------- */
-
 function buildUrl(template: string, payload?: THashMap): { url: string; leftover: THashMap } {
   if (payload == null) return { url: template, leftover: {} };
 
@@ -102,8 +100,6 @@ function buildUrl(template: string, payload?: THashMap): { url: string; leftover
 
   return { url: formattedUrl, leftover };
 }
-
-/* ---------------- REQUEST ---------------- */
 
 async function request<Req, Res>(
   endpoint: TEndpoint,
@@ -133,8 +129,6 @@ async function request<Req, Res>(
     return data as IApiResponse<Res>;
   });
 }
-
-/* ---------------- CLIENT FACTORY ---------------- */
 
 export function clientFactory<T extends TEndpointsMap>(
   base: string,

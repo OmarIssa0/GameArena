@@ -99,5 +99,3 @@ function RockPaperScissorsPage() {
 }
 
 export default RockPaperScissorsPage;
-
-

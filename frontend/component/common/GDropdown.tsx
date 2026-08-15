@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import clsx from "clsx";
 import { GBackdrop } from "./GBackdrop";
 
-const MENU_WIDTH = 208; // w-52 (13rem)
+const MENU_WIDTH = 208;
 
 interface GDropdownProps {
   open: boolean;
@@ -22,10 +22,7 @@ function GDropdown({ open, onClose, trigger, children, align = "end", className 
   const hasOpenedRef = useRef(false);
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
 
-  const getMenuItems = useCallback(
-    () => Array.from(menuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? []),
-    [],
-  );
+  const getMenuItems = useCallback(() => Array.from(menuRef.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? []), []);
 
   const updatePosition = useCallback(() => {
     const el = triggerRef.current;
@@ -34,7 +31,6 @@ function GDropdown({ open, onClose, trigger, children, align = "end", className 
     const rect = el.getBoundingClientRect();
     const rtl = typeof document !== "undefined" && document.documentElement.dir === "rtl";
 
-    // Logical start/end: in RTL the mirror is reversed geometrically.
     const endX = rtl ? rect.left : rect.right - MENU_WIDTH;
     const startX = rtl ? rect.right - MENU_WIDTH : rect.left;
     const x = Math.max(4, Math.min(align === "end" ? endX : startX, window.innerWidth - MENU_WIDTH - 4));
@@ -80,7 +76,6 @@ function GDropdown({ open, onClose, trigger, children, align = "end", className 
     };
   }, [open, onClose, updatePosition, getMenuItems]);
 
-  // Restore focus to the trigger once the menu closes (after the first open).
   useEffect(() => {
     if (open) return;
     if (!hasOpenedRef.current) return;
@@ -102,10 +97,7 @@ function GDropdown({ open, onClose, trigger, children, align = "end", className 
               ref={menuRef}
               role="menu"
               aria-orientation="vertical"
-              className={clsx(
-                "fixed z-popover w-52 overflow-hidden rounded-xl border border-border bg-bg-card shadow-lg",
-                className,
-              )}
+              className={clsx("fixed z-popover w-52 overflow-hidden rounded-xl border border-border bg-bg-card shadow-lg", className)}
               style={{ left: position.x, top: position.y }}>
               {children}
             </div>

@@ -42,25 +42,19 @@ export function useFriends() {
   const removeFriend = useCallback(async (friendId: string) => {
     try {
       await friendService.removeFriend(friendId);
-    } catch {
-      /* SignalR pushes update */
-    }
+    } catch {}
   }, []);
 
   const blockUser = useCallback(async (blockedId: string) => {
     try {
       await friendService.blockUser(blockedId);
-    } catch {
-      /* SignalR pushes update */
-    }
+    } catch {}
   }, []);
 
   const unblockUser = useCallback(async (blockedId: string) => {
     try {
       await friendService.unblockUser(blockedId);
-    } catch {
-      /* SignalR pushes update */
-    }
+    } catch {}
   }, []);
 
   const reload = useCallback(() => {
@@ -69,7 +63,6 @@ export function useFriends() {
     reloadBlocked();
   }, [reloadFriends, reloadRequests, reloadBlocked]);
 
-  // Aggregate loading — true if ANY sub-hook is still loading
   const loading = friendsLoading || requestsLoading || blockedLoading;
   const isOffline = friendsOffline && requestsOffline && blockedOffline;
 

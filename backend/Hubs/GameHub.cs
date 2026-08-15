@@ -98,11 +98,10 @@ namespace backend.Hubs
             {
                 var playerId = GetPlayerId();
 
-                if (TryGetPlayerRoom(playerId, out var existingRoom, out var existingRoomId)
-                    && !existingRoom!.IsFinished)
+                if (TryGetPlayerRoom(playerId, out var existingRoom, out var existingRoomId))
                 {
                     await Groups.AddToGroupAsync(Context.ConnectionId, existingRoomId!);
-                    await Clients.Caller.SendAsync("gameState", existingRoom.GetStatePayload());
+                    await Clients.Caller.SendAsync("gameState", existingRoom!.GetStatePayload());
                     return;
                 }
 
@@ -259,11 +258,10 @@ namespace backend.Hubs
             var playerId = GetPlayerId();
             var username = GetUsername();
 
-            if (TryGetPlayerRoom(playerId, out var existingRoom, out var existingRoomId)
-                && !existingRoom!.IsFinished)
+            if (TryGetPlayerRoom(playerId, out var existingRoom, out var existingRoomId))
             {
                 await Groups.AddToGroupAsync(Context.ConnectionId, existingRoomId!);
-                await Clients.Caller.SendAsync("gameState", existingRoom.GetStatePayload());
+                await Clients.Caller.SendAsync("gameState", existingRoom!.GetStatePayload());
                 return;
             }
 

@@ -71,8 +71,6 @@ namespace backend.Services
             }
             catch (DbUpdateException)
             {
-                // Two simultaneous registrations can bypass the checks above;
-                // the database unique indexes are the final authority.
                 if (await _context.Users.AnyAsync(u => u.Email == request.Email))
                     throw new AppException(ErrorCode.EmailAlreadyExists);
                 if (await _context.Users.AnyAsync(u => u.UserName == request.UserName))

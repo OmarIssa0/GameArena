@@ -14,7 +14,6 @@ public class ErrorResponse
         public static readonly IDictionary<ErrorCode, int> Errors =
          new Dictionary<ErrorCode, int>
          {
-             // AUTH
 
              [ErrorCode.InvalidCredentials] =
              401,
@@ -34,7 +33,7 @@ public class ErrorResponse
              [ErrorCode.EmailAlreadyVerified] =
              400,
 
-             // EMAIL / OTP
+
 
              [ErrorCode.EmailNotFound] =
              404,
@@ -54,7 +53,7 @@ public class ErrorResponse
              [ErrorCode.RateLimited] =
              429,
 
-             // USER
+
 
              [ErrorCode.UserNotFound] =
              404,
@@ -74,7 +73,7 @@ public class ErrorResponse
               [ErrorCode.YouBlockedUser] =
               403,
 
-             // FRIEND SYSTEM
+
 
              [ErrorCode.RequestAlreadyExists] =
              409,
@@ -94,7 +93,7 @@ public class ErrorResponse
              [ErrorCode.RequestAlreadyProcessed] =
              409,
 
-             // GAME
+
 
              [ErrorCode.RoomNotFound] =
              404,
@@ -108,7 +107,7 @@ public class ErrorResponse
              [ErrorCode.InvalidRoomId] =
              400,
 
-             // VALIDATION / REQUEST
+
 
              [ErrorCode.InvalidRequest] =
              400,
@@ -116,7 +115,7 @@ public class ErrorResponse
              [ErrorCode.ValidationError] =
              400,
 
-             // SYSTEM
+
 
              [ErrorCode.ServerError] =
              500,

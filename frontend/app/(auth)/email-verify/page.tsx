@@ -64,9 +64,7 @@ function EmailVerifyPage() {
         await refreshUser();
         router.replace("/home");
         return;
-      } catch {
-        // auto-login failed, go to login page
-      }
+      } catch {}
     }
     router.replace("/login");
   };

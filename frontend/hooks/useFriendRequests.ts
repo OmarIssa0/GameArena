@@ -38,33 +38,25 @@ export function useFriendRequests() {
   const accept = useCallback(async (senderId: string) => {
     try {
       await friendService.acceptFriendRequest(senderId);
-    } catch {
-      /* SignalR pushes update */
-    }
+    } catch {}
   }, []);
 
   const decline = useCallback(async (senderId: string) => {
     try {
       await friendService.rejectFriendRequest(senderId);
-    } catch {
-      /* SignalR pushes update */
-    }
+    } catch {}
   }, []);
 
   const send = useCallback(async (friendId: string) => {
     try {
       await friendService.sendFriendRequest(friendId);
-    } catch {
-      /* SignalR pushes update */
-    }
+    } catch {}
   }, []);
 
   const cancel = useCallback(async (receiverId: string) => {
     try {
       await friendService.cancelFriendRequest(receiverId);
-    } catch {
-      /* SignalR pushes update */
-    }
+    } catch {}
   }, []);
 
   return {

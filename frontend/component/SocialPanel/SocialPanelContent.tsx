@@ -39,9 +39,7 @@ function SocialPanelContent({
   const filteredFriends = useMemo(() => {
     const term = searchQuery.trim().toLowerCase();
     if (!term) return friends;
-    return friends.filter((f) =>
-      `${f.firstName ?? ""} ${f.lastName ?? ""} ${f.userName ?? ""}`.toLowerCase().includes(term),
-    );
+    return friends.filter((f) => `${f.firstName ?? ""} ${f.lastName ?? ""} ${f.userName ?? ""}`.toLowerCase().includes(term));
   }, [friends, searchQuery]);
 
   if (loading) {
@@ -101,11 +99,7 @@ function SocialPanelContent({
           {(req) => (
             <div className="flex items-center gap-3 px-3 py-2 min-w-0 rounded-lg bg-bg-card border border-border">
               <div className="relative shrink-0">
-                <GAvatar
-                  firstName={req.senderFirstName}
-                  lastName={req.senderLastName}
-                  size={SizeEnum.sm}
-                />
+                <GAvatar firstName={req.senderFirstName} lastName={req.senderLastName} size={SizeEnum.sm} />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-text">
@@ -117,10 +111,7 @@ function SocialPanelContent({
                 <GButton size={SizeEnum.sm} onClick={() => acceptRequest(req.senderId)}>
                   {t.invites.accept}
                 </GButton>
-                <GButton
-                  size={SizeEnum.sm}
-                  variant={ButtonVariantEnum.Secondary}
-                  onClick={() => declineRequest(req.senderId)}>
+                <GButton size={SizeEnum.sm} variant={ButtonVariantEnum.Secondary} onClick={() => declineRequest(req.senderId)}>
                   {t.invites.decline}
                 </GButton>
               </div>

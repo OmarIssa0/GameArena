@@ -30,7 +30,6 @@ export function ConnectionProvider({ children }: { children: React.ReactNode }) 
   const [socialConnection, setSocialConnection] = useState<TNullable<HubConnection>>(null);
   const [socialReconnectKey, setSocialReconnectKey] = useState(0);
 
-  // Track connection states per hub
   const [connectionStates, setConnectionStates] = useState<HubConnectionStates>({
     game: ConnectionState.Disconnected,
     social: ConnectionState.Disconnected,
@@ -60,12 +59,8 @@ export function ConnectionProvider({ children }: { children: React.ReactNode }) 
       ref: React.MutableRefObject<TNullable<HubConnection>>,
     ) => {
       const conn = createConnection(name);
-      // Generation token: a newer startHub call (e.g. StrictMode's second
-      // mount) supersedes this one, so a stale connection is stopped as soon
-      // as it finishes connecting and never registers handlers.
       const gen = ++hubGenRef.current[hubKey];
 
-      // Only the current connection may update state or run reconnect logic
       conn.onreconnecting(() => {
         if (ref.current === conn) updateState(hubKey, ConnectionState.Reconnecting);
       });
@@ -99,10 +94,6 @@ export function ConnectionProvider({ children }: { children: React.ReactNode }) 
         updateState(hubKey, ConnectionState.Connected);
         ref.current = conn;
 
-        // Register handlers immediately after the handshake completes.
-        // The social hub pushes `social:all` from OnConnectedAsync, so waiting
-        // for a React state effect would let that push arrive with no handler
-        // registered (SignalR logs "No client method ... found" warnings).
         if (name === "gameHub") {
           gameService.setConnection(conn);
         } else if (name === "socialHub") {
@@ -134,7 +125,6 @@ export function ConnectionProvider({ children }: { children: React.ReactNode }) 
       notificationService.disconnect();
       chatService.disconnect();
 
-      // Deregister callbacks before stopping
       if (gameRef.current) {
         gameRef.current.off("Reconnecting");
         gameRef.current.off("Reconnected");
@@ -162,8 +152,6 @@ export function ConnectionProvider({ children }: { children: React.ReactNode }) 
     };
   }, []);
 
-  // Gracefully stop all hubs (e.g. on logout) so the server's
-  // OnDisconnectedAsync fires and broadcasts presence going offline.
   const stopConnections = useCallback(async () => {
     cancelledRef.current = true;
     const conns = [gameRef.current, socialRef.current];
@@ -186,7 +174,6 @@ export function ConnectionProvider({ children }: { children: React.ReactNode }) 
     });
   }, []);
 
-  // ── Derived booleans ──────────────────────────────────────────────────
   const value = useMemo<IConnectionContext>(() => {
     const cs = connectionStates;
     const isGameConnected = cs.game === ConnectionState.Connected;

@@ -8,15 +8,13 @@ const en = {
     rankedMatches: "Ranked Matches",
     rankedMatchesDesc: "Climb the leaderboards",
     seasonalEvents: "Seasonal Events",
-    seasonalEventsDesc: "Exclusive rewards & modes"
+    seasonalEventsDesc: "Exclusive rewards & modes",
   },
   heroSubtitle: "Your ultimate gaming destination. Instant matches, ranked battles, and endless fun.",
   stats: {
     activePlayers: "10,000+ Active Players",
-    matchesPerDay: "500+ Matches/Day"
-  }
-}
-;
-
+    matchesPerDay: "500+ Matches/Day",
+  },
+};
 type TAuthLayoutTranslation = typeof en;
 export { en, type TAuthLayoutTranslation };

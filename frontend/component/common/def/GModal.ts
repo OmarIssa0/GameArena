@@ -11,7 +11,6 @@ interface GModalProps extends HTMLAttributes<HTMLDivElement> {
   closeOnEscape?: boolean;
   size?: SizeEnum;
   cardPadding?: SizeEnum;
-  /** "center" renders a centered dialog; others render a fixed side/bottom sheet panel */
   side?: GModalSide;
   panelClassName?: string;
   role?: "dialog" | "alertdialog";

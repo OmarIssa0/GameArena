@@ -14,7 +14,7 @@ namespace backend.Domain
         public float BallVX { get; set; } = InitialBallSpeed;
         public float BallVY { get; set; } = 0.006f;
 
-        public float PadYP1 { get; set; } = 0.4f;// paddle Y position for player 1
+        public float PadYP1 { get; set; } = 0.4f;
         public float PadHP1 { get; set; } = 0.2f; 
         public float PadVP1 { get; set; } = 0.035f;
         public float PadYP2 { get; set; } = 0.4f;
@@ -41,12 +41,11 @@ namespace backend.Domain
         private const float BallContactPlane2 = Paddle2Left + BallRadius;
 
         private const string ActionMovePaddle = "MOVE_PADDLE";
+        private const string ActionSetPaddle = "SET_PADDLE";
         private const string DirectionUp = "UP";
         private const string DirectionDown = "DOWN";
 
-        // Board size in pixels. Sent to clients in GetStatePayload so the
-        // frontend scales from a single source of truth instead of duplicating
-        // board constants.
+
         private const int BoardWidthPx = 600;
         private const int BoardHeightPx = 400;
 
@@ -108,9 +107,7 @@ namespace backend.Domain
                 ScoreP1++;
                 if (ScoreP1 >= WinScore)
                 {
-                    WinnerPlayerId = Player1Id;
-                    IsFinished = true;
-                    Score[0]++;
+                    CompleteRound(Player1Id);
                     return;
                 }
                 ResetBall();
@@ -121,9 +118,7 @@ namespace backend.Domain
                 ScoreP2++;
                 if (ScoreP2 >= WinScore)
                 {
-                    WinnerPlayerId = Player2Id;
-                    IsFinished = true;
-                    Score[1]++;
+                    CompleteRound(Player2Id);
                     return;
                 }
                 ResetBall();
@@ -223,15 +218,30 @@ namespace backend.Domain
                 if (Player1Id != playerId && Player2Id != playerId) return;
 
                 if (action.ValueKind != JsonValueKind.Object
-                    || !action.TryGetProperty("type", out var typeProp)
-                    || !typeProp.ValueEquals(ActionMovePaddle)
+                    || !action.TryGetProperty("type", out var typeProp))
+                    return;
+
+                bool isPlayerOne = playerId == Player1Id;
+
+                if (typeProp.ValueEquals(ActionSetPaddle)
+                    && action.TryGetProperty("y", out var yProp)
+                    && yProp.TryGetSingle(out var targetY))
+                {
+                    if (isPlayerOne)
+                        PadYP1 = Math.Clamp(targetY, 0, 1 - PadHP1);
+                    else
+                        PadYP2 = Math.Clamp(targetY, 0, 1 - PadHP2);
+                    return;
+                }
+
+                if (!typeProp.ValueEquals(ActionMovePaddle)
                     || !action.TryGetProperty("direction", out var directionProp))
                     return;
 
                 bool isUp = directionProp.ValueEquals(DirectionUp);
                 if (!isUp && !directionProp.ValueEquals(DirectionDown)) return;
 
-                if (playerId == Player1Id)
+                if (isPlayerOne)
                 {
                     PadYP1 = isUp
                         ? Math.Max(0, PadYP1 - PadVP1)

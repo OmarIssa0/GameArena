@@ -54,7 +54,6 @@ function GameLobby({ gameType }: IGameLobbyProps) {
         <GCard padding={SizeEnum.md} className="text-center">
           <div className="flex items-center justify-center gap-3 mb-2">
             <span className="relative flex h-3 w-3">
-              
               <span className="relative inline-flex rounded-full h-3 w-3 bg-primary" />
             </span>
             <p className="text-text-secondary text-sm">{t.waiting.subtitle}</p>

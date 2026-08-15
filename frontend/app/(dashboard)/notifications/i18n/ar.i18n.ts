@@ -5,32 +5,32 @@ export const ar = {
   tabs: {
     all: "الكل",
     gameInvites: "دعوات الألعاب",
-    friendRequests: "طلبات الصداقة"
+    friendRequests: "طلبات الصداقة",
   },
   empty: {
     title: "لا توجد إشعارات",
-    description: "أنت على اطلاع بكل شيء!"
+    description: "أنت على اطلاع بكل شيء!",
   },
   error: {
-    title: "تعذر تحميل الطلبات"
+    title: "تعذر تحميل الطلبات",
   },
   gameInvite: {
     title: "دعوة لعبة",
     description: "{name} دعاك للعب {game}",
-    fallbackName: "شخص ما"
+    fallbackName: "شخص ما",
   },
   friendRequest: {
     title: "طلب صداقة",
-    description: "{name} يريد أن يكون صديقك"
+    description: "{name} يريد أن يكون صديقك",
   },
   actions: {
-    dismiss: "إخفاء"
+    dismiss: "إخفاء",
   },
   time: {
     justNow: "الآن",
     minutesAgo: "منذ {n} دقيقة",
     hoursAgo: "منذ {n} ساعة",
-    daysAgo: "منذ {n} يوم"
+    daysAgo: "منذ {n} يوم",
   },
-  markAllRead: "تحديد الكل كمقروء"
-}
+  markAllRead: "تحديد الكل كمقروء",
+};

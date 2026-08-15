@@ -5,35 +5,34 @@ export const en = {
   tabs: {
     all: "All",
     gameInvites: "Game Invites",
-    friendRequests: "Friend Requests"
+    friendRequests: "Friend Requests",
   },
   empty: {
     title: "No notifications",
-    description: "You're all caught up!"
+    description: "You're all caught up!",
   },
   error: {
-    title: "Unable to load requests"
+    title: "Unable to load requests",
   },
   gameInvite: {
     title: "Game Invitation",
     description: "{name} invited you to play {game}",
-    fallbackName: "Someone"
+    fallbackName: "Someone",
   },
   friendRequest: {
     title: "Friend Request",
-    description: "{name} wants to be your friend"
+    description: "{name} wants to be your friend",
   },
   actions: {
-    dismiss: "Dismiss"
+    dismiss: "Dismiss",
   },
   time: {
     justNow: "Just now",
     minutesAgo: "{n} min ago",
     hoursAgo: "{n} hr ago",
-    daysAgo: "{n} day ago"
+    daysAgo: "{n} day ago",
   },
-  markAllRead: "Mark all as read"
-}
-;
+  markAllRead: "Mark all as read",
+};
 
 export type TNotificationsTranslation = typeof en;

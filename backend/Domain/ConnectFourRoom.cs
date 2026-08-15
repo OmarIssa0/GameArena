@@ -114,15 +114,14 @@ namespace backend.Domain
 
                 if (CheckWinner(col, row, piece))
                 {
-                    WinnerPlayerId = playerId;
                     WinnerSymbol = piece == 1 ? "🔴" : "🟡";
-                    if (playerId == Player1Id) Score[0]++; else Score[1]++;
+                    CompleteRound(playerId);
                     return;
                 }
 
                 if (IsBoardFull())
                 {
-                    WinnerPlayerId = "";
+                    CompleteRound("");
                     return;
                 }
 
@@ -153,15 +152,14 @@ namespace backend.Domain
 
                 if (CheckWinner(randomCol, row, piece))
                 {
-                    WinnerPlayerId = botId;
                     WinnerSymbol = piece == 1 ? "🔴" : "🟡";
-                    if (botId == Player1Id) Score[0]++; else Score[1]++;
+                    CompleteRound(botId);
                     return;
                 }
 
                 if (IsBoardFull())
                 {
-                    WinnerPlayerId = "";
+                    CompleteRound("");
                     return;
                 }
 

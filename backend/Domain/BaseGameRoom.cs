@@ -49,6 +49,17 @@ namespace backend.Domain
             HasStarted = true;
             CurrentTurnPlayerId = Player1Id;
         }
+
+        protected void CompleteRound(string? winnerPlayerId)
+        {
+            WinnerPlayerId = winnerPlayerId;
+            IsFinished = true;
+
+            if (string.IsNullOrEmpty(winnerPlayerId)) return;
+            if (winnerPlayerId == Player1Id) Score[0]++;
+            else if (winnerPlayerId == Player2Id) Score[1]++;
+        }
+
         public virtual bool NeedsGameLoop => false;
         public virtual int TickIntervalMs => 50;
         public virtual void Tick() { }

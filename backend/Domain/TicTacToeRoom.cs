@@ -69,15 +69,14 @@ public class TicTacToeRoom : BaseGameRoom
 
             if (GameHelper.CheckWinTicTacToe(Board))
             {
-                WinnerPlayerId = playerId;
                 WinnerSymbol = Board[cell];
-                if (playerId == Player1Id) Score[0]++; else Score[1]++;
+                CompleteRound(playerId);
                 return;
             }
 
             if (Board.All(x => x != "."))
             {
-                WinnerPlayerId = "";
+                CompleteRound("");
                 return;
             }
 
@@ -101,15 +100,14 @@ public class TicTacToeRoom : BaseGameRoom
             Board[botMove] = botSymbol;
             if (GameHelper.CheckWinTicTacToe(Board))
             {
-                WinnerPlayerId = botId;
                 WinnerSymbol = Board[botMove];
-                if (botId == Player1Id) Score[0]++; else Score[1]++;
+                CompleteRound(botId);
                 return;
             }
 
             if (Board.All(x => x != "."))
             {
-                WinnerPlayerId = "";
+                CompleteRound("");
                 return;
             }
 

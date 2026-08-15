@@ -20,7 +20,6 @@ namespace backend.Data
             }
             catch (Exception ex)
             {
-                // this only for debugging in production
                 _logger.LogError(ex, "Unhandled exception");
                 var error = ErrorHelper.GetErrorResponse(ex);
                 context.Response.ContentType = "application/json";

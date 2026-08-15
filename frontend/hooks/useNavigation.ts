@@ -10,10 +10,7 @@ export function useNavigation() {
   const pathname = usePathname();
   const t = useTranslation({ en, ar }) as TSidebarTranslation;
 
-  const activeId =
-    sidebarNav
-      .filter((n) => pathname.startsWith(`/${n.id}`))
-      .sort((a, b) => b.id.length - a.id.length)[0]?.id ?? "home";
+  const activeId = sidebarNav.filter((n) => pathname.startsWith(`/${n.id}`)).sort((a, b) => b.id.length - a.id.length)[0]?.id ?? "home";
 
   return { activeId, t, sidebarNav };
 }

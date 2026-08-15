@@ -25,7 +25,7 @@ function MobileFooter() {
 
   return (
     <GNav
-      className="md:hidden bg-bg-sidebar border-t pb-safe"
+      className="md:hidden bg-bg-sidebar border-t"
       aria-label={t.mainNavigation}
       items={navItems}
       orientation={NavOrientationEnum.Horizontal}

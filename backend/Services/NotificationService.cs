@@ -77,11 +77,8 @@ namespace backend.Services
                 .SendAsync("social:blocked", blocked);
         }
 
-
         public async Task SendSocialDataAsync(Guid userId)
         {
-            // Fetch all social data in parallel and send as a single batched event
-            // This prevents UI flicker from multiple sequential SignalR pushes
             var friendsTask = socialReadService.GetFriendsAsync(userId, null);
             var receivedTask = socialReadService.GetReceivedRequestsAsync(userId);
             var sentTask = socialReadService.GetSentRequestsAsync(userId);

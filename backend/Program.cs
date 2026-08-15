@@ -14,7 +14,6 @@ Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Controllers
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -22,12 +21,11 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
     });
 
-// Database
+
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddDbContextFactory<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")), ServiceLifetime.Scoped);
-// Authentication & Authorization
 var jwtKey = builder.Configuration["JWT:Token"]
     ?? throw new InvalidOperationException("JWT:Token is not configured");
 var jwtIssuer = builder.Configuration["JWT:Issuer"]
@@ -63,19 +61,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-// SignalR
 builder.Services.AddSignalR()
     .AddJsonProtocol(options =>
     {
         options.PayloadSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
         options.PayloadSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
     });
-
-// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("cors", policy =>
@@ -90,8 +83,6 @@ builder.Services.AddCors(options =>
               .AllowCredentials();
     });
 });
-
-// === Application Layer (Feature Services) ===
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
@@ -103,14 +94,12 @@ builder.Services.AddScoped<IFriendService, FriendService>();
 builder.Services.AddScoped<ISocialReadService, SocialReadService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IMatchHistoryService, MatchHistoryService>();
-
-// Event bus this for notification system like friend request, game invitation, message notification, user online/offline status.
 builder.Services.AddSingleton<IEventBus, EventBus>();
 builder.Services.AddScoped<SocialNotificationHandler>();
-builder.Services.AddScoped<IEventHandler<FriendRequestSentEvent>>(sp => sp.GetRequiredService<SocialNotificationHandler>()); // requst sent
-builder.Services.AddScoped<IEventHandler<FriendRequestAcceptedEvent>>(sp => sp.GetRequiredService<SocialNotificationHandler>()); // request accepted
-builder.Services.AddScoped<IEventHandler<FriendRequestDeclinedEvent>>(sp => sp.GetRequiredService<SocialNotificationHandler>()); // request declined
-builder.Services.AddScoped<IEventHandler<FriendRequestCancelledEvent>>(sp => sp.GetRequiredService<SocialNotificationHandler>()); // request cancelled
+builder.Services.AddScoped<IEventHandler<FriendRequestSentEvent>>(sp => sp.GetRequiredService<SocialNotificationHandler>());
+builder.Services.AddScoped<IEventHandler<FriendRequestAcceptedEvent>>(sp => sp.GetRequiredService<SocialNotificationHandler>());
+builder.Services.AddScoped<IEventHandler<FriendRequestDeclinedEvent>>(sp => sp.GetRequiredService<SocialNotificationHandler>());
+builder.Services.AddScoped<IEventHandler<FriendRequestCancelledEvent>>(sp => sp.GetRequiredService<SocialNotificationHandler>());
 builder.Services.AddScoped<IEventHandler<FriendRemovedEvent>>(sp => sp.GetRequiredService<SocialNotificationHandler>());
 builder.Services.AddScoped<IEventHandler<ChatMessageSentEvent>>(sp => sp.GetRequiredService<SocialNotificationHandler>());
 builder.Services.AddScoped<IEventHandler<GameStartedEvent>>(sp => sp.GetRequiredService<SocialNotificationHandler>());

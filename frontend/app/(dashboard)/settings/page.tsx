@@ -71,9 +71,7 @@ function SettingsPage() {
       const parsed = JSON.parse(user.preferences ?? "{}") as IUserPreferences;
       if (parsed.theme === ThemeEnum.Light || parsed.theme === ThemeEnum.Dark) setTheme(parsed.theme);
       if (parsed.locale === LocaleEnum.En || parsed.locale === LocaleEnum.Ar) setLocale(parsed.locale);
-    } catch {
-      // fall back to defaults
-    }
+    } catch {}
   }, [user, setLocale, setTheme]);
 
   const handleSaveProfile = async () => {

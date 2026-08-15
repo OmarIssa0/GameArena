@@ -15,7 +15,6 @@ interface GTabsProps<T extends string | number> {
   className?: string;
   tabClassName?: string;
   fullWidth?: boolean;
-  /** Vertical (stacked) on mobile, horizontal on md+ */
   responsive?: boolean;
   renderLabel?: (tab: GTabItem<T>, active: boolean) => ReactNode;
   renderIcon?: (tab: GTabItem<T>, active: boolean) => ReactNode;

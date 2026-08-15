@@ -44,12 +44,14 @@ export function useMessages(initialFriendId?: TNullable<string>) {
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<TNullable<string>>(null);
 
-  const { data: apiMessages, loading: loadingMessages, error } = useFetch(
+  const {
+    data: apiMessages,
+    loading: loadingMessages,
+    error,
+  } = useFetch(
     () => {
       if (!selectedFriendId) return Promise.resolve([] as IMessage[]);
-      return chatService
-        .getMessagesByFriendId(selectedFriendId)
-        .then((res) => (res.data ?? []).map(normalizeHistoryMessage));
+      return chatService.getMessagesByFriendId(selectedFriendId).then((res) => (res.data ?? []).map(normalizeHistoryMessage));
     },
     [selectedFriendId],
     t.error.title,
@@ -69,20 +71,14 @@ export function useMessages(initialFriendId?: TNullable<string>) {
     const off = chatService.onPrivateMessage((incoming) => {
       if (!selectedFriendId) return;
 
-      const isCurrentConversation =
-        incoming.senderId === selectedFriendId ||
-        incoming.receiverId === selectedFriendId;
+      const isCurrentConversation = incoming.senderId === selectedFriendId || incoming.receiverId === selectedFriendId;
 
       if (!isCurrentConversation) return;
 
-      setLocalMessages((prev) =>
-        prev.some((m) => areSameMessage(m, incoming))
-          ? prev
-          : [...prev, incoming],
-      );
+      setLocalMessages((prev) => (prev.some((m) => areSameMessage(m, incoming)) ? prev : [...prev, incoming]));
     });
 
-      return off;
+    return off;
   }, [selectedFriendId]);
 
   const selectFriend = useCallback((friendId: TNullable<string>) => {

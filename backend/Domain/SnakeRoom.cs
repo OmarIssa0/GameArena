@@ -38,7 +38,7 @@ namespace backend.Domain
             lock (_lock)
             {
                 if (WinnerPlayerId != null || !HasStarted) return;
-                if (_snake1.Count == 0 || _snake2.Count == 0) return; // Not initialized
+                if (_snake1.Count == 0 || _snake2.Count == 0) return;
 
                 ApplyDirections();
                 MovePlayers();
@@ -133,11 +133,9 @@ namespace backend.Domain
 
         private void ResolveWinner()
         {
-            if (!_alive1 && !_alive2) WinnerPlayerId = "";
-            else if (!_alive1) WinnerPlayerId = Player2Id;
-            else if (!_alive2) WinnerPlayerId = Player1Id;
-
-            if (WinnerPlayerId != null) IsFinished = true;
+            if (!_alive1 && !_alive2) CompleteRound("");
+            else if (!_alive1) CompleteRound(Player2Id);
+            else if (!_alive2) CompleteRound(Player1Id);
         }
 
         public override void HandleAction(string playerId, JsonElement action)
@@ -173,7 +171,7 @@ namespace backend.Domain
             lock (_lock)
             {
                 if (!IsBotGame || IsFinished || !HasStarted || !_alive2) return;
-                if (_snake2.Count == 0) return; // Not initialized
+                if (_snake2.Count == 0) return;
 
                 var head = _snake2.First!.Value;
                 var best = Dir2;

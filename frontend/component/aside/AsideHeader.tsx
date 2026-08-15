@@ -9,18 +9,7 @@ import { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import type { IAsideHeaderProps } from "./def/AsideHeader";
 
-function AsideHeader({
-  collapsed,
-  expand,
-  collapse,
-  closeMobile,
-  brand,
-  collapsedIcon,
-  label,
-  actions,
-  overlay = false,
-}: IAsideHeaderProps) {
-  // Overlay mode (tablet/mobile modal): always expanded, shows close button.
+function AsideHeader({ collapsed, expand, collapse, closeMobile, brand, collapsedIcon, label, actions, overlay = false }: IAsideHeaderProps) {
   if (overlay) {
     return (
       <header className="flex min-h-16 w-full shrink-0 items-center gap-2 border-b border-border px-3">
@@ -40,11 +29,7 @@ function AsideHeader({
   }
 
   return (
-    <header
-      className={clsx(
-        "flex min-h-16 w-full shrink-0 items-center gap-2 border-b border-border px-3",
-        collapsed && "justify-center",
-      )}>
+    <header className={clsx("flex min-h-16 w-full shrink-0 items-center gap-2 border-b border-border px-3", collapsed && "justify-center")}>
       {collapsed ? (
         <GButton
           variant={ButtonVariantEnum.Subtle}

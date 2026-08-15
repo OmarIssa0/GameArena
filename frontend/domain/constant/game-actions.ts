@@ -1,5 +1,6 @@
 export const GameActionTypes = {
   MOVE_PADDLE: "MOVE_PADDLE",
+  SET_PADDLE: "SET_PADDLE",
   CHANGE_DIRECTION: "CHANGE_DIRECTION",
   MAKE_MOVE: "MAKE_MOVE",
   PLACE: "place",
@@ -12,6 +13,7 @@ export const DirectionValues = {
 
 export type TGameAction =
   | { type: typeof GameActionTypes.MOVE_PADDLE; direction: "UP" | "DOWN" }
+  | { type: typeof GameActionTypes.SET_PADDLE; y: number }
   | { type: typeof GameActionTypes.CHANGE_DIRECTION; direction: "UP" | "DOWN" | "LEFT" | "RIGHT" }
   | { type: typeof GameActionTypes.MAKE_MOVE; choice?: string; cell?: number }
   | { type: typeof GameActionTypes.PLACE; col: number };

@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  useRef,
-  useState,
-  type ClipboardEvent,
-  type KeyboardEvent,
-} from "react";
+import { useRef, useState, type ClipboardEvent, type KeyboardEvent } from "react";
 import { GButton } from "@/component/common/GButton";
 import { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 import { en, type TOtpTranslation } from "../i18n/Otp/en.i18n";
@@ -95,8 +90,12 @@ function OtpForm({ email, onSuccess }: OtpFormProps) {
   };
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); void verify(); }} className="w-full max-w-sm mx-auto space-y-5">
-      {/* Input Array Blocks Container */}
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        void verify();
+      }}
+      className="w-full max-w-sm mx-auto space-y-5">
       <div className="flex gap-2 justify-center dir-ltr" dir="ltr">
         {code.map((digit, i) => (
           <input
@@ -119,7 +118,6 @@ function OtpForm({ email, onSuccess }: OtpFormProps) {
         ))}
       </div>
 
-      {/* Semantic Error Output Box */}
       {error && (
         <p role="alert" className="text-danger text-xs font-medium text-center">
           {error}
@@ -131,13 +129,7 @@ function OtpForm({ email, onSuccess }: OtpFormProps) {
           {t.verify}
         </GButton>
 
-        <GButton
-          type="button"
-          variant={ButtonVariantEnum.Subtle}
-          disabled={loading.verify || loading.resend}
-          onClick={resend}
-          className="w-full"
-        >
+        <GButton type="button" variant={ButtonVariantEnum.Subtle} disabled={loading.verify || loading.resend} onClick={resend} className="w-full">
           {t.resendCode}
         </GButton>
       </div>

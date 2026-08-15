@@ -6,8 +6,7 @@ interface GSelectOption<TValue extends string | number = string> {
   label: string;
 }
 
-export interface GSelectProps<TValue extends string | number = string>
-  extends Omit<SelectHTMLAttributes<HTMLSelectElement>, "children" | "size"> {
+export interface GSelectProps<TValue extends string | number = string> extends Omit<SelectHTMLAttributes<HTMLSelectElement>, "children" | "size"> {
   label?: string;
   error?: string;
   startIcon?: ReactNode;

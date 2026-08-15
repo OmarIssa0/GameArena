@@ -42,11 +42,11 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
     <ConnectionProvider>
       <GameProvider>
         <DashboardNotificationsProvider>
-          <div className="flex h-dvh w-full flex-col overflow-hidden bg-bg font-sans text-text antialiased">
+          <div className="flex h-viewport w-full flex-col overflow-hidden bg-bg font-sans text-text antialiased">
             <Header sidebar={sidebarAside} social={socialAside} />
             <div className="flex min-h-0 flex-1 pt-14">
               <Sidebar aside={sidebarAside} />
-              <main className="flex min-w-0 flex-1 flex-col overflow-y-auto pb-mobile-nav md:pb-0 custom-scrollbar">{children}</main>
+              <main className="flex min-w-0 flex-1 flex-col overflow-y-auto md:pb-mobile-nav md:pb-0 custom-scrollbar">{children}</main>
               <SocialPanel aside={socialAside} />
             </div>
             <MobileFooter />

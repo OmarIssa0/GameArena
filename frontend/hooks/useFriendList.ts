@@ -21,9 +21,7 @@ export function useFriendList() {
     });
 
     const offStatus = friendService.onFriendStatusChange((userId, status) => {
-      setFriends((prev) =>
-        prev.map((f) => (f.id === userId ? { ...f, status } : f))
-      );
+      setFriends((prev) => prev.map((f) => (f.id === userId ? { ...f, status } : f)));
     });
 
     if (isSocialConnected) {

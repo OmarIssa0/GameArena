@@ -9,13 +9,13 @@ export interface IGameConfig {
   type: GamesKindEnum;
   icon: LucideIcon;
   path: string;
-  tileGradient: string; // tile background for game icons, e.g. "from-primary to-accent"
+  tileGradient: string;
   animation: string;
   symbol1: string;
   symbol2: string;
   player1Colors: IPlayerCardColors;
   player2Colors: IPlayerCardColors;
-  needsInput: boolean; // does this game require keyboard input during play?
+  needsInput: boolean;
   nameKey: string;
   descriptionKey: string;
 }
@@ -108,7 +108,6 @@ export function getGameConfig(gameType: GamesKindEnum): IGameConfig {
   return config;
 }
 
-/** Translate game name/description using the unified Game i18n. */
 export function translateGameInfo(t: GameTranslations, gameType: GamesKindEnum): { name: string; description: string } {
   const config = getGameConfig(gameType);
   const lookup = (key: string): string => (t as unknown as Record<string, unknown>)[key] as string;

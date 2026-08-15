@@ -64,8 +64,8 @@ function SnakePage() {
 
   const mySnake = isPlayer1 ? snakeState.player1Snake : snakeState.player2Snake;
   const oppSnake = isPlayer1 ? snakeState.player2Snake : snakeState.player1Snake;
-  const myScore = isPlayer1 ? snakeState.player1Score : snakeState.player2Score;
-  const oppScore = isPlayer1 ? snakeState.player2Score : snakeState.player1Score;
+  const myScore = isPlayer1 ? snakeState.score[0] : snakeState.score[1];
+  const oppScore = isPlayer1 ? snakeState.score[1] : snakeState.score[0];
 
   return (
     <GameLayoutWrapper gameType={GamesKindEnum.Snake}>
@@ -130,4 +130,3 @@ function Cell({ type }: ICellProps) {
 }
 
 export default SnakePage;
-

@@ -8,9 +8,7 @@ function dispatch(handlers: TOptional<Set<Handler>>, ...args: unknown[]): void {
   for (const h of handlers) {
     try {
       h(...args);
-    } catch {
-      /* isolated */
-    }
+    } catch {}
   }
 }
 

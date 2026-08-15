@@ -78,7 +78,6 @@ function ConnectFourPage() {
         <GList
           items={cells}
           keyExtractor={(item) => `${item.row}-${item.col}`}
-         
           listClassName="grid grid-cols-7 gap-2"
           className="bg-surface rounded-xl p-3">
           {({ value }) => (
@@ -98,4 +97,3 @@ function ConnectFourPage() {
 }
 
 export default ConnectFourPage;
-

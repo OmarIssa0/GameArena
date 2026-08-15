@@ -44,14 +44,7 @@ function SocialTabs({ value, onChange, labels, badges }: SocialTabsProps) {
     [labels, badges],
   );
 
-  return (
-    <GTabs
-      tabs={tabs}
-      value={value}
-      onChange={(id) => onChange(id as SocialTabId)}
-      fullWidth
-    />
-  );
+  return <GTabs tabs={tabs} value={value} onChange={(id) => onChange(id as SocialTabId)} fullWidth />;
 }
 
 export { SocialTabs, SocialTabId };

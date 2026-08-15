@@ -5,7 +5,7 @@ import { useAuth } from "@/app/providers/AuthProvider";
 import { useTranslation } from "@/hooks/useSetting";
 import { useGameTranslation } from "@/hooks/useGameTranslation";
 import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
-import { ArrowRight, Gamepad2, MessageSquare, Users, Trophy, Zap, Sparkles } from "lucide-react";
+import { ArrowRight, Gamepad2, MessageSquare, Users, Trophy, Zap, Sparkles, Hexagon } from "lucide-react";
 import { GIcon } from "@/component/common/GIcon";
 import { ar } from "./i18n/ar.i18n";
 import { en, type THomeTranslation } from "./i18n/en.i18n";
@@ -51,12 +51,12 @@ function Home() {
       {/* Hero Section */}
       <section className="mb-8 lg:mb-12">
         <GCard variant={CardVariantEnum.Elevated} padding={SizeEnum.md} className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <GIcon icon={Gamepad2} size={SizeEnum.lg} tile color={AccentColorEnum.OnPrimary} />
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+            <GIcon icon={Hexagon} size={SizeEnum.lg} />
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-text">{t.brand}</h1>
           </div>
           <div className="text-right">
-            <strong className="block text-sm font-medium text-primary truncate">{t.welcome(user?.firstName || "")}</strong>
+            <strong className="block text-xl sm:text-2xl font-medium text-primary truncate">{t.welcome(user?.firstName || "")}</strong>
             <p className="text-sm text-text-secondary truncate">{t.welcomeDesc}</p>
           </div>
           <LottiePlayer autoplay loop src={"/game.json"} className="w-24 h-24 sm:w-32 sm:h-32" />
@@ -85,7 +85,7 @@ function Home() {
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
           {features.map((feature) => (
             <GCard key={feature.title} variant={CardVariantEnum.Default} padding={SizeEnum.lg} className="text-center h-full">
-              <div className="mx-auto mb-4">
+              <div className="flex justify-center mb-4">
                 <GIcon icon={feature.icon} size={SizeEnum.lg} color={AccentColorEnum.Primary} />
               </div>
               <h3 className="text-lg font-bold text-text mb-1">{feature.title}</h3>
@@ -102,7 +102,14 @@ function Home() {
           {GamesList.map((game) => {
             const { name, description } = translateGameInfo(gt, game.type);
             return (
-              <GameCard key={game.type} name={name} desc={description} animation={game.animation} onClick={() => handleGameSelect(game.path)} playLabel={t.playNow} />
+              <GameCard
+                key={game.type}
+                name={name}
+                desc={description}
+                animation={game.animation}
+                onClick={() => handleGameSelect(game.path)}
+                playLabel={t.playNow}
+              />
             );
           })}
         </div>
@@ -120,4 +127,3 @@ function Home() {
 }
 
 export default Home;
-

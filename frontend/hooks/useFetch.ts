@@ -7,17 +7,12 @@ interface UseFetchResult<T> {
   data: TNullable<T>;
   loading: boolean;
   error: TNullable<string>;
-  /** Re-fetches data. Note: if the component is unmounted, the result will be discarded. */
   reload: () => void;
 }
 
 type Fetcher<T> = ((signal: AbortSignal) => Promise<T>) | (() => Promise<T>);
 
-export function useFetch<T>(
-  fetcher: Fetcher<T>,
-  deps: ReadonlyArray<unknown> = [],
-  fallbackErrorMessage = "",
-): UseFetchResult<T> {
+export function useFetch<T>(fetcher: Fetcher<T>, deps: ReadonlyArray<unknown> = [], fallbackErrorMessage = ""): UseFetchResult<T> {
   const [data, setData] = useState<T>(null as unknown as T);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<TNullable<string>>(null);
@@ -34,6 +29,8 @@ export function useFetch<T>(
   useEffect(() => {
     fallbackErrorRef.current = fallbackErrorMessage;
   }, [fallbackErrorMessage]);
+
+  const depsKey = deps.join(",");
 
   const execute = useCallback(() => {
     controllerRef.current?.abort();
@@ -58,11 +55,10 @@ export function useFetch<T>(
         }
       });
   }, []);
-
   useEffect(() => {
     const gen = genRef.current;
     mountedRef.current = true;
-    // Initial fetch - use timeout to avoid sync setState in effect
+
     const timer = setTimeout(() => {
       if (mountedRef.current) execute();
     }, 0);
@@ -72,8 +68,7 @@ export function useFetch<T>(
       controllerRef.current?.abort();
       clearTimeout(timer);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- deps are intentionally dynamic: refetch on any dependency change
-  }, [execute, ...deps]);
+  }, [execute, depsKey]);
 
   return { data, loading, error, reload: execute };
 }

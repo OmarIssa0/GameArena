@@ -38,15 +38,15 @@ namespace backend.Domain
         public ICollection<Message> ReceivedMessages { get; set; } = new List<Message>();
         
 
-        // friends already added 
+
         public ICollection<UserFriends> FriendshipsSent  { get; set; } = new List<UserFriends>();
         public ICollection<UserFriends> FriendshipsReceived { get; set; } = new List<UserFriends>();
 
-        // friend requests sent and received
+
         public ICollection<FriendRequest> FriendRequestsSent { get; set; }= new List<FriendRequest>();
         public ICollection<FriendRequest> FriendRequestsReceived { get; set; } = new List<FriendRequest>();
 
-        // match history
+
         public ICollection<MatchHistory> MatchesAsPlayer1 { get; set; } = new List<MatchHistory>();
         public ICollection<MatchHistory> MatchesAsPlayer2 { get; set; } = new List<MatchHistory>();
         public string? Preferences { get; set; }

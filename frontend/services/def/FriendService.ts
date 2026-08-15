@@ -14,15 +14,11 @@ import type { Handler } from "../lib/signalRUtils";
 class FriendService extends SignalRServiceBase implements IFriendService {
   private repo = friendRepository;
 
-  // ── Connection setup (called once by ConnectionProvider) ──────────────
-
   setConnection(connection: HubConnection): void {
     super.setConnection(connection);
   }
 
   protected registerHandlers(): void {
-    // Batched social data event — replaces individual social:friends, social:requests, social:blocked
-    // on initial connect/reconnect to prevent UI flicker
     this.addHandler("social:all", (data: unknown) => {
       const batch = data as {
         friends?: IUserSummary[];
@@ -42,7 +38,6 @@ class FriendService extends SignalRServiceBase implements IFriendService {
       );
     });
 
-    // Legacy individual events — still handled for incremental updates
     this.addHandler("social:friends", (data: unknown) => {
       const list = (data as IUserSummary[]).map(withFullName).sort((a, b) => (a.fullName ?? "").localeCompare(b.fullName ?? ""));
       this.subs.dispatch("social:friends", list);
@@ -68,9 +63,6 @@ class FriendService extends SignalRServiceBase implements IFriendService {
       this.subs.dispatch("friend:status", (data as { userId: string }).userId, UserStatusEnum.InGame);
     });
 
-    // Informational pushes — the corresponding data refreshes (social:* /
-    // notification:*) are pushed by the server alongside these. Registered so
-    // SignalR does not log "No client method found" warnings.
     this.addHandler("friend:request", (data: unknown) => this.subs.dispatch("friend:request", data));
     this.addHandler("friend:accepted", (data: unknown) => this.subs.dispatch("friend:accepted", data));
     this.addHandler("friend:declined", (data: unknown) => this.subs.dispatch("friend:declined", data));
@@ -78,8 +70,6 @@ class FriendService extends SignalRServiceBase implements IFriendService {
     this.addHandler("friend:blocked", (data: unknown) => this.subs.dispatch("friend:blocked", data));
     this.addHandler("friend:requestCancelled", (data: unknown) => this.subs.dispatch("friend:requestCancelled", data));
   }
-
-  // ── REST API ─────────────────────────────────────────────────────────
 
   sendFriendRequest(friendId: string): TPromise<void> {
     return this.repo.sendFriendRequest(friendId);
@@ -123,8 +113,6 @@ class FriendService extends SignalRServiceBase implements IFriendService {
     return this.repo.unblockUser(blockedId);
   }
 
-  // ── SignalR subscriptions ────────────────────────────────────────────
-
   onFriendListUpdate(handler: (friends: IUserSummary[]) => void): () => void {
     return this.subscribe("social:friends", handler as Handler);
   }
@@ -140,8 +128,6 @@ class FriendService extends SignalRServiceBase implements IFriendService {
   onFriendStatusChange(handler: (userId: string, status: UserStatusEnum) => void): () => void {
     return this.subscribe("friend:status", handler as Handler);
   }
-
-  // ── SignalR invocations ────────────────────────────────────────────────
 
   async invokeFriends(): Promise<void> {
     await this.requireConnection("Social").invoke("RequestFriends");

@@ -103,7 +103,7 @@ namespace backend.Domain
         {
             if (Player1Choice == Player2Choice)
             {
-                WinnerPlayerId = "";
+                CompleteRound("");
                 return;
             }
 
@@ -111,13 +111,11 @@ namespace backend.Domain
                 (Player1Choice == "Paper" && Player2Choice == "Rock") ||
                 (Player1Choice == "Scissors" && Player2Choice == "Paper"))
             {
-                WinnerPlayerId = Player1Id;
-                Score[0]++;
+                CompleteRound(Player1Id);
             }
             else
             {
-                WinnerPlayerId = Player2Id;
-                Score[1]++;
+                CompleteRound(Player2Id);
             }
         }
     }

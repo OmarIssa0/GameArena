@@ -16,7 +16,6 @@ namespace backend.Data
         public DbSet<Notification> Notifications { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // tokens
             modelBuilder.Entity<RefreshToken>()
                 .HasOne(rt => rt.User)
                 .WithMany(u => u.RefreshTokens)
@@ -27,7 +26,6 @@ namespace backend.Data
                 .HasIndex(rt => rt.TokenHash)
                 .IsUnique();
 
-            // friends
             modelBuilder.Entity<UserFriends>()
                 .HasKey(uf => new { uf.UserId, uf.FriendId });
             modelBuilder.Entity<UserFriends>()
@@ -43,7 +41,6 @@ namespace backend.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
 
-            // friend requests
             modelBuilder.Entity<FriendRequest>()
                 .HasKey(FR => new { FR.SenderId, FR.ReceiverId });
             modelBuilder.Entity<FriendRequest>()
@@ -79,7 +76,7 @@ namespace backend.Data
 
             modelBuilder.Entity<Block>()
                 .HasIndex(b => new { b.BlockerId, b.BlockedId });
-            // chat
+
             modelBuilder.Entity<Message>()
                 .HasOne(m => m.Sender)
                 .WithMany(u => u.SentMessages)
@@ -97,7 +94,6 @@ namespace backend.Data
             modelBuilder.Entity<Message>()
                 .HasIndex(m => new { m.ReceiverId, m.IsRead });
 
-            // match history
             modelBuilder.Entity<MatchHistory>()
                 .HasOne(m => m.Player1)
                 .WithMany(u => u.MatchesAsPlayer1)
@@ -110,7 +106,6 @@ namespace backend.Data
                 .HasForeignKey(m => m.Player2Id)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // notifications
             modelBuilder.Entity<Notification>()
                 .HasOne(n => n.User)
                 .WithMany()

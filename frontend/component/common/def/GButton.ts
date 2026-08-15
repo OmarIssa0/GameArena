@@ -9,7 +9,6 @@ interface GButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariantEnum;
   size?: SizeEnum;
   rounded?: SizeEnum;
-  /** Content alignment. Defaults to "center". */
   align?: "start" | "center" | "end";
   loadingText?: string;
   fullWidth?: boolean;
