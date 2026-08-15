@@ -78,8 +78,8 @@ namespace backend.Domain
         {
             bool ate1 = false, ate2 = false;
 
-            if (_alive1 && _snake1.First!.Value.Equals(Food)) { ate1 = true; Score[0]++; }
-            if (_alive2 && _snake2.First!.Value.Equals(Food)) { ate2 = true; Score[1]++; }
+            if (_alive1 && _snake1.First!.Value.Equals(Food)) ate1 = true;
+            if (_alive2 && _snake2.First!.Value.Equals(Food)) ate2 = true;
 
             if (ate1 || ate2) SpawnFood();
         }
@@ -207,7 +207,6 @@ namespace backend.Domain
             lock (_lock)
             {
                 base.ResetForNewRound();
-                Score[0] = Score[1] = 0;
                 Dir1 = Direction.Right; Dir2 = Direction.Left;
                 _pending1 = _pending2 = null;
                 _alive1 = _alive2 = true;

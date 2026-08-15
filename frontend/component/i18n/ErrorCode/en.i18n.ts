@@ -25,6 +25,7 @@ const en: THashMap<string, number> = {
   [ErrorCodeEnum.CannotSelfBlock]: "Cannot block yourself",
   [ErrorCodeEnum.UserBlockedYou]: "This user has blocked you",
   [ErrorCodeEnum.YouBlockedUser]: "You have blocked this user",
+  [ErrorCodeEnum.RequestAlreadyProcessed]: "Friend request already processed",
   [ErrorCodeEnum.RoomNotFound]: "Game room not found",
   [ErrorCodeEnum.PlayerNotFound]: "Player not found",
   [ErrorCodeEnum.InvalidGameType]: "Invalid game type",

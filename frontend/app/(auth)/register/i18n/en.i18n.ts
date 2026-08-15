@@ -1,5 +1,3 @@
-import { ErrorCodeEnum } from "@/domain/enum/ErrorCodeEnum";
-
 const en = {
   register: "Register",
   createAccount: "Create your account and get started",
@@ -14,9 +12,6 @@ const en = {
   haveAccount: "Already have an account?",
   signIn: "Sign in",
   unknownError: "An unknown error occurred",
-  RegisterErrorCodeEnum: {
-    [ErrorCodeEnum.EmailAlreadyExists]: "Email already exists",
-    [ErrorCodeEnum.UsernameAlreadyExists]: "Username already exists"},
   dynamicFieldRequired: (field: string) => `${field} is required`,
   placeholder: {
     firstName: "Enter your first name",
@@ -24,10 +19,8 @@ const en = {
     userName: "Enter your username",
     email: "Enter your email",
     password: "Create a password",
-    confirmPassword: "Re-enter your password"
-  }
-}
-;
-
+    confirmPassword: "Re-enter your password",
+  },
+};
 type TRegisterTranslation = typeof en;
 export { en, type TRegisterTranslation };

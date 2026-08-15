@@ -100,6 +100,10 @@ function createProxy(langs: TTranslate, locale: LocaleEnum, path: string[] = [])
 
         return nextPath.join(".");
       },
+      has(_, key) {
+        if (typeof key !== "string") return false;
+        return resolve(langs[locale] ?? langs.en, [...path, ...key.split(".")]) !== undefined;
+      },
     },
   );
 }

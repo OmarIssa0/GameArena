@@ -87,8 +87,8 @@ function SettingsPage() {
       });
       await refreshUser();
       showMessage(t.settings.profile.saved);
-    } catch {
-      showMessage(t.settings.profile.saveFailed);
+    } catch (e: unknown) {
+      showMessage(resolveError(toErrorCode(e), t.settings.profile.saveFailed));
     }
     setSaving(false);
   };
@@ -139,8 +139,8 @@ function SettingsPage() {
       await userService.updatePreferences({ preferences: JSON.stringify(toPersist) });
       updatePreferences(toPersist);
       showMessage(t.settings.preferences.saved);
-    } catch {
-      showMessage(t.settings.preferences.saveFailed);
+    } catch (e: unknown) {
+      showMessage(resolveError(toErrorCode(e), t.settings.preferences.saveFailed));
     }
     setPrefSaving(false);
   };

@@ -15,9 +15,8 @@ import { useTranslation } from "@/hooks/useSetting";
 import Link from "next/link";
 import { ErrorCodeEnum } from "@/domain/enum/ErrorCodeEnum";
 import { authService } from "@/services/def/AuthService";
+import { toErrorCode, useErrorMessage } from "@/hooks/useErrorMessage";
 import { FieldRegisterEnum } from "@/domain/enum/FieldRegisterEnum";
-import { AxiosError } from "axios";
-import type { IApiResponse } from "@/domain/meta/IApiResponse";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 
@@ -28,6 +27,7 @@ function RegisterForm() {
     ar: { ...ar, ...ArTextField },
   }) as TRegisterTranslation & GTextFieldTranslation;
   const [loading, setLoading] = useState(false);
+  const resolveError = useErrorMessage();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -87,14 +87,8 @@ function RegisterForm() {
       });
       router.push("/email-verify?email=" + encodeURIComponent(email));
     } catch (e) {
-      const err = e as AxiosError<IApiResponse<unknown>>;
-      const data = err?.response?.data;
-      const code = data?.errorCode;
-
-      const errorMessage =
-        code !== undefined && t.RegisterErrorCodeEnum[code as keyof typeof t.RegisterErrorCodeEnum]
-          ? t.RegisterErrorCodeEnum[code as keyof typeof t.RegisterErrorCodeEnum]
-          : t.unknownError;
+      const code = toErrorCode(e);
+      const errorMessage = resolveError(code);
 
       if (code === ErrorCodeEnum.EmailAlreadyExists) {
         setApiError({ link: "/login", message: errorMessage });

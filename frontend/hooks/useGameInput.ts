@@ -106,26 +106,24 @@ export function useGameInput<T extends HTMLElement>(config: GameInputConfig<T>) 
       return Math.min(1, Math.max(0, (clientY - rect.top) / rect.height));
     };
 
-    const handlePointerDown = (e: PointerEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return;
       touching = true;
-      start.x = e.clientX;
-      start.y = e.clientY;
-      if (config.touchMode !== "follow") return;
-      board.setPointerCapture(e.pointerId);
-      if (config.createPositionAction) {
-        lastSentY = boardRelativeY(e.clientY);
-        lastSendTimeRef.current = Date.now();
-        sendAction(config.createPositionAction(lastSentY));
-      }
+      start.x = e.touches[0].clientX;
+      start.y = e.touches[0].clientY;
+      if (config.touchMode !== "follow" || !config.createPositionAction) return;
+      lastSentY = boardRelativeY(e.touches[0].clientY);
+      lastSendTimeRef.current = Date.now();
+      sendAction(config.createPositionAction(lastSentY));
     };
 
-    const handlePointerMove = (e: PointerEvent) => {
+    const handleTouchMove = (e: TouchEvent) => {
       e.preventDefault();
       if (!touching || config.touchMode !== "follow" || !config.createPositionAction) return;
+      const touch = e.touches[0];
+      if (!touch) return;
 
-      const y = boardRelativeY(e.clientY);
+      const y = boardRelativeY(touch.clientY);
       if (lastSentY !== null && Math.abs(y - lastSentY) < POSITION_SEND_STEP) return;
 
       const now = Date.now();
@@ -136,14 +134,16 @@ export function useGameInput<T extends HTMLElement>(config: GameInputConfig<T>) 
       sendAction(config.createPositionAction(y));
     };
 
-    const handlePointerUp = (e: PointerEvent) => {
-      e.preventDefault();
+    const handleTouchEnd = (e: TouchEvent) => {
       if (!touching) return;
       touching = false;
       if (config.touchMode !== "swipe") return;
 
-      const dx = e.clientX - start.x;
-      const dy = e.clientY - start.y;
+      const touch = e.changedTouches[0];
+      if (!touch) return;
+
+      const dx = touch.clientX - start.x;
+      const dy = touch.clientY - start.y;
       if (Math.max(Math.abs(dx), Math.abs(dy)) < SWIPE_THRESHOLD_PX) return;
 
       const direction = swipeDirection(dx, dy);
@@ -156,24 +156,19 @@ export function useGameInput<T extends HTMLElement>(config: GameInputConfig<T>) 
       sendAction(config.createAction(direction));
     };
 
-    const handlePointerCancel = (e: PointerEvent) => {
-      e.preventDefault();
-      if (!touching) return;
+    const handleTouchCancel = () => {
       touching = false;
-      if (config.touchMode === "follow" && board.hasPointerCapture(e.pointerId)) {
-        board.releasePointerCapture(e.pointerId);
-      }
     };
 
-    board.addEventListener("pointerdown", handlePointerDown);
-    board.addEventListener("pointermove", handlePointerMove);
-    board.addEventListener("pointerup", handlePointerUp);
-    board.addEventListener("pointercancel", handlePointerCancel);
+    board.addEventListener("touchstart", handleTouchStart, { passive: true });
+    board.addEventListener("touchmove", handleTouchMove, { passive: false });
+    board.addEventListener("touchend", handleTouchEnd);
+    board.addEventListener("touchcancel", handleTouchCancel);
     return () => {
-      board.removeEventListener("pointerdown", handlePointerDown);
-      board.removeEventListener("pointermove", handlePointerMove);
-      board.removeEventListener("pointerup", handlePointerUp);
-      board.removeEventListener("pointercancel", handlePointerCancel);
+      board.removeEventListener("touchstart", handleTouchStart);
+      board.removeEventListener("touchmove", handleTouchMove);
+      board.removeEventListener("touchend", handleTouchEnd);
+      board.removeEventListener("touchcancel", handleTouchCancel);
       touching = false;
     };
   }, [config.isActive, config.touchMode, config.boardRef, sendAction]);

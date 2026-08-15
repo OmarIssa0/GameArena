@@ -1,5 +1,3 @@
-import { ErrorCodeEnum } from "@/domain/enum/ErrorCodeEnum";
-
 const ar = {
   register: "تسجيل",
   createAccount: "قم بإنشاء حسابك وابدأ",
@@ -14,9 +12,6 @@ const ar = {
   haveAccount: "هل لديك حساب بالفعل؟",
   signIn: "تسجيل الدخول",
   unknownError: "حدث خطأ غير معروف",
-  RegisterErrorCodeEnum: {
-    [ErrorCodeEnum.EmailAlreadyExists]: "البريد الإلكتروني موجود بالفعل",
-    [ErrorCodeEnum.UsernameAlreadyExists]: "اسم المستخدم موجود بالفعل"},
   dynamicFieldRequired: (field: string) => `حقل ${field} مطلوب`,
   placeholder: {
     firstName: "أدخل اسمك الأول",
@@ -24,9 +19,7 @@ const ar = {
     userName: "أدخل اسم المستخدم الخاص بك",
     email: "أدخل بريدك الإلكتروني",
     password: "قم بإنشاء كلمة مرور",
-    confirmPassword: "أعد إدخال كلمة المرور الخاصة بك"
-  }
-}
-;
-
+    confirmPassword: "أعد إدخال كلمة المرور الخاصة بك",
+  },
+};
 export { ar };

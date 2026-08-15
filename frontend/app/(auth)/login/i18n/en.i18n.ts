@@ -1,5 +1,3 @@
-import { ErrorCodeEnum } from "@/domain/enum/ErrorCodeEnum";
-
 const en = {
   login: "Login",
   signIn: "Sign in",
@@ -13,19 +11,11 @@ const en = {
   verifyEmail: "Verify Email",
   unknownError: "An unknown error occurred",
   loginDescription: "Welcome back. Please login to continue.",
-  loginErrorCodeEnum: {
-    [ErrorCodeEnum.InvalidCredentials]: "Invalid email or password",
-    [ErrorCodeEnum.Unauthorized]: "Unauthorized",
-    [ErrorCodeEnum.TokenExpired]: "Token expired",
-    [ErrorCodeEnum.EmailNotVerified]: "Email not verified",
-    [ErrorCodeEnum.RefreshTokenInvalid]: "Refresh token invalid"},
   placeholder: {
     email: "Enter your email",
-    password: "Enter your password"
-  }
-}
-;
-
+    password: "Enter your password",
+  },
+};
 export { en };
 
 export type TLoginTranslation = typeof en;

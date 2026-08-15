@@ -15,9 +15,8 @@ import { ar } from "@/app/(auth)/login/i18n/ar.i18n";
 import { emailValidator, passwordValidator } from "@/lib/utils";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { authService } from "@/services/def/AuthService";
-import { AxiosError } from "axios";
 import { ErrorCodeEnum } from "@/domain/enum/ErrorCodeEnum";
-import type { IApiResponse } from "@/domain/meta/IApiResponse";
+import { toErrorCode, useErrorMessage } from "@/hooks/useErrorMessage";
 import { LoginFieldEnum } from "@/domain/enum/LoginFieldEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
@@ -31,6 +30,7 @@ function LoginForm() {
   }) as TLoginTranslation & GTextFieldTranslation;
 
   const { refreshUser } = useAuth();
+  const resolveError = useErrorMessage();
   const [email, setEmail] = useState(searchParams.get("email") ?? "");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -74,10 +74,8 @@ function LoginForm() {
         router.replace("/home");
       }
     } catch (e: unknown) {
-      const err = e as AxiosError<IApiResponse<unknown>>;
-      const data = err?.response?.data;
-      const code = data?.errorCode;
-      const errorMessage = t.loginErrorCodeEnum[code as keyof typeof t.loginErrorCodeEnum] || t.unknownError;
+      const code = toErrorCode(e);
+      const errorMessage = resolveError(code);
 
       if (code === ErrorCodeEnum.EmailNotVerified) {
         setApiError({
