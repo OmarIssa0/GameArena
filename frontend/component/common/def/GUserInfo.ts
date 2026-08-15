@@ -1,7 +1,7 @@
 import type { SizeEnum } from "@/domain/enum/SizeEnum";
 import type { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
 
-interface GUserInfoProps {
+interface IGUserInfoProps {
   firstName?: string | null;
   lastName?: string | null;
   userName?: string | null;
@@ -10,4 +10,4 @@ interface GUserInfoProps {
   className?: string;
 }
 
-export type { GUserInfoProps };
+export type { IGUserInfoProps };

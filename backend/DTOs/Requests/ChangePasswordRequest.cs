@@ -1,13 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 
+
 namespace backend.DTOs.Requests
 {
-    public class ChangePasswordRequest
-    {
-        [Required]
-        public string OldPassword { get; set; } = string.Empty;
-
-        [Required]
-        public string NewPassword { get; set; } = string.Empty;
-    }
+    public record ChangePasswordRequest(
+    [property: Required] string OldPassword,
+    [property: Required] string NewPassword);
 }

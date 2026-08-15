@@ -1,4 +1,4 @@
-﻿using backend.Enums;
+using backend.Enums;
 using System.Text.Json;
 
 namespace backend.Domain
@@ -13,31 +13,16 @@ namespace backend.Domain
 
         public ConnectFourRoom() : base(GamesKind.ConnectFour) { }
 
-        public override object GetStatePayload() => new
+        public override object GetStatePayload()
         {
-            roomId = RoomId,
-            gameType = GameType,
-            board = Board,
-            currentTurnPlayerId = CurrentTurnPlayerId,
-            winnerPlayerId = WinnerPlayerId,
-            winnerSymbol = WinnerSymbol,
-            isFinished = IsFinished,
-            hasStarted = HasStarted,
-            isFull = IsFull,
-            isPrivate = IsPrivate,
-            isBotGame = IsBotGame,
-            player1Id = Player1Id,
-            player1Username = Player1Username,
-            player2Id = Player2Id,
-            player2Username = Player2Username,
-            score = Score,
-            boardWidth = Cols,
-            boardHeight = Rows,
-            winScore = 4,
-            player1Score = Score[0],
-            player2Score = Score[1],
-            tickRateHz = 0
-        };
+            var p = GetBasePayload();
+            p["board"] = Board;
+            p["boardWidth"] = Cols;
+            p["boardHeight"] = Rows;
+            p["winScore"] = 4;
+            p["tickRateHz"] = 0;
+            return p;
+        }
 
         public override void ResetForNewRound()
         {
@@ -125,7 +110,7 @@ namespace backend.Domain
                     return;
                 }
 
-                CurrentTurnPlayerId = playerId == Player1Id ? Player2Id! : Player1Id!;
+                SwitchTurn();
             }
         }
 
@@ -134,8 +119,8 @@ namespace backend.Domain
             lock (_lock)
             {
                 if (!IsBotGame || WinnerPlayerId != null || CurrentTurnPlayerId == null) return;
-                var botId = Player1Id == "__BOT__" ? Player1Id : Player2Id;
-                if (CurrentTurnPlayerId != botId) return;
+                var botId = GetBotId();
+                if (botId == null || CurrentTurnPlayerId != botId) return;
                 int piece = botId == Player1Id ? 1 : 2;
 
                 List<int> availableColumns = [];
@@ -163,7 +148,7 @@ namespace backend.Domain
                     return;
                 }
 
-                CurrentTurnPlayerId = botId == Player1Id ? Player2Id! : Player1Id!;
+                SwitchTurn();
             }
         }
 

@@ -10,9 +10,9 @@ import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { useBusyAction } from "@/hooks/useBusyAction";
 
 import { FriendsList } from "../SocialPanel/FriendsList";
-import type { FriendsListTabProps } from "./def/FriendsTab";
+import type { IFriendsListTabProps } from "./def/FriendsTab";
 
-function FriendsListTab({ friends, onMessage, onBlock, onRemove, onAddFriend, t }: FriendsListTabProps) {
+function FriendsListTab({ friends, onMessage, onBlock, onRemove, onAddFriend, t }: IFriendsListTabProps) {
   const { run, isBusy, busyClass } = useBusyAction();
 
   if (friends.length === 0) {

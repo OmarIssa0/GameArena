@@ -1,31 +1,31 @@
+import { authProxy } from "@/repositories/proxy/auth.api";
 import type { IForgotPasswordRequest } from "@/domain/meta/IForgotPasswordRequest";
 import type { IRegisterRequest } from "@/domain/meta/IRegisterRequest";
 import type { IResetPasswordRequest } from "@/domain/meta/IResetPasswordRequest";
 import type { ILoginRequest } from "@/domain/meta/ILoginRequest";
 import type { TPromise } from "@/domain/type/TCommon";
 
-import type { IAuthService } from "../meta/IAuthService";
-import { authRepository } from "@/repositories/def/AuthRepository";
-class AuthService implements IAuthService {
-  private repo = authRepository;
+class AuthService {
+  private api = authProxy.api;
+
   login(data: ILoginRequest): TPromise<void> {
-    return this.repo.login(data);
+    return this.api.login<void>(data);
   }
 
   register(data: IRegisterRequest): TPromise<void> {
-    return this.repo.register(data);
+    return this.api.register<void>(data);
   }
 
   logout(): TPromise<void> {
-    return this.repo.logout();
+    return this.api.logout<void>();
   }
 
   forgotPassword(data: IForgotPasswordRequest): TPromise<void> {
-    return this.repo.forgotPassword(data);
+    return this.api.forgotPassword<void>(data);
   }
 
   resetPassword(data: IResetPasswordRequest): TPromise<void> {
-    return this.repo.resetPassword(data);
+    return this.api.resetPassword<void>(data);
   }
 }
 

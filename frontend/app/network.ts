@@ -141,7 +141,8 @@ export function clientFactory<T extends TEndpointsMap>(
   for (const key in endpoints) {
     const endpoint = endpoints[key];
 
-    proxy[key] = ((payload?: unknown) => request(endpoint, base, payload, config, resolver)) as TProxy<T>[typeof key];
+    proxy[key] = ((payload?: unknown, callConfig?: AxiosRequestConfig) =>
+      request(endpoint, base, payload, { ...config, ...callConfig }, resolver)) as TProxy<T>[typeof key];
   }
 
   return { api: proxy };

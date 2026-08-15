@@ -1,18 +1,17 @@
-import { emailVerificationRepository } from "@/repositories/def/EmailVerificationRepository";
+import { emailApi } from "@/repositories/proxy/email.api";
 import type { ISendOtpRequest } from "@/domain/meta/ISendOtpRequest";
 import type { IVerifyOtpRequest } from "@/domain/meta/IVerifyOtpRequest";
 import type { TPromise } from "@/domain/type/TCommon";
 
-import type { IEmailVerificationService } from "../meta/IEmailVerificationService";
-class EmailVerificationService implements IEmailVerificationService {
-  private repo = emailVerificationRepository;
+class EmailVerificationService {
+  private api = emailApi.api;
 
   sendOtp(data: ISendOtpRequest): TPromise<void> {
-    return this.repo.sendOtp(data);
+    return this.api.send<void>(data);
   }
 
   verifyOtp(data: IVerifyOtpRequest): TPromise<void> {
-    return this.repo.verifyOtp(data);
+    return this.api.verify<void>(data);
   }
 }
 

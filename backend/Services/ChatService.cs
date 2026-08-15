@@ -1,4 +1,4 @@
-﻿using backend.Data;
+using backend.Data;
 using backend.Domain;
 using backend.DTOs.Responses;
 using backend.Enums;
@@ -25,7 +25,7 @@ namespace backend.Services
                 .OrderBy(m => m.SentAt)
                 .ToListAsync();
 
-            return messages.Select(MapperHelper.ToDto).ToList();
+            return messages.Select(m => m.ToResponse()).ToList();
         }
 
         public async Task<MessageResponse> CreatePrivateMessageAsync(Guid senderId, Guid receiverId, string message)
@@ -49,7 +49,7 @@ namespace backend.Services
 
             await _eventBus.PublishAsync(new ChatMessageSentEvent(senderId, receiverId, message, msg.SentAt));
 
-            return MapperHelper.ToDto(msg);
+            return msg.ToResponse();
         }
 
         public async Task<List<PerFriendUnreadCountResponse>> GetUnreadCountsPerFriendAsync(Guid userId)
@@ -57,11 +57,7 @@ namespace backend.Services
             return await _context.Messages
                 .Where(m => m.ReceiverId == userId && !m.IsRead)
                 .GroupBy(m => m.SenderId)
-                .Select(g => new PerFriendUnreadCountResponse
-                {
-                    FriendId = g.Key,
-                    UnreadCount = g.Count()
-                })
+                .Select(g => new PerFriendUnreadCountResponse(g.Key, g.Count()))
                 .ToListAsync();
         }
     }

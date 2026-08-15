@@ -1,26 +1,18 @@
-﻿using backend.Enums;
+using backend.Enums;
 
 namespace backend.DTOs.Responses
 {
-    public class UserResponse
+    public sealed record UserResponse
     {
-        public Guid Id { get; set; }
-
-        public string UserName { get; set; } = string.Empty;
-
-        public string Email { get; set; } = string.Empty;
-
-        public string FirstName { get; set; } = string.Empty;
-
-        public string LastName { get; set; } = string.Empty;
-
-        public UserRole Role { get; set; }
-        public UserStatus Status { get; set; }
-
-        public DateTime CreatedAt { get; set; }
-
-        public bool IsVerified { get; set; }
-
-        public string? Preferences { get; set; }
+        public Guid Id { get; init; }
+        public string UserName { get; init; } = string.Empty;
+        public string Email { get; init; } = string.Empty;
+        public string FirstName { get; init; } = string.Empty;
+        public string LastName { get; init; } = string.Empty;
+        public UserRole Role { get; init; }
+        public UserStatus Status { get; init; }
+        public DateTime CreatedAt { get; init; }
+        public bool IsVerified { get; init; }
+        public string? Preferences { get; init; }
     }
 }

@@ -3,7 +3,7 @@ import type { SizeEnum } from "@/domain/enum/SizeEnum";
 
 export type GModalSide = "center" | "start" | "end" | "bottom";
 
-interface GModalProps extends HTMLAttributes<HTMLDivElement> {
+interface IGModalProps extends HTMLAttributes<HTMLDivElement> {
   open: boolean;
   onClose: () => void;
   children: ReactNode;
@@ -18,4 +18,4 @@ interface GModalProps extends HTMLAttributes<HTMLDivElement> {
   ariaDescription?: string;
 }
 
-export type { GModalProps };
+export type { IGModalProps };

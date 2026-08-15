@@ -1,10 +1,10 @@
-﻿namespace backend.DTOs.Responses
+namespace backend.DTOs.Responses
 {
-    public class NotificationCountersResponse
+    public sealed record NotificationCountersResponse
     {
-        public int ReceivedFriendRequests { get; set; }
-        public int SentFriendRequests { get; set; }
-        public int UnreadMessages { get; set; }
-        public int Friends { get; set; }
+        public int ReceivedFriendRequests { get; init; }
+        public int SentFriendRequests { get; init; }
+        public int UnreadMessages { get; init; }
+        public int Friends { get; init; }
     }
 }

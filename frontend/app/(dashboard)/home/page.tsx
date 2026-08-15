@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { useTranslation } from "@/hooks/useSetting";
 import { useGameTranslation } from "@/hooks/useGameTranslation";
-import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
+import { useDashboardData } from "@/app/providers/DashboardDataProvider";
 import { ArrowRight, Gamepad2, MessageSquare, Users, Trophy, Zap, Sparkles, Hexagon } from "lucide-react";
 import { GIcon } from "@/component/common/GIcon";
 import { ar } from "./i18n/ar.i18n";
@@ -26,7 +26,7 @@ function Home() {
   const { user } = useAuth();
   const t = useTranslation({ en, ar }) as THomeTranslation;
   const gt = useGameTranslation();
-  const { friendRequestCount, unreadMessageCount } = useDashboardNotifications();
+  const { friendRequestCount, unreadMessageCount } = useDashboardData();
   const router = useRouter();
 
   const handleGameSelect = (path: string) => {

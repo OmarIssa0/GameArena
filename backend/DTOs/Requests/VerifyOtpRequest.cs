@@ -2,13 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace backend.DTOs.Requests
 {
-    public class VerifyOtpRequest
-    {
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; } = string.Empty;
-
-        [Required]
-        public string Otp { get; set; } = string.Empty;
-    }
+    public record VerifyOtpRequest(
+        [property: Required, EmailAddress] string Email,
+        [property: Required] string Otp);
 }

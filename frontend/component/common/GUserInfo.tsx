@@ -3,9 +3,9 @@
 import clsx from "clsx";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { GAvatar } from "./GAvatar";
-import type { GUserInfoProps } from "./def/GUserInfo";
+import type { IGUserInfoProps } from "./def/GUserInfo";
 
-function GUserInfo({ firstName, lastName, userName, status, avatarSize = SizeEnum.sm, className }: GUserInfoProps) {
+function GUserInfo({ firstName, lastName, userName, status, avatarSize = SizeEnum.sm, className }: IGUserInfoProps) {
   return (
     <div className={clsx("flex items-center gap-3 min-w-0", className)}>
       <GAvatar firstName={firstName} lastName={lastName} status={status} size={avatarSize} />

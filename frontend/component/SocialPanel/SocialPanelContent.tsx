@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { Bell, UsersRound } from "lucide-react";
 
 import { GIcon } from "@/component/common/GIcon";
-import { GSpinner } from "@/component/common/GSpinner";
+import { GAsync } from "@/component/common/GAsync";
 import { GEmpty } from "@/component/common/GEmpty";
 import { GButton } from "@/component/common/GButton";
 import { GAvatar } from "@/component/common/GAvatar";
@@ -15,9 +15,9 @@ import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { SocialTabId } from "../social/SocialTabs";
 import { SocialListItem } from "../social/SocialListItem";
 import { GameInvitesList } from "./GameInvitesList";
-import type { SocialPanelContentProps } from "./def/SocialPanelContent";
+import type { ISocialPanelContentProps } from "./def/SocialPanelContent";
 
-function goToChat(router: SocialPanelContentProps["router"], friendId: string, closeMobile: () => void) {
+function goToChat(router: ISocialPanelContentProps["router"], friendId: string, closeMobile: () => void) {
   router.push(`/messages?friend=${friendId}`);
   closeMobile();
 }
@@ -35,23 +35,14 @@ function SocialPanelContent({
   acceptRequest,
   declineRequest,
   t,
-}: SocialPanelContentProps) {
+}: ISocialPanelContentProps) {
   const filteredFriends = useMemo(() => {
     const term = searchQuery.trim().toLowerCase();
     if (!term) return friends;
     return friends.filter((f) => `${f.firstName ?? ""} ${f.lastName ?? ""} ${f.userName ?? ""}`.toLowerCase().includes(term));
   }, [friends, searchQuery]);
 
-  if (loading) {
-    return (
-      <div className="flex-1 flex items-start justify-center py-10">
-        <GSpinner size={SizeEnum.lg} />
-      </div>
-    );
-  }
-
-  if (activeTab === SocialTabId.Friends) {
-    return (
+  const content = activeTab === SocialTabId.Friends ? (
       <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar px-2 py-2">
         {filteredFriends.length === 0 ? (
           <GEmpty
@@ -73,13 +64,10 @@ function SocialPanelContent({
           </GList>
         )}
       </div>
-    );
-  }
+  ) : (() => {
+    const hasItems = gameInvites.length > 0 || requests.length > 0 || notifications.length > 0;
 
-  const hasItems = gameInvites.length > 0 || requests.length > 0 || notifications.length > 0;
-
-  if (!hasItems) {
-    return (
+    if (!hasItems) return (
       <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar px-2 py-2">
         <GEmpty
           icon={<GIcon icon={Bell} size={SizeEnum.lg} color={AccentColorEnum.Muted} />}
@@ -88,9 +76,8 @@ function SocialPanelContent({
         />
       </div>
     );
-  }
 
-  return (
+    return (
     <div className="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar px-2 py-2 space-y-3">
       {gameInvites.length > 0 && <GameInvitesList />}
 
@@ -134,7 +121,10 @@ function SocialPanelContent({
         </GList>
       )}
     </div>
-  );
+    );
+  })();
+
+  return <GAsync loading={loading} className="flex-1">{content}</GAsync>;
 }
 
 export { SocialPanelContent };

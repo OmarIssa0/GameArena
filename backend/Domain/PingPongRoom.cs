@@ -1,4 +1,4 @@
-﻿using backend.Enums;
+using backend.Enums;
 using System.Text.Json;
 
 namespace backend.Domain
@@ -15,14 +15,11 @@ namespace backend.Domain
         public float BallVY { get; set; } = 0.006f;
 
         public float PadYP1 { get; set; } = 0.4f;
-        public float PadHP1 { get; set; } = 0.2f; 
+        public float PadHP1 { get; set; } = 0.2f;
         public float PadVP1 { get; set; } = 0.035f;
         public float PadYP2 { get; set; } = 0.4f;
         public float PadHP2 { get; set; } = 0.2f;
         public float PadVP2 { get; set; } = 0.035f;
-
-        public int ScoreP1 { get; set; } = 0;
-        public int ScoreP2 { get; set; } = 0;
 
         private const int WinScore = 5;
         private const float PaddleMargin = 0.01f;
@@ -104,8 +101,8 @@ namespace backend.Domain
 
             if (BallPX >= 1)
             {
-                ScoreP1++;
-                if (ScoreP1 >= WinScore)
+                Score[0]++;
+                if (Score[0] >= WinScore)
                 {
                     CompleteRound(Player1Id);
                     return;
@@ -115,8 +112,8 @@ namespace backend.Domain
 
             if (BallPX <= 0)
             {
-                ScoreP2++;
-                if (ScoreP2 >= WinScore)
+                Score[1]++;
+                if (Score[1] >= WinScore)
                 {
                     CompleteRound(Player2Id);
                     return;
@@ -165,43 +162,31 @@ namespace backend.Domain
             if (botIsP1)
                 PadYP1 = botPaddleY;
             else
-                PadYP2 = botPaddleY;;
+                PadYP2 = botPaddleY;
         }
 
-        public override object GetStatePayload() => new
+        public override object GetStatePayload()
         {
-            roomId = RoomId,
-            gameType = GameType,
-            player1Id = Player1Id,
-            player1Username = Player1Username,
-            player2Id = Player2Id,
-            player2Username = Player2Username,
-            hasStarted = HasStarted,
-            isFull = IsFull,
-            isPrivate = IsPrivate,
-            isBotGame = IsBotGame,
-            isFinished = IsFinished,
-            winnerPlayerId = WinnerPlayerId,
-            currentTurnPlayerId = CurrentTurnPlayerId,
-            boardWidth = BoardWidthPx,
-            boardHeight = BoardHeightPx,
-            ball = new { x = BallPX * BoardWidthPx, y = BallPY * BoardHeightPx, vx = BallVX, vy = BallVY },
-            ballSize = BallSizePx,
-            player1Paddle = new { x = Paddle1Left * BoardWidthPx, y = PadYP1 * BoardHeightPx, height = PadHP1 * BoardHeightPx },
-            player2Paddle = new { x = Paddle2Left * BoardWidthPx, y = PadYP2 * BoardHeightPx, height = PadHP2 * BoardHeightPx },
-            paddleWidth = PaddleWidthPx,
-            player1Score = ScoreP1,
-            player2Score = ScoreP2,
-            score = Score,
-            winScore = WinScore,
-            tickRateHz = 1000 / TickIntervalMs
-        };
+            var p = GetBasePayload();
+            p["boardWidth"] = BoardWidthPx;
+            p["boardHeight"] = BoardHeightPx;
+            p["ball"] = new { x = BallPX * BoardWidthPx, y = BallPY * BoardHeightPx, vx = BallVX, vy = BallVY };
+            p["ballSize"] = BallSizePx;
+            p["player1Paddle"] = new { x = Paddle1Left * BoardWidthPx, y = PadYP1 * BoardHeightPx, height = PadHP1 * BoardHeightPx };
+            p["player2Paddle"] = new { x = Paddle2Left * BoardWidthPx, y = PadYP2 * BoardHeightPx, height = PadHP2 * BoardHeightPx };
+            p["paddleWidth"] = PaddleWidthPx;
+            p["player1Score"] = Score[0];
+            p["player2Score"] = Score[1];
+            p["winScore"] = WinScore;
+            p["tickRateHz"] = 1000 / TickIntervalMs;
+            return p;
+        }
 
         public override void ResetForNewRound()
         {
             base.ResetForNewRound();
-            ScoreP1 = 0;
-            ScoreP2 = 0;
+            Score[0] = 0;
+            Score[1] = 0;
             PadYP1 = 0.4f;
             PadHP1 = 0.2f;
             PadVP1 = 0.035f;

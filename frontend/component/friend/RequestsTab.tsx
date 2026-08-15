@@ -10,9 +10,9 @@ import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import { useBusyAction } from "@/hooks/useBusyAction";
 
 import { FriendsList } from "../SocialPanel/FriendsList";
-import type { RequestsTabProps } from "./def/FriendsTab";
+import type { IRequestsTabProps } from "./def/FriendsTab";
 
-function RequestsTab({ requests, onAccept, onDecline, t }: RequestsTabProps) {
+function RequestsTab({ requests, onAccept, onDecline, t }: IRequestsTabProps) {
   const { run, isBusy, busyClass } = useBusyAction();
 
   if (requests.length === 0) {

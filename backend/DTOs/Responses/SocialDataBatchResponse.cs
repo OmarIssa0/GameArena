@@ -1,12 +1,11 @@
 namespace backend.DTOs.Responses
 {
-
-    public class SocialDataBatchResponse
+    public sealed record SocialDataBatchResponse
     {
-        public List<UserSummaryResponse> Friends { get; set; } = new();
-        public List<FriendRequestReceivedResponse> ReceivedRequests { get; set; } = new();
-        public List<FriendRequestSentResponse> SentRequests { get; set; } = new();
-        public List<UserSummaryResponse> BlockedUsers { get; set; } = new();
-        public NotificationCountersResponse Counters { get; set; } = new();
+        public List<UserSummaryResponse> Friends { get; init; } = [];
+        public List<FriendRequestReceivedResponse> ReceivedRequests { get; init; } = [];
+        public List<FriendRequestSentResponse> SentRequests { get; init; } = [];
+        public List<UserSummaryResponse> BlockedUsers { get; init; } = [];
+        public NotificationCountersResponse Counters { get; init; } = new();
     }
 }

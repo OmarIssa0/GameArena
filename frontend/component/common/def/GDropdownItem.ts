@@ -1,10 +1,10 @@
 import type { LucideIcon } from "lucide-react";
 
-interface GDropdownItemProps {
+interface IGDropdownItemProps {
   icon: LucideIcon;
   label: string;
   onClick: () => void;
   className?: string;
 }
 
-export type { GDropdownItemProps };
+export type { IGDropdownItemProps };

@@ -12,8 +12,8 @@ import { GPage } from "@/component/common/GPage";
 import { GTextField } from "@/component/common/GTextField";
 import { GSelect } from "@/component/common/GSelect";
 import { GIcon } from "@/component/common/GIcon";
-import { GSpinner } from "@/component/common/GSpinner";
-import { userRepository } from "@/repositories/def/UserRepository";
+import { GAsync } from "@/component/common/GAsync";
+import { userService } from "@/services/def/UserService";
 import { DEFAULT_USER_PREFERENCES, type IUserPreferences } from "@/domain/meta/IUserPreferences";
 import { passwordValidator } from "@/lib/utils";
 import { useAuth } from "@/app/providers/AuthProvider";
@@ -26,7 +26,7 @@ import { SettingsTabEnum } from "@/domain/enum/SettingsTabEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { PageHeader } from "@/component/common/PageHeader";
 import { GTabs } from "@/component/common/GTabs";
-import { GTabItem } from "@/component/common/def/GTabs";
+import { IGTabItem } from "@/component/common/def/GTabs";
 
 function SettingsPage() {
   const t = useTranslation({
@@ -78,7 +78,7 @@ function SettingsPage() {
     if (!user) return;
     setSaving(true);
     try {
-      await userRepository.updateProfile({
+      await userService.updateProfile({
         firstName,
         lastName,
         userName,
@@ -111,7 +111,7 @@ function SettingsPage() {
     if (!validatePassword()) return;
     setSaving(true);
     try {
-      await userRepository.changePassword({ oldPassword, newPassword });
+      await userService.changePassword({ oldPassword, newPassword });
       setOldPassword("");
       setNewPassword("");
       setConfirmPassword("");
@@ -136,7 +136,7 @@ function SettingsPage() {
         theme: theme as IUserPreferences["theme"],
         locale: locale as IUserPreferences["locale"],
       };
-      await userRepository.updatePreferences({ preferences: JSON.stringify(toPersist) });
+      await userService.updatePreferences({ preferences: JSON.stringify(toPersist) });
       updatePreferences(toPersist);
       showMessage(t.settings.preferences.saved);
     } catch {
@@ -151,7 +151,7 @@ function SettingsPage() {
     updatePreferences({ [key]: next });
   };
 
-  const navItems = useMemo<GTabItem[]>(
+  const navItems = useMemo<IGTabItem[]>(
     () =>
       [
         { id: SettingsTabEnum.Profile, label: t.settings.profile.title, icon: <GIcon icon={User} size={SizeEnum.md} /> },
@@ -205,11 +205,7 @@ function SettingsPage() {
             void handleSaveProfile();
           }}
           className="space-y-4">
-          {!user ? (
-            <div className="flex justify-center py-10">
-              <GSpinner size={SizeEnum.md} />
-            </div>
-          ) : (
+          <GAsync loading={!user} spinnerSize={SizeEnum.md} className="py-10">
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <GTextField label={t.settings.profile.firstName} value={firstName} onChange={(e) => setFirstName(e.target.value)} />
@@ -227,7 +223,7 @@ function SettingsPage() {
                 </GButton>
               </div>
             </>
-          )}
+          </GAsync>
         </form>
       )}
 

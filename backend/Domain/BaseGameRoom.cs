@@ -12,14 +12,14 @@ namespace backend.Domain
         public string? Player1Username { get; set; }
         public string? Player2Id { get; set; }
         public string? Player2Username { get; set; }
-        public bool IsFull { get; set; } = false;
-        public bool IsFinished { get; set; } = false;
-        public bool IsPrivate { get; set; } = false;
+        public bool IsFull { get; set; }
+        public bool IsFinished { get; set; }
+        public bool IsPrivate { get; set; }
         public string? InvitedPlayerId { get; set; }
-        public bool HasStarted { get; set; } = false;
+        public bool HasStarted { get; set; }
         public string? WinnerPlayerId { get; set; }
         public string? WinnerSymbol { get; set; }
-        public bool IsBotGame { get; set; } = false;
+        public bool IsBotGame { get; set; }
         public string? CurrentTurnPlayerId { get; set; }
         public int[] Score { get; set; } = [0, 0];
 
@@ -37,6 +37,35 @@ namespace backend.Domain
         }
 
         public abstract object GetStatePayload();
+
+        protected Dictionary<string, object?> GetBasePayload() => new()
+        {
+            ["roomId"] = RoomId,
+            ["gameType"] = GameType,
+            ["currentTurnPlayerId"] = CurrentTurnPlayerId,
+            ["winnerPlayerId"] = WinnerPlayerId,
+            ["winnerSymbol"] = WinnerSymbol,
+            ["isFinished"] = IsFinished,
+            ["hasStarted"] = HasStarted,
+            ["isFull"] = IsFull,
+            ["isPrivate"] = IsPrivate,
+            ["isBotGame"] = IsBotGame,
+            ["player1Id"] = Player1Id,
+            ["player1Username"] = Player1Username,
+            ["player2Id"] = Player2Id,
+            ["player2Username"] = Player2Username,
+            ["score"] = Score,
+            ["player1Score"] = Score[0],
+            ["player2Score"] = Score[1],
+        };
+
+        protected void SwitchTurn() =>
+            CurrentTurnPlayerId = CurrentTurnPlayerId == Player1Id ? Player2Id! : Player1Id!;
+
+        protected bool IsBot(string playerId) => playerId == "__BOT__";
+
+        protected string? GetBotId() =>
+            Player1Id == "__BOT__" ? Player1Id : Player2Id == "__BOT__" ? Player2Id : null;
 
         public abstract void HandleAction(string playerId, JsonElement action);
         public abstract void MakeBotMove();

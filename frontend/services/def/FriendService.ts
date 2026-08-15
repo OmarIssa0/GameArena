@@ -1,18 +1,17 @@
 import { SignalRServiceBase } from "../lib/SignalRServiceBase";
-import { friendRepository } from "@/repositories/def/FriendRepository";
+import { friendsApi } from "@/repositories/proxy/friends.api";
 import type { HubConnection } from "@microsoft/signalr";
 import type { TPromise } from "@/domain/type/TCommon";
 import type { IFriendRequestReceived } from "@/domain/meta/IFriendRequestReceived";
 import type { IFriendRequestSent } from "@/domain/meta/IFriendRequestSent";
 import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import type { IUserFilterRequest } from "@/domain/meta/IUserFilterRequest";
-import type { IFriendService } from "../meta/IFriendService";
 import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
 import { withFullName } from "@/domain/lib/userUtils";
 import type { Handler } from "../lib/signalRUtils";
 
-class FriendService extends SignalRServiceBase implements IFriendService {
-  private repo = friendRepository;
+class FriendService extends SignalRServiceBase {
+  private api = friendsApi.api;
 
   setConnection(connection: HubConnection): void {
     super.setConnection(connection);
@@ -72,45 +71,45 @@ class FriendService extends SignalRServiceBase implements IFriendService {
   }
 
   sendFriendRequest(friendId: string): TPromise<void> {
-    return this.repo.sendFriendRequest(friendId);
+    return this.api.sendFriendRequest<void>(friendId);
   }
 
   getReceivedFriendRequests(): TPromise<IFriendRequestReceived[]> {
-    return this.repo.getReceivedFriendRequests();
+    return this.api.getReceivedFriendRequests<IFriendRequestReceived[]>();
   }
 
   getSentFriendRequests(): TPromise<IFriendRequestSent[]> {
-    return this.repo.getSentFriendRequests();
+    return this.api.getSentFriendRequests<IFriendRequestSent[]>();
   }
 
   async getFriends(data: IUserFilterRequest): TPromise<IUserSummary[]> {
-    const result = await this.repo.getFriends(data);
+    const result = await this.api.getFriends<IUserSummary[]>(data);
     if (result.data) result.data = result.data.map(withFullName);
     return result;
   }
 
   acceptFriendRequest(senderId: string): TPromise<void> {
-    return this.repo.acceptFriendRequest(senderId);
+    return this.api.acceptFriendRequest<void>(senderId);
   }
 
   rejectFriendRequest(senderId: string): TPromise<void> {
-    return this.repo.rejectFriendRequest(senderId);
+    return this.api.rejectFriendRequest<void>(senderId);
   }
 
   cancelFriendRequest(receiverId: string): TPromise<void> {
-    return this.repo.cancelFriendRequest(receiverId);
+    return this.api.cancelFriendRequest<void>(receiverId);
   }
 
   removeFriend(friendId: string): TPromise<void> {
-    return this.repo.removeFriend(friendId);
+    return this.api.removeFriend<void>(friendId);
   }
 
   blockUser(blockedId: string): TPromise<void> {
-    return this.repo.blockUser(blockedId);
+    return this.api.blockUser<void>(blockedId);
   }
 
   unblockUser(blockedId: string): TPromise<void> {
-    return this.repo.unblockUser(blockedId);
+    return this.api.unblockUser<void>(blockedId);
   }
 
   onFriendListUpdate(handler: (friends: IUserSummary[]) => void): () => void {

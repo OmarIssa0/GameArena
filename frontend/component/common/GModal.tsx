@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { useCallback, useEffect, useRef } from "react";
 import { GBackdrop } from "./GBackdrop";
 import { GCard } from "./GCard";
-import type { GModalProps, GModalSide } from "./def/GModal";
+import type { IGModalProps, GModalSide } from "./def/GModal";
 import type { TNullable } from "@/domain/type/TCommon";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { modalSize } from "@/domain/constant/size-classes";
@@ -34,7 +34,7 @@ function GModal({
   ariaDescription,
   className,
   ...props
-}: GModalProps) {
+}: IGModalProps) {
   const modalRef = useRef<TNullable<HTMLDivElement>>(null);
   const previousFocusRef = useRef<TNullable<HTMLElement>>(null);
 

@@ -6,13 +6,7 @@ import { GButton } from "@/component/common/GButton";
 import { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 
-interface SocialPanelHeaderProps {
-  title: string;
-  onlineCount?: number;
-  onlineLabel?: string;
-  onClose?: () => void;
-  showClose?: boolean;
-}
+import type { ISocialPanelHeaderProps } from "./def/SocialPanelHeader";
 
 function SocialPanelHeader({
   title,
@@ -20,7 +14,7 @@ function SocialPanelHeader({
   onlineLabel,
   onClose,
   showClose = false,
-}: SocialPanelHeaderProps) {
+}: ISocialPanelHeaderProps) {
   return (
     <div className="flex items-center gap-3 px-4 pt-4 pb-2">
       <div className="flex-1 min-w-0">

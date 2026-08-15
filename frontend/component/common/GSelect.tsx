@@ -4,11 +4,11 @@ import clsx from "clsx";
 import { ChevronDown } from "lucide-react";
 import { forwardRef, useId } from "react";
 import { GLabel } from "./GLabel";
-import type { GSelectProps } from "./def/GSelect";
+import type { IGSelectProps } from "./def/GSelect";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { fieldSize } from "@/domain/constant/size-classes";
 
-const GSelect = forwardRef<HTMLSelectElement, GSelectProps<string | number>>(
+const GSelect = forwardRef<HTMLSelectElement, IGSelectProps<string | number>>(
   ({ label, error, className, startIcon, options, placeholder, size = SizeEnum.md, id: providedId, ...props }, ref) => {
     const generatedId = useId();
     const selectId = providedId ?? `select-${generatedId}`;

@@ -5,9 +5,9 @@ import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 import { GButton } from "./GButton";
 import { GIcon } from "./GIcon";
-import type { GDropdownItemProps } from "./def/GDropdownItem";
+import type { IGDropdownItemProps } from "./def/GDropdownItem";
 
-function GDropdownItem({ icon: Icon, label, onClick, className }: GDropdownItemProps) {
+function GDropdownItem({ icon: Icon, label, onClick, className }: IGDropdownItemProps) {
   return (
     <GButton
       variant={ButtonVariantEnum.Subtle}

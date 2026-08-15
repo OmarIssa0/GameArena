@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 import type { IndicatorPositionEnum } from "@/domain/enum/IndicatorPositionEnum";
 import type { NavOrientationEnum } from "@/domain/enum/NavOrientationEnum";
 
-interface GNavItem {
+interface IGNavItem {
   id: string;
   label?: ReactNode;
   icon?: ReactNode;
@@ -12,8 +12,8 @@ interface GNavItem {
   onClick?: () => void;
 }
 
-interface GNavProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onClick"> {
-  items: GNavItem[];
+interface IGNavProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onClick"> {
+  items: IGNavItem[];
   orientation?: NavOrientationEnum;
   indicator?: IndicatorPositionEnum;
   collapsed?: boolean;
@@ -23,4 +23,4 @@ interface GNavProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onCli
   className?: string;
 }
 
-export type { GNavProps, GNavItem };
+export type { IGNavProps, IGNavItem };

@@ -1,11 +1,11 @@
-﻿namespace backend.DTOs.Responses
+namespace backend.DTOs.Responses
 {
-    public class FriendRequestReceivedResponse
+    public sealed record FriendRequestReceivedResponse
     {
-        public Guid SenderId { get; set; }
-        public string SenderUserName { get; set; } = string.Empty;
-        public string SenderFirstName { get; set; } = string.Empty;
-        public string SenderLastName { get; set; } = string.Empty;
-        public DateTime SentAt { get; set; }
+        public Guid SenderId { get; init; }
+        public string SenderUserName { get; init; } = string.Empty;
+        public string SenderFirstName { get; init; } = string.Empty;
+        public string SenderLastName { get; init; } = string.Empty;
+        public DateTime SentAt { get; init; }
     }
 }

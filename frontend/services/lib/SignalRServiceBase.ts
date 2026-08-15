@@ -1,6 +1,5 @@
 import type { HubConnection } from "@microsoft/signalr";
 import type { TNullable } from "@/domain/type/TCommon";
-import { ReconnectManager } from "./ReconnectManager";
 import { SubscriptionManager } from "./SubscriptionManager";
 import { requireConnection, type Handler } from "./signalRUtils";
 
@@ -12,16 +11,7 @@ interface RegisteredHandler {
 abstract class SignalRServiceBase {
   protected connection: TNullable<HubConnection> = null;
   protected subs = new SubscriptionManager();
-  protected reconnectHandlers = new ReconnectManager();
   private handlers: RegisteredHandler[] = [];
-
-  handleReconnect(): void {
-    this.reconnectHandlers.handleReconnect();
-  }
-
-  onReconnect(handler: () => void): () => void {
-    return this.reconnectHandlers.onReconnect(handler);
-  }
 
   setConnection(connection: HubConnection): void {
     this.unregisterHandlers();

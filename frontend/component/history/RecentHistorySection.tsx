@@ -5,11 +5,11 @@ import { ArrowRight, Frown, Handshake, History, Trophy } from "lucide-react";
 
 import { ar } from "@/app/(dashboard)/history/i18n/ar.i18n";
 import { en, type THistoryTranslation } from "@/app/(dashboard)/history/i18n/en.i18n";
+import { GAsync } from "@/component/common/GAsync";
 import { GEmpty } from "@/component/common/GEmpty";
 import { GIcon } from "@/component/common/GIcon";
 import { GList } from "@/component/common/GList";
 import { GCard } from "@/component/common/GCard";
-import { GSpinner } from "@/component/common/GSpinner";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 import type { LocaleEnum } from "@/domain/enum/LocaleEnum";
 import { MatchStatusEnum } from "@/domain/enum/MatchStatusEnum";
@@ -18,12 +18,12 @@ import { useMatchHistory } from "@/hooks/useMatchHistory";
 import { useLocale, useTranslation } from "@/hooks/useSetting";
 
 import { MatchHistoryItem } from "./MatchHistoryItem";
-import type { RecentHistorySectionProps } from "./def/RecentHistorySection";
+import type { IRecentHistorySectionProps } from "./def/RecentHistorySection";
 
-function RecentHistorySection({ title, viewAll, emptyTitle, emptyDescription, limit = 3 }: RecentHistorySectionProps) {
+function RecentHistorySection({ title, viewAll, emptyTitle, emptyDescription, limit = 3 }: IRecentHistorySectionProps) {
   const [locale] = useLocale() as [LocaleEnum, (l: LocaleEnum) => void];
   const historyT = useTranslation({ en, ar }) as THistoryTranslation;
-  const { matches, summary, loading } = useMatchHistory(MatchStatusEnum.All, limit);
+  const { matches, summary, loading, error } = useMatchHistory(MatchStatusEnum.All, limit);
 
   const items = [
     { label: historyT.summary.wins, value: summary.wins, icon: Trophy, backGroundColor: AccentColorEnum.Success },
@@ -43,18 +43,15 @@ function RecentHistorySection({ title, viewAll, emptyTitle, emptyDescription, li
         </Link>
       </div>
 
-      {loading ? (
-        <div className="flex justify-center py-10">
-          <GSpinner />
-        </div>
-      ) : matches.length === 0 ? (
-        <GEmpty
-          icon={<GIcon icon={History} size={SizeEnum.xl} color={AccentColorEnum.Muted} className="opacity-50" />}
-          title={emptyTitle}
-          description={emptyDescription}
-        />
-      ) : (
-        <div className="flex flex-col gap-4">
+      <GAsync loading={loading} error={error} className="py-2">
+        {matches.length === 0 ? (
+          <GEmpty
+            icon={<GIcon icon={History} size={SizeEnum.xl} color={AccentColorEnum.Muted} className="opacity-50" />}
+            title={emptyTitle}
+            description={emptyDescription}
+          />
+        ) : (
+          <div className="flex flex-col gap-4">
           <GList items={items} keyExtractor={(item) => item.label} listClassName="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {(item) => (
               <GCard padding={SizeEnum.sm} className="flex items-center gap-3">
@@ -79,8 +76,9 @@ function RecentHistorySection({ title, viewAll, emptyTitle, emptyDescription, li
               />
             )}
           </GList>
-        </div>
-      )}
+          </div>
+        )}
+      </GAsync>
     </section>
   );
 }

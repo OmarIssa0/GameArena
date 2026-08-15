@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Bell, Gamepad2, Users, MessageSquare, X, Check, Trash2, CheckCheck } from "lucide-react";
 import { useTranslation } from "@/hooks/useSetting";
-import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
-import { useErrorMessage, toErrorCode } from "@/hooks/useErrorMessage";
+import { useDashboardData } from "@/app/providers/DashboardDataProvider";
 import { notificationService } from "@/services/def/NotificationService";
 import { GTabs } from "@/component/common/GTabs";
 import { GCard } from "@/component/common/GCard";
@@ -14,18 +13,15 @@ import { GList } from "@/component/common/GList";
 import { PageHeader } from "@/component/common/PageHeader";
 import { GButton } from "@/component/common/GButton";
 import { GEmpty } from "@/component/common/GEmpty";
-import { GSpinner } from "@/component/common/GSpinner";
+import { GAsync } from "@/component/common/GAsync";
 import { ar } from "./i18n/ar.i18n";
 import { en, type TNotificationsTranslation } from "./i18n/en.i18n";
-import type { GTabItem } from "@/component/common/def/GTabs";
-import { friendService } from "@/services/def/FriendService";
-import type { IFriendRequestReceived } from "@/domain/meta/IFriendRequestReceived";
-import { AlertTriangle } from "lucide-react";
-import type { TNullable } from "@/domain/type/TCommon";
+import type { IGTabItem } from "@/component/common/def/GTabs";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 import { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
+import { NotificationTypeEnum } from "@/domain/enum/NotificationTypeEnum";
 
 type Tab = "all" | "gameInvites" | "friendRequests";
 
@@ -38,47 +34,30 @@ function timeAgo(d: Date, t: TNotificationsTranslation) {
   return t.time.daysAgo.replace("{n}", String(Math.floor(h / 24)));
 }
 
-const icons: Record<string, typeof Users> = { FriendRequest: Users, FriendRequestAccepted: Users, GameInvite: Gamepad2, NewMessage: MessageSquare };
+const icons: Record<NotificationTypeEnum, typeof Users> = {
+  [NotificationTypeEnum.FriendRequest]: Users,
+  [NotificationTypeEnum.FriendRequestAccepted]: Users,
+  [NotificationTypeEnum.GameInvite]: Gamepad2,
+  [NotificationTypeEnum.NewMessage]: MessageSquare,
+};
 
 export default function NotificationsPage() {
   const t = useTranslation({ en, ar }) as TNotificationsTranslation;
-  const resolveError = useErrorMessage();
-  const { notifications, gameInvites, dismissGameInvite, acceptGameInvite } = useDashboardNotifications();
+  const {
+    notifications,
+    gameInvites,
+    dismissGameInvite,
+    acceptGameInvite,
+    requests,
+    loading: requestsLoading,
+    acceptRequest,
+    declineRequest,
+  } = useDashboardData();
   const [tab, setTab] = useState<Tab>("all");
-  const [requests, setRequests] = useState<IFriendRequestReceived[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<TNullable<string>>(null);
-
-  useEffect(() => {
-    let alive = true;
-
-    const off = friendService.onFriendRequestUpdate((data) => {
-      if (!alive) return;
-      setRequests(data.received ?? []);
-      setLoading(false);
-    });
-
-    friendService
-      .getReceivedFriendRequests()
-      .then((r) => {
-        if (alive && r.data) setRequests(r.data);
-      })
-      .catch((e: unknown) => {
-        if (alive) setError(resolveError(toErrorCode(e), t.error.title));
-      })
-      .finally(() => {
-        if (alive) setLoading(false);
-      });
-
-    return () => {
-      alive = false;
-      off();
-    };
-  }, [t, resolveError]);
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
-  const tabs = useMemo<GTabItem<Tab>[]>(
+  const tabs = useMemo<IGTabItem<Tab>[]>(
     () => [
       { id: "all", label: t.tabs.all, icon: <GIcon icon={Bell} size={SizeEnum.sm} />, badge: unreadCount || undefined },
       {
@@ -98,8 +77,16 @@ export default function NotificationsPage() {
   );
 
   const all = useMemo(() => {
-    const out: Array<{ id: string; type: string; title: string; desc: string; time: string; read: boolean; onAction?(): void; onDismiss?(): void }> =
-      [];
+    const out: Array<{
+      id: string;
+      type: NotificationTypeEnum;
+      title: string;
+      desc: string;
+      time: string;
+      read: boolean;
+      onAction?(): void;
+      onDismiss?(): void;
+    }> = [];
     for (const n of notifications) {
       const isGameInvite = n.type === "GameInvite" && n.referenceId != null;
       if (isGameInvite && gameInvites.some((g) => g.roomId === n.referenceId)) continue;
@@ -130,7 +117,7 @@ export default function NotificationsPage() {
     for (const g of gameInvites) {
       out.push({
         id: `g-${g.roomId}`,
-        type: "GameInvite",
+        type: NotificationTypeEnum.GameInvite,
         title: t.gameInvite.title,
         desc: t.gameInvite.description.replace("{name}", g.inviterName ?? t.gameInvite.fallbackName).replace("{game}", t.gameInvite.fallbackName),
         time: timeAgo(new Date(), t),
@@ -143,18 +130,18 @@ export default function NotificationsPage() {
       const name = `${r.senderFirstName ?? ""} ${r.senderLastName ?? ""}`.trim() || (r.senderUserName ?? t.gameInvite.fallbackName);
       out.push({
         id: `fr-${r.senderId}`,
-        type: "FriendRequest",
+        type: NotificationTypeEnum.FriendRequest,
         title: t.friendRequest.title,
         desc: t.friendRequest.description.replace("{name}", name),
         time: timeAgo(new Date(r.sentAt), t),
         read: false,
-        onAction: () => friendService.acceptFriendRequest(r.senderId).then(() => setRequests((p) => p.filter((x) => x.senderId !== r.senderId))),
-        onDismiss: () => friendService.rejectFriendRequest(r.senderId).then(() => setRequests((p) => p.filter((x) => x.senderId !== r.senderId))),
+        onAction: () => acceptRequest(r.senderId),
+        onDismiss: () => declineRequest(r.senderId),
       });
     }
     out.sort((a, b) => Number(a.read) - Number(b.read));
     return out;
-  }, [notifications, gameInvites, requests, t, acceptGameInvite, dismissGameInvite]);
+  }, [notifications, gameInvites, requests, t, acceptGameInvite, dismissGameInvite, acceptRequest, declineRequest]);
 
   const filtered = useMemo(() => {
     if (tab === "all") return all;
@@ -174,15 +161,8 @@ export default function NotificationsPage() {
         </div>
       )}
       <GTabs tabs={tabs} value={tab} onChange={setTab} fullWidth className="mb-2" />
-      {error && tab === "friendRequests" ? (
-          <GEmpty
-            icon={<GIcon icon={AlertTriangle} size={SizeEnum.xl} color={AccentColorEnum.Danger} />}
-            title={t.error.title}
-            description={error}
-          />
-        ) : loading && tab === "friendRequests" ? (
-          <GSpinner size={SizeEnum.md} className="mx-auto py-16" />
-        ) : filtered.length === 0 ? (
+      <GAsync loading={tab === "friendRequests" && requestsLoading} spinnerSize={SizeEnum.md} errorTitle={t.error.title} className="py-16">
+        {filtered.length === 0 ? (
           <GEmpty
             icon={<GIcon icon={Bell} size={SizeEnum.xl} color={AccentColorEnum.Muted} />}
             title={t.empty.title}
@@ -203,8 +183,7 @@ export default function NotificationsPage() {
                 padding={SizeEnum.md}
                 className={n.read ? "opacity-60" : ""}>
                 <div className="flex items-start gap-3">
-                  <div
-                    className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${n.read ? "bg-surface" : "bg-primary-muted"}`}>
+                  <div className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${n.read ? "bg-surface" : "bg-primary-muted"}`}>
                     <GIcon icon={icons[n.type] ?? Bell} size={SizeEnum.md} color={n.read ? AccentColorEnum.Muted : AccentColorEnum.Primary} />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -244,8 +223,7 @@ export default function NotificationsPage() {
             )}
           </GList>
         )}
+      </GAsync>
     </GPage>
   );
 }
-
-

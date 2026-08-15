@@ -3,21 +3,10 @@
 import clsx from "clsx";
 import { GAvatar } from "@/component/common/GAvatar";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
-import type { ReactNode } from "react";
-import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
 
-interface SocialListItemProps {
-  firstName: string | null;
-  lastName: string | null;
-  userName?: string | null;
-  status?: UserStatusEnum;
-  badge?: ReactNode;
-  action?: ReactNode;
-  onClick?: () => void;
-  className?: string;
-}
+import type { ISocialListItemProps } from "./def/SocialListItem";
 
-function SocialListItem({ firstName, lastName, userName, status, badge, action, onClick, className }: SocialListItemProps) {
+function SocialListItem({ firstName, lastName, userName, status, badge, action, onClick, className }: ISocialListItemProps) {
   return (
     <button
       type="button"

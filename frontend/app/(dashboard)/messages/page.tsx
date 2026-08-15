@@ -11,7 +11,7 @@ import { statusColorText } from "@/domain/constant/status-color";
 import { ar } from "./i18n/ar.i18n";
 import { en, type TMessagesTranslation } from "./i18n/en.i18n";
 import { GButton } from "@/component/common/GButton";
-import { GSpinner } from "@/component/common/GSpinner";
+import { GAsync } from "@/component/common/GAsync";
 import { GAvatar } from "@/component/common/GAvatar";
 import { GBadge } from "@/component/common/GBadge";
 import { GIcon } from "@/component/common/GIcon";
@@ -115,11 +115,8 @@ function MessagesPage() {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-          {friendsLoading ? (
-            <div className="flex justify-center py-10">
-              <GSpinner size={SizeEnum.lg} />
-            </div>
-          ) : filteredFriends.length === 0 ? (
+          <GAsync loading={friendsLoading} spinnerSize={SizeEnum.lg} className="py-10">
+          {filteredFriends.length === 0 ? (
             <GEmpty
               icon={<GIcon icon={MessagesSquare} size={SizeEnum.xl} color={AccentColorEnum.Muted} />}
               title={t.noFriendsTitle}
@@ -164,6 +161,7 @@ function MessagesPage() {
               })}
             </div>
           )}
+          </GAsync>
         </div>
       </aside>
 
@@ -192,19 +190,8 @@ function MessagesPage() {
             </header>
 
             <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 custom-scrollbar">
-              {loadingMessages ? (
-                <div className="flex h-full items-center justify-center">
-                  <GSpinner size={SizeEnum.lg} />
-                </div>
-              ) : error ? (
-                <div className="flex h-full items-center justify-center">
-                  <GEmpty
-                    icon={<GIcon icon={MessagesSquare} size={SizeEnum.xl} color={AccentColorEnum.Danger} />}
-                    title={t.error.title}
-                    description={error}
-                  />
-                </div>
-              ) : messages.length === 0 ? (
+              <GAsync loading={loadingMessages} error={error} spinnerSize={SizeEnum.lg} errorTitle={t.error.title} className="h-full">
+              {messages.length === 0 ? (
                 <div className="flex h-full items-center justify-center">
                   <GEmpty
                     icon={<GIcon icon={MessagesSquare} size={SizeEnum.xl} color={AccentColorEnum.Muted} />}
@@ -245,6 +232,7 @@ function MessagesPage() {
                   })}
                 </div>
               )}
+              </GAsync>
             </div>
 
             <footer className="border-t border-border bg-surface px-4 sm:px-6 py-4 shrink-0 pb-safe">

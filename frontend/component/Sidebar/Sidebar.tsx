@@ -4,13 +4,13 @@ import { useMemo } from "react";
 import { Hexagon, PanelLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
+import { useDashboardData } from "@/app/providers/DashboardDataProvider";
 import { useAside } from "@/hooks/useAside";
 import { useNavigation } from "@/hooks/useNavigation";
 import { GIcon } from "@/component/common/GIcon";
 import { GBadge } from "@/component/common/GBadge";
 import { GNav } from "@/component/common/GNav";
-import type { GNavItem } from "@/component/common/def/GNav";
+import type { IGNavItem } from "@/component/common/def/GNav";
 import { GModal } from "@/component/common/GModal";
 import { BrandText } from "@/component/common/BrandText";
 import { AsideWrapper } from "@/component/aside/AsideWrapper";
@@ -20,22 +20,18 @@ import { IndicatorPositionEnum } from "@/domain/enum/IndicatorPositionEnum";
 import { NavOrientationEnum } from "@/domain/enum/NavOrientationEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { SidebarFooter } from "./SidebarFooter";
-import type { AsideConfig } from "@/component/aside/AsideTypes";
-import type { UseAsideReturn } from "@/hooks/useAside";
+import type { IAsideConfig } from "@/component/aside/AsideTypes";
+import type { ISidebarProps } from "./def/Sidebar";
 
-interface SidebarProps {
-  aside?: UseAsideReturn;
-}
-
-function Sidebar({ aside: asideProp }: SidebarProps) {
+function Sidebar({ aside: asideProp }: ISidebarProps) {
   const router = useRouter();
   const { activeId, t, sidebarNav } = useNavigation();
   const asideDefault = useAside(false);
   const aside = asideProp ?? asideDefault;
   const { collapsed, open, closeMobile, expand, collapse } = aside;
-  const { friendRequestCount, unreadMessageCount, gameInvites, unreadNotificationCount } = useDashboardNotifications();
+  const { friendRequestCount, unreadMessageCount, gameInvites, unreadNotificationCount } = useDashboardData();
 
-  const navItems = useMemo<GNavItem[]>(
+  const navItems = useMemo<IGNavItem[]>(
     () =>
       sidebarNav.map(({ id, labelKey, icon: Icon, badge }) => ({
         id,
@@ -64,7 +60,7 @@ function Sidebar({ aside: asideProp }: SidebarProps) {
     [t, activeId, router, closeMobile, friendRequestCount, unreadMessageCount, gameInvites.length, unreadNotificationCount, sidebarNav],
   );
 
-  const asideConfig: AsideConfig = {
+  const asideConfig: IAsideConfig = {
     expandedWidth: "w-72",
     collapsedWidth: "w-18",
     label: t.mainNavigation,

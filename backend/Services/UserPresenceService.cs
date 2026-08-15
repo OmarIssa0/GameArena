@@ -1,80 +1,49 @@
 using backend.Enums;
 using backend.Services.Interface;
+using System.Collections.Concurrent;
 
 namespace backend.Services
 {
     public class UserPresenceService : IUserPresenceService
     {
-        private readonly Dictionary<string, UserStatus> _presence = new();
-        private readonly Dictionary<string, int> _connectionCounts = new();
-        private readonly object _lock = new();
+        private readonly ConcurrentDictionary<string, (UserStatus Status, int Connections)> _state = new();
 
-        public UserStatus GetStatus(string userId)
-        {
-            lock (_lock)
-            {
-                return _presence.TryGetValue(userId, out var status) ? status : UserStatus.Offline;
-            }
-        }
+        public UserStatus GetStatus(string userId) =>
+            _state.TryGetValue(userId, out var s) ? s.Status : UserStatus.Offline;
 
-        public bool AddConnection(string userId)
-        {
-            lock (_lock)
-            {
-                var count = _connectionCounts.GetValueOrDefault(userId, 0) + 1;
-                _connectionCounts[userId] = count;
-
-                if (count == 1)
-                {
-                    _presence[userId] = UserStatus.Online;
-                    return true;
-                }
-
-                return false;
-            }
-        }
+        public bool AddConnection(string userId) =>
+            _state.AddOrUpdate(
+                userId,
+                _ => (UserStatus.Online, 1),
+                (_, old) => (old.Status, old.Connections + 1)
+            ).Connections == 1;
 
         public bool RemoveConnection(string userId)
         {
-            lock (_lock)
+            while (_state.TryGetValue(userId, out var current) && current.Connections > 0)
             {
-                var current = _connectionCounts.GetValueOrDefault(userId, 0);
+                if (current.Connections == 1)
+                    return _state.TryRemove(new KeyValuePair<string, (UserStatus, int)>(userId, current));
 
-                if (current <= 0)
+                if (_state.TryUpdate(userId, (current.Status, current.Connections - 1), current))
                     return false;
-
-                var count = current - 1;
-                if (count <= 0)
-                {
-                    _connectionCounts.Remove(userId);
-                    _presence.Remove(userId);
-                    return true;
-                }
-
-                _connectionCounts[userId] = count;
-                return false;
             }
+            return false;
         }
 
         public bool SetActivity(string userId, UserStatus status)
         {
-            lock (_lock)
+            if (status is not (UserStatus.Online or UserStatus.InGame)) return false;
+
+            while (_state.TryGetValue(userId, out var current) && current.Connections > 0)
             {
-                if (status != UserStatus.Online && status != UserStatus.InGame)
-                    return false;
-                if (_connectionCounts.GetValueOrDefault(userId, 0) <= 0)
-                    return false;
-                _presence[userId] = status;
-                return true;
+                if (_state.TryUpdate(userId, (status, current.Connections), current))
+                    return true;
             }
+            return false;
         }
 
-        public bool HasOtherConnections(string userId)
-        {
-            lock (_lock)
-            {
-                return _connectionCounts.GetValueOrDefault(userId, 0) > 1;
-            }
-        }
+        public bool HasOtherConnections(string userId) =>
+            _state.TryGetValue(userId, out var s) && s.Connections > 1;
     }
 }

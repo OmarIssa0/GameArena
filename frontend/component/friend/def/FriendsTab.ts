@@ -3,7 +3,7 @@ import type { IFriendRequestReceived } from "@/domain/meta/IFriendRequestReceive
 import type { IFriendRequestSent } from "@/domain/meta/IFriendRequestSent";
 import type { TFriendsTranslation } from "@/app/(dashboard)/friends/i18n/en.i18n";
 
-interface FriendsListTabProps {
+interface IFriendsListTabProps {
   friends: IUserSummary[];
   onMessage: (friendId: string) => void;
   onBlock: (friendId: string) => Promise<void>;
@@ -12,23 +12,23 @@ interface FriendsListTabProps {
   t: TFriendsTranslation;
 }
 
-interface RequestsTabProps {
+interface IRequestsTabProps {
   requests: IFriendRequestReceived[];
   onAccept: (senderId: string) => Promise<void>;
   onDecline: (senderId: string) => Promise<void>;
   t: TFriendsTranslation;
 }
 
-interface SentRequestsTabProps {
+interface ISentRequestsTabProps {
   sentRequests: IFriendRequestSent[];
   onCancel: (receiverId: string) => Promise<void>;
   t: TFriendsTranslation;
 }
 
-interface BlockedUsersTabProps {
+interface IBlockedUsersTabProps {
   blockedUsers: IUserSummary[];
   onUnblock: (blockedId: string) => Promise<void>;
   t: TFriendsTranslation;
 }
 
-export type { FriendsListTabProps, RequestsTabProps, SentRequestsTabProps, BlockedUsersTabProps };
+export type { IFriendsListTabProps, IRequestsTabProps, ISentRequestsTabProps, IBlockedUsersTabProps };

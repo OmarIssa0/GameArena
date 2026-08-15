@@ -11,15 +11,12 @@ namespace backend.Utils
 {
     public static class AuthHelper
     {
-        public static string HashPassword(User user, string password)
-        {
-            return new PasswordHasher<User>().HashPassword(user, password);
-        }
+        private static readonly PasswordHasher<User> _hasher = new();
+
+        public static string HashPassword(User user, string password) => _hasher.HashPassword(user, password);
 
         public static bool VerifyPassword(User user, string hashedPassword, string providedPassword)
-        {
-            return new PasswordHasher<User>().VerifyHashedPassword(user, hashedPassword, providedPassword) == PasswordVerificationResult.Success;
-        }
+            => _hasher.VerifyHashedPassword(user, hashedPassword, providedPassword) == PasswordVerificationResult.Success;
 
         public static string GenerateRefreshTokenString()
         {

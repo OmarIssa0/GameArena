@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 import type { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 import type { SizeEnum } from "@/domain/enum/SizeEnum";
 
-interface GButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+interface IGButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
   startIcon?: ReactNode;
   endIcon?: ReactNode;
@@ -14,4 +14,4 @@ interface GButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   fullWidth?: boolean;
 }
 
-export type { GButtonProps };
+export type { IGButtonProps };

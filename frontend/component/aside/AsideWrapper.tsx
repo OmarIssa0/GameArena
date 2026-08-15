@@ -1,9 +1,9 @@
 "use client";
 
 import clsx from "clsx";
-import type { AsideWrapperProps } from "./def/AsideWrapper";
+import type { IAsideWrapperProps } from "./def/AsideWrapper";
 
-function AsideWrapper({ config, collapsed, header, children, footer, className }: AsideWrapperProps) {
+function AsideWrapper({ config, collapsed, header, children, footer, className }: IAsideWrapperProps) {
   const { expandedWidth, collapsedWidth, label } = config;
 
   const width = collapsed ? collapsedWidth : expandedWidth;

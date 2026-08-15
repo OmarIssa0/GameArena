@@ -1,16 +1,15 @@
-﻿using backend.Enums;
+using backend.Enums;
 
 namespace backend.DTOs.Responses
 {
-    public class MatchHistoryResponse
+    public sealed record MatchHistoryResponse
     {
         public Guid Id { get; init; }
-
-        public DateTime CompletedAt { get; set; }
-        public MatchStatus Result { get; set; }
-        public UserSummaryResponse Opponent { get; set; } = null!;
-        public GamesKind Kind { get; set; }
-        public int Player1Score { get; set; }
-        public int Player2Score { get; set; }
+        public DateTime CompletedAt { get; init; }
+        public MatchStatus Result { get; init; }
+        public UserSummaryResponse Opponent { get; init; } = null!;
+        public GamesKind Kind { get; init; }
+        public int Player1Score { get; init; }
+        public int Player2Score { get; init; }
     }
 }

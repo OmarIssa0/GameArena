@@ -1,10 +1,9 @@
 import { SignalRServiceBase } from "../lib/SignalRServiceBase";
-import { chatRepository } from "@/repositories/def/ChatRepository";
+import { chatApi } from "@/repositories/proxy/chat.api";
 import type { IMessage } from "@/domain/meta/IMessage";
 import type { IPrivateMessagePayload } from "@/domain/meta/IPrivateMessagePayload";
 import type { TPromise } from "@/domain/type/TCommon";
-import type { IChatService } from "../meta/IChatService";
-import type { IPerFriendUnreadCount } from "@/repositories/meta/IChatRepository";
+import type { IPerFriendUnreadCount } from "@/domain/meta/IPerFriendUnreadCount";
 import type { Handler } from "../lib/signalRUtils";
 
 const normalizeMessage = (payload: IPrivateMessagePayload): IMessage => ({
@@ -15,8 +14,8 @@ const normalizeMessage = (payload: IPrivateMessagePayload): IMessage => ({
   isRead: payload.isRead ?? false,
 });
 
-class ChatService extends SignalRServiceBase implements IChatService {
-  private repo = chatRepository;
+class ChatService extends SignalRServiceBase {
+  private api = chatApi.api;
 
   protected registerHandlers(): void {
     this.addHandler("chat:private", (data: unknown) => {
@@ -24,12 +23,12 @@ class ChatService extends SignalRServiceBase implements IChatService {
     });
   }
 
-  getMessagesByFriendId(friendId: string): TPromise<IMessage[]> {
-    return this.repo.getMessagesByFriendId(friendId);
+  getMessagesByFriendId(friendId: string, signal?: AbortSignal): TPromise<IMessage[]> {
+    return this.api.getMessages<IMessage[]>({ friendId }, { signal });
   }
 
   getPerFriendUnreadCounts(): TPromise<IPerFriendUnreadCount[]> {
-    return this.repo.getPerFriendUnreadCounts();
+    return this.api.perFriendUnreadCounts<IPerFriendUnreadCount[]>();
   }
 
   async sendMessage(receiverId: string, content: string): Promise<void> {

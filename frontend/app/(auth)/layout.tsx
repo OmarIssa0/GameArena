@@ -7,7 +7,7 @@ import { GSpinner } from "@/component/common/GSpinner";
 import { GIcon } from "@/component/common/GIcon";
 import { GCard } from "@/component/common/GCard";
 import { Hexagon } from "lucide-react";
-import { LangTheme } from "@/component/LangTheme";
+import { LangTheme } from "@/component/LangTheme/LangTheme";
 import { BrandText } from "@/component/common/BrandText";
 import { useTranslation } from "@/hooks/useSetting";
 import { en, type TAuthLayoutTranslation } from "./i18n/en.i18n";

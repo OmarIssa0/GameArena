@@ -7,11 +7,11 @@ import { en, type TOtpTranslation } from "../i18n/Otp/en.i18n";
 import { ar } from "../i18n/Otp/ar.i18n";
 import { useTranslation } from "@/hooks/useSetting";
 import type { TNullable } from "@/domain/type/TCommon";
-import type { OtpFormProps } from "./def/OtpForm";
+import type { IOtpFormProps } from "./def/OtpForm";
 import { emailVerificationService } from "@/services/def/EmailVerificationService";
 import { toErrorCode, useErrorMessage } from "@/hooks/useErrorMessage";
 
-function OtpForm({ email, onSuccess }: OtpFormProps) {
+function OtpForm({ email, onSuccess }: IOtpFormProps) {
   const [code, setCode] = useState<string[]>(Array(6).fill(""));
   const [loading, setLoading] = useState({ verify: false, resend: false });
   const [error, setError] = useState("");

@@ -6,7 +6,6 @@ using backend.Services.Interface;
 using backend.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Logging;
 
 namespace backend.Hubs
 {

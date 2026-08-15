@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import type { GIconProps } from "./def/GIcon";
+import type { IGIconProps } from "./def/GIcon";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 import { accentHoverBg, accentHoverText } from "@/domain/constant/accent-bg";
@@ -21,7 +21,7 @@ function GIcon({
   tileColor,
   tileClassName,
   hover = false,
-}: GIconProps) {
+}: IGIconProps) {
   const sizeClass = iconSize[size];
   const isRtl = flip ? "rtl:scale-x-[-1]" : "";
 

@@ -1,13 +1,6 @@
-﻿using backend.Enums;
+using backend.Enums;
 
 namespace backend.DTOs.Responses
 {
-    public class UserSummaryResponse
-    {
-        public Guid Id { get; set; }
-        public string UserName { get; set; } = string.Empty;
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
-        public UserStatus Status { get; set; }
-    }
+    public sealed record UserSummaryResponse(Guid Id, string UserName, string FirstName, string LastName, UserStatus Status);
 }

@@ -6,9 +6,9 @@ import { ar } from "@/component/i18n/GLabel/ar.i18n";
 import { en, type GLabelTranslation } from "@/component/i18n/GLabel/en.i18n";
 import { useTranslation } from "@/hooks/useSetting";
 
-import type { GLabelProps } from "./def/GLabel";
+import type { IGLabelProps } from "./def/GLabel";
 
-function GLabel({ required, className, children, ...props }: GLabelProps) {
+function GLabel({ required, className, children, ...props }: IGLabelProps) {
   const t = useTranslation({ en, ar }) as GLabelTranslation;
 
   return (

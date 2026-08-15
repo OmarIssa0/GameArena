@@ -6,6 +6,7 @@ using backend.Enums;
 using backend.Services.Interface;
 using backend.Utils;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace backend.Services
 {
@@ -38,7 +39,6 @@ namespace backend.Services
 
         public async Task RegisterAsync(RegisterRequest request)
         {
-
             if (string.IsNullOrWhiteSpace(request.Email) ||
                 string.IsNullOrWhiteSpace(request.Password) ||
                 string.IsNullOrWhiteSpace(request.FirstName) ||
@@ -46,34 +46,27 @@ namespace backend.Services
                 string.IsNullOrWhiteSpace(request.LastName))
                 throw new AppException(ErrorCode.ValidationError);
 
-
-            var exists = await _context.Users.AnyAsync(u => u.Email == request.Email);
-            if (exists) throw new AppException(ErrorCode.EmailAlreadyExists);
-
-            var userNameExists = await _context.Users.AnyAsync(u => u.UserName == request.UserName);
-            if (userNameExists) throw new AppException(ErrorCode.UsernameAlreadyExists);
-
             var user = new User
             {
                 UserName = request.UserName,
                 Email = request.Email,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
-                PasswordHash = AuthHelper.HashPassword(new User(), request.Password),
                 Role = UserRole.User,
                 IsVerified = false
             };
+            user.PasswordHash = AuthHelper.HashPassword(user, request.Password);
 
             _context.Users.Add(user);
             try
             {
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateException)
+            catch (DbUpdateException ex) when (ex.InnerException is PostgresException pg)
             {
-                if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+                if (pg.ConstraintName?.Contains("Email") == true)
                     throw new AppException(ErrorCode.EmailAlreadyExists);
-                if (await _context.Users.AnyAsync(u => u.UserName == request.UserName))
+                if (pg.ConstraintName?.Contains("UserName") == true)
                     throw new AppException(ErrorCode.UsernameAlreadyExists);
                 throw;
             }
@@ -108,13 +101,17 @@ namespace backend.Services
 
         public async Task RevokeRefreshTokenAsync(string rawToken)
         {
+            var tokenHash = AuthHelper.Hash(rawToken);
             var storedToken = await _context.RefreshTokens
-                .FirstOrDefaultAsync(t => t.TokenHash == AuthHelper.Hash(rawToken)) ?? throw new AppException(ErrorCode.RefreshTokenInvalid);
-            var activeTokens = await _context.RefreshTokens
-                .Where(t => t.UserId == storedToken.UserId && t.Id != storedToken.Id && t.ExpiresAt > DateTime.UtcNow)
-                .CountAsync();
+                .Include(t => t.User)
+                .FirstOrDefaultAsync(t => t.TokenHash == tokenHash) ?? throw new AppException(ErrorCode.RefreshTokenInvalid);
 
-            if (activeTokens == 0 && storedToken.User != null) storedToken.User.Status = UserStatus.Offline;
+            if (storedToken.User != null)
+            {
+                var hasOtherActive = await _context.RefreshTokens
+                    .AnyAsync(t => t.UserId == storedToken.UserId && t.Id != storedToken.Id && t.ExpiresAt > DateTime.UtcNow);
+                if (!hasOtherActive) storedToken.User.Status = UserStatus.Offline;
+            }
 
             _context.RefreshTokens.Remove(storedToken);
             await _context.SaveChangesAsync();

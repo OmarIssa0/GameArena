@@ -29,17 +29,13 @@ namespace backend.Services
                     u.UserName != null && u.UserName.ToLower().Contains(searchTerm));
             }
 
-            var users = await query.ToListAsync();
-            var result = users
-                .Select(user =>
-                {
-                    var dto = MapperHelper.ToDtoSummary(user);
-                    dto.Status = _presence.GetStatus(user.Id.ToString());
-                    return dto;
-                })
-                .ToList();
+            var users = await query
+                .Select(u => new UserSummaryResponse(u.Id, u.UserName, u.FirstName, u.LastName, u.Status))
+                .ToListAsync();
 
-           if (filter != null && filter.UserStatus != UserStatus.All)
+            var result = users.Select(u => u with { Status = _presence.GetStatus(u.Id.ToString()) }).ToList();
+
+            if (filter != null && filter.UserStatus != UserStatus.All)
                 result = result.Where(u => u.Status == filter.UserStatus).ToList();
             return result;
         }
@@ -48,26 +44,36 @@ namespace backend.Services
         {
             await using var context = await _contextFactory.CreateDbContextAsync();
 
-            var requests = await context.FriendRequests
+            return await context.FriendRequests
                 .AsNoTracking()
                 .Where(fr => fr.ReceiverId == userId && fr.Status == FriendRequestStatus.Pending)
-                .Include(u => u.Sender)
+                .Select(fr => new FriendRequestReceivedResponse
+                {
+                    SenderId = fr.SenderId,
+                    SenderFirstName = fr.Sender.FirstName,
+                    SenderLastName = fr.Sender.LastName,
+                    SenderUserName = fr.Sender.UserName,
+                    SentAt = fr.CreatedAt
+                })
                 .ToListAsync();
-
-            return requests.Select(MapperHelper.ToDto).ToList();
         }
 
         public async Task<List<FriendRequestSentResponse>> GetSentRequestsAsync(Guid userId)
         {
             await using var context = await _contextFactory.CreateDbContextAsync();
 
-            var requests = await context.FriendRequests
+            return await context.FriendRequests
                 .AsNoTracking()
                 .Where(fr => fr.SenderId == userId && fr.Status == FriendRequestStatus.Pending)
-                .Include(fr => fr.Receiver)
+                .Select(fr => new FriendRequestSentResponse
+                {
+                    ReceiverId = fr.ReceiverId,
+                    ReceiverFirstName = fr.Receiver.FirstName,
+                    ReceiverLastName = fr.Receiver.LastName,
+                    ReceiverUserName = fr.Receiver.UserName,
+                    SentAt = fr.CreatedAt
+                })
                 .ToListAsync();
-
-            return requests.Select(MapperHelper.ToSentRequestDto).ToList();
         }
 
         public async Task<List<UserSummaryResponse>> GetBlockedUsersAsync(Guid userId)
@@ -77,17 +83,10 @@ namespace backend.Services
             var blocked = await context.Blocks
                 .AsNoTracking()
                 .Where(b => b.BlockerId == userId)
-                .Select(b => b.Blocked)
+                .Select(b => new UserSummaryResponse(b.Blocked.Id, b.Blocked.UserName, b.Blocked.FirstName, b.Blocked.LastName, b.Blocked.Status))
                 .ToListAsync();
 
-            return blocked
-                .Select(user =>
-                {
-                    var dto = MapperHelper.ToDtoSummary(user);
-                    dto.Status = _presence.GetStatus(user.Id.ToString());
-                    return dto;
-                })
-                .ToList();
+            return blocked.Select(u => u with { Status = _presence.GetStatus(u.Id.ToString()) }).ToList();
         }
 
         public async Task<HashSet<Guid>> GetFriendIdsAsync(Guid userId)

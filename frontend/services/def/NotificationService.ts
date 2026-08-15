@@ -1,10 +1,10 @@
 import { SignalRServiceBase } from "../lib/SignalRServiceBase";
 import type { HubConnection } from "@microsoft/signalr";
-import type { INotificationCounters, INotificationService } from "../meta/INotificationService";
+import type { INotificationCounters } from "@/domain/meta/INotification";
 import type { INotificationItem } from "@/domain/meta/INotification";
 import type { Handler } from "../lib/signalRUtils";
 
-class NotificationService extends SignalRServiceBase implements INotificationService {
+class NotificationService extends SignalRServiceBase {
   setConnection(connection: HubConnection): void {
     super.setConnection(connection);
   }
@@ -14,12 +14,6 @@ class NotificationService extends SignalRServiceBase implements INotificationSer
     this.addHandler("chat:notification", (data: unknown) => this.subs.dispatch("chat:notification", data));
     this.addHandler("notification:new", (data: unknown) => this.subs.dispatch("notification:new", data));
     this.addHandler("notification:list", (data: unknown) => this.subs.dispatch("notification:list", data));
-  }
-
-  handleReconnect(): void {
-    this.requestCounters().catch(() => {});
-    this.requestNotificationList().catch(() => {});
-    this.reconnectHandlers.handleReconnect();
   }
 
   async requestCounters() {

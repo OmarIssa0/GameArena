@@ -9,13 +9,14 @@ import { GAvatar } from "@/component/common/GAvatar";
 import { GButton } from "@/component/common/GButton";
 import { GIcon } from "@/component/common/GIcon";
 import { GUserInfo } from "@/component/common/GUserInfo";
-import { LangTheme } from "@/component/LangTheme";
+import { LangTheme } from "@/component/LangTheme/LangTheme";
 import { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { ar } from "@/component/i18n/SideBar/ar.i18n";
 import { en, type TSidebarTranslation } from "@/component/i18n/SideBar/en.i18n";
+import type { ISidebarFooterProps } from "./def/SidebarFooter";
 
-function SidebarFooter({ collapsed, closeMobile }: { collapsed: boolean; closeMobile: () => void }) {
+function SidebarFooter({ collapsed, closeMobile }: ISidebarFooterProps) {
   const router = useRouter();
   const { user } = useAuth();
   const t = useTranslation({ en, ar }) as TSidebarTranslation;

@@ -10,9 +10,9 @@ import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import { useBusyAction } from "@/hooks/useBusyAction";
 
 import { FriendsList } from "../SocialPanel/FriendsList";
-import type { SentRequestsTabProps } from "./def/FriendsTab";
+import type { ISentRequestsTabProps } from "./def/FriendsTab";
 
-function SentRequestsTab({ sentRequests, onCancel, t }: SentRequestsTabProps) {
+function SentRequestsTab({ sentRequests, onCancel, t }: ISentRequestsTabProps) {
   const { run, isBusy, busyClass } = useBusyAction();
 
   if (sentRequests.length === 0) {

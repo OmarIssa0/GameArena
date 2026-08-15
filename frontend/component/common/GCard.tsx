@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
-import type { GCardProps } from "./def/GCard";
+import type { IGCardProps } from "./def/GCard";
 import { paddingSize, radiusSize } from "@/domain/constant/size-classes";
 
 const variants: Record<CardVariantEnum, string> = {
@@ -18,7 +18,7 @@ function GCard({
   className,
   children,
   ...props
-}: GCardProps) {
+}: IGCardProps) {
   return (
     <div className={clsx(variants[variant], paddingSize[padding], radiusSize[roundedProp], className)} {...props}>
       {children}

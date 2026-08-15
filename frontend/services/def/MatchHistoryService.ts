@@ -1,13 +1,13 @@
-import { matchHistoryRepository } from "@/repositories/def/MatchHistoryRepository";
+import { matchHistoryApi } from "@/repositories/proxy/matchHistory.api";
 import { withFullName } from "@/domain/lib/userUtils";
-import type { IMatchHistoryService } from "../meta/IMatchHistoryService";
 import type { IMatchHistory } from "@/domain/meta/IMatchHistory";
 import type { TPromise } from "@/domain/type/TCommon";
 
-class MatchHistoryService implements IMatchHistoryService {
-  private repository = matchHistoryRepository;
+class MatchHistoryService {
+  private api = matchHistoryApi.api;
+
   async getMatchHistory(): TPromise<IMatchHistory[]> {
-    const result = await this.repository.getMatchHistory();
+    const result = await this.api.getMatchHistory<IMatchHistory[]>();
     if (result.data) {
       result.data.forEach((match) => {
         match.completedAt = new Date(match.completedAt);

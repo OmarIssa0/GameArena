@@ -1,16 +1,18 @@
 import type { SelectHTMLAttributes, ReactNode } from "react";
 import type { SizeEnum } from "@/domain/enum/SizeEnum";
 
-interface GSelectOption<TValue extends string | number = string> {
+interface IGSelectOption<TValue extends string | number = string> {
   value: TValue;
   label: string;
 }
 
-export interface GSelectProps<TValue extends string | number = string> extends Omit<SelectHTMLAttributes<HTMLSelectElement>, "children" | "size"> {
+export interface IGSelectProps<TValue extends string | number = string> extends Omit<SelectHTMLAttributes<HTMLSelectElement>, "children" | "size"> {
   label?: string;
   error?: string;
   startIcon?: ReactNode;
-  options: GSelectOption<TValue>[];
+  options: IGSelectOption<TValue>[];
   placeholder?: string;
   size?: SizeEnum;
 }
+
+export type { IGSelectOption };

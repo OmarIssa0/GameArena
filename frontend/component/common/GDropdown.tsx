@@ -1,22 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import clsx from "clsx";
 import { GBackdrop } from "./GBackdrop";
+import type { IGDropdownProps } from "./def/GDropdown";
 
 const MENU_WIDTH = 208;
 
-interface GDropdownProps {
-  open: boolean;
-  onClose: () => void;
-  trigger: ReactNode;
-  children: ReactNode;
-  align?: "start" | "end";
-  className?: string;
-}
-
-function GDropdown({ open, onClose, trigger, children, align = "end", className }: GDropdownProps) {
+function GDropdown({ open, onClose, trigger, children, align = "end", className }: IGDropdownProps) {
   const triggerRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const hasOpenedRef = useRef(false);

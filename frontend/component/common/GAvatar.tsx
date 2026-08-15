@@ -4,11 +4,11 @@ import clsx from "clsx";
 
 import { squareSize } from "@/domain/constant/size-classes";
 import { statusColor } from "@/domain/constant/status-color";
-import type { GAvatarProps } from "./def/GAvatar";
+import type { IGAvatarProps } from "./def/GAvatar";
 import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 
-function GAvatar({ firstName, lastName, size = SizeEnum.xs, status = UserStatusEnum.All, className }: GAvatarProps) {
+function GAvatar({ firstName, lastName, size = SizeEnum.xs, status = UserStatusEnum.All, className }: IGAvatarProps) {
   const initials = `${firstName?.[0] ?? ""}${lastName?.[0] ?? ""}`.toUpperCase();
 
   const avatarClassName = clsx(

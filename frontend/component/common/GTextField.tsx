@@ -3,11 +3,11 @@
 import clsx from "clsx";
 import { forwardRef, useId } from "react";
 import { GLabel } from "./GLabel";
-import type { GTextFieldProps } from "./def/GTextField";
+import type { IGTextFieldProps } from "./def/GTextField";
 import { fieldBase, fieldSize } from "@/domain/constant/size-classes";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 
-const GTextField = forwardRef<HTMLInputElement, GTextFieldProps>(
+const GTextField = forwardRef<HTMLInputElement, IGTextFieldProps>(
   ({ label, error, startIcon, endIcon, required, size = SizeEnum.md, className, name, id: providedId, ...props }, ref) => {
     const generatedId = useId();
     const inputId = providedId ?? (name ? `field-${name}` : `field-${generatedId}`);

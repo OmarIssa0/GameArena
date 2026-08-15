@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { Users, Bell } from "lucide-react";
 import { GTabs } from "@/component/common/GTabs";
 import { GIcon } from "@/component/common/GIcon";
-import type { GTabItem } from "@/component/common/def/GTabs";
+import type { IGTabItem } from "@/component/common/def/GTabs";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 
 enum SocialTabId {
@@ -12,21 +12,10 @@ enum SocialTabId {
   Notifications = "notifications",
 }
 
-interface SocialTabsProps {
-  value: SocialTabId;
-  onChange: (tabId: SocialTabId) => void;
-  labels: {
-    friends: string;
-    notifications: string;
-  };
-  badges?: {
-    friends?: number;
-    notifications?: number;
-  };
-}
+import type { ISocialTabsProps } from "./def/SocialTabs";
 
-function SocialTabs({ value, onChange, labels, badges }: SocialTabsProps) {
-  const tabs = useMemo<GTabItem<SocialTabId>[]>(
+function SocialTabs({ value, onChange, labels, badges }: ISocialTabsProps) {
+  const tabs = useMemo<IGTabItem<SocialTabId>[]>(
     () => [
       {
         id: SocialTabId.Friends,

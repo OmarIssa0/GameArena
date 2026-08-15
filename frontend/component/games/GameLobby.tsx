@@ -12,7 +12,7 @@ import { InviteModal } from "@/component/games/common/InviteModal";
 import { translateGameInfo } from "@/domain/constant/games";
 import { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
-import { useFriendList } from "@/hooks/useFriendList";
+import { useDashboardData } from "@/app/providers/DashboardDataProvider";
 import { useGameTranslation } from "@/hooks/useGameTranslation";
 
 import { GamePlayersHeader } from "./GameUI";
@@ -22,7 +22,7 @@ function GameLobby({ gameType }: IGameLobbyProps) {
   const { user } = useAuth();
   const { state, startGame, inviteToRoom, resetGame } = useGame();
   const t = useGameTranslation();
-  const { friends, loading: loadingFriends } = useFriendList();
+  const { friends, loading: loadingFriends } = useDashboardData();
   const { name: gameName, description: gameDescription } = translateGameInfo(t, gameType);
 
   const [showInvitePicker, setShowInvitePicker] = useState(false);

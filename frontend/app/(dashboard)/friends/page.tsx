@@ -13,15 +13,15 @@ import { GPage } from "@/component/common/GPage";
 import { PageHeader } from "@/component/common/PageHeader";
 import { GBadge } from "@/component/common/GBadge";
 import { GIcon } from "@/component/common/GIcon";
-import { GSpinner } from "@/component/common/GSpinner";
+import { GAsync } from "@/component/common/GAsync";
 import { FriendsListTab } from "@/component/friend/FriendsListTab";
 import { RequestsTab } from "@/component/friend/RequestsTab";
 import { SentRequestsTab } from "@/component/friend/SentRequestsTab";
 import { BlockedUsersTab } from "@/component/friend/BlockedUsersTab";
 import { SearchTab } from "@/component/friend/SearchTab";
 import { FriendsTabEnum } from "@/domain/enum/FriendsTabEnum";
-import { useFriends } from "@/hooks/useFriends";
-import type { GTabItem } from "@/component/common/def/GTabs";
+import { useDashboardData } from "@/app/providers/DashboardDataProvider";
+import type { IGTabItem } from "@/component/common/def/GTabs";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 
@@ -47,8 +47,8 @@ function FriendsPage() {
     unblockUser,
     acceptRequest,
     declineRequest,
-    cancelFriendRequest,
-  } = useFriends();
+    cancelRequest,
+  } = useDashboardData();
 
   const tabLoading = useMemo(() => {
     switch (activeTab) {
@@ -64,7 +64,7 @@ function FriendsPage() {
     }
   }, [activeTab, friendsLoading, requestsLoading, blockedLoading]);
 
-  const tabs = useMemo<GTabItem<FriendsTabEnum>[]>(
+  const tabs = useMemo<IGTabItem<FriendsTabEnum>[]>(
     () => [
       { id: FriendsTabEnum.Friends, label: t.friends, icon: <GIcon icon={Users} size={SizeEnum.sm} /> },
       {
@@ -112,7 +112,7 @@ function FriendsPage() {
         return <RequestsTab requests={requests} onAccept={acceptRequest} onDecline={declineRequest} t={t} />;
 
       case FriendsTabEnum.Sent:
-        return <SentRequestsTab sentRequests={sentRequests} onCancel={cancelFriendRequest} t={t} />;
+        return <SentRequestsTab sentRequests={sentRequests} onCancel={cancelRequest} t={t} />;
 
       case FriendsTabEnum.Blocked:
         return <BlockedUsersTab blockedUsers={blockedUsers} onUnblock={unblockUser} t={t} />;
@@ -142,13 +142,9 @@ function FriendsPage() {
       <GTabs tabs={tabs} value={activeTab} onChange={changeTab} fullWidth responsive />
 
       <div className="pt-1">
-        {tabLoading ? (
-          <div className="flex justify-center py-10">
-            <GSpinner size={SizeEnum.lg} />
-          </div>
-        ) : (
-          renderTab()
-        )}
+        <GAsync loading={tabLoading} spinnerSize={SizeEnum.lg} className="py-10">
+          {renderTab()}
+        </GAsync>
       </div>
     </GPage>
   );

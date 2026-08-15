@@ -1,13 +1,21 @@
+import { NotificationTypeEnum } from "@/domain/enum/NotificationTypeEnum";
 import type { TNullable } from "@/domain/type/TCommon";
 
 interface INotificationItem {
   id: string;
-  type: string;
+  type: NotificationTypeEnum;
   title: string;
   body: string;
   referenceId: TNullable<string>;
   isRead: boolean;
   createdAt: string;
+}
+
+interface INotificationCounters {
+  receivedFriendRequests: number;
+  sentFriendRequests: number;
+  friends: number;
+  unreadMessages: number;
 }
 
 interface IGameInvite {
@@ -17,14 +25,4 @@ interface IGameInvite {
   inviterName: TNullable<string>;
 }
 
-interface INotificationState {
-  friendRequestCount: number;
-  unreadMessageCount: number;
-  unreadNotificationCount: number;
-  gameInvites: IGameInvite[];
-  notifications: INotificationItem[];
-  dismissGameInvite: (roomId: string) => void;
-  acceptGameInvite: (roomId: string) => Promise<void>;
-}
-
-export type { IGameInvite, INotificationItem, INotificationState };
+export type { IGameInvite, INotificationCounters, INotificationItem };

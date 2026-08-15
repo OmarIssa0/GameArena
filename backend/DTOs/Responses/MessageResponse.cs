@@ -1,11 +1,11 @@
-﻿namespace backend.DTOs.Responses
+namespace backend.DTOs.Responses
 {
-    public class MessageResponse
+    public sealed record MessageResponse
     {
-        public Guid SenderId { get; set; }
-        public Guid ReceiverId { get; set; }
-        public string Content { get; set; } = string.Empty;
-        public DateTime SentAt { get; set; } = DateTime.UtcNow;
-        public bool IsRead { get; set; } = false;
+        public Guid SenderId { get; init; }
+        public Guid ReceiverId { get; init; }
+        public string Content { get; init; } = string.Empty;
+        public DateTime SentAt { get; init; } = DateTime.UtcNow;
+        public bool IsRead { get; init; }
     }
 }

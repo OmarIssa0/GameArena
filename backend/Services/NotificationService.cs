@@ -1,4 +1,4 @@
-﻿using backend.Data;
+using backend.Data;
 using backend.Domain;
 using backend.DTOs.Responses;
 using backend.Enums;
@@ -18,29 +18,50 @@ namespace backend.Services
     {
         public async Task<NotificationCountersResponse> GetCountersAsync(Guid userId)
         {
-            await using var context = await contextFactory.CreateDbContextAsync();
+            var receivedTask = CountReceivedRequestsAsync(userId);
+            var sentTask = CountSentRequestsAsync(userId);
+            var friendsTask = CountFriendsAsync(userId);
+            var unreadTask = CountUnreadMessagesAsync(userId);
 
-            var receivedRequests = await context.FriendRequests
-                .CountAsync(fr => fr.ReceiverId == userId && fr.Status == FriendRequestStatus.Pending);
-
-            var sentRequests = await context.FriendRequests
-                .CountAsync(fr => fr.SenderId == userId && fr.Status == FriendRequestStatus.Pending);
-
-            var friends = await context.UserFriends
-                .CountAsync(uf => uf.UserId == userId && !context.Blocks.Any(b =>
-                    (b.BlockerId == userId && b.BlockedId == uf.FriendId) ||
-                    (b.BlockerId == uf.FriendId && b.BlockedId == userId)));
-
-            var unreadMessages = await context.Messages
-                .CountAsync(m => m.ReceiverId == userId && !m.IsRead);
+            await Task.WhenAll(receivedTask, sentTask, friendsTask, unreadTask);
 
             return new NotificationCountersResponse
             {
-                ReceivedFriendRequests = receivedRequests,
-                SentFriendRequests = sentRequests,
-                Friends = friends,
-                UnreadMessages = unreadMessages
+                ReceivedFriendRequests = receivedTask.Result,
+                SentFriendRequests = sentTask.Result,
+                Friends = friendsTask.Result,
+                UnreadMessages = unreadTask.Result
             };
+        }
+
+        private async Task<int> CountReceivedRequestsAsync(Guid userId)
+        {
+            await using var context = await contextFactory.CreateDbContextAsync();
+            return await context.FriendRequests
+                .CountAsync(fr => fr.ReceiverId == userId && fr.Status == FriendRequestStatus.Pending);
+        }
+
+        private async Task<int> CountSentRequestsAsync(Guid userId)
+        {
+            await using var context = await contextFactory.CreateDbContextAsync();
+            return await context.FriendRequests
+                .CountAsync(fr => fr.SenderId == userId && fr.Status == FriendRequestStatus.Pending);
+        }
+
+        private async Task<int> CountFriendsAsync(Guid userId)
+        {
+            await using var context = await contextFactory.CreateDbContextAsync();
+            return await context.UserFriends
+                .CountAsync(uf => uf.UserId == userId && !context.Blocks.Any(b =>
+                    (b.BlockerId == userId && b.BlockedId == uf.FriendId) ||
+                    (b.BlockerId == uf.FriendId && b.BlockedId == userId)));
+        }
+
+        private async Task<int> CountUnreadMessagesAsync(Guid userId)
+        {
+            await using var context = await contextFactory.CreateDbContextAsync();
+            return await context.Messages
+                .CountAsync(m => m.ReceiverId == userId && !m.IsRead);
         }
 
         public async Task SendCountersAsync(Guid userId)
@@ -118,7 +139,7 @@ namespace backend.Services
                 .AsNoTracking()
                 .ToListAsync();
 
-            return notifications.Select(MapperHelper.ToDto).ToList();
+            return notifications.Select(n => n.ToResponse()).ToList();
         }
 
         public async Task<NotificationResponse> CreateNotificationAsync(Guid userId, string type, string title, string body, string? referenceId = null)
@@ -142,7 +163,7 @@ namespace backend.Services
             context.Notifications.Add(notification);
             await context.SaveChangesAsync();
 
-            var response = MapperHelper.ToDto(notification);
+            var response = notification.ToResponse();
 
             try
             {

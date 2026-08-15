@@ -68,12 +68,7 @@ export function ConnectionProvider({ children }: { children: React.ReactNode }) 
         if (ref.current !== conn) return;
         updateState(hubKey, ConnectionState.Connected);
 
-        if (name === "gameHub") {
-          gameService.handleReconnect();
-        } else if (name === "socialHub") {
-          notificationService.handleReconnect();
-          friendService.handleReconnect();
-          chatService.handleReconnect();
+        if (name === "socialHub") {
           setSocialReconnectKey((k) => k + 1);
         }
       });
@@ -81,37 +76,48 @@ export function ConnectionProvider({ children }: { children: React.ReactNode }) 
         if (ref.current === conn) updateState(hubKey, ConnectionState.Disconnected);
       });
 
-      updateState(hubKey, ConnectionState.Connecting);
+      const connectWithRetry = async (attempt: number) => {
+        updateState(hubKey, ConnectionState.Connecting);
 
-      try {
-        await conn.start();
+        try {
+          await conn.start();
 
-        if (cancelledRef.current || gen !== hubGenRef.current[hubKey]) {
-          conn.stop().catch(() => {});
-          return;
-        }
-
-        updateState(hubKey, ConnectionState.Connected);
-        ref.current = conn;
-
-        if (name === "gameHub") {
-          gameService.setConnection(conn);
-        } else if (name === "socialHub") {
-          notificationService.setConnection(conn);
-          friendService.setConnection(conn);
-          chatService.setConnection(conn);
-        }
-
-        stateSetter(conn);
-      } catch (err) {
-        if (gen === hubGenRef.current[hubKey]) {
-          updateState(hubKey, ConnectionState.Disconnected);
-
-          if (!cancelledRef.current && err instanceof Error && err.message.toLowerCase().includes("unauthorized")) {
-            window.location.replace("/login");
+          if (cancelledRef.current || gen !== hubGenRef.current[hubKey]) {
+            conn.stop().catch(() => {});
+            return;
           }
+
+          updateState(hubKey, ConnectionState.Connected);
+          ref.current = conn;
+
+          if (name === "gameHub") {
+            gameService.setConnection(conn);
+          } else if (name === "socialHub") {
+            notificationService.setConnection(conn);
+            friendService.setConnection(conn);
+            chatService.setConnection(conn);
+          }
+
+          stateSetter(conn);
+        } catch (err) {
+          if (cancelledRef.current || gen !== hubGenRef.current[hubKey]) return;
+
+          if (err instanceof Error && err.message.toLowerCase().includes("unauthorized")) {
+            updateState(hubKey, ConnectionState.Disconnected);
+            window.location.replace("/login");
+            return;
+          }
+
+          if (attempt >= 4) {
+            updateState(hubKey, ConnectionState.Disconnected);
+            return;
+          }
+
+          setTimeout(() => void connectWithRetry(attempt + 1), Math.min(1000 * 2 ** attempt, 15000));
         }
-      }
+      };
+
+      void connectWithRetry(0);
     };
 
     startHub("gameHub", "game", setGameConnection, gameRef);

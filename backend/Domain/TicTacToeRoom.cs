@@ -10,31 +10,16 @@ public class TicTacToeRoom : BaseGameRoom
 
     public TicTacToeRoom() : base(GamesKind.TicTacToe) { }
     public string[] Board { get; set; } = [.. Enumerable.Repeat(".", 9)];
-    public override object GetStatePayload() => new
+    public override object GetStatePayload()
     {
-        roomId = RoomId,
-        gameType = GameType,
-        board = Board,
-        currentTurnPlayerId = CurrentTurnPlayerId,
-        winnerPlayerId = WinnerPlayerId,
-        winnerSymbol = WinnerSymbol,
-        isFinished = IsFinished,
-        hasStarted = HasStarted,
-        isFull = IsFull,
-        isPrivate = IsPrivate,
-        isBotGame = IsBotGame,
-        player1Id = Player1Id,
-        player1Username = Player1Username,
-        player2Id = Player2Id,
-        player2Username = Player2Username,
-        score = Score,
-        boardWidth = 3,
-        boardHeight = 3,
-        winScore = 3,
-        player1Score = Score[0],
-        player2Score = Score[1],
-        tickRateHz = 0
-    };
+        var p = GetBasePayload();
+        p["board"] = Board;
+        p["boardWidth"] = 3;
+        p["boardHeight"] = 3;
+        p["winScore"] = 3;
+        p["tickRateHz"] = 0;
+        return p;
+    }
 
     public override void ResetForNewRound()
     {
@@ -80,10 +65,7 @@ public class TicTacToeRoom : BaseGameRoom
                 return;
             }
 
-            CurrentTurnPlayerId =
-                playerId == Player1Id
-                ? Player2Id!
-                : Player1Id!;
+            SwitchTurn();
         }
     }
 
@@ -92,8 +74,8 @@ public class TicTacToeRoom : BaseGameRoom
         lock (_lock)
         {
             if (WinnerPlayerId != null || CurrentTurnPlayerId == null) return;
-            var botId = Player1Id == "__BOT__" ? Player1Id : Player2Id;
-            if (CurrentTurnPlayerId != botId) return;
+            var botId = GetBotId();
+            if (botId == null || CurrentTurnPlayerId != botId) return;
             var botSymbol = botId == Player1Id ? "X" : "O";
             var botMove = TicTacToeMinimax.GetBestMove(Board, botSymbol);
             if (botMove < 0) return;
@@ -111,7 +93,7 @@ public class TicTacToeRoom : BaseGameRoom
                 return;
             }
 
-            CurrentTurnPlayerId = botId == Player1Id ? Player2Id! : Player1Id!;
+            SwitchTurn();
         }
     }
 

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Bell, X } from "lucide-react";
 
-import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
+import { useDashboardData } from "@/app/providers/DashboardDataProvider";
 import { GButton } from "@/component/common/GButton";
 import { GIcon } from "@/component/common/GIcon";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
@@ -21,7 +21,7 @@ import { en, type TNotificationsTranslation } from "@/app/(dashboard)/notificati
 function NotificationPopup() {
   const router = useRouter();
   const t = useTranslation({ en, ar }) as TNotificationsTranslation;
-  const { notifications } = useDashboardNotifications();
+  const { notifications } = useDashboardData();
   const [visible, setVisible] = useState(false);
   const [dismissedIds, setDismissedIds] = useState<Set<string>>(new Set());
   const timerRef = useRef<TNullable<ReturnType<typeof setTimeout>>>(null);

@@ -6,9 +6,9 @@ import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 import { MatchStatusEnum } from "@/domain/enum/MatchStatusEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 
-import type { MatchHistoryItemProps } from "./def/MatchHistoryItem";
+import type { IMatchHistoryItemProps } from "./def/MatchHistoryItem";
 
-export function MatchHistoryItem({ match, locale, winLabel, lossLabel, drawLabel, versusLabel, gameLabel }: MatchHistoryItemProps) {
+export function MatchHistoryItem({ match, locale, winLabel, lossLabel, drawLabel, versusLabel, gameLabel }: IMatchHistoryItemProps) {
   const game = GamesList[match.kind];
   const isWin = match.result === MatchStatusEnum.Win;
   const isLoss = match.result === MatchStatusEnum.Lost;

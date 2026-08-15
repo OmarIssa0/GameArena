@@ -5,7 +5,7 @@ import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import type { IFriendRequestReceived } from "@/domain/meta/IFriendRequestReceived";
 import type { INotificationItem, IGameInvite } from "@/domain/meta/INotification";
 
-interface SocialPanelContentProps {
+interface ISocialPanelContentProps {
   router: ReturnType<typeof useRouter>;
   activeTab: SocialTabId;
   friends: IUserSummary[];
@@ -20,4 +20,4 @@ interface SocialPanelContentProps {
   t: TSocialPanelTranslation;
 }
 
-export type { SocialPanelContentProps };
+export type { ISocialPanelContentProps };

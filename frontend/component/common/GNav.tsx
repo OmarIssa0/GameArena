@@ -5,7 +5,7 @@ import { forwardRef } from "react";
 import { IndicatorPositionEnum } from "@/domain/enum/IndicatorPositionEnum";
 import { NavOrientationEnum } from "@/domain/enum/NavOrientationEnum";
 import { navIndicator } from "@/domain/constant/nav-indicator";
-import type { GNavProps } from "./def/GNav";
+import type { IGNavProps } from "./def/GNav";
 
 const navBase = {
   itemIdle: "text-text-secondary hover:bg-primary-muted hover:text-text",
@@ -22,7 +22,7 @@ const invertedResponsiveIndicator = {
   idle: "border-s-[3px] border-s-transparent md:border-s-0 md:border-t-[3px] md:border-t-transparent",
 };
 
-const GNav = forwardRef<HTMLDivElement, GNavProps>(
+const GNav = forwardRef<HTMLDivElement, IGNavProps>(
   (
     {
       items,

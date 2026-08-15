@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-interface GTabItem<T extends string | number = string> {
+interface IGTabItem<T extends string | number = string> {
   id: T;
   label?: ReactNode;
   icon?: ReactNode;
@@ -8,18 +8,18 @@ interface GTabItem<T extends string | number = string> {
   disabled?: boolean;
 }
 
-interface GTabsProps<T extends string | number> {
-  tabs: GTabItem<T>[];
+interface IGTabsProps<T extends string | number> {
+  tabs: IGTabItem<T>[];
   value: T;
   onChange: (tabId: T) => void;
   className?: string;
   tabClassName?: string;
   fullWidth?: boolean;
   responsive?: boolean;
-  renderLabel?: (tab: GTabItem<T>, active: boolean) => ReactNode;
-  renderIcon?: (tab: GTabItem<T>, active: boolean) => ReactNode;
-  renderBadge?: (tab: GTabItem<T>, active: boolean) => ReactNode;
+  renderLabel?: (tab: IGTabItem<T>, active: boolean) => ReactNode;
+  renderIcon?: (tab: IGTabItem<T>, active: boolean) => ReactNode;
+  renderBadge?: (tab: IGTabItem<T>, active: boolean) => ReactNode;
   children?: ReactNode;
 }
 
-export type { GTabItem, GTabsProps };
+export type { IGTabItem, IGTabsProps };

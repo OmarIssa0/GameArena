@@ -1,8 +1,8 @@
 
-interface AsideConfig {
+interface IAsideConfig {
   expandedWidth: string;
   collapsedWidth: string;
   label: string;
 }
 
-export type { AsideConfig };
+export type { IAsideConfig };

@@ -1,17 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace backend.DTOs.Requests
 {
-    public class ResetPasswordRequest
-    {
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; } = string.Empty;
+    public record ResetPasswordRequest(
+        [property: Required, EmailAddress] string Email,
+        [property: Required] string Otp,
+        [property: Required] string NewPassword);
 
-        [Required]
-        public string Otp { get; set; } = string.Empty;
-
-        [Required]
-        public string NewPassword { get; set; } = string.Empty;
-    }
 }

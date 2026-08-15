@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
 import { SocialPanel } from "@/component/SocialPanel/SocialPanel";
 import { ConnectionProvider } from "@/app/providers/ConnectionProvider";
 import { GameProvider } from "@/app/providers/GameProvider";
-import { DashboardNotificationsProvider } from "@/app/providers/DashboardNotificationsProvider";
+import { DashboardDataProvider } from "@/app/providers/DashboardDataProvider";
 import { ActiveGameBanner } from "@/component/games/ActiveGameBanner";
 import { NotificationPopup } from "@/component/notification/NotificationPopup";
 import { GSpinner } from "@/component/common/GSpinner";
@@ -41,7 +41,7 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <ConnectionProvider>
       <GameProvider>
-        <DashboardNotificationsProvider>
+        <DashboardDataProvider>
           <div className="flex h-viewport w-full flex-col overflow-hidden bg-bg font-sans text-text antialiased">
             <Header sidebar={sidebarAside} social={socialAside} />
             <div className="flex min-h-0 flex-1 pt-14">
@@ -53,7 +53,7 @@ function DashboardLayout({ children }: { children: React.ReactNode }) {
           </div>
           <NotificationPopup />
           <ActiveGameBanner />
-        </DashboardNotificationsProvider>
+        </DashboardDataProvider>
       </GameProvider>
     </ConnectionProvider>
   );

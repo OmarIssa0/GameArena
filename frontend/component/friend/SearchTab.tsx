@@ -12,7 +12,7 @@ import { GCard } from "@/component/common/GCard";
 import { GIcon } from "@/component/common/GIcon";
 import { GList } from "@/component/common/GList";
 import { GSelect } from "@/component/common/GSelect";
-import { GSpinner } from "@/component/common/GSpinner";
+import { GAsync } from "@/component/common/GAsync";
 import { GTextField } from "@/component/common/GTextField";
 import { CardVariantEnum } from "@/domain/enum/CardVariantEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
@@ -164,17 +164,8 @@ function SearchTab() {
 
       <p className="text-xs text-text-muted">{t.searchTab.hint}</p>
 
-      {searchError && (
-        <GCard padding={SizeEnum.md} className="text-center text-sm text-danger border border-danger/30 bg-danger/5">
-          {searchError}
-        </GCard>
-      )}
-
-      {searching ? (
-        <div className="flex justify-center py-12">
-          <GSpinner />
-        </div>
-      ) : query ? (
+      <GAsync loading={searching} error={query ? searchError : undefined} className="py-12">
+      {query ? (
         <div className="space-y-3">
           {searchResults.length === 0 ? (
             <GCard padding={SizeEnum.lg} className="text-center text-sm text-text-muted">
@@ -213,6 +204,7 @@ function SearchTab() {
           {t.searchTab.emptyHint}
         </GCard>
       )}
+      </GAsync>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import type { IMatchHistory } from "@/domain/meta/IMatchHistory";
 
-interface MatchHistoryItemProps {
+interface IMatchHistoryItemProps {
   match: IMatchHistory;
   locale: string;
   winLabel: string;
@@ -10,4 +10,4 @@ interface MatchHistoryItemProps {
   gameLabel: string;
 }
 
-export type { MatchHistoryItemProps };
+export type { IMatchHistoryItemProps };

@@ -1,6 +1,6 @@
-interface OtpFormProps {
+interface IOtpFormProps {
   email: string;
   onSuccess: (otp: string) => void;
 }
 
-export type { OtpFormProps };
+export type { IOtpFormProps };

@@ -6,9 +6,8 @@ import { Search } from "lucide-react";
 import { UserStatusEnum } from "@/domain/enum/UserStatusEnum";
 
 import { useTranslation } from "@/hooks/useSetting";
-import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
-import { useFriends } from "@/hooks/useFriends";
-import { useAside, type UseAsideReturn } from "@/hooks/useAside";
+import { useDashboardData } from "@/app/providers/DashboardDataProvider";
+import { useAside } from "@/hooks/useAside";
 import { en, type TSocialPanelTranslation } from "@/component/i18n/SocialPanel/en.i18n";
 import { ar } from "@/component/i18n/SocialPanel/ar.i18n";
 import { GIcon } from "@/component/common/GIcon";
@@ -19,16 +18,13 @@ import { SocialTabs, SocialTabId } from "../social/SocialTabs";
 import { SocialPanelContent } from "./SocialPanelContent";
 import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
+import type { ISocialPanelProps } from "./def/SocialPanel";
 
-interface SocialPanelProps {
-  aside?: UseAsideReturn;
-}
-
-function SocialPanel({ aside: asideProp }: SocialPanelProps) {
+function SocialPanel({ aside: asideProp }: ISocialPanelProps) {
   const router = useRouter();
   const t = useTranslation({ en, ar }) as TSocialPanelTranslation;
-  const { friendRequestCount, unreadMessageCount, unreadNotificationCount, gameInvites, notifications } = useDashboardNotifications();
-  const { friends, requests, loading, acceptRequest, declineRequest } = useFriends();
+  const { friendRequestCount, unreadMessageCount, unreadNotificationCount, gameInvites, notifications, friends, requests, loading, acceptRequest, declineRequest } =
+    useDashboardData();
   const asideDefault = useAside(false);
   const aside = asideProp ?? asideDefault;
 

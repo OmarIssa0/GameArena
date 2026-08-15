@@ -3,11 +3,10 @@ import type { HubConnection } from "@microsoft/signalr";
 import type { GamesKindEnum } from "@/domain/enum/GamesKindEnum";
 import type { IGameInvite } from "@/domain/meta/INotification";
 import type { IGameState } from "@/app/providers/def/IGameState";
-import type { IGameService } from "../meta/IGameService";
 import type { TNullable } from "@/domain/type/TCommon";
 import type { Handler } from "../lib/signalRUtils";
 
-class GameService extends SignalRServiceBase implements IGameService {
+class GameService extends SignalRServiceBase {
   private _connectionReady: Promise<void>;
   private _resolveConnectionReady!: () => void;
 

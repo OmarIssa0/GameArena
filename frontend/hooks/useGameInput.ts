@@ -107,6 +107,8 @@ export function useGameInput<T extends HTMLElement>(config: GameInputConfig<T>) 
     };
 
     const handlePointerDown = (e: PointerEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
       touching = true;
       start.x = e.clientX;
       start.y = e.clientY;
@@ -120,6 +122,7 @@ export function useGameInput<T extends HTMLElement>(config: GameInputConfig<T>) 
     };
 
     const handlePointerMove = (e: PointerEvent) => {
+      e.preventDefault();
       if (!touching || config.touchMode !== "follow" || !config.createPositionAction) return;
 
       const y = boardRelativeY(e.clientY);
@@ -134,6 +137,7 @@ export function useGameInput<T extends HTMLElement>(config: GameInputConfig<T>) 
     };
 
     const handlePointerUp = (e: PointerEvent) => {
+      e.preventDefault();
       if (!touching) return;
       touching = false;
       if (config.touchMode !== "swipe") return;
@@ -153,6 +157,7 @@ export function useGameInput<T extends HTMLElement>(config: GameInputConfig<T>) 
     };
 
     const handlePointerCancel = (e: PointerEvent) => {
+      e.preventDefault();
       if (!touching) return;
       touching = false;
       if (config.touchMode === "follow" && board.hasPointerCapture(e.pointerId)) {

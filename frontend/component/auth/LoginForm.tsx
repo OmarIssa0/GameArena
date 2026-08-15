@@ -6,7 +6,7 @@ import { GTextField } from "@/component/common/GTextField";
 import { GButton } from "@/component/common/GButton";
 import { GIcon } from "@/component/common/GIcon";
 import { useState, type SubmitEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { en as EnTextField, type GTextFieldTranslation } from "@/component/i18n/GTextField/en.i18n";
 import { ar as ArTextField } from "@/component/i18n/GTextField/ar.i18n";
 import { useTranslation } from "@/hooks/useSetting";
@@ -24,13 +24,14 @@ import { AccentColorEnum } from "@/domain/enum/AccentColorEnum";
 
 function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const t = useTranslation({
     en: { ...en, ...EnTextField },
     ar: { ...ar, ...ArTextField },
   }) as TLoginTranslation & GTextFieldTranslation;
 
   const { refreshUser } = useAuth();
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(searchParams.get("email") ?? "");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState({

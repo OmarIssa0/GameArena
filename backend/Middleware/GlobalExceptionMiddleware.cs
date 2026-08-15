@@ -1,17 +1,10 @@
-﻿using backend.Utils;
+using backend.Utils;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
-namespace backend.Data
+namespace backend.Middleware
 {
     public class GlobalExceptionMiddleware(RequestDelegate _next, ILogger<GlobalExceptionMiddleware> _logger)
     {
-        private static readonly JsonSerializerOptions _jsonOptions = new()
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-        };
-
         public async Task InvokeAsync(HttpContext context)
         {
             try
@@ -24,7 +17,7 @@ namespace backend.Data
                 var error = ErrorHelper.GetErrorResponse(ex);
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = error.StatusCode;
-                var json = JsonSerializer.Serialize(error.Value, _jsonOptions);
+                var json = JsonSerializer.Serialize(error.Value, JsonDefaults.Options);
                 await context.Response.WriteAsync(json);
             }
         }

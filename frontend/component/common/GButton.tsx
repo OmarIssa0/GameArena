@@ -3,7 +3,7 @@
 import clsx from "clsx";
 import { forwardRef } from "react";
 import { GSpinner } from "./GSpinner";
-import type { GButtonProps } from "./def/GButton";
+import type { IGButtonProps } from "./def/GButton";
 import { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 import { AccentBackGroundEnum } from "@/domain/enum/AccentBackGroundEnum";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
@@ -18,7 +18,7 @@ const variantStyles: Record<ButtonVariantEnum, string> = {
   [ButtonVariantEnum.Danger]: `${AccentBackGroundEnum.Danger} text-on-primary hover:bg-danger`,
 };
 
-const GButton = forwardRef<HTMLButtonElement, GButtonProps>(
+const GButton = forwardRef<HTMLButtonElement, IGButtonProps>(
   (
     {
       children,

@@ -7,7 +7,7 @@ namespace backend.Domain
     {
         public RockPaperScissors() : base(GamesKind.RockPaperScissors) { }
         private readonly Lock _lock = new();
-        private string[] choices = ["Rock", "Paper", "Scissors"];
+        private static readonly string[] Choices = ["Rock", "Paper", "Scissors"];
         public string? Player1Choice { get; set; }
         public string? Player2Choice { get; set; }
 
@@ -18,35 +18,21 @@ namespace backend.Domain
             Player2Choice = null;
         }
 
-        public override object GetStatePayload() => new
+        public override object GetStatePayload()
         {
-            roomId = RoomId,
-            gameType = GameType,
-            currentTurnPlayerId = CurrentTurnPlayerId,
-            winnerPlayerId = WinnerPlayerId,
-            isFinished = IsFinished,
-            hasStarted = HasStarted,
-            isFull = IsFull,
-            isPrivate = IsPrivate,
-            isBotGame = IsBotGame,
-            player1Id = Player1Id,
-            player1Username = Player1Username,
-            player2Id = Player2Id,
-            player2Username = Player2Username,
-            score = Score,
-            winScore = 3,
-            player1Score = Score[0],
-            player2Score = Score[1],
-            boardWidth = 1,
-            boardHeight = 1,
-            tickRateHz = 0,
-            player1Choice = Player1Choice,
-            player2Choice = Player2Choice
-        };
+            var p = GetBasePayload();
+            p["winScore"] = 3;
+            p["boardWidth"] = 1;
+            p["boardHeight"] = 1;
+            p["tickRateHz"] = 0;
+            p["player1Choice"] = Player1Choice;
+            p["player2Choice"] = Player2Choice;
+            return p;
+        }
 
         public override void HandleAction(string playerId, JsonElement action)
         {
-           lock (_lock)
+            lock (_lock)
             {
                 if (action.ValueKind != JsonValueKind.Object
                     || !action.TryGetProperty("type", out var typeProp)
@@ -60,7 +46,7 @@ namespace backend.Domain
                     || !IsFull
                     || playerId != CurrentTurnPlayerId
                     || (playerId != Player1Id && playerId != Player2Id)
-                    || !choices.Contains(choice)
+                    || !Choices.Contains(choice)
                 )
                     return;
 
@@ -85,15 +71,15 @@ namespace backend.Domain
                 bool botIsP1 = Player1Id == "__BOT__";
                 bool botIsP2 = Player2Id == "__BOT__";
                 if (!botIsP1 && !botIsP2) return;
-                var botChoice = new Random().Next(0, 3);
+                var botChoice = Random.Shared.Next(3);
                 if (botIsP1)
                 {
-                    Player1Choice = choices[botChoice];
+                    Player1Choice = Choices[botChoice];
                     CurrentTurnPlayerId = Player2Id;
                 }
                 else if (botIsP2)
                 {
-                    Player2Choice = choices[botChoice];
+                    Player2Choice = Choices[botChoice];
                     DetermineWinner();
                 }
             }

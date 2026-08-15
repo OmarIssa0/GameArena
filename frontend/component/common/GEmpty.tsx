@@ -1,6 +1,6 @@
-import type { GEmptyProps } from "./def/GEmpty";
+import type { IGEmptyProps } from "./def/GEmpty";
 
-function GEmpty({ icon, title, description, children }: GEmptyProps) {
+function GEmpty({ icon, title, description, children }: IGEmptyProps) {
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center">
       {icon && <div className="text-text-muted mb-4">{icon}</div>}

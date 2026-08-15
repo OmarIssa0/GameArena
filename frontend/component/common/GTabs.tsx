@@ -2,12 +2,12 @@
 
 import clsx from "clsx";
 import { GBadge } from "./GBadge";
-import type { GTabsProps } from "./def/GTabs";
+import type { IGTabsProps } from "./def/GTabs";
 import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { GButton } from "./GButton";
 import { ButtonVariantEnum } from "@/domain/enum/ButtonVariantEnum";
 
-function renderTabBadge<T extends string | number>(tab: { id: T; badge?: number }, renderBadge: GTabsProps<T>["renderBadge"], active: boolean) {
+function renderTabBadge<T extends string | number>(tab: { id: T; badge?: number }, renderBadge: IGTabsProps<T>["renderBadge"], active: boolean) {
   if (renderBadge) {
     return renderBadge(tab, active);
   }
@@ -35,7 +35,7 @@ function GTabs<T extends string | number>({
   tabClassName,
   fullWidth,
   children,
-}: GTabsProps<T>) {
+}: IGTabsProps<T>) {
   return (
     <div className={responsive ? "w-full" : undefined}>
       <nav

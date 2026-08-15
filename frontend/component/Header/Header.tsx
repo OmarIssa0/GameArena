@@ -2,9 +2,8 @@
 
 import { Hexagon, Menu, Users } from "lucide-react";
 
-import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
+import { useDashboardData } from "@/app/providers/DashboardDataProvider";
 import { useTranslation } from "@/hooks/useSetting";
-import type { UseAsideReturn } from "@/hooks/useAside";
 
 import { GButton } from "@/component/common/GButton";
 import { GIcon } from "@/component/common/GIcon";
@@ -20,16 +19,12 @@ import { en as sideEn, type TSidebarTranslation } from "@/component/i18n/SideBar
 import { ar as socialAr } from "@/component/i18n/SocialPanel/ar.i18n";
 import { en as socialEn, type TSocialPanelTranslation } from "@/component/i18n/SocialPanel/en.i18n";
 import { useRouter } from "next/navigation";
+import type { IHeaderProps } from "./def/Header";
 
-interface HeaderProps {
-  sidebar?: UseAsideReturn;
-  social?: UseAsideReturn;
-}
-
-function Header({ sidebar, social }: HeaderProps) {
+function Header({ sidebar, social }: IHeaderProps) {
   const t = useTranslation({ en: sideEn, ar: sideAr }) as TSidebarTranslation;
   const st = useTranslation({ en: socialEn, ar: socialAr }) as TSocialPanelTranslation;
-  const { friendRequestCount, unreadMessageCount, unreadNotificationCount, gameInvites } = useDashboardNotifications();
+  const { friendRequestCount, unreadMessageCount, unreadNotificationCount, gameInvites } = useDashboardData();
   const router = useRouter();
   const socialBadge = friendRequestCount + unreadMessageCount + unreadNotificationCount + gameInvites.length;
 
@@ -74,7 +69,7 @@ function Header({ sidebar, social }: HeaderProps) {
           <span className="relative inline-flex">
             <GIcon icon={Users} size={SizeEnum.md} />
             {socialBadge > 0 && (
-              <span className="absolute -top-1 -end-1">
+              <span className="absolute -top-1 -inset-e-1">
                 <GBadge variant={AccentColorEnum.Danger} size={SizeEnum.xs} className="min-w-4 justify-center px-1">
                   {socialBadge > 99 ? "99+" : socialBadge}
                 </GBadge>

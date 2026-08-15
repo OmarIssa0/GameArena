@@ -1,11 +1,11 @@
-﻿using backend.Enums;
+using backend.Enums;
 
 namespace backend.DTOs.Responses
 {
-    public class ApiResponse<T>
+    public sealed record ApiResponse<T>
     {
-        public bool Success { get; set; } = true;
-        public T? Data { get; set; } 
-        public ErrorCode ErrorCode { get; set; } = ErrorCode.None;
+        public bool Success { get; init; } = true;
+        public T? Data { get; init; }
+        public ErrorCode ErrorCode { get; init; } = ErrorCode.None;
     }
 }

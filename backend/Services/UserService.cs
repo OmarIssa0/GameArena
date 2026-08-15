@@ -1,4 +1,4 @@
-﻿using backend.Data;
+using backend.Data;
 using backend.DTOs.Requests;
 using backend.DTOs.Responses;
 using backend.Enums;
@@ -14,7 +14,7 @@ namespace backend.Services
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId) ?? throw new AppException(ErrorCode.UserNotFound);
 
-            return MapperHelper.ToDto(user);
+            return user.ToResponse();
         }
 
         public async Task<List<UserSummaryResponse>> GetUsersAsync(Guid currentUserId, UserFilterRequest? filter)
@@ -23,19 +23,13 @@ namespace backend.Services
 
             var name = filter.Name.Trim().ToLower();
 
-            var query = _context.Users
+            var users = await _context.Users
                 .Where(u => u.Id != currentUserId)
-                .Where(u =>
-                    u.UserName != null && u.UserName.ToLower().Contains(name)
-                );
+                .Where(u => u.UserName != null && u.UserName.ToLower().Contains(name))
+                .Select(u => new UserSummaryResponse(u.Id, u.UserName, u.FirstName, u.LastName, u.Status))
+                .ToListAsync();
 
-            var users = await query.ToListAsync();
-            var results = users.Select(user =>
-            {
-                var dto = MapperHelper.ToDtoSummary(user);
-                dto.Status = _presence.GetStatus(user.Id.ToString());
-                return dto;
-            });
+            var results = users.Select(u => u with { Status = _presence.GetStatus(u.Id.ToString()) });
             if (filter.UserStatus != UserStatus.All)
                 results = results.Where(dto => dto.Status == filter.UserStatus);
             return [.. results];
@@ -49,7 +43,7 @@ namespace backend.Services
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
             await _context.SaveChangesAsync();
-            return MapperHelper.ToDto(user);
+            return user.ToResponse();
         }
 
         public async Task ChangePasswordAsync(Guid userId, string oldPassword, string newPassword)
@@ -64,16 +58,14 @@ namespace backend.Services
         }
 
         public async Task<string?> GetPreferencesAsync(Guid userId)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId) ?? throw new AppException(ErrorCode.UserNotFound);
-            return user.Preferences;
-        }
+            => await _context.Users.Where(u => u.Id == userId).Select(u => u.Preferences).FirstOrDefaultAsync()
+               ?? throw new AppException(ErrorCode.UserNotFound);
 
         public async Task UpdatePreferencesAsync(Guid userId, string preferencesJson)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId) ?? throw new AppException(ErrorCode.UserNotFound);
-            user.Preferences = preferencesJson;
-            await _context.SaveChangesAsync();
+            var rows = await _context.Users.Where(u => u.Id == userId)
+                .ExecuteUpdateAsync(s => s.SetProperty(u => u.Preferences, preferencesJson));
+            if (rows == 0) throw new AppException(ErrorCode.UserNotFound);
         }
     }
 }

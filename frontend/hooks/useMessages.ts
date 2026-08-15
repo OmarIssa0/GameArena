@@ -1,14 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import axios from "axios";
 import { chatService } from "@/services/def/ChatService";
-import { useFriends } from "./useFriends";
+import { useDashboardData } from "@/app/providers/DashboardDataProvider";
 import { useAuth } from "@/app/providers/AuthProvider";
 import { useConnections } from "@/app/providers/ConnectionProvider";
 import type { IMessage } from "@/domain/meta/IMessage";
 import type { IUserSummary } from "@/domain/meta/IUserSummary";
 import type { TNullable } from "@/domain/type/TCommon";
-import { useFetch } from "./useFetch";
 import { useTranslation } from "./useSetting";
 import { ar as messagesAr } from "@/app/(dashboard)/messages/i18n/ar.i18n";
 import { en as messagesEn, type TMessagesTranslation } from "@/app/(dashboard)/messages/i18n/en.i18n";
@@ -28,9 +28,11 @@ export function useMessages(initialFriendId?: TNullable<string>) {
   const { isSocialConnected: isConnected } = useConnections();
   const { user } = useAuth();
   const t = useTranslation({ en: messagesEn, ar: messagesAr }) as TMessagesTranslation;
-  const { friends, loading: friendsLoading } = useFriends();
+  const { friends, loading: friendsLoading } = useDashboardData();
   const [selectedFriendId, setSelectedFriendId] = useState<TNullable<string>>(initialFriendId ?? null);
   const prevInitialRef = useRef(initialFriendId);
+  const loadGenRef = useRef(0);
+  const controllerRef = useRef<TNullable<AbortController>>(null);
 
   useEffect(() => {
     if (initialFriendId && initialFriendId !== prevInitialRef.current) {
@@ -41,24 +43,47 @@ export function useMessages(initialFriendId?: TNullable<string>) {
 
   const [draft, setDraft] = useState("");
   const [localMessages, setLocalMessages] = useState<IMessage[]>([]);
+  const [apiMessages, setApiMessages] = useState<IMessage[]>([]);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [error, setError] = useState<TNullable<string>>(null);
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<TNullable<string>>(null);
 
-  const {
-    data: apiMessages,
-    loading: loadingMessages,
-    error,
-  } = useFetch(
-    () => {
-      if (!selectedFriendId) return Promise.resolve([] as IMessage[]);
-      return chatService.getMessagesByFriendId(selectedFriendId).then((res) => (res.data ?? []).map(normalizeHistoryMessage));
-    },
-    [selectedFriendId],
-    t.error.title,
-  );
+  useEffect(() => {
+    controllerRef.current?.abort();
+    const gen = ++loadGenRef.current;
+
+    if (!selectedFriendId) return;
+
+    const controller = new AbortController();
+    controllerRef.current = controller;
+
+    const timer = setTimeout(() => {
+      setLoadingMessages(true);
+      setError(null);
+
+      chatService
+        .getMessagesByFriendId(selectedFriendId, controller.signal)
+        .then((res) => {
+          if (loadGenRef.current === gen) setApiMessages((res.data ?? []).map(normalizeHistoryMessage));
+        })
+        .catch((err) => {
+          if (loadGenRef.current !== gen || axios.isCancel(err)) return;
+          setError(t.error.title);
+        })
+        .finally(() => {
+          if (loadGenRef.current === gen) setLoadingMessages(false);
+        });
+    }, 0);
+
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
+  }, [selectedFriendId, t]);
 
   const messages = useMemo(() => {
-    const combined = [...(apiMessages ?? []), ...localMessages];
+    const combined = [...apiMessages, ...localMessages];
     return combined.sort((a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime());
   }, [apiMessages, localMessages]);
 
@@ -82,8 +107,15 @@ export function useMessages(initialFriendId?: TNullable<string>) {
   }, [selectedFriendId]);
 
   const selectFriend = useCallback((friendId: TNullable<string>) => {
+    controllerRef.current?.abort();
+    loadGenRef.current++;
     setSelectedFriendId(friendId);
     setLocalMessages([]);
+    if (!friendId) {
+      setApiMessages([]);
+      setLoadingMessages(false);
+      setError(null);
+    }
     setSendError(null);
   }, []);
 

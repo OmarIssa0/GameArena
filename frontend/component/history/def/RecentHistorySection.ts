@@ -1,4 +1,4 @@
-interface RecentHistorySectionProps {
+interface IRecentHistorySectionProps {
   title: string;
   viewAll: string;
   emptyTitle: string;
@@ -6,4 +6,4 @@ interface RecentHistorySectionProps {
   limit?: number;
 }
 
-export type { RecentHistorySectionProps };
+export type { IRecentHistorySectionProps };

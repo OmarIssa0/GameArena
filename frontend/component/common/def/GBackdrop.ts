@@ -1,5 +1,5 @@
-interface GBackdropProps {
+interface IGBackdropProps {
   onClick: () => void;
   className?: string;
 }
-export type { GBackdropProps };
+export type { IGBackdropProps };

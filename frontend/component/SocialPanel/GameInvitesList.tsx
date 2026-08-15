@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useDashboardNotifications } from "@/app/providers/DashboardNotificationsProvider";
+import { useDashboardData } from "@/app/providers/DashboardDataProvider";
 import { useGame } from "@/app/providers/GameProvider";
 import { GButton } from "@/component/common/GButton";
 import { GCard } from "@/component/common/GCard";
@@ -26,7 +26,7 @@ const gamePath = (gameType: number) => GamesList.find((g) => g.type === gameType
 export function GameInvitesList({ onAfterAccept }: IGameInvitesListProps) {
   const router = useRouter();
   const t = useTranslation({ en, ar }) as TSocialPanelTranslation;
-  const { gameInvites, acceptGameInvite, dismissGameInvite } = useDashboardNotifications();
+  const { gameInvites, acceptGameInvite, dismissGameInvite } = useDashboardData();
   const { state, leaveGame } = useGame();
   const [pendingAccept, setPendingAccept] = useState<TNullable<{ roomId: string; path: TOptional<string> }>>(null);
 

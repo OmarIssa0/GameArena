@@ -1,4 +1,4 @@
-﻿using backend.Enums;
+using backend.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace backend.Domain
@@ -27,28 +27,22 @@ namespace backend.Domain
         [MaxLength(100)]
         public string LastName { get; set; } = string.Empty;
 
-
         public UserRole Role { get; set; } = UserRole.User;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public bool IsVerified { get; set; } = false;
+        public bool IsVerified { get; set; }
         public UserStatus Status { get; set; } = UserStatus.Offline;
-        public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
-        
-        public ICollection<Message> SentMessages { get; set; } = new List<Message>();
-        public ICollection<Message> ReceivedMessages { get; set; } = new List<Message>();
-        
+        public ICollection<RefreshToken> RefreshTokens { get; set; } = [];
+        public ICollection<Message> SentMessages { get; set; } = [];
+        public ICollection<Message> ReceivedMessages { get; set; } = [];
 
+        public ICollection<UserFriends> FriendshipsSent { get; set; } = [];
+        public ICollection<UserFriends> FriendshipsReceived { get; set; } = [];
 
-        public ICollection<UserFriends> FriendshipsSent  { get; set; } = new List<UserFriends>();
-        public ICollection<UserFriends> FriendshipsReceived { get; set; } = new List<UserFriends>();
+        public ICollection<FriendRequest> FriendRequestsSent { get; set; } = [];
+        public ICollection<FriendRequest> FriendRequestsReceived { get; set; } = [];
 
-
-        public ICollection<FriendRequest> FriendRequestsSent { get; set; }= new List<FriendRequest>();
-        public ICollection<FriendRequest> FriendRequestsReceived { get; set; } = new List<FriendRequest>();
-
-
-        public ICollection<MatchHistory> MatchesAsPlayer1 { get; set; } = new List<MatchHistory>();
-        public ICollection<MatchHistory> MatchesAsPlayer2 { get; set; } = new List<MatchHistory>();
+        public ICollection<MatchHistory> MatchesAsPlayer1 { get; set; } = [];
+        public ICollection<MatchHistory> MatchesAsPlayer2 { get; set; } = [];
         public string? Preferences { get; set; }
     }
 }

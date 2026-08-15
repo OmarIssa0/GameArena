@@ -85,7 +85,7 @@ function RegisterForm() {
         lastName,
         userName,
       });
-      router.push("/email-verify?email=" + encodeURIComponent(email) + "&password=" + encodeURIComponent(password));
+      router.push("/email-verify?email=" + encodeURIComponent(email));
     } catch (e) {
       const err = e as AxiosError<IApiResponse<unknown>>;
       const data = err?.response?.data;

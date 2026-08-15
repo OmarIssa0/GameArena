@@ -9,9 +9,9 @@ import { SizeEnum } from "@/domain/enum/SizeEnum";
 import { useBusyAction } from "@/hooks/useBusyAction";
 
 import { FriendsList } from "../SocialPanel/FriendsList";
-import type { BlockedUsersTabProps } from "./def/FriendsTab";
+import type { IBlockedUsersTabProps } from "./def/FriendsTab";
 
-function BlockedUsersTab({ blockedUsers, onUnblock, t }: BlockedUsersTabProps) {
+function BlockedUsersTab({ blockedUsers, onUnblock, t }: IBlockedUsersTabProps) {
   const { run, isBusy, busyClass } = useBusyAction();
 
   if (blockedUsers.length === 0) {

@@ -1,7 +1,7 @@
-import type { AsideConfig } from "../AsideTypes";
+import type { IAsideConfig } from "../AsideTypes";
 
-interface AsideWrapperProps {
-  config: AsideConfig;
+interface IAsideWrapperProps {
+  config: IAsideConfig;
   collapsed: boolean;
   header?: React.ReactNode;
   children: React.ReactNode;
@@ -9,4 +9,4 @@ interface AsideWrapperProps {
   className?: string;
 }
 
-export type { AsideWrapperProps };
+export type { IAsideWrapperProps };

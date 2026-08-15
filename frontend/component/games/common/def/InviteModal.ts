@@ -1,6 +1,6 @@
 import type { IUserSummary } from "@/domain/meta/IUserSummary";
 
-interface InviteModalProps {
+interface IInviteModalProps {
   open: boolean;
   searchQuery: string;
   onSearchChange: (q: string) => void;
@@ -14,4 +14,4 @@ interface InviteModalProps {
   noFriendsText: string;
 }
 
-export type { InviteModalProps };
+export type { IInviteModalProps };
