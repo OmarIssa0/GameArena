@@ -3,7 +3,7 @@
 import { useEffect, useRef, type RefObject } from "react";
 import { useGame } from "@/app/providers/GameProvider";
 import { PADDLE_KEYS, DIRECTIONS, type TGameAction } from "@/domain/constant/game-actions";
-import { SWIPE_THRESHOLD_PX, POSITION_SEND_STEP } from "@/domain/constant/game-constants";
+import { SWIPE_THRESHOLD_PX } from "@/domain/constant/game-constants";
 
 type Direction = "UP" | "DOWN" | "LEFT" | "RIGHT";
 
@@ -14,6 +14,11 @@ const OPPOSITE: Record<Direction, Direction> = {
   RIGHT: "LEFT",
 };
 
+export interface IDragPosition {
+  y: number;
+  height: number;
+}
+
 interface GameInputConfig<T extends HTMLElement = HTMLElement> {
   gameKey: "PING_PONG" | "SNAKE";
   isActive: boolean;
@@ -21,8 +26,9 @@ interface GameInputConfig<T extends HTMLElement = HTMLElement> {
   createAction: (direction: Direction) => TGameAction;
   throttleMs: number;
   boardRef?: RefObject<T | null>;
-  touchMode?: "swipe" | "follow";
+  pointerMode?: "swipe" | "drag";
 
+  getCurrentPosition?: () => IDragPosition | null;
   createPositionAction?: (y: number) => TGameAction;
 }
 
@@ -93,85 +99,110 @@ export function useGameInput<T extends HTMLElement>(config: GameInputConfig<T>) 
   }, [config.isActive, sendAction]);
 
   useEffect(() => {
-    const config = configRef.current;
-    if (!config.isActive || !config.touchMode || !config.boardRef?.current) return;
+    if (!config.isActive || !config.pointerMode || !config.boardRef?.current) return;
     const board = config.boardRef.current;
 
-    const start = { x: 0, y: 0 };
-    let touching = false;
-    let lastSentY: number | null = null;
+    let activePointerId: number | null = null;
+    let startPointerX = 0;
+    let startPointerY = 0;
+    let startPaddleY = 0;
+    let paddleHeight = 0;
+    let boardHeightPx = 0;
 
-    const boardRelativeY = (clientY: number): number => {
-      const rect = board.getBoundingClientRect();
-      return Math.min(1, Math.max(0, (clientY - rect.top) / rect.height));
+    const releasePointer = (pointerId: number) => {
+      if (pointerId !== activePointerId) return;
+      activePointerId = null;
+      try {
+        if (board.hasPointerCapture(pointerId)) board.releasePointerCapture(pointerId);
+      } catch {
+        // capture already released
+      }
     };
 
-    const handleTouchStart = (e: TouchEvent) => {
-      if (e.touches.length !== 1) return;
-      touching = true;
-      start.x = e.touches[0].clientX;
-      start.y = e.touches[0].clientY;
-      if (config.touchMode !== "follow" || !config.createPositionAction) return;
-      lastSentY = boardRelativeY(e.touches[0].clientY);
-      lastSendTimeRef.current = Date.now();
-      sendAction(config.createPositionAction(lastSentY));
+    const handlePointerDown = (e: PointerEvent) => {
+      if (!e.isPrimary || activePointerId !== null) return;
+      if (config.pointerMode === "swipe" && e.pointerType !== "touch") return;
+
+      activePointerId = e.pointerId;
+      startPointerX = e.clientX;
+      startPointerY = e.clientY;
+
+      if (config.pointerMode === "drag") {
+        const pos = configRef.current.getCurrentPosition?.() ?? null;
+        if (!pos) {
+          activePointerId = null;
+          return;
+        }
+        const rect = board.getBoundingClientRect();
+        if (rect.height <= 0) {
+          activePointerId = null;
+          return;
+        }
+        boardHeightPx = rect.height;
+        startPaddleY = pos.y;
+        paddleHeight = pos.height;
+        lastSendTimeRef.current = Date.now();
+
+        try {
+          board.setPointerCapture(e.pointerId);
+        } catch {
+          // pointer already released
+        }
+      }
     };
 
-    const handleTouchMove = (e: TouchEvent) => {
-      e.preventDefault();
-      if (!touching || config.touchMode !== "follow" || !config.createPositionAction) return;
-      const touch = e.touches[0];
-      if (!touch) return;
+    const handlePointerMove = (e: PointerEvent) => {
+      if (e.pointerId !== activePointerId) return;
 
-      const y = boardRelativeY(touch.clientY);
-      if (lastSentY !== null && Math.abs(y - lastSentY) < POSITION_SEND_STEP) return;
+      const cfg = configRef.current;
+      if (cfg.pointerMode !== "drag" || !cfg.createPositionAction || e.clientY === startPointerY) return;
+
+      const deltaY = e.clientY - startPointerY;
+      const clampedY = Math.max(0, Math.min(1 - paddleHeight, startPaddleY + deltaY / boardHeightPx));
 
       const now = Date.now();
-      if (now - lastSendTimeRef.current < config.throttleMs) return;
-
-      lastSentY = y;
+      if (now - lastSendTimeRef.current < cfg.throttleMs) return;
       lastSendTimeRef.current = now;
-      sendAction(config.createPositionAction(y));
+      sendAction(cfg.createPositionAction(clampedY));
     };
 
-    const handleTouchEnd = (e: TouchEvent) => {
-      if (!touching) return;
-      touching = false;
-      if (config.touchMode !== "swipe") return;
+    const handlePointerUp = (e: PointerEvent) => {
+      if (e.pointerId !== activePointerId) return;
 
-      const touch = e.changedTouches[0];
-      if (!touch) return;
+      const cfg = configRef.current;
+      if (cfg.pointerMode === "swipe") {
+        const dx = e.clientX - startPointerX;
+        const dy = e.clientY - startPointerY;
+        if (Math.max(Math.abs(dx), Math.abs(dy)) >= SWIPE_THRESHOLD_PX) {
+          const direction = swipeDirection(dx, dy);
+          const last = lastActionRef.current;
+          if (!(last && direction === OPPOSITE[last])) {
+            lastActionRef.current = direction;
+            lastSendTimeRef.current = Date.now();
+            sendAction(cfg.createAction(direction));
+          }
+        }
+      }
 
-      const dx = touch.clientX - start.x;
-      const dy = touch.clientY - start.y;
-      if (Math.max(Math.abs(dx), Math.abs(dy)) < SWIPE_THRESHOLD_PX) return;
-
-      const direction = swipeDirection(dx, dy);
-
-      const last = lastActionRef.current;
-      if (last && direction === OPPOSITE[last]) return;
-
-      lastActionRef.current = direction;
-      lastSendTimeRef.current = Date.now();
-      sendAction(config.createAction(direction));
+      releasePointer(e.pointerId);
     };
 
-    const handleTouchCancel = () => {
-      touching = false;
+    const handlePointerCancel = (e: PointerEvent) => {
+      releasePointer(e.pointerId);
     };
 
-    board.addEventListener("touchstart", handleTouchStart, { passive: true });
-    board.addEventListener("touchmove", handleTouchMove, { passive: false });
-    board.addEventListener("touchend", handleTouchEnd);
-    board.addEventListener("touchcancel", handleTouchCancel);
+    board.addEventListener("pointerdown", handlePointerDown);
+    board.addEventListener("pointermove", handlePointerMove);
+    board.addEventListener("pointerup", handlePointerUp);
+    board.addEventListener("pointercancel", handlePointerCancel);
     return () => {
-      board.removeEventListener("touchstart", handleTouchStart);
-      board.removeEventListener("touchmove", handleTouchMove);
-      board.removeEventListener("touchend", handleTouchEnd);
-      board.removeEventListener("touchcancel", handleTouchCancel);
-      touching = false;
+      board.removeEventListener("pointerdown", handlePointerDown);
+      board.removeEventListener("pointermove", handlePointerMove);
+      board.removeEventListener("pointerup", handlePointerUp);
+      board.removeEventListener("pointercancel", handlePointerCancel);
+      activePointerId = null;
     };
-  }, [config.isActive, config.touchMode, config.boardRef, sendAction]);
+  }, [config.isActive, config.pointerMode, config.boardRef, sendAction]);
 }
 
 function swipeDirection(dx: number, dy: number): Direction {

@@ -51,7 +51,7 @@ function SnakePage() {
     createAction: (dir) => ({ type: GameActionTypes.CHANGE_DIRECTION, direction: dir }),
     throttleMs: INPUT_THROTTLE_MS.SNAKE,
     boardRef,
-    touchMode: "swipe",
+    pointerMode: "swipe",
   });
 
   if (!state || !isSnake) {

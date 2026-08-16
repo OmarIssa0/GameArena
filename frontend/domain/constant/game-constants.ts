@@ -4,7 +4,6 @@ export const INPUT_THROTTLE_MS = {
 } as const;
 
 export const SWIPE_THRESHOLD_PX = 20;
-export const POSITION_SEND_STEP = 0.004;
 
 export const PLAY_AGAIN_TIMEOUT_MS = 30000;
 

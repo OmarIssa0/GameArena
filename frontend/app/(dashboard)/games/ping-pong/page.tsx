@@ -3,6 +3,7 @@
 import { useRef } from "react";
 
 import type { IPingPongGameState } from "@/app/providers/def/IGameState";
+import { useAuth } from "@/app/providers/AuthProvider";
 import { useGame } from "@/app/providers/GameProvider";
 import { GCard } from "@/component/common/GCard";
 import { GameLayoutWrapper } from "@/component/games/GameLayoutWrapper";
@@ -17,6 +18,7 @@ const calculatePercentage = (value: number, total: number) => `${(value / total)
 
 function PingPongPage() {
   const { state } = useGame();
+  const { user } = useAuth();
   const t = useGameTranslation();
   const boardRef = useRef<HTMLDivElement>(null);
 
@@ -39,7 +41,14 @@ function PingPongPage() {
     createPositionAction: (y) => ({ type: GameActionTypes.SET_PADDLE, y }),
     throttleMs: INPUT_THROTTLE_MS.PING_PONG,
     boardRef,
-    touchMode: "follow",
+    pointerMode: "drag",
+    getCurrentPosition: () => {
+      if (!state || !("ball" in state)) return null;
+      const pongState = state as IPingPongGameState;
+      const isPlayer1 = pongState.player1Id === user?.id;
+      const paddle = isPlayer1 ? pongState.player1Paddle : pongState.player2Paddle;
+      return { y: paddle.y / pongState.boardHeight, height: paddle.height / pongState.boardHeight };
+    },
   });
 
   if (!state || !("ball" in state)) {
