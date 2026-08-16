@@ -121,13 +121,12 @@ function SearchTab() {
 
   return (
     <div className="space-y-5">
-      <div className="grid gap-3 lg:grid-cols-[1fr_auto]">
+      <div className="grid gap-3 lg:grid-cols-[1fr_auto] items-end">
         <GTextField
           id="search"
           value={userFilter.name ?? ""}
           onChange={(e) => setUserFilter((prev) => ({ ...prev, name: e.target.value }))}
           placeholder={t.searchTab.placeholder}
-          label={t.searchTab.add}
           startIcon={<GIcon icon={Search} size={SizeEnum.sm} color={AccentColorEnum.Muted} />}
           endIcon={
             userFilter.name && (
@@ -165,45 +164,45 @@ function SearchTab() {
       <p className="text-xs text-text-muted">{t.searchTab.hint}</p>
 
       <GAsync loading={searching} error={query ? searchError : undefined} className="py-12">
-      {query ? (
-        <div className="space-y-3">
-          {searchResults.length === 0 ? (
-            <GCard padding={SizeEnum.lg} className="text-center text-sm text-text-muted">
-              {t.searchTab.noResults}
-            </GCard>
-          ) : (
-            <GList items={searchResults} keyExtractor={(user) => user.id} pageSize={10} listClassName="gap-3">
-              {(user) => (
-                <GCard padding={SizeEnum.sm} className="flex items-center justify-between gap-4">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <GAvatar firstName={user.firstName} lastName={user.lastName} status={user.status} size={SizeEnum.sm} />
-                    <div className="min-w-0">
-                      <p className="truncate font-medium text-text">{displayName(user, t.searchTab.unknownUser)}</p>
-                      <p className="truncate text-xs text-text-muted">{user.userName ? `@${user.userName}` : t.searchTab.noUsername}</p>
+        {query ? (
+          <div className="space-y-3">
+            {searchResults.length === 0 ? (
+              <GCard padding={SizeEnum.lg} className="text-center text-sm text-text-muted">
+                {t.searchTab.noResults}
+              </GCard>
+            ) : (
+              <GList items={searchResults} keyExtractor={(user) => user.id} pageSize={10} listClassName="gap-3">
+                {(user) => (
+                  <GCard padding={SizeEnum.sm} className="flex items-center justify-between gap-4">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <GAvatar firstName={user.firstName} lastName={user.lastName} status={user.status} size={SizeEnum.sm} />
+                      <div className="min-w-0">
+                        <p className="truncate font-medium text-text">{displayName(user, t.searchTab.unknownUser)}</p>
+                        <p className="truncate text-xs text-text-muted">{user.userName ? `@${user.userName}` : t.searchTab.noUsername}</p>
+                      </div>
                     </div>
-                  </div>
 
-                  {user.isSendRequest ? (
-                    <GBadge variant={AccentColorEnum.Muted}>{t.searchTab.requestSent}</GBadge>
-                  ) : (
-                    <GButton
-                      onClick={() => void handleSendRequest(user.id)}
-                      size={SizeEnum.sm}
-                      variant={ButtonVariantEnum.Primary}
-                      startIcon={<GIcon icon={UserPlus} size={SizeEnum.sm} className="text-on-primary" />}>
-                      {t.searchTab.add}
-                    </GButton>
-                  )}
-                </GCard>
-              )}
-            </GList>
-          )}
-        </div>
-      ) : (
-        <GCard variant={CardVariantEnum.Outlined} padding={SizeEnum.lg} className="text-center text-sm text-text-muted border-dashed">
-          {t.searchTab.emptyHint}
-        </GCard>
-      )}
+                    {user.isSendRequest ? (
+                      <GBadge variant={AccentColorEnum.Muted}>{t.searchTab.requestSent}</GBadge>
+                    ) : (
+                      <GButton
+                        onClick={() => void handleSendRequest(user.id)}
+                        size={SizeEnum.sm}
+                        variant={ButtonVariantEnum.Primary}
+                        startIcon={<GIcon icon={UserPlus} size={SizeEnum.sm} className="text-on-primary" />}>
+                        {t.searchTab.add}
+                      </GButton>
+                    )}
+                  </GCard>
+                )}
+              </GList>
+            )}
+          </div>
+        ) : (
+          <GCard variant={CardVariantEnum.Outlined} padding={SizeEnum.lg} className="text-center text-sm text-text-muted border-dashed">
+            {t.searchTab.emptyHint}
+          </GCard>
+        )}
       </GAsync>
     </div>
   );

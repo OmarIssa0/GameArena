@@ -10,7 +10,7 @@ const ar = {
       email: "البريد الإلكتروني",
       save: "حفظ التغييرات",
       saved: "تم تحديث الملف الشخصي بنجاح",
-      saveFailed: "فشل حفظ الملف الشخصي"
+      saveFailed: "فشل حفظ الملف الشخصي",
     },
     password: {
       title: "تغيير كلمة المرور",
@@ -21,7 +21,7 @@ const ar = {
       save: "تحديث كلمة المرور",
       saved: "تم تغيير كلمة المرور بنجاح",
       saveFailed: "فشل تغيير كلمة المرور",
-      invalidCurrentPassword: "كلمة المرور الحالية غير صحيحة"
+      invalidCurrentPassword: "كلمة المرور الحالية غير صحيحة",
     },
     preferences: {
       title: "التفضيلات",
@@ -35,10 +35,8 @@ const ar = {
       showOnline: "إظهار حالة الاتصال",
       showGameActivity: "إظهار نشاط اللعب",
       showNotifications: "إظهار الإشعارات",
-      pageSize: "حجم الصفحة"
-    }
-  }
-}
-;
-
+      recordsPerPage: "عدد السجلات في الصفحة",
+    },
+  },
+};
 export { ar };

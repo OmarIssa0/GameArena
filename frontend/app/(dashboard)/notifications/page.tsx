@@ -139,7 +139,7 @@ export default function NotificationsPage() {
         onDismiss: () => declineRequest(r.senderId),
       });
     }
-    out.sort((a, b) => Number(a.read) - Number(b.read));
+    out.sort((a, b) => +a.read - +b.read);
     return out;
   }, [notifications, gameInvites, requests, t, acceptGameInvite, dismissGameInvite, acceptRequest, declineRequest]);
 

@@ -37,7 +37,7 @@ function GTabs<T extends string | number>({
   children,
 }: IGTabsProps<T>) {
   return (
-    <div className={responsive ? "w-full" : undefined}>
+    <div className={responsive ? "w-full mb-3" : undefined}>
       <nav
         aria-orientation={responsive ? undefined : "horizontal"}
         className={clsx(

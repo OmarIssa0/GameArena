@@ -24,7 +24,7 @@ function GameReady({ gameType }: IGameReadyProps) {
   const gameInfo = getGameConfig(gameType);
 
   return (
-    <div className="flex items-center justify-center min-h-40 p-4">
+    <div className="flex items-center justify-center p-4">
       <GCard padding={SizeEnum.lg} className="w-full max-w-lg text-center">
         <h2 className="text-2xl font-bold text-text mb-6">{t.ready.title}</h2>
 

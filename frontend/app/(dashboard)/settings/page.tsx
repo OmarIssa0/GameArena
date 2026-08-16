@@ -272,7 +272,7 @@ function SettingsPage() {
             </div>
             <GTextField
               type="checkbox"
-              className="size-5"
+              className="px-6"
               aria-label={t.settings.preferences.darkMode}
               checked={theme === ThemeEnum.Dark}
               onChange={(e) => setTheme(e.target.checked ? ThemeEnum.Dark : ThemeEnum.Light)}
@@ -304,7 +304,7 @@ function SettingsPage() {
               </div>
               <GTextField
                 type="checkbox"
-                className="size-5"
+                className="px-6"
                 aria-label={item.label}
                 checked={preferences[item.key] as boolean}
                 onChange={() => togglePref(item.key)}
@@ -315,14 +315,14 @@ function SettingsPage() {
           <div className="flex items-center justify-between py-3 border-b border-border">
             <div className="flex items-center gap-3">
               <GIcon icon={List} size={SizeEnum.sm} />
-              <span className="text-sm text-text">{t.settings.preferences.pageSize}</span>
+              <span className="text-sm text-text">{t.settings.preferences.recordsPerPage}</span>
             </div>
             <GSelect
               className="w-20"
-              aria-label={t.settings.preferences.pageSize}
+              aria-label={t.settings.preferences.recordsPerPage}
               value={preferences.pageSize}
               options={pageSizeOptions.map((n) => ({ value: n, label: `${n}` }))}
-              onChange={(e) => setPreferences((prev) => ({ ...prev, pageSize: Number(e.target.value) }))}
+              onChange={(e) => setPreferences((prev) => ({ ...prev, pageSize: +e.target.value }))}
             />
           </div>
 

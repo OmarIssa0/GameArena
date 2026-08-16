@@ -46,7 +46,7 @@ function GameActive({ children, gameType }: IGameActiveProps) {
   );
 
   return (
-    <div className="flex items-center justify-center min-h-40 p-4">
+    <div className="flex items-center justify-center p-4">
       <div className="w-full max-w-xl space-y-6">
         <GamePlayersHeader gameType={gameType} />
 

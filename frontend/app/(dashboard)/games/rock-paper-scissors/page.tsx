@@ -65,7 +65,7 @@ function RockPaperScissorsPage() {
           </div>
         </div>
 
-        <GList items={CHOICE_ITEMS} keyExtractor={(item) => item.id} listClassName="grid grid-cols-3 gap-4 mb-6">
+        <GList items={CHOICE_ITEMS} keyExtractor={(item) => item.id} listClassName="grid grid-cols-3 gap-4 mb-6 text-center">
           {({ id, labelKey, emoji }) => (
             <GButton
               onClick={() => handleChoice(id)}

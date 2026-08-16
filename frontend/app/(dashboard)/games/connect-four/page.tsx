@@ -58,10 +58,9 @@ function ConnectFourPage() {
           </div>
         </div>
 
-        <GList items={[1, 2, 3, 4, 5, 6, 7]} keyExtractor={(item) => `${item}`} listClassName="grid grid-cols-7 gap-1">
+        <GList items={[1, 2, 3, 4, 5, 6, 7]} keyExtractor={(item) => `${item}`} listClassName="grid grid-cols-7 gap-1 text-center p-4">
           {(item) => {
             const isColFull = board[item - 1][0] !== CellEnum.None;
-
             return (
               <GButton
                 onClick={() => sendAction({ type: GameActionTypes.PLACE, col: item - 1 })}

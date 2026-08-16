@@ -35,7 +35,7 @@ const en = {
       showOnline: "Show Online Status",
       showGameActivity: "Show Game Activity",
       showNotifications: "Show Notifications",
-      pageSize: "Page Size"
+      recordsPerPage: "Records per Page",
     }
   }
 }

@@ -71,7 +71,7 @@ class FriendService extends SignalRServiceBase {
   }
 
   sendFriendRequest(friendId: string): TPromise<void> {
-    return this.api.sendFriendRequest<void>(friendId);
+    return this.api.sendFriendRequest<void>({ friendId });
   }
 
   getReceivedFriendRequests(): TPromise<IFriendRequestReceived[]> {
@@ -89,27 +89,27 @@ class FriendService extends SignalRServiceBase {
   }
 
   acceptFriendRequest(senderId: string): TPromise<void> {
-    return this.api.acceptFriendRequest<void>(senderId);
+    return this.api.acceptFriendRequest<void>({ senderId });
   }
 
   rejectFriendRequest(senderId: string): TPromise<void> {
-    return this.api.rejectFriendRequest<void>(senderId);
+    return this.api.rejectFriendRequest<void>({ senderId });
   }
 
   cancelFriendRequest(receiverId: string): TPromise<void> {
-    return this.api.cancelFriendRequest<void>(receiverId);
+    return this.api.cancelFriendRequest<void>({ receiverId });
   }
 
   removeFriend(friendId: string): TPromise<void> {
-    return this.api.removeFriend<void>(friendId);
+    return this.api.removeFriend<void>({ friendId });
   }
 
   blockUser(blockedId: string): TPromise<void> {
-    return this.api.blockUser<void>(blockedId);
+    return this.api.blockUser<void>({ blockedId });
   }
 
   unblockUser(blockedId: string): TPromise<void> {
-    return this.api.unblockUser<void>(blockedId);
+    return this.api.unblockUser<void>({ blockedId });
   }
 
   onFriendListUpdate(handler: (friends: IUserSummary[]) => void): () => void {

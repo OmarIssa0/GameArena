@@ -55,18 +55,14 @@ function TicTacToePage() {
             <div className="text-xs text-text-muted">{PLAYER_O}</div>
           </div>
         </div>
-        <GList items={cells} keyExtractor={(item) => item.index.toString()} listClassName="grid grid-cols-3 gap-3">
+        <GList items={cells} keyExtractor={(item) => item.index.toString()} listClassName="grid grid-cols-3 gap-3 text-center">
           {({ index, cell }) => (
             <GButton
               onClick={() => sendAction({ type: GameActionTypes.MAKE_MOVE, cell: index })}
               disabled={!isCellPlayable(cell)}
               size={SizeEnum.xl}
               rounded={SizeEnum.md}
-              className={clsx(
-                "aspect-square",
-                cell === PLAYER_X && "text-accent",
-                cell === PLAYER_O && "text-warning",
-              )}
+              className={clsx("aspect-square", cell === PLAYER_X && "text-accent", cell === PLAYER_O && "text-warning")}
               variant={cell === BOARD_EMPTY ? ButtonVariantEnum.Secondary : ButtonVariantEnum.Subtle}>
               {cell === PLAYER_X && <span className="text-accent">{PLAYER_X}</span>}
               {cell === PLAYER_O && <span className="text-warning">{PLAYER_O}</span>}
@@ -80,5 +76,3 @@ function TicTacToePage() {
 }
 
 export default TicTacToePage;
-
-

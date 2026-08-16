@@ -29,7 +29,7 @@ function GameLayoutWrapper({ children, gameType }: IGameLayoutWrapperProps) {
   const stage = resolveStage(state, isConnected, isSearching);
 
   if (stage === "loading") {
-    return <GAsync loading spinnerSize={SizeEnum.lg} spinnerLabel={isSearching ? t.lobby.searchingTitle : undefined} className="min-h-40 p-4" />;
+    return <GAsync loading spinnerSize={SizeEnum.lg} spinnerLabel={isSearching ? t.lobby.searchingTitle : undefined} className="p-4" />;
   }
   if (stage === "entry") return <GameEntry gameType={gameType} />;
   if (stage === "lobby") return <GameLobby gameType={gameType} />;
